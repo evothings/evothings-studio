@@ -1,0 +1,16 @@
+{
+  "main": "application/hyper-ui.html",
+  "name": "EvoStudio",
+  "description": "HTML/JS IoT mobile app development tool",
+  "version": "__VERSION__",
+  "keywords": ["EvoStudio", "HyperReload", "mobile", "JavaScript"],
+  "window": 
+  {
+    "title": "EvoStudio __VERSION__",
+    "toolbar": true,
+    "frame": true,
+    "width": 580,
+    "height": 600,
+    "position": "mouse"
+  }
+}
