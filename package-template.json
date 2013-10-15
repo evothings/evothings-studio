@@ -7,7 +7,7 @@
   "window": 
   {
     "title": "EvoStudio __VERSION__",
-    "toolbar": true,
+    "toolbar": false,
     "frame": true,
     "width": 580,
     "height": 600,
