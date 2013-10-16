@@ -3,7 +3,7 @@
 
 # Destination folder for distribution packages.
 def pathDist
-	"../EvoStudio " + version + "/"
+	"../../EvoStudio " + version + "/"
 end
 
 # Destination temporary folder for application code.
@@ -13,7 +13,7 @@ end
 
 # Source of main HyperReload application code.
 def pathSourceHyper
-	"../HyperReload/UI/"
+	"../../HyperReload/UI/"
 end
 
 # Source file for package.json.
@@ -23,7 +23,7 @@ end
 
 # Source file for LICENSE.md.
 def pathSourceLicense
-	"./LICENSE"
+	"../LICENSE"
 end
 
 # Source of main demo apps.
@@ -46,19 +46,19 @@ def distPackageName
 end
 
 def pathNodeWebkitLinux32
-	"../node-webkit-bin/node-webkit-v0.7.5-linux-ia32/"
+	"../../node-webkit-bin/node-webkit-v0.7.5-linux-ia32/"
 end
 
 def pathNodeWebkitLinux64
-	"../node-webkit-bin/node-webkit-v0.7.5-linux-x64/"
+	"../../node-webkit-bin/node-webkit-v0.7.5-linux-x64/"
 end
 
 def pathNodeWebkitWin
-	"../node-webkit-bin/node-webkit-v0.7.5-win-ia32/"
+	"../../node-webkit-bin/node-webkit-v0.7.5-win-ia32/"
 end
 
 def pathNodeWebkitMac
-	"../node-webkit-bin/node-webkit-v0.7.5-osx-ia32/"
+	"../../node-webkit-bin/node-webkit-v0.7.5-osx-ia32/"
 end
 
 def buildPostProcess
