@@ -6,7 +6,7 @@ require "pathname"
 
 def startBuild
 	FileUtils.copy_entry(
-		"../HyperReload/UI/buildHyper.rb", 
+		"../../HyperReload/UI/buildHyper.rb", 
 		"./buildHyper.rb")
 
 	load("buildHyper.rb")
