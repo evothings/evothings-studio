@@ -62,4 +62,12 @@ def pathNodeWebkitMac
 end
 
 def buildPostProcess
+	# Copy EvoStudio-specific files to dist.
+	FileUtils.copy_entry(
+		"./application/hyper-ui.html", 
+		pathDistSource + "application/hyper-ui.html")
+	FileUtils.copy_entry(
+		"./application/hyper-ui.css", 
+		pathDistSource + "application/hyper-ui.css")
+	# TODO: Copy EvoStudio license file.
 end
