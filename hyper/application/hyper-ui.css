@@ -1,0 +1,140 @@
+body
+{
+	font-family: sans-serif;
+}
+
+#panel-page
+{
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+}
+
+#panel-top
+{
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	right: 0px;
+	margin-top: 4px;
+	height: 36px;
+}
+
+#panel-tool-menu
+{
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	right: 0px;
+	margin-left: 4px;
+	margin-right: 4px;
+}
+
+#button-workbench, #button-documentation, #button-store
+{
+	/* If you remove the store button, change width from 33.33% to 50%. */
+	width: 50%;
+	height: 36px;
+	font-size: 18px;
+	/*font-weight: bold;*/
+}
+
+#panel-middle
+{
+	position: absolute;
+	left: 0;
+	top: 42px;
+	bottom: 0px;
+	width: 100%;
+	overflow: auto;
+}
+
+#panel-bottom
+{
+	position: absolute;
+	left: 0;
+	bottom: 0px;
+	width: 100%;
+	height: 40px;
+	background-color: rgba(200,200,200,1);
+}
+
+#panel-bottom div
+{
+	padding: 10px 10px 10px 10px;
+}
+
+#panel-bottom div span
+{
+	font-weight: bold;
+}
+
+#project-list
+{
+	position: relative;
+	margin: 0; 
+	padding: 0px 0px 50px 0px;
+	width: 100%;
+}
+
+#project-list div 
+{ 
+	position: relative;
+	margin: 5px; 
+	padding: 0 10px;
+	min-height: 40px;
+	border: 1px solid #000000;
+	cursor: pointer;
+	overflow: hidden;
+}
+
+.button-run
+{
+	position: absolute;
+	right: 20px;
+	top: 10px;
+	bottom: 10px;
+	width: 80px;
+	font-weight: bold;
+}
+
+.button-open
+{
+	position: absolute;
+	right: 110px;
+	top: 10px;
+	bottom: 10px;
+	width: 80px;
+	font-weight: bold;
+}
+
+.button-delete
+{
+	position: absolute;
+	right: 4px;
+	top: 2px;
+}
+
+#drag-overlay
+{
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	margin: 0px;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(100,255,100,0.0);
+	display: none;
+}
+
+#drag-overlay div
+{
+	position: absolute;
+	left: 40px;
+	top: 40px;
+	right: 40px;
+	padding: 20px;
+	border: 1px solid #000000;
+	background-color: rgba(255,255,255,0.7);
+}
