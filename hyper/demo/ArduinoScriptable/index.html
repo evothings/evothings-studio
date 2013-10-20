@@ -41,12 +41,11 @@ WiFi shield for this example to work. See comment below in the code.
             <textarea class="form-control input-lg" id="ArduinoScript" rows="10">
 // Loop turning a LED on/off.
 arduino.pinMode(5, OUTPUT)
+var state = LOW
 var timerId = setInterval(function() {
-  arduino.digitalWrite(5, HIGH)
-  arduino.delay(1000)
-  arduino.digitalWrite(5, LOW)
-  arduino.delay(1000)
-}, 0)
+  state = !state
+  arduino.digitalWrite(5, state)
+}, 1000)
 // Terminate loop after 10 seconds.
 setTimeout(function() { clearInterval(timerId) }, 10000)
             </textarea>
@@ -101,8 +100,8 @@ setTimeout(function() { clearInterval(timerId) }, 10000)
 
     var OUTPUT = 1
     var INPUT = 2
-    var HIGH = 1
-    var LOW = 2
+    var HIGH = true
+    var LOW = false
 
     arduino.callbackFun = function(data, error)
     {
