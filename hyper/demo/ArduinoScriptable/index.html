@@ -39,15 +39,13 @@ WiFi shield for this example to work. See comment below in the code.
         <div class="form-group">
             <p class="lead">Script your Arduino using JavaScript!</p>
             <textarea class="form-control input-lg" id="ArduinoScript" rows="10">
-// Loop turning a LED on/off.
+// Timeout loop turning a LED on/off.
 arduino.pinMode(5, OUTPUT)
-var state = LOW
-var timerId = setInterval(function() {
-  state = !state
-  arduino.digitalWrite(5, state)
-}, 1000)
-// Terminate loop after 10 seconds.
-setTimeout(function() { clearInterval(timerId) }, 10000)
+function UpdateLed(n) {
+  arduino.digitalWrite(5, n%2)
+  n && setTimeout(UpdateLed, 1000, n-1)
+}
+UpdateLed(10)
             </textarea>
         </div>
         <div class="form-group">
@@ -59,6 +57,7 @@ setTimeout(function() { clearInterval(timerId) }, 10000)
 
     <script src="libs/jquery-2.0.3.js"></script>
     <script src="libs/bootstrap-3.0.0/js/bootstrap.min.js"></script>
+    <script src="arduino.js"></script>
     <script>
     var app = {}
 
@@ -79,66 +78,11 @@ setTimeout(function() { clearInterval(timerId) }, 10000)
         window.location.reload(false)
     }
 
-    app.getArduinoIpAddress = function()
+	// Redefine the arduino.getIpAddress function to
+	// get the value of the IP address text field.
+    arduino.getIpAddress = function()
     {
         return $('#ArduinoIpAddress').val()
-    }
-
-    app.sendRequest = function(command, callbackFun)
-    {
-        $.ajax({
-            type: 'GET',
-            dataType: 'text',
-            timeout: 3000,
-            url: 'http://' + app.getArduinoIpAddress() + '/' + command,
-            success: function(data) { callbackFun(data) },
-            error: function(a, err) { callbackFun(null, err) }
-        })
-    }
-
-    var arduino = {}
-
-    var OUTPUT = 1
-    var INPUT = 2
-    var HIGH = true
-    var LOW = false
-
-    arduino.callbackFun = function(data, error)
-    {
-    }
-
-    arduino.digitalWrite = function(pin, value)
-    {
-        if (value == HIGH)
-        {
-            app.sendRequest('H' + pin, arduino.callbackFun)
-        }
-        else if (value == LOW)
-        {
-            app.sendRequest('L' + pin, arduino.callbackFun)
-        }
-    }
-
-    arduino.pinMode = function(pin, mode)
-    {
-        if (mode == OUTPUT)
-        {
-            app.sendRequest('O' + pin, arduino.callbackFun)
-        }
-        else if (mode == INPUT)
-        {
-            app.sendRequest('I' + pin, arduino.callbackFun)
-        }
-    }
-
-    arduino.delay = function(ms)
-    {
-        app.sendRequest('D' + ms, arduino.callbackFun)
-    }
-
-    arduino.digitalRead = function(n, fun)
-    {
-        app.sendRequest('R' + n, fun)
     }
     </script>
 </body>

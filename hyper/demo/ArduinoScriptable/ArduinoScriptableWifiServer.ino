@@ -28,10 +28,6 @@ READ pin n: GET /Rn
 Response: "H" (HIGH) or "L" (LOW)
 Example: R5 -> H
 
-DELAY for n milliseconds: GET /Dn
-Response: "OK"
-Example: D1000 -> OK
-
 Created October 20, 2013
 Mikael Kindborg, EvoThings AB
 */
@@ -148,12 +144,6 @@ void executeRequest(WiFiClient* client, String* request)
     {
         digitalWrite(n, HIGH);
         sendResponse(client, "OK");
-    }
-	else if ('D' == command)
-    {
-        delay(n);
-        sendResponse(client, "OK");
-
     }
 	else if ('R' == command)
     {
