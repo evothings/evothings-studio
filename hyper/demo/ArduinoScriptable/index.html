@@ -7,38 +7,38 @@ Please note that you must enter the IP-address of the Arduino
 WiFi shield for this example to work. See comment below in the code.
 -->
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=1">
-	<title>Arduino Scriptable</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=1">
+    <title>Arduino Scriptable</title>
     <link href="libs/bootstrap-3.0.0/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <style>
     html, body
     {
-		margin: 20px 20px;
-		background-color: rgb(255,255,255);
-	}
-	div
-	{
-		margin: 10px 0px;
-	}
-	.lead
-	{
-		font-weight: bold;
-	}
-	</style>
+        margin: 20px 20px;
+        background-color: rgb(255,255,255);
+    }
+    div
+    {
+        margin: 10px 0px;
+    }
+    .lead
+    {
+        font-weight: bold;
+    }
+    </style>
 </head>
 <body>
-	<h1>Arduino Scriptable</h1>
+    <h1>Arduino Scriptable</h1>
 
-		<div class="form-group">
-			<p class="lead">Enter IP-address of the Arduino:</p>
-			<input type="text" class="form-control input-lg" id="ArduinoIpAddress"
-				value="192.168.0.x" type="url"/>
-		</div>
+        <div class="form-group">
+            <p class="lead">Enter IP-address of the Arduino:</p>
+            <input type="text" class="form-control input-lg" id="ArduinoIpAddress"
+                value="192.168.0.x" type="url"/>
+        </div>
 
-		<div class="form-group">
-		<p class="lead">Script your Arduino using JavaScript!</p>
-  			<textarea class="form-control input-lg" id="ArduinoScript" rows="10">
+        <div class="form-group">
+            <p class="lead">Script your Arduino using JavaScript!</p>
+            <textarea class="form-control input-lg" id="ArduinoScript" rows="10">
 // Loop turning a LED on/off.
 arduino.pinMode(5, OUTPUT)
 var timerId = setInterval(function() {
@@ -49,98 +49,98 @@ var timerId = setInterval(function() {
 }, 0)
 // Terminate loop after 10 seconds.
 setTimeout(function() { clearInterval(timerId) }, 10000)
-  			</textarea>
-		</div>
-		<div class="form-group">
-  			<button class="btn btn-lg btn-success" onclick="app.runScript()">
-  				Run Script</button>
-  			<button class="btn btn-lg btn-primary" onclick="app.reset()">
-  				Reset</button>
-		</div>
+            </textarea>
+        </div>
+        <div class="form-group">
+            <button class="btn btn-lg btn-success" onclick="app.runScript()">
+                Run Script</button>
+            <button class="btn btn-lg btn-primary" onclick="app.reset()">
+                Reset</button>
+        </div>
 
     <script src="libs/jquery-2.0.3.js"></script>
     <script src="libs/bootstrap-3.0.0/js/bootstrap.min.js"></script>
-	<script>
-	var app = {}
+    <script>
+    var app = {}
 
-	app.runScript = function()
-	{
-		try
-		{
-			eval($('#ArduinoScript').val())
-		}
-		catch (err)
-		{
-			alert(err)
-		}
-	}
+    app.runScript = function()
+    {
+        try
+        {
+            eval($('#ArduinoScript').val())
+        }
+        catch (err)
+        {
+            alert(err)
+        }
+    }
 
-	app.reset = function()
-	{
-		window.location.reload(false)
-	}
+    app.reset = function()
+    {
+        window.location.reload(false)
+    }
 
-	app.getArduinoIpAddress = function()
-	{
-		return $('#ArduinoIpAddress').val()
-	}
+    app.getArduinoIpAddress = function()
+    {
+        return $('#ArduinoIpAddress').val()
+    }
 
-	app.sendRequest = function(command, callbackFun)
-	{
-		$.ajax({
-			type: 'GET',
-			dataType: 'text',
+    app.sendRequest = function(command, callbackFun)
+    {
+        $.ajax({
+            type: 'GET',
+            dataType: 'text',
             timeout: 3000,
-			url: 'http://' + app.getArduinoIpAddress() + '/' + command,
-			success: function(data) { callbackFun(data) },
-			error: function(a, err) { callbackFun(null, err) }
-		})
-	}
+            url: 'http://' + app.getArduinoIpAddress() + '/' + command,
+            success: function(data) { callbackFun(data) },
+            error: function(a, err) { callbackFun(null, err) }
+        })
+    }
 
-	var arduino = {}
+    var arduino = {}
 
-	var OUTPUT = 1
-	var INPUT = 2
-	var HIGH = 1
-	var LOW = 2
+    var OUTPUT = 1
+    var INPUT = 2
+    var HIGH = 1
+    var LOW = 2
 
-	arduino.callbackFun = function(data, error)
-	{
-	}
+    arduino.callbackFun = function(data, error)
+    {
+    }
 
-	arduino.digitalWrite = function(pin, value)
-	{
-		if (value == HIGH)
-		{
-			app.sendRequest('H' + pin, arduino.callbackFun)
-		}
-		else if (value == LOW)
-		{
-			app.sendRequest('L' + pin, arduino.callbackFun)
-		}
-	}
+    arduino.digitalWrite = function(pin, value)
+    {
+        if (value == HIGH)
+        {
+            app.sendRequest('H' + pin, arduino.callbackFun)
+        }
+        else if (value == LOW)
+        {
+            app.sendRequest('L' + pin, arduino.callbackFun)
+        }
+    }
 
-	arduino.pinMode = function(pin, mode)
-	{
-		if (mode == OUTPUT)
-		{
-			app.sendRequest('O' + pin, arduino.callbackFun)
-		}
-		else if (mode == INPUT)
-		{
-			app.sendRequest('I' + pin, arduino.callbackFun)
-		}
-	}
+    arduino.pinMode = function(pin, mode)
+    {
+        if (mode == OUTPUT)
+        {
+            app.sendRequest('O' + pin, arduino.callbackFun)
+        }
+        else if (mode == INPUT)
+        {
+            app.sendRequest('I' + pin, arduino.callbackFun)
+        }
+    }
 
-	arduino.delay = function(ms)
-	{
-		app.sendRequest('D' + ms, arduino.callbackFun)
-	}
+    arduino.delay = function(ms)
+    {
+        app.sendRequest('D' + ms, arduino.callbackFun)
+    }
 
-	arduino.digitalRead = function(n, fun)
-	{
-		app.sendRequest('R' + n, fun)
-	}
-	</script>
+    arduino.digitalRead = function(n, fun)
+    {
+        app.sendRequest('R' + n, fun)
+    }
+    </script>
 </body>
 </html>
