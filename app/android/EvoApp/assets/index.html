@@ -25,15 +25,15 @@
 	</div>
     <div>
 		<p>
-        	<input id="IpAddressField" class="form-control input-lg" value="192.168.0.x" type="url" size="30"/>
+        	<input id="IpAddressField" class="form-control input-lg" value="192.168.0.x" type="url"/>
         </p>
 		<p>
         	<button type="button" class="btn btn-lg btn-primary" onclick="DoConnect()">Connect</button>
 		</p>
-		<!-- 
+		<!--
 		<p>
         	<button id="ScanButton" type="button" class="btn btn-lg btn-primary" onclick="DoScan()">Scan</button>
-		</p>  
+		</p>
 		-->
     </div>
 </div>
@@ -61,26 +61,26 @@ function ParseIpAddress(ip)
     	// Add protocol.
     	url = 'http://' + url
     }
-    
+
     if (!url.match('^https?://[A-Z0-9\.]*:[0-9]*$'))
     {
     	// Add port
     	url = url + ':4042'
     }
-    
+
     if (!url.match('^https?://[A-Z0-9\.]*:[0-9]*$'))
     {
     	// Wrong format.
     	return null
     }
-    
+
 	return url
 }
 
 function SetSavedIpAddress()
 {
 	var ip = localStorage.getItem('RecentIpAddress')
-	if (ip) 
+	if (ip)
 	{
 		document.getElementById("IpAddressField").value = ip
 	}

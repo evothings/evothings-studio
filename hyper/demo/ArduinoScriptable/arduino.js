@@ -45,18 +45,19 @@ arduino.digitalRead = function(n, callbackFun)
 	arduino.sendRequest('R' + n, callbackFun)
 }
 
-arduino.sendRequest = function(ipAddress, command, callbackFun)
+arduino.sendRequest = function(command, callbackFun)
 {
 	$.ajax({
 		type: 'GET',
 		dataType: 'text',
-		timeout: 3000,
+		timeout: 5000,
 		url: 'http://' + arduino.getIpAddress() + '/' + command,
-		success: function(data) { callbackFun(data) },
-		error: function(a, err) { callbackFun(null, err) }
+		success: function(data) { console.log("X1"); callbackFun(data) },
+		error: function(a, err) { console.log("X2" + err); callbackFun(null, err) }
 	})
 }
 
 arduino.callbackFun = function(data, error)
 {
+	if (!data) { console.log('Ajax error: ' + error) }
 }

@@ -37,10 +37,10 @@ Mikael Kindborg, EvoThings AB
 #include <WiFi.h>
 
 // Your network SSID (network name).
-char ssid[] = "type your wifi network name here";
+char ssid[] = "OO";
 
 // Your network password.
-char pass[] = "type your wifi password here";
+char pass[] = "weareoceanites";
 
 // Your network key Index number (needed only for WEP).
 int keyIndex = 0;
@@ -61,7 +61,7 @@ void setup()
     // Check for the presence of the WiFi shield.
     if (WiFi.status() == WL_NO_SHIELD)
     {
-        If no shield, print message and exit setup.
+        // If no shield, print message and exit setup.
         Serial.println("WiFi shield not present");
         status = WL_NO_SHIELD;
         return;
@@ -84,7 +84,7 @@ void setup()
         status = WiFi.begin(ssid, pass);
 
         // Wait for connection.
-        delay(5000);
+        delay(1000);
     }
 
     // Start the web server.
@@ -111,9 +111,13 @@ void loop()
 
     Serial.println("Client connected");
 
-    String request = readGetRequest(&client);
-    consumeRequest(&client);
-	executeRequest(&client, &request);
+    //while (client.connected())
+    //{
+      String request = readGetRequest(&client);
+      consumeRequest(&client);
+      executeRequest(&client, &request);
+   //   client.flush();
+    //}
 
     // Close the connection.
     client.stop();
@@ -159,7 +163,7 @@ void executeRequest(WiFiClient* client, String* request)
 int readParam(String* request)
 {
 	int i = request->indexOf(" HTTP");
-	String value = request->substring(6, i);
+	String value = request->substring(6, 7);
 	return value.toInt();
 }
 
@@ -172,7 +176,7 @@ String readGetRequest(WiFiClient* client)
     while (client->connected())
     {
         // Read available bytes.
-        if (client->available())
+        while (client->available())
         {
             // Read a byte.
             char c = client->read();
@@ -183,27 +187,25 @@ String readGetRequest(WiFiClient* client)
             // Exit loop if end of line.
             if ('\n' == c)
             {
-                break;
+                return request;
             }
 
             // Add byte to request line.
             request += c;
         }
-    }
-
-    return request;
+    }  
 }
 
 // Read rest of the request.
 void consumeRequest(WiFiClient* client)
-{
+{   
     int endOfLineCounter = 0;
 
     // Loop while the client is connected.
     while (client->connected())
     {
         // Read available bytes.
-        if (client->available())
+        while (client->available())
         {
             // Read a byte.
             char c = client->read();
@@ -225,7 +227,7 @@ void consumeRequest(WiFiClient* client)
             // Exit when last empty line is consumed.
             if (4 == endOfLineCounter)
             {
-                break;
+                return;
             }
         }
     }
@@ -237,7 +239,7 @@ void sendResponse(WiFiClient* client, String response)
     // Ajax requests.
     client->println("HTTP/1.1 200 OK");
     client->println("Access-Control-Allow-Origin: *");
-    client->println("Content-type:text/html");
+    client->println("Content-type:text/plain");
     client->println();
 
     // Write the string in the response body.
