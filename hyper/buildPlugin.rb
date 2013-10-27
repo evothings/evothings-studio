@@ -1,9 +1,13 @@
 # Path definitions for EvoStudio.
 # Author: Mikael Kindborg
 
+def distPackageName
+	"EvoStudio"
+end
+
 # Destination folder for distribution packages.
 def pathDist
-	"../../EvoStudio " + version + "/"
+	"../../" + distPackageName + "_" + version + "/"
 end
 
 # Destination temporary folder for application code.
@@ -13,17 +17,12 @@ end
 
 # Source of main HyperReload application code.
 def pathSourceHyper
-	"../../HyperReload/UI/"
+	"../../HyperOpen/"
 end
 
 # Source file for package.json.
 def pathSourcePackageJson
 	"./package-template.json"
-end
-
-# Source file for LICENSE.md.
-def pathSourceLicense
-	"../LICENSE"
 end
 
 # Source of main demo apps.
@@ -39,10 +38,6 @@ end
 # Source of documentation files.
 def pathSourceDoc
 	"./documentation/"
-end
-
-def distPackageName
-	"EvoStudio"
 end
 
 def pathNodeWebkitLinux32
@@ -64,10 +59,17 @@ end
 def buildPostProcess
 	# Copy EvoStudio-specific files to dist.
 	FileUtils.copy_entry(
-		"./application/hyper-ui.html", 
-		pathDistSource + "application/hyper-ui.html")
+		"./application/ui/hyper-ui.html",
+		pathDistSource + "application/ui/hyper-ui.html")
 	FileUtils.copy_entry(
-		"./application/hyper-ui.css", 
-		pathDistSource + "application/hyper-ui.css")
-	# TODO: Copy EvoStudio license file.
+		"./application/ui/hyper-ui.css",
+		pathDistSource + "application/ui/hyper-ui.css")
+	FileUtils.copy_entry(
+		"./application/ui/hyper-ui.js",
+		pathDistSource + "application/ui/hyper-ui.js")
+
+	# Copy EvoStudio license file.
+	FileUtils.copy_entry(
+		"../LICENSE.md",
+		pathDistSource + "license/EvoStudio-license.md")
 end
