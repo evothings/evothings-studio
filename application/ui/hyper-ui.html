@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<!--
+File: hyper-ui.html
+Description: Main application file. Defines the UI and starts the server.
+Author: Mikael Kindborg
+Copyright (c) 2013 EvoThings AB
+-->
+<!-- HTML 5 differences from HTML 4: http://www.w3.org/TR/2008/WD-html5-diff-20080122/ -->
+<head>
+    <meta charset="utf-8">
+
+    <link href="../libs/jquery-ui-bootstrap-0.5/assets/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="../libs/jquery-ui-bootstrap-0.5/css/custom-theme/jquery-ui-1.10.0.custom.css" rel="stylesheet" />
+
+    <script src="../libs/jquery/jquery-2.0.3.min.js"></script>
+	<!-- <script src="../libs/jquery-ui-bootstrap-0.5/assets/js/jquery-1.9.0.min.js"></script> -->
+	<script src="../libs/jquery-ui-bootstrap-0.5/assets/js/bootstrap.min.js"></script>
+	<script src="../libs/jquery-ui-bootstrap-0.5/assets/js/jquery-ui-1.10.0.custom.min.js"></script>
+
+    <link href="hyper-ui.css" rel="stylesheet" />
+</head>
+<body>
+	<div id="panel-page">
+
+		<div id="panel-top">
+			<div id="panel-tool-menu" class="btn-group btn-group-justified">
+				<!-- Delete or comment out this line to remove the Store button.
+				Also update the CSS for #button-store in hyper-ui.css -->
+				<!-- <button id="button-store" type="button" class="btn btn-success">Store</button> -->
+				<button id="button-documentation" type="button" class="btn btn-warning">Documentation</button>
+				<button id="button-workbench" type="button" class="btn btn-primary">Workbench</button>
+				<!-- <button id="button-quick-start" type="button" class="btn btn-danger">Quick-Start</button> -->
+			</div>
+		</div>
+
+		<div id="panel-middle">
+			<div id="project-list">
+				<div class="ui-state-default ui-corner-all">
+					<h4>Quick Start</h4>
+					<ul style="font-size: 130%;">
+<li>Connect from a mobile device using the EvoThings Client app (for full functionality) or a web browser. Connect with the URL displayed in the bottom panel. Mobile devices must be on the same WiFi network as this computer to be able connect!</li>
+<li>Click <b>Run</b> to reload a project on connected devices. Updating and saving a file in the project will automatically reload it!</li>
+<li>Drag and drop HTML files here to add them to the project list!</li>
+					</ul>
+				</div>
+
+			</div>
+		</div>
+
+		<div id="panel-bottom">
+			<div>
+				<p style="float:left;">Connect URL: <b><span id="connect-address">[Server not running]</span></b></p>
+				<p style="float:right;">Clients: <b><span id="connect-counter">0</span></b> Files: <b><span id="files-counter">0</span></b></p>
+			</div>
+		</div>
+
+		<div id="drag-overlay">
+			<div class="ui-corner-all">
+				<h1>Drop HTML file here</h1>
+				<h4>Drop the main HTML file of your project here to
+				add it to the project list. You can rearrange the list
+				by drag and drop of items.</h4>
+			</div>
+		</div>
+
+	</div> <!-- panel-page -->
+
+    <script src="hyper-ui.js"></script>
+</body>
+</html>

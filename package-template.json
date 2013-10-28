@@ -1,0 +1,17 @@
+{
+  "main": "application/ui/hyper-ui.html",
+  "name": "EvoThingsStudio",
+  "description": "HTML/JS IoT mobile app development tool",
+  "version": "__VERSION__",
+  "hyper-version": __HYPER_VERSION__,
+  "keywords": ["EvoThings Studio", "mobile", "JavaScript"],
+  "window":
+  {
+    "title": "EvoThingsStudio __VERSION__",
+    "toolbar": false,
+    "frame": true,
+    "width": 580,
+    "height": 600,
+    "position": "mouse"
+  }
+}
