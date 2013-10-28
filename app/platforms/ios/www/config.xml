@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.evothings.evoapp" version="0.2.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>EvoApp</name>
+    <description>
+        EvoStudio companion app
+    </description>
+    <author email="mikael.kindborg@evothings.com" href="http://evothings.com">
+        Mikael Kindborg
+    </author>
+    <content src="index.html" />
+    <access origin="*" />
+    <preference name="fullscreen" value="true" />
+    <preference name="webviewbounce" value="false" />
+</widget>

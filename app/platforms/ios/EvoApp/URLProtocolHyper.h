@@ -1,0 +1,2 @@
+@interface URLProtocolHyper : NSURLProtocol
+@end

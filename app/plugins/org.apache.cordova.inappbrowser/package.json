@@ -1,0 +1,15 @@
+{
+    "version": "0.2.3",
+    "name": "org.apache.cordova.inappbrowser",
+    "cordova_name": "InAppBrowser",
+    "description": "Cordova InAppBrowser Plugin",
+    "license": "Apache 2.0",
+    "keywords": [
+        "cordova",
+        "in",
+        "app",
+        "browser",
+        "inappbrowser"
+    ],
+    "engines": []
+}
