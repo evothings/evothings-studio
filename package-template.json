@@ -1,13 +1,13 @@
 {
   "main": "application/ui/hyper-ui.html",
-  "name": "EvoStudio",
+  "name": "EvoThingsStudio",
   "description": "HTML/JS IoT mobile app development tool",
   "version": "__VERSION__",
   "hyper-version": __HYPER_VERSION__,
-  "keywords": ["EvoStudio", "mobile", "JavaScript"],
+  "keywords": ["EvoThings Studio", "mobile", "JavaScript"],
   "window":
   {
-    "title": "EvoStudio __VERSION__",
+    "title": "EvoThingsStudio __VERSION__",
     "toolbar": false,
     "frame": true,
     "width": 580,

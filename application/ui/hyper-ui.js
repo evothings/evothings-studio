@@ -2,7 +2,7 @@
 File: hyper-ui.js
 Description: HyperReload UI functionality.
 Author: Mikael Kindborg
-Copyright (c) 2013 Mikael Kindborg
+Copyright (c) 2013 EvoThings AB
 */
 
 // Code below is split into two parts, one for the UI

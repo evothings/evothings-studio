@@ -1,15 +1,2 @@
 .DS_Store
 buildHyper.rb
-
-# Android
-*.apk
-*.ap_
-*.dex
-*.class
-bin/
-gen/
-
-# Eclipse
-local.properties
-.classpath
-.project

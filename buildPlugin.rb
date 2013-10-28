@@ -1,13 +1,13 @@
-# Path definitions for EvoStudio.
+# Path definitions for EvoThings Studio.
 # Author: Mikael Kindborg
 
 def distPackageName
-	"EvoStudio"
+	"EvoThingsStudio"
 end
 
 # Destination folder for distribution packages.
 def pathDist
-	"../../" + distPackageName + "_" + version + "/"
+	"../" + distPackageName + "_" + version + "/"
 end
 
 # Destination temporary folder for application code.
@@ -17,7 +17,7 @@ end
 
 # Source of main HyperReload application code.
 def pathSourceHyper
-	"../../HyperOpen/"
+	"../HyperOpen/"
 end
 
 # Source file for package.json.
@@ -41,19 +41,19 @@ def pathSourceDoc
 end
 
 def pathNodeWebkitLinux32
-	"../../node-webkit-bin/node-webkit-v0.7.5-linux-ia32/"
+	"../node-webkit-bin/node-webkit-v0.7.5-linux-ia32/"
 end
 
 def pathNodeWebkitLinux64
-	"../../node-webkit-bin/node-webkit-v0.7.5-linux-x64/"
+	"../node-webkit-bin/node-webkit-v0.7.5-linux-x64/"
 end
 
 def pathNodeWebkitWin
-	"../../node-webkit-bin/node-webkit-v0.7.5-win-ia32/"
+	"../node-webkit-bin/node-webkit-v0.7.5-win-ia32/"
 end
 
 def pathNodeWebkitMac
-	"../../node-webkit-bin/node-webkit-v0.7.5-osx-ia32/"
+	"../node-webkit-bin/node-webkit-v0.7.5-osx-ia32/"
 end
 
 def buildPostProcess
@@ -70,6 +70,6 @@ def buildPostProcess
 
 	# Copy EvoStudio license file.
 	FileUtils.copy_entry(
-		"../LICENSE.md",
+		"./LICENSE.md",
 		pathDistSource + "license/EvoStudio-license.md")
 end
