@@ -73,15 +73,15 @@ body
 #project-list
 {
 	position: relative;
-	margin: 0; 
+	margin: 0;
 	padding: 0px 0px 50px 0px;
 	width: 100%;
 }
 
-#project-list div 
-{ 
+#project-list div
+{
 	position: relative;
-	margin: 5px; 
+	margin: 5px;
 	padding: 0 10px;
 	min-height: 40px;
 	border: 1px solid #000000;
