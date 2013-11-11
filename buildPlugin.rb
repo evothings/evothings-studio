@@ -1,13 +1,21 @@
-# Path definitions for EvoThings Studio.
+# Build plugin for EvoThings Studio.
 # Author: Mikael Kindborg
 
 def distPackageName
 	"EvoThingsStudio"
 end
 
+def distCopyright
+	"Copyright (c) 2013 EvoThings AB"
+end
+
+def root
+	"../"
+end
+
 # Destination folder for distribution packages.
 def pathDist
-	"../" + distPackageName + "_" + version + "/"
+	root + distPackageName + "_" + version + "/"
 end
 
 # Destination temporary folder for application code.
@@ -17,7 +25,7 @@ end
 
 # Source of main HyperReload application code.
 def pathSourceHyper
-	"../HyperOpen/"
+	root + "HyperReload/"
 end
 
 # Source file for package.json.
@@ -40,36 +48,50 @@ def pathSourceDoc
 	"./documentation/"
 end
 
+def nodeWebKitVersion
+	"0.8.0"
+end
+
 def pathNodeWebkitLinux32
-	"../node-webkit-bin/node-webkit-v0.7.5-linux-ia32/"
+	root + "node-webkit-bin-" + nodeWebKitVersion +
+		"/node-webkit-v" + nodeWebKitVersion +
+		"-linux-ia32/"
 end
 
 def pathNodeWebkitLinux64
-	"../node-webkit-bin/node-webkit-v0.7.5-linux-x64/"
+	root + "node-webkit-bin-" + nodeWebKitVersion +
+		"/node-webkit-v" + nodeWebKitVersion +
+		"-linux-x64/"
 end
 
 def pathNodeWebkitWin
-	"../node-webkit-bin/node-webkit-v0.7.5-win-ia32/"
+	root + "node-webkit-bin-" + nodeWebKitVersion +
+		"/node-webkit-v" + nodeWebKitVersion +
+		"-win-ia32/"
 end
 
 def pathNodeWebkitMac
-	"../node-webkit-bin/node-webkit-v0.7.5-osx-ia32/"
+	root + "node-webkit-bin-" + nodeWebKitVersion +
+		"/node-webkit-v" + nodeWebKitVersion +
+		"-osx-ia32/"
 end
 
 def buildPostProcess
 	# Copy EvoStudio-specific files to dist.
 	FileUtils.copy_entry(
-		"./application/ui/hyper-ui.html",
-		pathDistSource + "application/ui/hyper-ui.html")
+		"./hyper/ui/hyper-ui.html",
+		pathDistSource + "hyper/ui/hyper-ui.html")
 	FileUtils.copy_entry(
-		"./application/ui/hyper-ui.css",
-		pathDistSource + "application/ui/hyper-ui.css")
+		"./hyper/ui/hyper-ui.css",
+		pathDistSource + "hyper/ui/hyper-ui.css")
+
+	# Rename HyperReload license file.
 	FileUtils.copy_entry(
-		"./application/ui/hyper-ui.js",
-		pathDistSource + "application/ui/hyper-ui.js")
+		pathDistSource + "LICENSE.md",
+		pathDistSource + "HyperReload-LICENSE.md")
 
 	# Copy EvoStudio license file.
 	FileUtils.copy_entry(
 		"./LICENSE.md",
-		pathDistSource + "license/EvoStudio-license.md")
+		pathDistSource + "LICENSE.md")
 end
