@@ -115,7 +115,9 @@ for this example to work. See comment below in the code.
 
     app.getCSSHSL = function(hsl)
     {
-        return 'hsl(' + hsl.hue + ', ' + hsl.sat + '%, ' + hsl.bri + '%)';
+        return 'hsl(' + (360 * hsl.hue / 65535) + ', ' +
+                Math.round(100 * hsl.sat / 255) + '%, ' +
+                Math.round(100 * hsl.bri / 255) + '%)';
     };
 
     app.changeButtonColors = function()
