@@ -68,11 +68,11 @@ for this example to work. See comment below in the code.
         </div>
 
         <div>
-            <button type="button" class="btn btn-lg btn-primary"
+            <button type="button" class="btn btn-lg btn-primary" id="btn_color_1"
                 onclick="app.lightsSetColor1()">Color 1</button>
-            <button type="button" class="btn btn-lg btn-primary"
+            <button type="button" class="btn btn-lg btn-primary" id="btn_color_2"
                 onclick="app.lightsSetColor2()">Color 2</button>
-            <button type="button" class="btn btn-lg btn-primary"
+            <button type="button" class="btn btn-lg btn-primary" id="btn_color_3"
                 onclick="app.lightsSetColor3()">Color 3</button>
         </div>
         <div>
@@ -87,16 +87,45 @@ for this example to work. See comment below in the code.
     <script src="libs/bootstrap-3.0.0/js/bootstrap.min.js"></script>
     <script>
     // Application object.
-    var app = {}
+    var app = {};
 
-	// User name (you can change this, must be at least 10 characters).
-    app.user = 'miki123456'
+    // User name (you can change this, must be at least 10 characters).
+    app.user = 'miki123456';
 
-	// Default light.
-    app.lightId = 1
+    // Default light.
+    app.lightId = 1;
+
+    app.bridgeIP = null;
+
+    // define colors that the lights can be configured with
+    app.hueColors = [
+        {'hue': 1000,  'bri': 25, 'sat': 250},
+        {'hue': 10000, 'bri': 25, 'sat': 250},
+        {'hue': 30000, 'bri': 25, 'sat': 250}
+    ];
 
     // Display the selected default light.
-    $('#lightButton' + app.lightId).button('toggle')
+    $('#lightButton' + app.lightId).button('toggle');
+
+    $(function() {
+        app.fetchBridgeIP(app.checkConnection);
+
+        app.changeButtonColors();
+    });
+
+    app.getCSSHSL = function(hsl)
+    {
+        return 'hsl(' + hsl.hue + ', ' + hsl.sat + '%, ' + hsl.bri + '%)';
+    };
+
+    app.changeButtonColors = function()
+    {
+        for (var i in app.hueColors) {
+            $('#btn_color_' + (parseInt(i)+1))
+                .css('background', app.getCSSHSL(app.hueColors[i]))
+                .css('borderColor', app.getCSSHSL(app.hueColors[i]));
+        }
+    };
 
     // You can lookup the ip-address of the Hue Bridge by using
     // this on the command line (ping detectes the Hue Bridge):
@@ -107,8 +136,37 @@ for this example to work. See comment below in the code.
     // matching ip-address in the arp listing.
     app.getHueBridgeIpAddress = function()
     {
-        return $('#HueBridgeIpAddress').val()
-    }
+        return app.bridgeIP || $('#HueBridgeIpAddress').val();
+    };
+
+    app.setHueBridgeIpAddress = function(ipAddress)
+    {
+        app.bridgeIP = ipAddress;
+        $('#HueBridgeIpAddress').val(app.bridgeIP);
+    };
+
+    app.fetchBridgeIP = function(successFun, failFun) {
+        $.getJSON('http://www.meethue.com/api/nupnp', function(data) {
+            if (data[0] && data[0].hasOwnProperty('internalipaddress')) {
+                app.setHueBridgeIpAddress(data[0].internalipaddress);
+                if (successFun) successFun();
+            }
+        })
+            .fail(failFun);
+    };
+
+    app.checkConnection = function()
+    {
+        $.ajax({
+            type: 'GET',
+            dataType: 'json',
+            url: 'http://' + app.getHueBridgeIpAddress() +'/api/' + app.user + '/config',
+            success:
+                function() {
+                    $('#connectButton').html('Connected');
+                }
+        });
+    };
 
     app.connect = function()
     {
@@ -123,7 +181,7 @@ for this example to work. See comment below in the code.
                 }
                 else if (json[0].success)
                 {
-                    $('#connectButton').html('Connected')
+                    $('#connectButton').html('Connected');
                 }
                 else
                 {
@@ -134,7 +192,7 @@ for this example to work. See comment below in the code.
             {
                 $('#connectButton').html('Could not find Hue Bridge')
             })
-    }
+    };
 
     app.registerUser = function(userName, successFun, failFun)
     {
@@ -147,48 +205,48 @@ for this example to work. See comment below in the code.
             data: JSON.stringify(data),
             success: function(data) { successFun(data) },
             error: function(a, err) { failFun(err) }
-        })
-    }
+        });
+    };
 
     app.selectLight = function(lightId)
     {
-        app.lightId = lightId
-    }
+        app.lightId = lightId;
+    };
 
     app.lightsOn = function()
     {
-        app.lightSetState(app.lightId, {"on":true})
-    }
+        app.lightSetState(app.lightId, {"on":true});
+    };
 
     app.lightsOff = function()
     {
-        app.lightSetState(app.lightId, {"on":false})
-    }
+        app.lightSetState(app.lightId, {"on":false});
+    };
 
     app.lightsSetColor1 = function()
     {
-        app.lightSetState(app.lightId, {"sat":250, "bri":25, "hue":1000})
-    }
+        app.lightSetState(app.lightId, app.hueColors[0]);
+    };
 
     app.lightsSetColor2 = function()
     {
-        app.lightSetState(app.lightId, {"sat":250, "bri":25, "hue":10000})
-    }
+        app.lightSetState(app.lightId, app.hueColors[1]);
+    };
 
     app.lightsSetColor3 = function()
     {
-        app.lightSetState(app.lightId, {"sat":250, "bri":25, "hue":30000})
-    }
+        app.lightSetState(app.lightId, app.hueColors[2]);
+    };
 
     app.lightsEffectOn = function()
     {
-        app.lightSetState(app.lightId, {"effect":"colorloop"})
-    }
+        app.lightSetState(app.lightId, {"effect":"colorloop"});
+    };
 
     app.lightsEffectOff = function()
     {
-        app.lightSetState(app.lightId, {"effect":"none"})
-    }
+        app.lightSetState(app.lightId, {"effect":"none"});
+    };
 
     app.lightSetState = function(lightId, state)
     {
@@ -200,8 +258,8 @@ for this example to work. See comment below in the code.
             data: JSON.stringify(state),
             success: function(data) { },
             error: function(a, err) { }
-        })
-    }
+        });
+    };
     </script>
 </body>
 </html>
