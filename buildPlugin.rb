@@ -33,16 +33,6 @@ def pathSourcePackageJson
 	"./package-template.json"
 end
 
-# Source of main demo apps.
-def pathSourceDemo
-	"./demo/"
-end
-
-# Source of initial project list.
-def pathSourceProjectList
-	"./project-list-template.json"
-end
-
 # Source of documentation files.
 def pathSourceDoc
 	"./documentation/"
@@ -79,11 +69,19 @@ end
 def buildPostProcess
 	# Copy EvoStudio-specific files to dist.
 	FileUtils.copy_entry(
-		"./hyper/ui/hyper-ui.html",
-		pathDistSource + "hyper/ui/hyper-ui.html")
+		"./hyper/ui",
+		pathDistSource + "hyper/ui")
 	FileUtils.copy_entry(
-		"./hyper/ui/hyper-ui.css",
-		pathDistSource + "hyper/ui/hyper-ui.css")
+		"./hyper/settings",
+		pathDistSource + "hyper/settings")
+
+	# Delete files that should not be in the dist.
+	FileUtils.remove_dir(pathDistSource + "hyper/demo", true)
+
+	# Copy EvoStudio examples to dist.
+	#FileUtils.copy_entry(
+	#	"../EvoStudioExamples/examples",
+	#	pathDistSource + "examples")
 
 	# Rename HyperReload license file.
 	FileUtils.copy_entry(
