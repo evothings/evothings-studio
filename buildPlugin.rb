@@ -79,9 +79,9 @@ def buildPostProcess
 	FileUtils.remove_dir(pathDistSource + "hyper/demo", true)
 
 	# Copy EvoStudio examples to dist.
-	#FileUtils.copy_entry(
-	#	"../EvoStudioExamples/examples",
-	#	pathDistSource + "examples")
+	FileUtils.copy_entry(
+		root + "EvoThingsExamples/examples",
+		pathDistSource + "examples")
 
 	# Rename HyperReload license file.
 	FileUtils.copy_entry(
