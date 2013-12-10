@@ -70,6 +70,17 @@ def pathNodeWebkitMac
 		"-osx-ia32/"
 end
 
+def buildPreProcess
+	# Build EvoThingsClient
+	cwd = FileUtils.pwd
+	FileUtils.chdir(root + 'EvoThingsClient')
+	sh 'ruby workfile.rb'
+	FileUtils.chdir(cwd)
+	FileUtils.copy_entry(root + 'EvoThingsClient',
+		pathDistSource + 'EvoThingsClient')
+	FileUtils.remove_dir(pathDistSource + 'EvoThingsClient/.git', true)
+end
+
 def buildPostProcess
 	# Copy EvoStudio-specific files to dist.
 	FileUtils.copy_entry(
