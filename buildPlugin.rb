@@ -39,7 +39,7 @@ end
 
 # Source of documentation files.
 def pathSourceDoc
-	"./documentation/"
+	root + "EvoThingsDoc"
 end
 
 def nodeWebKitVersion
