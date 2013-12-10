@@ -28,8 +28,9 @@ Copyright (c) 2013 EvoThings AB
 				<!-- Delete or comment out this line to remove the Store button.
 				Also update the CSS for #button-store in hyper-ui.css -->
 				<!-- <button id="button-store" type="button" class="btn btn-success">Store</button> -->
+				<button id="button-feedback" type="button" class="btn btn-success">Feedback</button>
 				<button id="button-documentation" type="button" class="btn btn-warning">Documentation</button>
-				<button id="button-workbench" type="button" class="btn btn-primary">Workbench</button>
+				<button id="button-workbench" type="button" class="btn btn-primary">Tools</button>
 				<!-- <button id="button-quick-start" type="button" class="btn btn-danger">Quick-Start</button> -->
 			</div>
 		</div>
@@ -67,5 +68,25 @@ Copyright (c) 2013 EvoThings AB
 	</div> <!-- panel-page -->
 
 	<script src="hyper-ui.js"></script>
+	<script>
+	// Setup UI buttons (using closure to make variables local).
+	(function()
+	{
+		var PATH = require('path')
+		var GUI = require('nw.gui')
+		var url = 'file://' + PATH.resolve('./documentation/index.html')
+		var button = $('#button-documentation')
+		button && button.click(function()
+		{
+			GUI.Shell.openExternal(url)
+		})
+		button = $('#button-feedback')
+		button && button.click(function()
+		{
+			// TODO: Change URL to feedback page.
+			GUI.Shell.openExternal('http://evothings.com')
+		})
+	})()
+	</script>
 </body>
 </html>

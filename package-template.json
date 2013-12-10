@@ -6,7 +6,7 @@
   "keywords": ["EvoThings Studio", "mobile", "JavaScript"],
   "window":
   {
-    "title": "EvoThings Studio __VERSION__",
+    "title": "EvoThings Workbench __VERSION__",
     "toolbar": false,
     "frame": true,
     "width": 580,
