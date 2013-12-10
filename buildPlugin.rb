@@ -9,6 +9,10 @@ def distCopyright
 	"Copyright (c) 2013 EvoThings AB"
 end
 
+def distVersion
+	"0.5"
+end
+
 def root
 	"../"
 end
@@ -90,6 +94,10 @@ def buildPostProcess
 
 	# Copy EvoStudio license file.
 	FileUtils.copy_entry(
-		"./LICENSE.md",
-		pathDistSource + "LICENSE.md")
+		"./LICENSE",
+		pathDistSource + "LICENSE")
 end
+
+# load local_config.rb, if it exists.
+lc = "#{File.dirname(__FILE__)}/local_config.rb"
+require lc if(File.exists?(lc))

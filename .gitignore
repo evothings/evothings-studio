@@ -1,2 +1,3 @@
 .DS_Store
 buildHyper.rb
+local_config.rb
