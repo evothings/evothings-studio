@@ -1,10 +1,10 @@
-// reverse order
-["examples/ble-ti-sensortag/index.html",
-"examples/ble-discovery/index.html",
+["examples/hello-world/index.html",
+"examples/canvas-basic/index.html",
+"examples/cordova-basic/index.html",
+"examples/hue-lights/index.html",
+"examples/ble-ti-sensortag/index.html",
 "examples/arduino-led-onoff-wifi/app/index.html",
 "examples/arduino-led-blink-wifi/app/index.html",
 "examples/arduino-ble/app/index.html",
-"examples/hue-lights/index.html",
-"examples/cordova-basic/index.html",
-"examples/canvas-basic/index.html",
-"examples/hello-world/index.html"]
+"examples/ble-discovery/index.html"
+]
