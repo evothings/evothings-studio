@@ -5,6 +5,10 @@ def distPackageName
 	"EvoThingsStudio"
 end
 
+def applicationName
+	"EvoThingsWorkbench"
+end
+
 def distCopyright
 	"Copyright (c) 2013 EvoThings AB"
 end
@@ -71,7 +75,10 @@ def pathNodeWebkitMac
 end
 
 def buildPreProcess
-	# Build EvoThingsClient
+	buildEvoThingsClient
+end
+
+def buildEvoThingsClient
 	cwd = FileUtils.pwd
 	FileUtils.chdir(root + 'EvoThingsClient')
 	sh 'ruby workfile.rb'
