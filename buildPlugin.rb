@@ -5,6 +5,10 @@ def distPackageName
 	"EvoThingsStudio"
 end
 
+def applicationName
+	"EvoThingsWorkbench"
+end
+
 def distCopyright
 	"Copyright (c) 2013 EvoThings AB"
 end
@@ -71,7 +75,10 @@ def pathNodeWebkitMac
 end
 
 def buildPreProcess
-	# Build EvoThingsClient
+	buildEvoThingsClient
+end
+
+def buildEvoThingsClient
 	cwd = FileUtils.pwd
 	FileUtils.chdir(root + 'EvoThingsClient')
 	sh 'ruby workfile.rb'
@@ -99,7 +106,7 @@ def buildPostProcess
 		pathDistSource + "examples")
 
 	# Rename HyperReload license file.
-	FileUtils.copy_entry(
+	FileUtils.mv(
 		pathDistSource + "LICENSE.md",
 		pathDistSource + "HyperReload-LICENSE.md")
 
@@ -109,6 +116,6 @@ def buildPostProcess
 		pathDistSource + "LICENSE")
 end
 
-# load local_config.rb, if it exists.
-lc = "#{File.dirname(__FILE__)}/local_config.rb"
+# load localConfig.rb, if it exists.
+lc = "#{File.dirname(__FILE__)}/localConfig.rb"
 require lc if(File.exists?(lc))
