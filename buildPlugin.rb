@@ -74,7 +74,34 @@ def pathNodeWebkitMac
 		"-osx-ia32/"
 end
 
+def updateFile(tar, src)
+	if(!FileUtils.uptodate?(tar, [src]))
+		FileUtils::Verbose.cp(src, tar)
+	end
+end
+
+def buildOSXIcons
+	osxIcons = [
+		16,
+		32,
+		128,
+		256,
+		512,
+	]
+	FileUtils.mkdir_p('build/icon.iconset')
+	osxIcons.each do |size|
+		updateFile("build/icon.iconset/icon_#{size}x#{size}.png", "#{root}EvoThingsClient/config/icons/icon-#{size}.png")
+		updateFile("build/icon.iconset/icon_#{size}x#{size}@2.png", "#{root}EvoThingsClient/config/icons/icon-#{size*2}.png")
+	end
+	# Only on OSX.
+	if(RUBY_PLATFORM =~ /darwin/)
+		sh 'iconutil -c build/icns build/icon.iconset'
+	end
+end
+
 def buildPreProcess
+	buildOSXIcons
+
 	buildEvoThingsClient
 end
 
