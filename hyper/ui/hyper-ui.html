@@ -29,7 +29,8 @@ Copyright (c) 2013 EvoThings AB
 				Also update the CSS for #button-store in hyper-ui.css -->
 				<!-- <button id="button-store" type="button" class="btn btn-success">Store</button> -->
 				<button id="button-documentation" type="button" class="btn btn-warning">Documentation</button>
-				<button id="button-workbench" type="button" class="btn btn-primary">Tools</button>
+				<button id="button-workbench" type="button" class="btn btn-danger">Tools</button>
+				<button id="button-forum" type="button" class="btn btn-primary">Forum</button>
 				<button id="button-feedback" type="button" class="btn btn-success">Feedback</button>
 				<!-- <button id="button-quick-start" type="button" class="btn btn-danger">Quick-Start</button> -->
 			</div>
@@ -82,11 +83,20 @@ Copyright (c) 2013 EvoThings AB
 		var PATH = require('path')
 		var GUI = require('nw.gui')
 		var url = 'file://' + PATH.resolve('./documentation/index.html')
+
 		var button = $('#button-documentation')
 		button && button.click(function()
 		{
 			GUI.Shell.openExternal(url)
 		})
+
+		button = $('#button-forum')
+		button && button.click(function()
+		{
+			// URL to feedback page.
+			GUI.Shell.openExternal('http://evothings.com/forum/')
+		})
+
 		button = $('#button-feedback')
 		button && button.click(function()
 		{

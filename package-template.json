@@ -9,7 +9,7 @@
     "title": "EvoThings Workbench __VERSION__",
     "toolbar": false,
     "frame": true,
-    "width": 580,
+    "width": 700,
     "height": 600,
     "position": "mouse"
   }

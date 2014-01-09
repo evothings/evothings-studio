@@ -31,10 +31,10 @@ body
 	margin-right: 4px;
 }
 
-#button-workbench, #button-documentation, #button-feedback
+#button-workbench, #button-documentation, #button-forum, #button-feedback
 {
 	/* If you have two buttons, change width from 33.33% to 50%. */
-	width: 33.33%;
+	width: 25%;
 	height: 36px;
 	font-size: 18px;
 	/*font-weight: bold;*/
