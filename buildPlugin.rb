@@ -47,7 +47,7 @@ def pathSourceDoc
 end
 
 def nodeWebKitVersion
-	"0.8.0"
+	"0.8.4"
 end
 
 def pathNodeWebkitLinux32
@@ -74,7 +74,55 @@ def pathNodeWebkitMac
 		"-osx-ia32/"
 end
 
+def updateFile(tar, src)
+	if(!FileUtils.uptodate?(tar, [src]))
+		FileUtils::Verbose.cp(src, tar)
+	end
+end
+
+def buildOSXIcons
+	osxIcons = [
+		16,
+		32,
+		128,
+		256,
+		512,
+	]
+	FileUtils.mkdir_p('build/icon.iconset')
+	osxIcons.each do |size|
+		updateFile("build/icon.iconset/icon_#{size}x#{size}.png", "#{root}EvoThingsClient/config/icons/icon-#{size}.png")
+		updateFile("build/icon.iconset/icon_#{size}x#{size}@2x.png", "#{root}EvoThingsClient/config/icons/icon-#{size*2}.png")
+	end
+	# Only on OSX.
+	if(RUBY_PLATFORM =~ /darwin/)
+		sh 'iconutil -c icns --output build/nw.icns build/icon.iconset'
+	end
+end
+
+def buildGitVersionFile
+	open(pathDistSource + 'gitVersions.txt', 'w') do |file|
+		[
+			'EvoThingsStudio',
+			'EvoThingsClient',
+			'EvoThingsDoc',
+			'EvoThingsExamples',
+			'HyperReload',
+			'cordova-ble',
+		].each do |repo|
+			if(!File.exist?("#{root}#{repo}/.git"))
+				raise "Missing source directory: #{root}#{repo}"
+			end
+			o = `git --git-dir=#{root}#{repo}/.git rev-parse HEAD`
+			file.puts "#{repo}: #{o.strip}"
+		end
+	end
+end
+
 def buildPreProcess
+	buildGitVersionFile
+
+	buildOSXIcons
+
 	buildEvoThingsClient
 end
 
