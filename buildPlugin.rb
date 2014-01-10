@@ -99,7 +99,28 @@ def buildOSXIcons
 	end
 end
 
+def buildGitVersionFile
+	open(pathDistSource + 'gitVersions.txt', 'w') do |file|
+		[
+			'EvoThingsStudio',
+			'EvoThingsClient',
+			'EvoThingsDoc',
+			'EvoThingsExamples',
+			'HyperReload',
+			'cordova-ble',
+		].each do |repo|
+			if(!File.exist?("#{root}#{repo}/.git"))
+				raise "Missing source directory: #{root}#{repo}"
+			end
+			o = `git --git-dir=#{root}#{repo}/.git rev-parse HEAD`
+			file.puts "#{repo}: #{o.strip}"
+		end
+	end
+end
+
 def buildPreProcess
+	buildGitVersionFile
+
 	buildOSXIcons
 
 	buildEvoThingsClient
