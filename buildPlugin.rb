@@ -47,7 +47,7 @@ def pathSourceDoc
 end
 
 def nodeWebKitVersion
-	"0.8.0"
+	"0.8.4"
 end
 
 def pathNodeWebkitLinux32
