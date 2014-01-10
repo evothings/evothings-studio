@@ -91,11 +91,11 @@ def buildOSXIcons
 	FileUtils.mkdir_p('build/icon.iconset')
 	osxIcons.each do |size|
 		updateFile("build/icon.iconset/icon_#{size}x#{size}.png", "#{root}EvoThingsClient/config/icons/icon-#{size}.png")
-		updateFile("build/icon.iconset/icon_#{size}x#{size}@2.png", "#{root}EvoThingsClient/config/icons/icon-#{size*2}.png")
+		updateFile("build/icon.iconset/icon_#{size}x#{size}@2x.png", "#{root}EvoThingsClient/config/icons/icon-#{size*2}.png")
 	end
 	# Only on OSX.
 	if(RUBY_PLATFORM =~ /darwin/)
-		sh 'iconutil -c build/icns build/icon.iconset'
+		sh 'iconutil -c icns --output build/nw.icns build/icon.iconset'
 	end
 end
 
