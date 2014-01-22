@@ -83,6 +83,9 @@ Copyright (c) 2013 EvoThings AB
 		var PATH = require('path')
 		var GUI = require('nw.gui')
 		var url = 'file://' + PATH.resolve('./documentation/index.html')
+		/** Reference to Welcome window, used for preventing opening it
+			multiple times and instead focusing it if already opened. **/
+		var mWelcomeWindow = null
 
 		var button = $('#button-documentation')
 		button && button.click(function()
@@ -103,6 +106,35 @@ Copyright (c) 2013 EvoThings AB
 			// URL to feedback page.
 			GUI.Shell.openExternal('http://evothings.com/feedback/')
 		})
+
+		var getShouldShowWelcome = function() {
+			if (typeof(Storage)!=="undefined")
+			{
+				if (localStorage.showWelcome !== "undefined") {
+					if (localStorage.showWelcome ==  false) {
+						return false;
+					}
+				}
+			}
+			return true;
+		};
+
+		if (mWelcomeWindow && !mWelcomeWindow.closed)
+		{
+			// Bring existing window to front.
+			mWelcomeWindow.focus()
+		}
+		else if (getShouldShowWelcome())
+		{
+			// Create new window.
+			mWelcomeWindow = window.open(
+				'ets-welcome.html',
+				'welcome',
+				'resizable=1,width=800,height=600')
+			mWelcomeWindow.moveTo(50, 50)
+			mWelcomeWindow.focus()
+		}
+
 	})()
 	</script>
 </body>
