@@ -31,8 +31,16 @@ Copyright (c) 2013 EvoThings AB
 </head>
 <body>
 	<div id="showScreenCBContainer">
-		<input type="checkbox" id="showScreenAtStartup" value="1" /><label for="showScreenAtStartup">Show Welcome screen at startup</label>
+		<input type="checkbox" id="showScreenAtStartup" value="1" />
+		<label for="showScreenAtStartup">Show Welcome screen at startup</label>
 	</div>
 	<h1>Welcome to EvoThings Studio!</h1>
+
+	<script>
+	if (typeof(Storage)!=="undefined")
+	{
+		localStorage.showWelcome = 0;
+	}
+	</script>
 </body>
 </html>
