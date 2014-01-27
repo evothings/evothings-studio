@@ -46,6 +46,7 @@ body
 	height: 36px;
 	align-items: flex-start;
 	box-sizing: border-box;
+	cursor: pointer;
 }
 
 #panel-middle
