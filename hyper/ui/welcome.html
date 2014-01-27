@@ -19,27 +19,36 @@ Copyright (c) 2013 EvoThings AB
 	<script src="../libs/jquery-ui-bootstrap-0.5/assets/js/bootstrap.min.js"></script>
 	<script src="../libs/jquery-ui-bootstrap-0.5/assets/js/jquery-ui-1.10.0.custom.min.js"></script>
 
+	<link href="hyper-ui.css" rel="stylesheet" />
+
 	<script>
 	function setShowWelcome(show)
 	{
-		if (typeof(Storage) === "undefined") throw "nolocalstorage";
-		localStorage.showWelcome = (show ? 1 : 0);
+		if (typeof(Storage) === "undefined") throw "nolocalstorage"
+		localStorage.showWelcome = (show ? 1 : 0)
+	}
+	function getShowWelcome()
+	{
+		if (typeof(Storage) === "undefined") throw "nolocalstorage"
+		return (localStorage.showWelcome == 1);
 	}
 
-	$('#showScreenAtStartup').change(function(e)
-	{
-		try
+	$(function() {
+		$('#showScreenAtStartup').prop('checked', getShowWelcome());
+
+		$('#showScreenAtStartup').change(function(e)
 		{
-			setShowWelcome($(this).is(':checked'));
-		}
-		catch (err)
-		{
-			alert('Failed to save setting.')
-		}
+			try
+			{
+				setShowWelcome($(this).is(':checked'))
+			}
+			catch (err)
+			{
+				alert('Failed to save setting.')
+			}
+		});
 	});
 	</script>
-
-	<link href="hyper-ui.css" rel="stylesheet" />
 
 	<style>
 	html, body {

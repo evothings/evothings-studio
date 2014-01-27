@@ -32,6 +32,7 @@ Copyright (c) 2013 EvoThings AB
 				<button id="button-workbench" type="button" class="btn btn-danger">Tools</button>
 				<button id="button-forum" type="button" class="btn btn-primary">Forum</button>
 				<button id="button-feedback" type="button" class="btn btn-success">Feedback</button>
+				<div id="button-evothings"><img src="evothings-logo.png" height="100%" /></div>
 				<!-- <button id="button-quick-start" type="button" class="btn btn-danger">Quick-Start</button> -->
 			</div>
 		</div>
@@ -107,6 +108,22 @@ Copyright (c) 2013 EvoThings AB
 			GUI.Shell.openExternal('http://evothings.com/feedback/')
 		})
 
+		var showWelcomeScreen = function() {
+			// Create new window.
+			mWelcomeWindow = window.open(
+				'welcome.html',
+				'welcome',
+				'resizable=1,width=800,height=600')
+			mWelcomeWindow.moveTo(50, 50)
+			mWelcomeWindow.focus()
+		};
+
+		button = $('#button-evothings')
+		button && button.click(function()
+		{
+			showWelcomeScreen()
+		})
+
 		var getShouldShowWelcome = function() {
 			if (typeof(Storage) !== "undefined")
 			{
@@ -128,13 +145,7 @@ Copyright (c) 2013 EvoThings AB
 		}
 		else if (getShouldShowWelcome())
 		{
-			// Create new window.
-			mWelcomeWindow = window.open(
-				'welcome.html',
-				'welcome',
-				'resizable=1,width=800,height=600')
-			mWelcomeWindow.moveTo(50, 50)
-			mWelcomeWindow.focus()
+			showWelcomeScreen()
 		}
 
 	})()
