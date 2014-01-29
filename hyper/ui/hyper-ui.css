@@ -34,10 +34,19 @@ body
 #button-workbench, #button-documentation, #button-forum, #button-feedback
 {
 	/* If you have two buttons, change width from 33.33% to 50%. */
-	width: 25%;
+	width: 23%;
 	height: 36px;
 	font-size: 18px;
 	/*font-weight: bold;*/
+}
+
+#button-evothings {
+	display: inline-block;
+	width: 8%;
+	height: 36px;
+	align-items: flex-start;
+	box-sizing: border-box;
+	cursor: pointer;
 }
 
 #panel-middle

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<!--
+File: ets-welcome.html
+Description: Welcome page for EvoThings Studio.
+Author: Eric Svensson
+Copyright (c) 2013 EvoThings AB
+-->
+<head>
+	<meta charset="utf-8">
+
+	<title>Welcome</title>
+
+	<link href="../libs/jquery-ui-bootstrap-0.5/assets/css/bootstrap.min.css" rel="stylesheet" />
+	<link href="../libs/jquery-ui-bootstrap-0.5/css/custom-theme/jquery-ui-1.10.0.custom.css" rel="stylesheet" />
+
+	<script src="../libs/jquery/jquery-2.0.3.min.js"></script>
+	<!-- <script src="../libs/jquery-ui-bootstrap-0.5/assets/js/jquery-1.9.0.min.js"></script> -->
+	<script src="../libs/jquery-ui-bootstrap-0.5/assets/js/bootstrap.min.js"></script>
+	<script src="../libs/jquery-ui-bootstrap-0.5/assets/js/jquery-ui-1.10.0.custom.min.js"></script>
+
+	<link href="hyper-ui.css" rel="stylesheet" />
+
+	<script>
+	function setShowWelcome(show)
+	{
+		if (typeof(Storage) === "undefined") throw "nolocalstorage"
+		localStorage.showWelcome = (show ? 1 : 0)
+	}
+	function getShowWelcome()
+	{
+		if (typeof(Storage) === "undefined") throw "nolocalstorage"
+		return (localStorage.showWelcome == 1);
+	}
+
+	$(function() {
+		$('#showScreenAtStartup').prop('checked', getShowWelcome());
+
+		$('#showScreenAtStartup').change(function(e)
+		{
+			try
+			{
+				setShowWelcome($(this).is(':checked'))
+			}
+			catch (err)
+			{
+				alert('Failed to save setting.')
+			}
+		});
+	});
+	</script>
+
+	<style>
+	html, body {
+		width: 100%; height: 100%;
+		margin: 0; padding: 0;
+	}
+
+	iframe#welcomePage {
+		width: 100%; height: 95%;
+		margin: 0; padding: 0;
+		z-index: 0;
+	}
+
+	/** Make the div behave like a table element so that
+		vertical alignment works. **/
+	div#showScreenCBContainer {
+		display: table;
+		table-layout: fixed;
+		border-collapse: collapse;
+		position: fixed;
+		bottom: 0; left: 0;
+		width: 100%; height: 6%;
+		border: none;
+		z-index: 1;
+		background: -moz-linear-gradient(180deg, #f7f7f7, #fff, #fff, #fff, #fff);
+		background: -webkit-linear-gradient(180deg, #f7f7f7, #fff, #fff, #fff, #fff);
+		background: -o-linear-gradient(180deg, #f7f7f7, #fff, #fff, #fff, #fff);
+		background: linear-gradient(180deg, #f7f7f7, #fff, #fff, #fff, #fff);
+	}
+	div#showScreenCBContainer > div {
+		display: table-cell;
+		vertical-align: middle;
+		padding-left: 1%;
+	}
+
+	div#showScreenCBContainer label {
+		float: left;
+		margin: 0; padding: 0;
+	}
+	div#showScreenCBContainer input { float: left; }
+	</style>
+
+</head>
+<body>
+	<iframe id="welcomePage" src="../../documentation/welcome.html"
+		frameborder="0" width="100%" height="95%"></iframe>
+
+	<div id="showScreenCBContainer">
+		<!-- div element acting like a table cell needed to make vertical
+			 alignment work. -->
+		<div>
+			<input type="checkbox" id="showScreenAtStartup" value="1"
+				checked="checked" />
+			<label for="showScreenAtStartup">
+				&nbsp;Show this welcome screen at startup</label>
+		</div>
+	</div>
+</body>
+</html>
