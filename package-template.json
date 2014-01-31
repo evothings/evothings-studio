@@ -1,6 +1,6 @@
 {
   "main": "hyper/ui/hyper-ui.html",
-  "name": "EvoThingsStudio",
+  "name": "EvoThings Workbench",
   "description": "HTML/JS IoT mobile app development tool",
   "version": "__VERSION__",
   "keywords": ["EvoThings Studio", "mobile", "JavaScript"],
