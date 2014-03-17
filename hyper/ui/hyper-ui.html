@@ -4,57 +4,71 @@
 File: hyper-ui.html
 Description: Main application file. Defines the UI and starts the server.
 Author: Mikael Kindborg
-Copyright (c) 2013 EvoThings AB
+Copyright (c) 2013-2014 EvoThings AB
 -->
 <!-- HTML 5 differences from HTML 4: http://www.w3.org/TR/2008/WD-html5-diff-20080122/ -->
 <head>
 	<meta charset="utf-8">
-
-	<link href="../libs/jquery-ui-bootstrap-0.5/assets/css/bootstrap.min.css" rel="stylesheet" />
-	<link href="../libs/jquery-ui-bootstrap-0.5/css/custom-theme/jquery-ui-1.10.0.custom.css" rel="stylesheet" />
-
-	<script src="../libs/jquery/jquery-2.0.3.min.js"></script>
-	<!-- <script src="../libs/jquery-ui-bootstrap-0.5/assets/js/jquery-1.9.0.min.js"></script> -->
-	<script src="../libs/jquery-ui-bootstrap-0.5/assets/js/bootstrap.min.js"></script>
-	<script src="../libs/jquery-ui-bootstrap-0.5/assets/js/jquery-ui-1.10.0.custom.min.js"></script>
-
+	<link href="../libs/bootstrap-3.1.1/css/bootstrap.min.css" rel="stylesheet">
+	<script src="../libs/jquery/jquery-2.1.0.min.js"></script>
+	<script src="../libs/jquery/jquery-ui-1.10.3.custom.min.js"></script>
+	<script src="../libs/bootstrap-3.1.1/js/bootstrap.min.js"></script>
 	<link href="hyper-ui.css" rel="stylesheet" />
+	<style>
+	/* Style used for evothings logo, which has been removed.
+	   Kept here as a reference.
+	#button-evothings {
+		display: inline-block;
+		width: 8%;
+		height: 36px;
+		align-items: flex-start;
+		box-sizing: border-box;
+		cursor: pointer;
+	}
+	*/
+	</style>
 </head>
 <body>
 	<div id="panel-page">
 
 		<div id="panel-top">
-			<div id="panel-tool-menu" class="btn-group btn-group-justified">
-				<!-- Delete or comment out this line to remove the Store button.
-				Also update the CSS for #button-store in hyper-ui.css -->
-				<!-- <button id="button-store" type="button" class="btn btn-success">Store</button> -->
-				<button id="button-documentation" type="button" class="btn btn-warning">Documentation</button>
-				<button id="button-workbench" type="button" class="btn btn-danger">Tools</button>
-				<button id="button-forum" type="button" class="btn btn-primary">Forum</button>
-				<button id="button-feedback" type="button" class="btn btn-success">Feedback</button>
-				<div id="button-evothings"><img src="evothings-logo.png" height="100%" /></div>
-				<!-- <button id="button-quick-start" type="button" class="btn btn-danger">Quick-Start</button> -->
+
+			<div id="panel-tool-menu">
+				<div class="btn-group btn-group-justified">
+					<button id="button-tool-menu" class="btn btn-primary dropdown-toggle btn-hyper-toolbar"
+						data-toggle="dropdown">
+						<span class="glyphicon glyphicon-align-justify"></span>
+					</button>
+					<ul class="dropdown-menu">
+						<li><a href="javascript:void(0)"
+							onclick="alert('Not implemented yet.')">Settings</a></li>
+						<li><a href="javascript:void(0)"
+							onclick="hyper.showWelcomeScreen()">Welcome Screen</a></li>
+					</ul>
+				</div>
 			</div>
+
+			<div id="panel-tool-buttons">
+				<div class="btn-group btn-group-justified">
+					<a id="button-documentation"
+						class="btn btn-warning btn-hyper-toolbar"
+						href="javascript:void(0)">Documentation</a>
+					<a id="button-workbench"
+						class="btn btn-danger btn-hyper-toolbar"
+						href="javascript:void(0)">Tools</a>
+					<a id="button-forum"
+						class="btn btn-primary btn-hyper-toolbar"
+						href="javascript:void(0)">Forum</a>
+					<a id="button-feedback"
+						class="btn btn-success btn-hyper-toolbar"
+						href="javascript:void(0)">Feedback</a>
+				</div>
+			</div>
+
 		</div>
 
 		<div id="panel-middle">
 			<div id="project-list">
-				<div class="ui-state-default ui-corner-all">
-					<button
-						type="button"
-						class="close button-delete"
-						onclick="hyper.UI.deleteEntry(this)">
-						&times;
-					</button>
-					<h4>Quick Start</h4>
-					<ul style="font-size: 120%;">
-<li>Connect from a mobile device using the EvoThings Client app (for full functionality) or a web browser. Connect with the URL displayed in the bottom panel.</li>
-<li>Mobile devices must be on the same WiFi network as this computer to be able to connect, unless you've made the server accessible from the Internet.</li>
-<li>Click <b>Run</b> to reload a project on connected devices. Updating and saving a file in the project will automatically reload it!</li>
-<li>Drag and drop HTML files here to add them to the project list!</li>
-					</ul>
-				</div>
-
 			</div>
 		</div>
 
@@ -83,14 +97,15 @@ Copyright (c) 2013 EvoThings AB
 	{
 		var PATH = require('path')
 		var GUI = require('nw.gui')
-		var url = 'file://' + PATH.resolve('./documentation/index.html')
-		/** Reference to Welcome window, used for preventing opening it
-			multiple times and instead focusing it if already opened. **/
+
+		// Reference to Welcome window, used for preventing opening it
+		// multiple times and instead focusing it if already opened.
 		var mWelcomeWindow = null
 
 		var button = $('#button-documentation')
 		button && button.click(function()
 		{
+			var url = 'file://' + PATH.resolve('./documentation/index.html')
 			GUI.Shell.openExternal(url)
 		})
 
@@ -108,46 +123,37 @@ Copyright (c) 2013 EvoThings AB
 			GUI.Shell.openExternal('http://evothings.com/feedback/')
 		})
 
-		var showWelcomeScreen = function() {
-			// Create new window.
-			mWelcomeWindow = window.open(
-				'welcome.html',
-				'welcome',
-				'resizable=1,width=800,height=600')
-			mWelcomeWindow.moveTo(50, 50)
-			mWelcomeWindow.focus()
-		};
-
-		button = $('#button-evothings')
-		button && button.click(function()
+		hyper.showWelcomeScreen = function()
 		{
-			showWelcomeScreen()
-		})
-
-		var getShouldShowWelcome = function() {
-			if (typeof(Storage) !== "undefined")
+			console.log('show welcome screen')
+			if (mWelcomeWindow && !mWelcomeWindow.closed)
 			{
-				if (localStorage.showWelcome !== "undefined")
-				{
-					if (localStorage.showWelcome == 0)
-					{
-						return false;
-					}
-				}
+				// Bring existing window to front.
+				mWelcomeWindow.focus()
 			}
-			return true;
+			else
+			{
+				// Create new window.
+				mWelcomeWindow = window.open(
+					'welcome.html',
+					'welcome',
+					'resizable=1,width=800,height=600')
+				mWelcomeWindow.moveTo(50, 50)
+				mWelcomeWindow.focus()
+			}
 		};
 
-		if (mWelcomeWindow && !mWelcomeWindow.closed)
+		function getShowWelcomeScreen()
 		{
-			// Bring existing window to front.
-			mWelcomeWindow.focus()
-		}
-		else if (getShouldShowWelcome())
-		{
-			showWelcomeScreen()
+			return 'no' != localStorage.getItem('evo-show-welcome-screen')
 		}
 
+		// Display welcome screen on startup if the display
+		// setting is not turned off.
+		if (getShowWelcomeScreen())
+		{
+			hyper.showWelcomeScreen()
+		}
 	})()
 	</script>
 </body>
