@@ -14,7 +14,7 @@ def distCopyright
 end
 
 def distVersion
-	"0.7.1"
+	"0.7.2"
 end
 
 def root
@@ -123,7 +123,7 @@ def buildPreProcess
 
 	buildOSXIcons
 
-	buildEvoThingsClient
+	#buildEvoThingsClient
 end
 
 def buildEvoThingsClient
