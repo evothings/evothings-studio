@@ -2,15 +2,15 @@
 # Author: Mikael Kindborg
 
 def distPackageName
-	"EvoThingsStudio"
+	"EvothingsStudio"
 end
 
 def applicationName
-	"EvoThingsWorkbench"
+	"EvothingsWorkbench"
 end
 
 def distCopyright
-	"Copyright (c) 2014 EvoThings AB"
+	"Copyright (c) 2014 Evothings AB"
 end
 
 def distVersion
@@ -123,7 +123,7 @@ def buildPreProcess
 
 	buildOSXIcons
 
-	#buildEvoThingsClient
+	buildEvoThingsClient
 end
 
 def buildEvoThingsClient
