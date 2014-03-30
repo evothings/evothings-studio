@@ -2,19 +2,19 @@
 # Author: Mikael Kindborg
 
 def distPackageName
-	"EvoThingsStudio"
+	"EvothingsStudio"
 end
 
 def applicationName
-	"EvoThingsWorkbench"
+	"EvothingsWorkbench"
 end
 
 def distCopyright
-	"Copyright (c) 2014 EvoThings AB"
+	"Copyright (c) 2014 Evothings AB"
 end
 
 def distVersion
-	"0.7.1"
+	"0.7.2"
 end
 
 def root
