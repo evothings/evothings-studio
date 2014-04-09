@@ -1,4 +1,4 @@
-# Build a distribution package of EvoThings Studio.
+# Build a distribution package of Evothings Studio.
 # Author: Mikael Kindborg
 
 require "fileutils"
