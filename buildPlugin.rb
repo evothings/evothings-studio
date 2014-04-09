@@ -1,4 +1,4 @@
-# Build plugin for EvoThings Studio.
+# Build plugin for Evothings Studio.
 # Author: Mikael Kindborg
 
 def distPackageName

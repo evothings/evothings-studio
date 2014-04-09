@@ -1,12 +1,12 @@
 {
   "main": "hyper/ui/hyper-ui.html",
-  "name": "EvoThings Workbench",
+  "name": "Evothings Workbench",
   "description": "HTML/JS IoT mobile app development tool",
   "version": "__VERSION__",
-  "keywords": ["EvoThings Studio", "mobile", "JavaScript"],
+  "keywords": ["Evothings Studio", "mobile", "JavaScript"],
   "window":
   {
-    "title": "EvoThings Workbench __VERSION__",
+    "title": "Evothings Workbench __VERSION__",
     "toolbar": false,
     "frame": true,
     "width": 700,
