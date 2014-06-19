@@ -66,16 +66,16 @@ Copyright (c) 2013-2014 Evothings AB
 		</div>
 
 		<div id="panel-middle">
-			<!-- Modal -->
-			<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			<!-- ModalDialog-NoClientConnected--->
+			<div class="modal fade" id="ModalDialog-NoClientConnected" tabindex="-1" role="dialog" aria-labelledby="ModalDialog-NoClientConnected-Label" aria-hidden="true">
 				<div class="modal-dialog">
 					<div class="modal-content">
 						<div class="modal-header">
 							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-							<h4 class="modal-title" id="myModalLabel">No client connected</h4>
+							<h4 class="modal-title" id="ModalDialog-NoClientConnected-Label">No client connected</h4>
 						</div>
 						<div class="modal-body">
-							Please use the <a href="javascript:void(0)" id="clientAppLink">Evothings Client app</a>.
+							Please use the <a href="javascript:void(0)" id="ModalDialog-NoClientConnected-ClientAppLink">Evothings Client app</a>.
 						</div>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -83,8 +83,33 @@ Copyright (c) 2013-2014 Evothings AB
 					</div>
 				</div>
 			</div>
-			<div id="project-list">
+
+			<!-- ModalDialog-NewVersionAvailable--->
+			<div class="modal fade" id="ModalDialog-NewVersionAvailable" tabindex="-1" role="dialog" aria-labelledby="ModalDialog-NewVersionAvailable-Label" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h4 class="modal-title" id="ModalDialog-NewVersionAvailable-Label">New Version Available!</h4>
+						</div>
+						<div class="modal-body">
+							<p>New version <span id="ModalDialog-NewVersionAvailable-VersionNumber"></span>
+							of Evothings Studio is available! Get it at the
+							<a href="javascript:void(0)" id="ModalDialog-NewVersionAvailable-DownloadLink">download page</a>.</p>
+							<div class="checkbox">
+								<input id="ModalDialog-NewVersionAvailable-DoNotShowCheckbox" type="checkbox"> Do not show again for this version.
+							</div>
+						</div>
+
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+						</div>
+					</div>
+				</div>
 			</div>
+
+			<!-- Project list -->
+			<div id="project-list"></div>
 		</div>
 
 		<div id="panel-bottom">
@@ -112,10 +137,9 @@ Copyright (c) 2013-2014 Evothings AB
 	{
 		var PATH = require('path')
 		var GUI = require('nw.gui')
+		var FILEUTIL = require('../server/fileutil.js')
 
-		// Reference to Welcome window, used for preventing opening it
-		// multiple times and instead focusing it if already opened.
-		var mWelcomeWindow = null
+		// ************** Documentation Button **************
 
 		var button = $('#button-documentation')
 		button && button.click(function()
@@ -124,6 +148,8 @@ Copyright (c) 2013-2014 Evothings AB
 			GUI.Shell.openExternal(url)
 		})
 
+		// ************** Forum Button **************
+
 		button = $('#button-forum')
 		button && button.click(function()
 		{
@@ -131,12 +157,20 @@ Copyright (c) 2013-2014 Evothings AB
 			GUI.Shell.openExternal('http://forum.evothings.com/')
 		})
 
+		// ************** Feedback Button **************
+
 		button = $('#button-feedback')
 		button && button.click(function()
 		{
 			// URL to feedback page.
 			GUI.Shell.openExternal('http://evothings.com/feedback/')
 		})
+
+		// ************** Welcome Window **************
+
+		// Reference to Welcome window, used for preventing opening it
+		// multiple times and instead focusing it if already opened.
+		var mWelcomeWindow = null
 
 		hyper.showWelcomeScreen = function()
 		{
@@ -170,16 +204,74 @@ Copyright (c) 2013-2014 Evothings AB
 			hyper.showWelcomeScreen()
 		}
 
+		// ************** No Client Connected Event **************
+
+		// Called when you press Run and no client is connected.
 		hyper.noClientConnectedHander = function()
 		{
-			$('#myModal').modal('show')
+			$('#ModalDialog-NoClientConnected').modal('show')
 		}
 
-		$('#clientAppLink').click(function()
+		// Click handler for link in the ModalDialog-NoClientConnected dialog.
+		$('#ModalDialog-NoClientConnected-ClientAppLink').click(function()
 		{
 			var url = 'file://' + PATH.resolve('./documentation/mobile-app.html')
 			GUI.Shell.openExternal(url)
 		})
+
+		// ************** Version Check **************
+
+		function doVersionCheck()
+		{
+			// Check for new version at most every 24h.
+			var millisIn24h = 1000*60*60*24
+			var lastCheck = localStorage.getItem('evo-version-check-timestamp')
+			if (!lastCheck || (parseInt(lastCheck) + millisIn24h <= Date.now()))
+			{
+				// Save time stamp for this check.
+				localStorage.setItem('evo-version-check-timestamp', Date.now())
+
+				// Get installed version from package file.
+				var data = FILEUTIL.readFileSync('package.json')
+				var installedVersion = JSON.parse(data).version
+
+				// Get version info from server.
+				FILEUTIL.downloadAsString(
+					'http://evomedia.evothings.com/versioninfo/EvothingsWorkbench.txt',
+					function(status, version)
+					{
+						var doNotShowVersion = localStorage.getItem(
+							'evo-version-check-do-not-show-version')
+						if (200 == status &&
+							version > installedVersion &&
+							version != doNotShowVersion)
+						{
+							hyper.newAvaiableVersion = version
+							$('#ModalDialog-NewVersionAvailable-VersionNumber').html(version)
+							$('#ModalDialog-NewVersionAvailable').modal('show')
+						}
+					})
+
+				// Do a new check every 60 minutes.
+				setTimeout(doVersionCheck, 1000*60*60)
+			}
+		}
+
+		// Click handler for download link in the ModalDialog-NewVersionAvailable dialog.
+		$('#ModalDialog-NewVersionAvailable-DownloadLink').click(function()
+		{
+			GUI.Shell.openExternal('http://evothings.com/download/')
+		})
+
+		// Click handler for download link in the ModalDialog-NewVersionAvailable dialog.
+		$('#ModalDialog-NewVersionAvailable-DoNotShowCheckbox').change(function(event)
+		{
+			var version = event.target.checked ? hyper.newAvaiableVersion : null
+			localStorage.setItem('evo-version-check-do-not-show-version', version)
+		})
+
+		// Do version check on start up.
+		setTimeout(doVersionCheck, 1000)
 	})()
 	</script>
 </body>
