@@ -237,7 +237,7 @@ Copyright (c) 2013-2014 Evothings AB
 
 				// Get version info from server.
 				FILEUTIL.downloadAsString(
-					'http://evomedia.evothings.com/versioninfo/EvothingsWorkbench.txt',
+					'http://evothings.com/versioninfo/EvothingsWorkbench.txt',
 					function(status, version)
 					{
 						var doNotShowVersion = localStorage.getItem(
@@ -246,7 +246,7 @@ Copyright (c) 2013-2014 Evothings AB
 							version > installedVersion &&
 							version != doNotShowVersion)
 						{
-							hyper.newAvaiableVersion = version
+							hyper.newAvailableVersion = version
 							$('#ModalDialog-NewVersionAvailable-VersionNumber').html(version)
 							$('#ModalDialog-NewVersionAvailable').modal('show')
 						}
@@ -266,7 +266,7 @@ Copyright (c) 2013-2014 Evothings AB
 		// Click handler for download link in the ModalDialog-NewVersionAvailable dialog.
 		$('#ModalDialog-NewVersionAvailable-DoNotShowCheckbox').change(function(event)
 		{
-			var version = event.target.checked ? hyper.newAvaiableVersion : null
+			var version = event.target.checked ? hyper.newAvailableVersion : null
 			localStorage.setItem('evo-version-check-do-not-show-version', version)
 		})
 
