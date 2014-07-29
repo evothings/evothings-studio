@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<!--
+File: hyper-connect.html
+Description: Loaded when making a root get request to
+open a connection from browser to server.
+Author: Mikael Kindborg
+Copyright (c) 2013 Mikael Kindborg
+License: Apache Version 2.0
+-->
+<head>
+
+	<meta charset="utf-8">
+
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=1">
+
+	<title>Connect</title>
+
+	<script>
+	hyper.onConnected(function()
+	{
+		document.getElementById('screen1').style.display = 'none'
+		document.getElementById('screen2').style.display = 'block'
+	})
+	</script>
+
+	<style>
+		@import 'ui/evothings-app.css';
+		#screen2 { display: none; }
+	</style>
+
+</head>
+
+<body>
+
+	<header>
+		<button class="back" onclick="history.back()">
+			<img src="ui/gfx/arrow_left.svg" />
+		</button>
+
+		<img class="logotype" src="ui/gfx/logo.svg" alt="Evothings" />
+	</header>
+
+	<main id="screen1">
+		<h1>Connecting...</h1>
+	</main>
+
+	<article id="screen2">
+		<h1>Connected</h1>
+		<p>Click the Run button in the Evothings Workbench to run an app.</p>
+	</article>
+
+</body>
+
+</html>

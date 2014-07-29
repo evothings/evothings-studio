@@ -139,6 +139,9 @@ end
 def buildPostProcess
 	# Copy EvoStudio-specific files to dist.
 	FileUtils.copy_entry(
+		"./hyper/server/hyper-connect.html",
+		pathDistSource + "hyper/server/hyper-connect.html")
+	FileUtils.copy_entry(
 		"./hyper/ui",
 		pathDistSource + "hyper/ui")
 	FileUtils.copy_entry(
@@ -152,6 +155,11 @@ def buildPostProcess
 	FileUtils.copy_entry(
 		root + "EvoThingsExamples/examples",
 		pathDistSource + "examples")
+
+	# Copy Evothings Examples resources to dist.
+	FileUtils.copy_entry(
+		root + "EvoThingsExamples/resources",
+		pathDistSource + "hyper/server/ui")
 
 	# Rename HyperReload license file.
 	FileUtils.mv(
