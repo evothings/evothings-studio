@@ -159,7 +159,7 @@ def buildPostProcess
 	# Copy Evothings Examples resources to dist.
 	FileUtils.copy_entry(
 		root + "EvoThingsExamples/resources",
-		pathDistSource + "hyper/server/ui")
+		pathDistSource + "hyper/ui/style")
 
 	# Rename HyperReload license file.
 	FileUtils.mv(
