@@ -157,9 +157,9 @@ def buildPostProcess
 		pathDistSource + "examples")
 
 	# Copy Evothings Examples resources to dist.
-	FileUtils.copy_entry(
-		root + "EvoThingsExamples/resources",
-		pathDistSource + "hyper/ui/style")
+	FileUtils.cp_r(
+		Dir[root + "EvoThingsExamples/resources/*"],
+		pathDistSource + "hyper/ui/")
 
 	# Rename HyperReload license file.
 	FileUtils.mv(
