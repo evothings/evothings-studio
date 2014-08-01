@@ -10,8 +10,8 @@ body {
 }
 
 .et-btn-red {
-	border-color: #e15a64;
-	background-color: #e15a64;
+	border-color: #e15a64 !important;
+	background-color: #e15a64 !important;
 }
 .et-btn-red:hover, .et-btn-red:active,
 .btn-group.open .et-btn-red {
@@ -20,8 +20,8 @@ body {
 }
 
 .et-btn-yellow {
-	border-color: #ecd53b;
-	background-color: #ecd53b;
+	border-color: #ecd53b !important;
+	background-color: #ecd53b !important;
 }
 .et-btn-yellow:hover, .et-btn-yellow:active,
 .btn-group.open .et-btn-yellow {
@@ -30,8 +30,8 @@ body {
 }
 
 .et-btn-green, .button-run {
-	border-color: #54dfb3;
-	background-color: #54dfb3;
+	border-color: #54dfb3 !important;
+	background-color: #54dfb3 !important;
 }
 .et-btn-green:hover, .et-btn-green:active,
 .btn-group.open .et-btn-green,
@@ -41,8 +41,8 @@ body {
 }
 
 .et-btn-blue {
-	border-color: #6bc6ce;
-	background-color: #6bc6ce;
+	border-color: #6bc6ce !important;
+	background-color: #6bc6ce !important;
 }
 .et-btn-blue:hover, .et-btn-blue:active,
 .btn-group.open .et-btn-blue {
@@ -51,8 +51,8 @@ body {
 }
 
 .et-btn-indigo {
-	border-color: #b48b9b;
-	background-color: #b48b9b;
+	border-color: #b48b9b !important;
+	background-color: #b48b9b !important;
 }
 .et-btn-indigo:hover, .et-btn-indigo:active,
 .btn-group.open .et-btn-indigo {
@@ -61,8 +61,8 @@ body {
 }
 
 .et-btn-arctic {
-	border-color: #f3f3f3;
-	background-color: #f3f3f3;
+	border-color: #f3f3f3 !important;
+	background-color: #f3f3f3 !important;
 }
 .et-btn-arctic:hover, .et-btn-arctic:active,
 .btn-group.open .et-btn-arctic {
@@ -71,8 +71,8 @@ body {
 }
 
 .et-btn-aluminium, .button-open {
-	border-color: #e2e2e2;
-	background-color: #e2e2e2;
+	border-color: #e2e2e2 !important;
+	background-color: #e2e2e2 !important;
 }
 .et-btn-aluminium:hover, .et-btn-aluminium:active,
 .btn-group.open .et-btn-aluminium,
@@ -82,8 +82,8 @@ body {
 }
 
 .et-btn-charcoal {
-	border-color: #b9b9b9;
-	background-color: #b9b9b9;
+	border-color: #b9b9b9 !important;
+	background-color: #b9b9b9 !important;
 }
 .et-btn-charcoal:hover, .et-btn-charcoal:active,
 .btn-group.open .et-btn-charcoal {
