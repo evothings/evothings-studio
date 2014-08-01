@@ -1,0 +1,100 @@
+
+@import 'fonts/ProximaNova.css';
+
+body {
+	font-family: 'Proxima Nova Regular';
+}
+
+.btn {
+	text-transform: uppercase;
+}
+
+.et-btn-red {
+	border-color: #e15a64;
+	background-color: #e15a64;
+}
+.et-btn-red:hover, .et-btn-red:active,
+.btn-group.open .et-btn-red {
+	border-color: #cb414b !important;
+	background-color: #cb414b !important;
+}
+
+.et-btn-yellow {
+	border-color: #ecd53b;
+	background-color: #ecd53b;
+}
+.et-btn-yellow:hover, .et-btn-yellow:active,
+.btn-group.open .et-btn-yellow {
+	border-color: #d9c022 !important;
+	background-color: #d9c022 !important;
+}
+
+.et-btn-green, .button-run {
+	border-color: #54dfb3;
+	background-color: #54dfb3;
+}
+.et-btn-green:hover, .et-btn-green:active,
+.btn-group.open .et-btn-green,
+.button-run:hover, .button-run:active {
+	border-color: #3aca9c !important;
+	background-color: #3aca9c !important;
+}
+
+.et-btn-blue {
+	border-color: #6bc6ce;
+	background-color: #6bc6ce;
+}
+.et-btn-blue:hover, .et-btn-blue:active,
+.btn-group.open .et-btn-blue {
+	border-color: #52afb8 !important;
+	background-color: #52afb8 !important;
+}
+
+.et-btn-indigo {
+	border-color: #b48b9b;
+	background-color: #b48b9b;
+}
+.et-btn-indigo:hover, .et-btn-indigo:active,
+.btn-group.open .et-btn-indigo {
+	border-color: #9c7283 !important;
+	background-color: #9c7283 !important;
+}
+
+.et-btn-arctic {
+	border-color: #f3f3f3;
+	background-color: #f3f3f3;
+}
+.et-btn-arctic:hover, .et-btn-arctic:active,
+.btn-group.open .et-btn-arctic {
+	border-color: #656565 !important;
+	background-color: #656565 !important;
+}
+
+.et-btn-aluminium, .button-open {
+	border-color: #e2e2e2;
+	background-color: #e2e2e2;
+}
+.et-btn-aluminium:hover, .et-btn-aluminium:active,
+.btn-group.open .et-btn-aluminium,
+.button-open:hover, .button-open:active {
+	border-color: #c0c0c0 !important;
+	background-color: #c0c0c0 !important;
+}
+
+.et-btn-charcoal {
+	border-color: #b9b9b9;
+	background-color: #b9b9b9;
+}
+.et-btn-charcoal:hover, .et-btn-charcoal:active,
+.btn-group.open .et-btn-charcoal {
+	border-color: #9d9d9d !important;
+	background-color: #9d9d9d !important;
+}
+
+#button-documentation {
+	width: 30%;
+}
+
+#button-workbench, #button-forum, #button-feedback {
+	width: 23%;
+}
