@@ -9,7 +9,7 @@ body {
 	text-transform: uppercase;
 }
 
-.et-btn-red {
+.et-btn-red, #button-clear-log, #button-clear-editor {
 	border-color: #e15a64 !important;
 	background-color: #e15a64 !important;
 }
@@ -19,7 +19,7 @@ body {
 	background-color: #cb414b !important;
 }
 
-.et-btn-yellow {
+.et-btn-yellow, #button-restore {
 	border-color: #ecd53b !important;
 	background-color: #ecd53b !important;
 }
@@ -29,7 +29,7 @@ body {
 	background-color: #d9c022 !important;
 }
 
-.et-btn-green, .button-run {
+.et-btn-green, .button-run, #button-eval, #button-eval-node {
 	border-color: #54dfb3 !important;
 	background-color: #54dfb3 !important;
 }
@@ -40,7 +40,7 @@ body {
 	background-color: #3aca9c !important;
 }
 
-.et-btn-blue {
+.et-btn-blue, #button-undo, #button-redo {
 	border-color: #6bc6ce !important;
 	background-color: #6bc6ce !important;
 }
@@ -50,7 +50,7 @@ body {
 	background-color: #52afb8 !important;
 }
 
-.et-btn-indigo {
+.et-btn-indigo, #button-toggle-autoscroll {
 	border-color: #b48b9b !important;
 	background-color: #b48b9b !important;
 }
