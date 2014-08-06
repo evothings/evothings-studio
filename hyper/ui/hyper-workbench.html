@@ -462,6 +462,8 @@ $(function()
 
 	function saveUIState()
 	{
+		// Save editor and log content.
+
 		var maxStorageSize = 100000
 		var editorContent = mEditor.getValue()
 		var resultContent = mResult.getValue()
@@ -477,6 +479,19 @@ $(function()
 		localStorage.setItem('workbench-code-editor-content', editorContent)
 		localStorage.setItem('workbench-result-editor-content', resultContent)
 
+		// Save window layout.
+
+		var win = GUI.Window.get()
+
+		// Do not save if window is minimized on Windows.
+		// On Windows an icon has x,y coords -32000 when
+		// window is minimized. On Linux and OS X the window
+		// coordinates and size are intact when minimized.
+		if (win.x < -1000)
+		{
+			return;
+		}
+
 		localStorage.setItem('workbench-window-geometry', JSON.stringify({
 			x: win.x,
 			y: win.y,
@@ -489,7 +504,7 @@ $(function()
 		localStorage.setItem('workbench-divider-position', layout.state.south.size)
 	}
 
-	// Global reference.
+	// Save global reference to function.
 	window.saveUIState = saveUIState
 
 	function restoreSavedUIState()
