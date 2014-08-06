@@ -11,6 +11,7 @@
     "frame": true,
     "width": 700,
     "height": 600,
-    "position": "mouse"
+    "position": "mouse",
+    "icon": "hyper/ui/evothings-icon.png"
   }
 }
