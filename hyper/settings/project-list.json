@@ -7,5 +7,6 @@
 "examples/arduino-ble/app/index.html",
 "examples/ble-scan/index.html",
 "examples/ble-discovery/index.html",
-"examples/ble-ti-sensortag/index.html"
+"examples/ble-ti-sensortag/index.html",
+"examples/ibeacon-scan/index.html"
 ]
