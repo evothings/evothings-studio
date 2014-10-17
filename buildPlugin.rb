@@ -43,7 +43,7 @@ end
 
 # Source of documentation files.
 def pathSourceDoc
-	root + "EvoThingsDoc"
+	root + "evothings-doc"
 end
 
 def nodeWebKitVersion
@@ -102,10 +102,10 @@ end
 def buildGitVersionFile
 	open(pathDistSource + 'gitVersions.txt', 'w') do |file|
 		[
-			'EvoThingsStudio',
-			'EvoThingsClient',
-			'EvoThingsDoc',
-			'EvoThingsExamples',
+			'evothings-studio',
+			'evothings-client',
+			'evothings-doc',
+			'evothings-examples',
 			'HyperReload',
 			'cordova-ble',
 		].each do |repo|
@@ -128,12 +128,12 @@ end
 
 def buildEvoThingsClient
 	cwd = FileUtils.pwd
-	FileUtils.chdir(root + 'EvoThingsClient')
+	FileUtils.chdir(root + 'evothings-client')
 	sh 'ruby workfile.rb'
 	FileUtils.chdir(cwd)
-	FileUtils.copy_entry(root + 'EvoThingsClient',
-		pathDistSource + 'EvoThingsClient')
-	FileUtils.remove_dir(pathDistSource + 'EvoThingsClient/.git', true)
+	FileUtils.copy_entry(root + 'evothings-client',
+		pathDistSource + 'evothings-client')
+	FileUtils.remove_dir(pathDistSource + 'evothings-client/.git', true)
 end
 
 def buildPostProcess
@@ -153,17 +153,17 @@ def buildPostProcess
 
 	# Copy EvoStudio examples to dist.
 	FileUtils.copy_entry(
-		root + "EvoThingsExamples/examples",
+		root + "evothings-examples/examples",
 		pathDistSource + "examples")
 
 	# Copy Evothings Examples resources to dist.
 	FileUtils.cp_r(
-		Dir[root + "EvoThingsExamples/resources/*"],
+		Dir[root + "evothings-examples/resources/*"],
 		pathDistSource + "hyper/ui/")
 
 	# Copy Evothings Examples resources to documentation directory.
 	FileUtils.cp_r(
-		Dir[root + "EvoThingsExamples/resources/*"],
+		Dir[root + "evothings-examples/resources/*"],
 		pathDistSource + "documentation/")
 
 	# Rename HyperReload license file.
