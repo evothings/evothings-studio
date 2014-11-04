@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<!--
+File: welcome.html
+Description: Evothings Studio welcome page.
+Author: Eric Svensson, Mikael Kindborg
+Copyright (c) 2013-2014 Evothings AB
+-->
+<head>
+
+	<meta charset="utf-8">
+
+	<title>Welcome to Evothings Studio</title>
+
+	<script>
+	var GUI = require('nw.gui')
+
+	function openInBrowser(url)
+	{
+		GUI.Shell.openExternal(url)
+	}
+	</script>
+
+	<style>
+	@import '../server/ui/css/evothings-app.css';
+
+	body {
+		width: 93.5%;
+		margin: 0 3.25% 0 3.25%;
+		font-size: 300%;
+		font-size: 5vmin;
+	}
+
+	/* Add a top margin to the content corresponding to the height of the header. */
+	body::before {
+		height: 3%;
+		margin-bottom: 0;
+	}
+
+	button {
+		font-family: 'Proxima Nova Regular', sans-serif;
+		font-weight: normal;
+	}
+
+	.logotype {
+		position: absolute;
+		width: 10%;
+		top: 2%;
+		right: 2%;
+	}
+
+	.download-links img,
+	.download-links button {
+		vertical-align: middle;
+		display: inline-block;
+		height: 2em;
+		line-height: 2em;
+		text-transform: none;
+		margin: 0;
+		padding: 0;
+	}
+	.download-links button {
+		padding: 0 0.5em;
+	}
+	</style>
+
+</head>
+
+<body>
+
+	<h1>Welcome to Evothings Studio!</h1>
+
+	<img class="logotype" src="../server/ui/images/logo.svg" alt="Evothings" />
+
+	<p>
+		Evothings Studio consists of two parts, the Workbench and the Client app.
+	</p>
+
+	<p>
+		Next step is to install the <strong>Evothings Client</strong> app on your mobile devices.
+	</p>
+
+	<p class="download-links">
+		<img src="images/google-play.svg" alt="Google Play" onclick="openInBrowser('https://play.google.com/store/apps/details?id=com.evothings.evothingsclient')"/>
+		<img src="images/app-store.png" alt="App Store" onclick="openInBrowser('https://itunes.apple.com/nz/app/evothings-client/id848974292?mt=8')"/>
+		<button class="black" alt="Manual download"
+			onclick="openInBrowser('http://evothings.com/download/#otherdownloads')" />Manual download</button>
+	</p>
+
+	<img src="images/ets-illustration_v2.png" width="75%" />
+
+	<p>
+		To connect the Client app to the Workbench, they should be on a local network that allows connections.
+	</p>
+
+	<p>Happy tinkering!</p>
+
+	<script>
+	;(function()
+		{
+			var GUI = require('nw.gui')
+
+			var button = $('#button-googleplay')
+			button && button.click(function(event)
+			{
+				event.preventDefault();
+				var url = $(this).attr('href')
+				GUI.Shell.openExternal(url)
+			})
+	})()
+	</script>
+
+</body>
+
+</html>

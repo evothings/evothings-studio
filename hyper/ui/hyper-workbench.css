@@ -1,5 +1,4 @@
-
-@import 'fonts/ProximaNova.css';
+@import '../server/ui/fonts/ProximaNova.css';
 
 body {
 	font-family: 'Proxima Nova Regular';
@@ -8,6 +7,16 @@ body {
 .btn {
 	text-transform: uppercase;
 }
+
+
+#panel-tool-buttons .btn {
+	text-transform: none !important;
+}
+
+#toolbar .btn {
+	text-transform: uppercase !important;
+}
+
 
 .et-btn-red, #button-clear-log, #button-clear-editor {
 	border-color: #e15a64 !important;

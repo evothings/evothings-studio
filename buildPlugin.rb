@@ -14,7 +14,7 @@ def distCopyright
 end
 
 def distVersion
-	"0.8.0"
+	"1.0.0"
 end
 
 def root
@@ -120,10 +120,9 @@ end
 
 def buildPreProcess
 	buildGitVersionFile
-
 	buildOSXIcons
-
-	buildEvoThingsClient
+	# Commented out build of Evothings Client to make download package smaller.
+	#buildEvoThingsClient
 end
 
 def buildEvoThingsClient
@@ -137,41 +136,44 @@ def buildEvoThingsClient
 end
 
 def buildPostProcess
-	# Copy EvoStudio-specific files to dist.
+	# Copy (overwrite) custom server files to dist.
 	FileUtils.copy_entry(
-		"./hyper/server/hyper-connect.html",
-		pathDistSource + "hyper/server/hyper-connect.html")
+		"./hyper/server",
+		pathDistSource + "hyper/server")
+
+	# Copy (overwrite) custom UI files to dist.
 	FileUtils.copy_entry(
 		"./hyper/ui",
 		pathDistSource + "hyper/ui")
+
+	# Copy (overwrite) custom settings files to dist.
 	FileUtils.copy_entry(
 		"./hyper/settings",
 		pathDistSource + "hyper/settings")
 
+	# Copy Evothings Examples UI resources to hyper/server.
+	# This is used by the hyper-connect.html page.
+	FileUtils.cp_r(
+		Dir[root + "evothings-examples/resources/ui"],
+		pathDistSource + "hyper/server")
+
 	# Delete files that should not be in the dist.
 	FileUtils.remove_dir(pathDistSource + "hyper/demo", true)
 
-	# Copy EvoStudio examples to dist.
+	# Build Evothings Examples.
+	sh 'cd ../evothings-examples/; ruby build.rb; cd ../evothings-studio/'
+
+	# Copy Evothings Examples to dist.
 	FileUtils.copy_entry(
 		root + "evothings-examples/examples",
 		pathDistSource + "examples")
-
-	# Copy Evothings Examples resources to dist.
-	FileUtils.cp_r(
-		Dir[root + "evothings-examples/resources/*"],
-		pathDistSource + "hyper/ui/")
-
-	# Copy Evothings Examples resources to documentation directory.
-	FileUtils.cp_r(
-		Dir[root + "evothings-examples/resources/*"],
-		pathDistSource + "documentation/")
 
 	# Rename HyperReload license file.
 	FileUtils.mv(
 		pathDistSource + "LICENSE.md",
 		pathDistSource + "HyperReload-LICENSE.md")
 
-	# Copy EvoStudio license file.
+	# Copy Evothings Studio license file.
 	FileUtils.copy_entry(
 		"./LICENSE",
 		pathDistSource + "LICENSE")
