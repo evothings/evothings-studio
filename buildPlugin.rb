@@ -161,7 +161,7 @@ def buildPostProcess
 	FileUtils.remove_dir(pathDistSource + "hyper/demo", true)
 
 	# Build Evothings Examples.
-	sh 'cd ../evothings-examples/; ruby build.rb; cd ../evothings-studio/'
+	sh 'cd ../evothings-examples/ && ruby build.rb && cd ../evothings-studio/'
 
 	# Copy Evothings Examples to dist.
 	FileUtils.copy_entry(
