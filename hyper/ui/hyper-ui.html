@@ -221,41 +221,86 @@ Copyright (c) 2013-2014 Evothings AB
 
 		// ************** Version Check **************
 
-		function doVersionCheck()
+		function versionCheck()
 		{
-			// Check for new version at most every 24h.
-			var millisIn24h = 1000*60*60*24
-			var lastCheck = localStorage.getItem('evo-version-check-timestamp')
-			if (!lastCheck || (parseInt(lastCheck) + millisIn24h <= Date.now()))
+			// Get currently installed version.
+			var installedVersion = versionGetCurrent()
+
+			// Get platform string.
+			var platformTable =
 			{
-				// Save time stamp for this check.
-				localStorage.setItem('evo-version-check-timestamp', Date.now())
-
-				// Get installed version from package file.
-				var data = FILEUTIL.readFileSync('package.json')
-				var installedVersion = JSON.parse(data).version
-
-				// Get version info from server.
-				FILEUTIL.downloadAsString(
-					'http://evothings.com/versioninfo/EvothingsWorkbench.txt',
-					'EvothingsWorkbench',
-					function(status, version)
-					{
-						var doNotShowVersion = localStorage.getItem(
-							'evo-version-check-do-not-show-version')
-						if (200 == status &&
-							version > installedVersion &&
-							version != doNotShowVersion)
-						{
-							hyper.newAvailableVersion = version
-							$('#ModalDialog-NewVersionAvailable-VersionNumber').html(version)
-							$('#ModalDialog-NewVersionAvailable').modal('show')
-						}
-					})
-
-				// Do a new check every 60 minutes.
-				setTimeout(doVersionCheck, 1000*60*60)
+				'linux':'linux',
+				'win32':'windows',
+				'darwin':'macosx'
 			}
+			var platform = platformTable[process.platform]
+
+			// Get saved GUID.
+			var guid = localStorage.getItem('evo-guid')
+
+			// Create JSON request data.
+			var json =
+				'{"platform":"' + platform + '",'
+				+ '"version":"' + installedVersion + '"'
+			if (guid) { json += ',"guid":"' + guid + '"' }
+			json += '}'
+
+			// Create URL for the request.
+			var requestURL =
+				'http://evothings.com/versioninfo/EvothingsWorkbench.php?param='
+				+ encodeURIComponent(json)
+
+			// TODO: For debugging, remove later on.
+			console.log('Version request: ' + json)
+
+			// Get version info from server.
+			FILEUTIL.downloadAsString(
+				requestURL,
+				'EvothingsWorkbench', // User agent
+				versionCheckResponseHandler)
+		}
+
+		function versionCheckResponseHandler(status, data)
+		{
+			// Abort if the response is not valid.
+			if (200 != status)
+			{
+				return
+			}
+
+			// Parse response.
+			var response = JSON.parse(data)
+
+			// Store GUID.
+			localStorage.setItem('evo-guid', response.guid)
+
+			// Get currently installed version.
+			var installedVersion = versionGetCurrent()
+
+			// Get value of version update user does not want to be reminded of.
+			var doNotShowVersion = localStorage.getItem(
+				'evo-version-check-do-not-show-version')
+
+			// Show dialog with info about new version.
+			// Check that the available version is greater
+			// than the installed version and that the user
+			// has not marked this version as do-not-show.
+			if (response.version > installedVersion &&
+				response.version != doNotShowVersion)
+			{
+				hyper.newAvailableVersion = response.version
+
+				$('#ModalDialog-NewVersionAvailable-VersionNumber').html(response.version)
+				$('#ModalDialog-NewVersionAvailable').modal('show')
+			}
+		}
+
+		function versionGetCurrent()
+		{
+			// Get installed version from package file.
+			var data = FILEUTIL.readFileSync('package.json')
+			var installedVersion = JSON.parse(data).version
+			return installedVersion
 		}
 
 		// Click handler for download link in the ModalDialog-NewVersionAvailable dialog.
@@ -267,12 +312,13 @@ Copyright (c) 2013-2014 Evothings AB
 		// Click handler for download link in the ModalDialog-NewVersionAvailable dialog.
 		$('#ModalDialog-NewVersionAvailable-DoNotShowCheckbox').change(function(event)
 		{
+			// Store the version info that we should not show dialog for.
 			var version = event.target.checked ? hyper.newAvailableVersion : null
 			localStorage.setItem('evo-version-check-do-not-show-version', version)
 		})
 
-		// Do version check on start up.
-		setTimeout(doVersionCheck, 1000)
+		// Do version check at start up.
+		setTimeout(versionCheck, 1000)
 	})()
 	</script>
 </body>
