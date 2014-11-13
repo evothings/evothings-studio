@@ -16,18 +16,20 @@ License: Apache Version 2.0
 
 	<title>Connect</title>
 
+	<style>
+		@import 'ui/css/evothings-app.css';
+		#screen2 { display: none; }
+	</style>
+
+	<!--hyper.reloader-->
+
 	<script>
-	hyper.onConnected(function()
+	window.hyper && hyper.onConnected(function()
 	{
 		document.getElementById('screen1').style.display = 'none'
 		document.getElementById('screen2').style.display = 'block'
 	})
 	</script>
-
-	<style>
-		@import 'ui/css/evothings-app.css';
-		#screen2 { display: none; }
-	</style>
 
 </head>
 

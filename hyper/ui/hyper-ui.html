@@ -175,22 +175,16 @@ Copyright (c) 2013-2014 Evothings AB
 
 		hyper.showWelcomeScreen = function()
 		{
-			if (mWelcomeWindow && !mWelcomeWindow.closed)
-			{
-				// Bring existing window to front.
-				mWelcomeWindow.focus()
-			}
-			else
-			{
-				// Create new window.
-				mWelcomeWindow = window.open(
-					'welcome-frame.html',
-					'welcome',
-					'resizable=1,width=800,height=600')
-				mWelcomeWindow.moveTo(50, 50)
-				mWelcomeWindow.focus()
-			}
-		};
+			// Create window.
+			mWelcomeWindow = window.open(
+				'welcome.html',
+				{
+					resizable: true
+				})
+			mWelcomeWindow.resizeTo(650, 700)
+			mWelcomeWindow.moveTo(50, 50)
+			mWelcomeWindow.focus()
+		}
 
 		function getShowWelcomeScreen()
 		{
