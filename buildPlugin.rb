@@ -159,6 +159,7 @@ def buildPostProcess
 
 	# Delete files that should not be in the dist.
 	FileUtils.remove_dir(pathDistSource + "hyper/demo", true)
+	FileUtils.remove_dir(pathDistSource + "documentation/.git", true)
 
 	# Build Evothings Examples.
 	sh 'cd ../evothings-examples/ && ruby build.rb && cd ../evothings-studio/'
