@@ -14,7 +14,7 @@ def distCopyright
 end
 
 def distVersion
-	"1.0.0"
+	"1.1.0 RC"
 end
 
 def root
@@ -47,7 +47,7 @@ def pathSourceDoc
 end
 
 def nodeWebKitVersion
-	"0.8.4"
+	"0.11.2"
 end
 
 def pathNodeWebkitLinux32
@@ -62,16 +62,22 @@ def pathNodeWebkitLinux64
 		"-linux-x64/"
 end
 
-def pathNodeWebkitWin
+def pathNodeWebkitWin32
 	root + "node-webkit-bin-" + nodeWebKitVersion +
 		"/node-webkit-v" + nodeWebKitVersion +
 		"-win-ia32/"
 end
 
-def pathNodeWebkitMac
+def pathNodeWebkitWin64
 	root + "node-webkit-bin-" + nodeWebKitVersion +
 		"/node-webkit-v" + nodeWebKitVersion +
-		"-osx-ia32/"
+		"-win-x64/"
+end
+
+def pathNodeWebkitMac64
+	root + "node-webkit-bin-" + nodeWebKitVersion +
+		"/node-webkit-v" + nodeWebKitVersion +
+		"-osx-x64/"
 end
 
 def updateFile(tar, src)
