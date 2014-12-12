@@ -15,10 +15,10 @@
 "examples/arduino-ble/app/index.html",
 "examples/arduino-scriptable-tcp/app/index.html",
 
-"examples/redbearlabs-simplecontrol/index.html",
-"examples/redbearlabs-simplechat/index.html",
+"examples/redbearlab-simplecontrol/index.html",
+"examples/redbearlab-simplechat/index.html",
 
 "examples/lightblue-bean-basic/app/index.html",
 "examples/rfduino-led-onoff/app/index.html",
 "examples/bluno-helloworld/app/index.html",
-"examples/nordic-ble/app/index.html"]
+"examples/nordic-ble/index.html"]
