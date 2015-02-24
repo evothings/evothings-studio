@@ -127,8 +127,31 @@ end
 def buildPreProcess
 	buildGitVersionFile
 	buildOSXIcons
+	buildDocumentation
 	# Commented out build of Evothings Client to make download package smaller.
 	#buildEvoThingsClient
+end
+
+def buildDocumentation
+	include FileUtils::Verbose
+	cwd = pwd
+
+	mkdir_p pathDistSource + 'documentation'
+
+	# plugins
+	cd "#{root}evothings-client"
+	sh 'ruby workfile.rb doc'
+	cd cwd
+	dst = pathDistSource + 'documentation/plugins'
+	mv("#{root}evothings-client/gen-doc", dst)
+
+	# libraries
+	src = "#{root}evothings-examples/resources/libs/evothings"
+	cd src
+	sh 'jsdoc -r .'
+	cd cwd
+	dst = pathDistSource + 'documentation/libs'
+	mv(src + '/out', dst)
 end
 
 def buildEvoThingsClient
