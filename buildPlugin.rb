@@ -155,6 +155,7 @@ def buildDocumentation
 	# insert plugin list into API overview.
 	apiOverview = File.read(pathDistSource + 'documentation/studio/api-overview.html')
 	list = File.read(pathDistSource + 'documentation/plugins/index.html.embed')
+	list.gsub!('<a href="', '<a href="../plugins/')
 	apiOverview.gsub!('INSERT_PLUGIN_LIST_HERE', list)
 	File.write(pathDistSource + 'documentation/studio/api-overview.html', apiOverview)
 end
