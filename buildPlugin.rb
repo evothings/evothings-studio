@@ -127,7 +127,6 @@ end
 def buildPreProcess
 	buildGitVersionFile
 	buildOSXIcons
-	buildDocumentation
 	# Commented out build of Evothings Client to make download package smaller.
 	#buildEvoThingsClient
 end
@@ -150,8 +149,14 @@ def buildDocumentation
 	cd src
 	sh 'jsdoc -r .'
 	cd cwd
-	dst = pathDistSource + 'documentation/libs'
+	dst = pathDistSource + 'documentation/lib-doc'
 	mv(src + '/out', dst)
+
+	# insert plugin list into API overview.
+	apiOverview = File.read(pathDistSource + 'documentation/studio/api-overview.html')
+	list = File.read(pathDistSource + 'documentation/plugins/index.html.embed')
+	apiOverview.gsub!('INSERT_PLUGIN_LIST_HERE', list)
+	File.write(pathDistSource + 'documentation/studio/api-overview.html', apiOverview)
 end
 
 def buildEvoThingsClient
@@ -165,6 +170,8 @@ def buildEvoThingsClient
 end
 
 def buildPostProcess
+	buildDocumentation
+
 	# Copy (overwrite) custom server files to dist.
 	FileUtils.copy_entry(
 		"./hyper/server",
