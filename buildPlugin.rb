@@ -10,11 +10,11 @@ def applicationName
 end
 
 def distCopyright
-	"Copyright (c) 2014 Evothings AB"
+	"Copyright (c) 2015 Evothings AB"
 end
 
 def distVersion
-	"1.1.0"
+	"1.1.3"
 end
 
 def root
