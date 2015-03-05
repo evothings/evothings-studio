@@ -105,9 +105,9 @@ Copyright (c) 2013 Evothings AB
 
 	<img src="images/evothings-studio-illustration.jpg" width="90%" />
 
-	<p>
-		To connect the Client app to the Workbench, they should be on a local network that allows connections.
-	</p>
+	<p><strong>To connect over WiFi from Evothings Client to Evothings Workbench, they must be on the same network and client isolation must be off.</strong></p>
+
+	<p>For further details and a Getting Started guide, <a href="javascript:void(0)" onclick="openDocumentation()">visit the documentation</a>.</p>
 
 	<p>Happy tinkering!</p>
 
@@ -124,6 +124,13 @@ Copyright (c) 2013 Evothings AB
 
 	<script>
 	var GUI = require('nw.gui')
+	var PATH = require('path')
+
+	function openDocumentation()
+	{
+		var url = 'file://' + PATH.resolve('./documentation/index.html')
+		openInBrowser(url)
+	}
 
 	function openInBrowser(url)
 	{
