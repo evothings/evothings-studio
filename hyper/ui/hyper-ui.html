@@ -58,9 +58,9 @@ Copyright (c) 2013-2014 Evothings AB
 					<a id="button-forum"
 						class="btn btn-primary btn-hyper-toolbar et-btn-blue"
 						href="javascript:void(0)">Forum</a>
-					<a id="button-feedback"
+					<a id="button-examples"
 						class="btn btn-success btn-hyper-toolbar et-btn-green"
-						href="javascript:void(0)">Feedback</a>
+						href="javascript:void(0)">Examples</a>
 				</div>
 			</div>
 
@@ -154,17 +154,16 @@ Copyright (c) 2013-2014 Evothings AB
 		button = $('#button-forum')
 		button && button.click(function()
 		{
-			// URL to feedback page.
 			GUI.Shell.openExternal('http://forum.evothings.com/')
 		})
 
-		// ************** Feedback Button **************
+		// ************** Examples Button **************
 
-		button = $('#button-feedback')
+		button = $('#button-examples')
 		button && button.click(function()
 		{
-			// URL to feedback page.
-			GUI.Shell.openExternal('http://evothings.com/feedback/')
+			var url = 'file://' + PATH.resolve('./documentation/examples/examples.html')
+			GUI.Shell.openExternal(url)
 		})
 
 		// ************** Welcome Window **************
