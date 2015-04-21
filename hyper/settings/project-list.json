@@ -9,7 +9,9 @@
 "examples/estimote-beacons/index.html",
 "examples/estimote-nearables/index.html",
 
-"examples/ti-sensortag-demo/index.html",
+"examples/ti-sensortag-accelerometer/index.html",
+"examples/ti-sensortag-cc2541-demo/index.html",
+"examples/ti-sensortag-cc2650-demo/index.html",
 "examples/ti-sensortag-sensors/index.html",
 
 "examples/mediatek-linkit/app/index.html",
