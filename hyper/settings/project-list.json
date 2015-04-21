@@ -1,5 +1,5 @@
 ["examples/hello-world/index.html",
-"examples/cordova-basic/index.html",
+"examples/cordova-accelerometer/index.html",
 "examples/hue-lights/index.html",
 
 "examples/ble-scan/index.html",
@@ -10,9 +10,9 @@
 "examples/estimote-nearables/index.html",
 
 "examples/ti-sensortag-accelerometer/index.html",
-"examples/ti-sensortag-cc2541-demo/index.html",
-"examples/ti-sensortag-cc2650-demo/index.html",
 "examples/ti-sensortag-sensors/index.html",
+"examples/ti-sensortag-cc2650-demo/index.html",
+"examples/ti-sensortag-cc2541-demo/index.html",
 
 "examples/mediatek-linkit/app/index.html",
 
