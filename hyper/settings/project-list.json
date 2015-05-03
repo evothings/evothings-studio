@@ -1,6 +1,12 @@
 ["examples/hello-world/index.html",
 "examples/cordova-accelerometer/index.html",
+"examples/hue-lights/index.html",
+
 "examples/ble-scan/index.html",
+"examples/ibeacon-scan/index.html",
+"examples/estimote-beacons/index.html",
+"examples/estimote-nearables/index.html",
+"examples/ble-discovery/index.html",
 
 "examples/ti-sensortag-accelerometer/index.html",
 "examples/ti-sensortag-sensors/index.html",
@@ -11,15 +17,6 @@
 "examples/mbed-custom-gatt/index.html",
 "examples/nordic-nRF51-dk-ble/app/index.html",
 
-"examples/ibeacon-scan/index.html",
-"examples/estimote-beacons/index.html",
-"examples/estimote-nearables/index.html",
-"examples/ble-discovery/index.html",
-
-"examples/hue-lights/index.html",
-
-"examples/mediatek-linkit/app/index.html",
-
 "examples/arduino-led-onoff-tcp/app/index.html",
 "examples/arduino-led-onoff-ble/app/index.html",
 "examples/arduino-ble/app/index.html",
@@ -28,6 +25,7 @@
 "examples/redbearlab-simplecontrol/index.html",
 "examples/redbearlab-simplechat/index.html",
 
+"examples/mediatek-linkit/app/index.html",
 "examples/lightblue-bean-basic/app/index.html",
 "examples/rfduino-led-onoff/app/index.html",
 "examples/bluno-helloworld/app/index.html"]
