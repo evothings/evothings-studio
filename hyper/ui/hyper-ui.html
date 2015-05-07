@@ -28,6 +28,25 @@ Copyright (c) 2013-2014 Evothings AB
 	}
 	*/
 	</style>
+	<style>
+	.glyphicon-spin {
+		-webkit-animation: spin 1000ms infinite linear;
+		animation: spin 1000ms infinite linear; }
+	@-webkit-keyframes spin {
+		0% {
+			-webkit-transform: rotate(0deg);
+			transform: rotate(0deg); }
+		100% {
+			-webkit-transform: rotate(359deg);
+			transform: rotate(359deg); } }
+	@keyframes spin {
+		0% {
+			-webkit-transform: rotate(0deg);
+			transform: rotate(0deg); }
+		100% {
+			-webkit-transform: rotate(359deg);
+			transform: rotate(359deg); } }
+	</style>
 </head>
 <body>
 	<div id="panel-page">
@@ -41,6 +60,8 @@ Copyright (c) 2013-2014 Evothings AB
 						<span class="glyphicon glyphicon-align-justify"></span>
 					</button>
 					<ul class="dropdown-menu">
+						<li><a href="javascript:void(0)" onclick="window.showConnectKeyDialog()">Connect Key</a></li>
+						<li><a href="javascript:void(0)" onclick="window.showSettingsDialog()">Settings</a></li>
 						<li><a href="javascript:void(0)"
 							onclick="hyper.showWelcomeScreen()">Welcome Screen</a></li>
 					</ul>
@@ -121,7 +142,7 @@ Copyright (c) 2013-2014 Evothings AB
 						<div class="modal-header">
 							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 							<h4 class="modal-title" id="dialog-connect-label">
-								Connect To Server
+								Connect Key Dialog
 							</h4>
 						</div>
 
@@ -137,22 +158,75 @@ Copyright (c) 2013-2014 Evothings AB
 							-->
 
 							<div class="form-group">
-								<label for="input-connect-url">Server URL:</label>
+								<label for="input-connect-url">Key Server:</label>
 								<input type="text"
 									id="input-connect-url"
 									class="form-control"
-									value="http://evoserver1-evothings.rhcloud.com"
+									value="http://localhost:8080"
 									placeholder="Enter server URL"/>
 							</div>
 
-							<p>Click Connect to get a Connect Key. Your key is displayed in the bottom status bar. Use this key when connecting from the Evothings Maker mobile app.</p>
+							<p>Click "Get Key" to obtain a connect key. Use this key when connecting from the Evothings Studio mobile app.</p>
+
+							<p>Your key is: <strong><span id="connect-key">[Waiting for key]</span></strong></p>
 						</div>
 
 						<div class="modal-footer">
 								<button type="button"
 									class="btn btn-success"
-									onclick="connectToRemoteServer()">
-									Connect
+									onclick="hyper.UI.connectToServer()">
+									Get Key <span id="connect-spinner" class="glyphicon glyphicon-refresh glyphicon-spin"></span>
+								</button>
+							<button type="button"
+								class="btn btn-default"
+								data-dismiss="modal">
+								Close
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Modal dialog: dialog-settings -->
+			<div class="modal fade"
+				id="dialog-settings"
+				tabindex="-1"
+				role="dialog"
+				aria-labelledby="dialog-settings-label"
+				aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h4 class="modal-title" id="dialog-settings-label">
+								Settings Dialog
+							</h4>
+						</div>
+
+						<div class="modal-body">
+							<div class="form-group">
+								<label for="input-setting-javascript-workbench-font-size">
+									JavaScript Workbench font size:</label>
+								<input type="text"
+									id="input-setting-javascript-workbench-font-size"
+									class="form-control"
+									placeholder="24px"/>
+							</div>
+							<div class="form-group">
+								<label for="input-setting-number-of-directory-levels">
+									Number of directory levels to monitor for live reload:</label>
+								<input type="text"
+									id="input-setting-number-of-directory-levels"
+									class="form-control"
+									placeholder="3"/>
+							</div>
+						</div>
+
+						<div class="modal-footer">
+								<button type="button"
+									class="btn btn-success"
+									onclick="hyper.UI.saveSettings()">
+									Save
 								</button>
 							<button type="button"
 								class="btn btn-default"
@@ -170,7 +244,7 @@ Copyright (c) 2013-2014 Evothings AB
 
 		<div id="panel-bottom">
 			<div>
-				<p style="float:left;">Connect URL: <b><span id="connect-address">[Server not running]</span></b></p>
+				<p style="float:left;">Status: <b><span id="connect-address">Waiting to connect</span></b></p>
 				<p style="float:right;">Clients: <b><span id="connect-counter">0</span></b> Files: <b><span id="files-counter">0</span></b></p>
 			</div>
 		</div>
@@ -189,11 +263,15 @@ Copyright (c) 2013-2014 Evothings AB
 	<script src="hyper-ui.js"></script>
 	<script>
 	// Setup UI buttons (using closure to make variables local).
-	(function()
+	;(function()
 	{
 		var PATH = require('path')
 		var GUI = require('nw.gui')
 		var FILEUTIL = require('../server/fileutil.js')
+		var WEBSERVER = require('../server/webserver.js')
+		var LOGGER = require('../server/log.js')
+
+		var mWebServer = WEBSERVER.create()
 
 		// ************** Documentation Button **************
 
@@ -299,7 +377,7 @@ Copyright (c) 2013-2014 Evothings AB
 				+ encodeURIComponent(json)
 
 			// TODO: For debugging, remove later on.
-			console.log('Version request: ' + json)
+			LOGGER.log('Version request: ' + json)
 
 			// Get version info from server.
 			FILEUTIL.downloadAsString(
@@ -324,7 +402,7 @@ Copyright (c) 2013-2014 Evothings AB
 			}
 			catch(e)
 			{
-				window.console.log("JSON.parse error: " + e)
+				LOGGER.log("JSON.parse error: " + e)
 				return
 			}
 
@@ -374,22 +452,24 @@ Copyright (c) 2013-2014 Evothings AB
 			localStorage.setItem('evo-version-check-do-not-show-version', version)
 		})
 
-		window.connectToRemoteServer = function()
+		window.showConnectKeyDialog = function()
 		{
-			var url = $('#input-connect-url').val()
-			hyper.setRemoteServerURL(url)
-			hyper.startServer()
-			$('#dialog-connect').modal('hide')
+			mWebServer.getIpAddress(function (address) {
+				hyper.UI.showConnectDialog('http://' + address + ':8080')
+			})
 		}
 
-		window.showConnectDialog = function()
+		window.showSettingsDialog = function()
 		{
-			$('#dialog-connect').modal('show')
+			hyper.UI.showSettingsDialog()
 		}
 
+		// Initialize the file server (socket.io client that
+		// handles file requests).
 		hyper.setUpServer()
 
-		setTimeout(window.showConnectDialog, 100)
+		// Display the Connect dialog box.
+		setTimeout(window.showConnectKeyDialog, 100)
 
 		// Do version check at start up.
 		// VERSION CHECK DISABLED!
