@@ -1,5 +1,5 @@
 {
-  "main": "hyper/ui/hyper-ui.html",
+  "main": "hyper/ui/evothings-ui.html",
   "name": "Evothings Workbench",
   "description": "HTML/JS IoT mobile app development tool",
   "version": "__VERSION__",

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
 <!--
-File: hyper-ui.html
+File: evothings-ui.html
 Description: Main application file. Defines the UI and starts the server.
 Author: Mikael Kindborg
-Copyright (c) 2013-2014 Evothings AB
+Copyright (c) 2013-2015 Evothings AB
 -->
 <!-- HTML 5 differences from HTML 4: http://www.w3.org/TR/2008/WD-html5-diff-20080122/ -->
 <head>
@@ -29,6 +29,11 @@ Copyright (c) 2013-2014 Evothings AB
 	*/
 	</style>
 	<style>
+	#connect-key {
+		font-size: 125%;
+		font-weight: bold; }
+
+	/* For spinning icon on the Get Key button */
 	.glyphicon-spin {
 		-webkit-animation: spin 1000ms infinite linear;
 		animation: spin 1000ms infinite linear; }
@@ -147,28 +152,28 @@ Copyright (c) 2013-2014 Evothings AB
 						</div>
 
 						<div class="modal-body">
-							<!--
-							<div class="form-group">
-								<label for="input-connect-key">Connect Key:</label>
-								<input type="text"
-									id="input-connect-key"
-									class="form-control"
-									placeholder="Enter connect key"/>
-							</div>
-							-->
-
-							<div class="form-group">
+							<!-- This input box is hidden to reduce UI complexity
+								and avoid potential confusion. Hard coded value
+								is used for server address. -->
+							<div class="form-group"
+								style="display:none;">
 								<label for="input-connect-url">Key Server:</label>
 								<input type="text"
 									id="input-connect-url"
 									class="form-control"
-									value="http://localhost:8080"
+									value="http://evothings.com:8080"
 									placeholder="Enter server URL"/>
 							</div>
 
+							<p>To connect to the Workbench from the Evothings Studio mobile app, you need Internet access and a connect key.</p>
+
 							<p>Click "Get Key" to obtain a connect key. Use this key when connecting from the Evothings Studio mobile app.</p>
 
-							<p>Your key is: <strong><span id="connect-key">[Waiting for key]</span></strong></p>
+							<p>Click "Close" to close this dialog box. If you need to find your key again, open this dialog from the menu icon in the upper-left corner of the Workbench window.</p>
+							<p id="connect-key-paragraph">Your key is:</p>
+							<div class="well">
+								<span id="connect-key">[Click "Get Key"]</span>
+							</div>
 						</div>
 
 						<div class="modal-footer">
@@ -454,9 +459,16 @@ Copyright (c) 2013-2014 Evothings AB
 
 		window.showConnectKeyDialog = function()
 		{
+			/*
+			// Use with server running on the same machine as the Workbench.
 			mWebServer.getIpAddress(function (address) {
 				hyper.UI.showConnectDialog('http://' + address + ':8080')
 			})
+			*/
+
+			// Use server on evothings.com.
+			// TODO: Fetch server address from a PHP script at evothings.com
+			hyper.UI.showConnectDialog('http://evothings.com:8080')
 		}
 
 		window.showSettingsDialog = function()
