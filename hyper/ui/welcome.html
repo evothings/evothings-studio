@@ -93,21 +93,19 @@ Copyright (c) 2013 Evothings AB
 	</p>
 
 	<p>
-		Next step is to install the <strong>Evothings Studio App</strong> on your mobile devices.
+		Next step is to install the <strong>Evothings Studio App</strong> on your mobile devices, unless you already done that.
 	</p>
 
 	<p class="download-links">
-		<img src="images/google-play.svg" alt="Google Play" onclick="openInBrowser('https://play.google.com/store/apps/details?id=com.evothings.evothingsclient')"/>
-		<img src="images/app-store.png" alt="App Store" onclick="openInBrowser('https://itunes.apple.com/nz/app/evothings-client/id848974292?mt=8')"/>
-		<button class="black" alt="Manual download"
-			onclick="openInBrowser('http://evothings.com/download/#otherdownloads')" />Manual download</button>
+		<button class="black" alt="Goto download page"
+			onclick="openInBrowser('http://evothings.com/uploads/evothings2/alpha1/download/')" />Goto Download Page</button>
 	</p>
-
-	<img src="images/evothings-studio-illustration.jpg" width="90%" />
 
 	<p><strong>To connect from the Evothings App to the Workbench you need an Internet connection and a connect key. Get the key in the Connect Key dialog box.</strong></p>
 
 	<p>For further details and a Getting Started guide, <a href="javascript:void(0)" onclick="openDocumentation()">visit the documentation</a>.</p>
+
+	<p>Also check out the <a href="javascript:void(0)" onclick="openReleaseNotes()">release notes</a> for a summary of what is new in Evothings Studio 2.0.</p>
 
 	<p>Happy tinkering!</p>
 
@@ -132,6 +130,12 @@ Copyright (c) 2013 Evothings AB
 		openInBrowser(url)
 	}
 
+	function openReleaseNotes()
+	{
+		var url = 'file://' + PATH.resolve('./documentation/studio/release-notes.html')
+		openInBrowser(url)
+	}
+
 	function openInBrowser(url)
 	{
 		GUI.Shell.openExternal(url)
@@ -139,12 +143,12 @@ Copyright (c) 2013 Evothings AB
 
 	function setShowWelcomeScreen(show)
 	{
-		localStorage.setItem('evo-show-welcome-screen', show ? 'yes' : 'no')
+		localStorage.setItem('evo-show-welcome-screen-2', show ? 'yes' : 'no')
 	}
 
 	function getShowWelcomeScreen()
 	{
-		return 'no' != localStorage.getItem('evo-show-welcome-screen')
+		return 'no' != localStorage.getItem('evo-show-welcome-screen-2')
 	}
 
 	$('#showScreenAtStartup').prop('checked', getShowWelcomeScreen())
