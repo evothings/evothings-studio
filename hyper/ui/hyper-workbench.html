@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html>
+<!--
+File: hyper-workbench.html
+Description: JavaScript Workbench and Log panel.
+Author: Mikael Kindborg
+Copyright (c) 2013-2014 Mikael Kindborg
+License: Apache Version 2.0
+jQuery Layout: http://layout.jquery-dev.net/
+-->
+<head>
+<meta charset="utf-8">
+
+<title>JavaScript Workbench</title>
+
+<link href="../libs/bootstrap-3.1.1/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="../libs/jquery/layout-default-latest.css" />
+<link rel="stylesheet" href="hyper-workbench.css" />
+
+<script src="../libs/jquery/jquery-2.1.0.min.js"></script>
+<script src="../libs/jquery/jquery-ui-1.10.3.custom.min.js"></script>
+<script src="../libs/jquery/jquery.layout-latest.min.js"></script>
+
+<link rel="stylesheet" href="../libs/codemirror-3.15/lib/codemirror.css">
+<script src="../libs/codemirror-3.15/lib/codemirror.js"></script>
+<script src="../libs/codemirror-3.15/addon/edit/matchbrackets.js"></script>
+<script src="../libs/codemirror-3.15/addon/edit/continuecomment.js"></script>
+<script src="../libs/codemirror-3.15/addon/comment/comment.js"></script>
+<script src="../libs/codemirror-3.15/mode/javascript/javascript.js"></script>
+
+<style>
+.CodeMirror
+{
+	font-family: monospace;
+	font-size: 18px;
+	height: 100%;
+}
+
+.ui-layout-pane
+{
+	background: #FFF;
+	border: 1px solid #BBB;
+	padding: 0px;
+	overflow: auto;
+}
+
+#toolbar
+{
+	color: #111111;
+	background-color: rgb(230,230,230);
+	border: 0px solid #BBB;
+	border-bottom-style: solid;
+	border-bottom-width: 0px;
+	border-bottom-color: #BBB;
+	padding: 0px;
+	font-size: 0.8em;
+	font-family: Sans-serif;
+}
+
+.unused-btn
+{
+	-webkit-border-radius: 0;
+	-moz-border-radius: 0;
+	border-radius: 0;
+}
+
+#code-area
+{
+/*
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	right: 0px;
+	bottom: 0px;
+	padding: 0px;
+	*/
+}
+
+#result-area
+{
+/*
+	position: absolute;
+	left: 100px;
+	top: 2.5em;
+	right: 0px;
+	bottom: 0px;
+	padding: 0px;
+*/
+	padding: 0px;
+	margin: 0px;
+}
+
+#result-editor
+{
+/*
+	position: absolute;
+	left: 100px;
+	top: 2.5em;
+	right: 0px;
+	bottom: 0px;
+	padding: 0px;
+*/
+}
+
+button
+{
+	line-height: normal;
+}
+</style>
+</head>
+
+<body>
+
+<div class="ui-layout-center">
+
+<div id="code-area">
+	<textarea id="code-editor">
+	</textarea>
+</div>
+
+</div> <!-- center -->
+
+<div class="ui-layout-south">
+
+<!--
+<div id="toolbar" class="header-footer">
+	<button id="button-eval" type="button" class="btn btn-success">Eval Selection</button>
+	<button id="button-undo" type="button" class="btn btn-primary">Undo</button>
+	<button id="button-redo" type="button" class="btn btn-primary">Redo</button>
+	<button id="button-clear-editor" type="button" class="btn btn-danger">Clear Editor</button>
+	<button id="button-clear-log" type="button" class="btn btn-danger">Clear Log</button>
+	<button id="button-toggle-autoscroll" type="button" class="btn btn-info">Toggle AutoScroll</button>
+	<button id="button-eval-node" type="button" class="btn btn-success">Node Eval</button>
+</div>
+-->
+
+<!--
+<div id="toolbar">
+	<div class="btn-toolbar" role="toolbar">
+		<div class="btn-group">
+			<a href="javascript:void(0)" id="button-eval" class="btn btn-success">Eval Selection</a>
+			<a href="javascript:void(0)" id="button-eval-node" class="btn btn-success">Node Eval</a>
+		</div>
+		<div class="btn-group">
+			<a href="javascript:void(0)" id="button-undo" class="btn btn-success">Undo</a>
+			<a href="javascript:void(0)" id="button-redo" class="btn btn-success">Redo</a>
+		</div>
+		<div class="btn-group">
+			<a href="javascript:void(0)" id="button-toggle-autoscroll" class="btn btn-success">Toggle AutoScroll</a>
+		</div>
+		<div class="btn-group">
+			<a href="javascript:void(0)" id="button-clear-log" class="btn btn-success">Clear Log</a>
+			<a href="javascript:void(0)" id="button-clear-editor" class="btn btn-success">Clear Editor</a>
+			<a href="javascript:void(0)" id="button-restore" class="btn btn-success">Restore</a>
+		</div>
+	</div>
+</div>
+-->
+
+<div id="toolbar">
+	<a href="javascript:void(0)" id="button-eval" class="btn btn-success">Eval Selection</a>
+	<a href="javascript:void(0)" id="button-undo" class="btn btn-primary">Undo</a>
+	<a href="javascript:void(0)" id="button-redo" class="btn btn-primary">Redo</a>
+	<a href="javascript:void(0)" id="button-toggle-autoscroll" class="btn btn-info">Toggle AutoScroll</a>
+	<a href="javascript:void(0)" id="button-clear-log" class="btn btn-danger">Clear Log</a>
+	<a href="javascript:void(0)" id="button-clear-editor" class="btn btn-danger">Clear Editor</a>
+	<a href="javascript:void(0)" id="button-restore" class="btn btn-warning">Restore</a>
+	<a href="javascript:void(0)" id="button-eval-node" class="btn btn-success">Node Eval</a>
+</div>
+
+
+<div id="result-area" class="ui-layout-content">
+	<textarea id="result-editor">
+	</textarea>
+</div>
+
+</div> <!-- south -->
+
+<div id="code-editor-default-content" style="display:none;"
+>// Select a snippet of code, then click the "Eval" button.
+// This will run the connected devices/browsers.
+
+// Compute a value, the return value is shown in the
+// result panel.
+1 + 2
+
+// Send log message from connected devices/browsers.
+// Use this in your code for debugging.
+hyper.log('Hello World')
+
+// Replace the browser content with the given HTML.
+document.body.innerHTML = '<h1>Hello World</h1>'
+
+// Now try this.
+counter = 1
+display = function() {
+	document.body.innerHTML =
+		'<h1>Counter: ' + counter + '</h1>'
+	++counter
+}
+timer = setInterval(function() { display() }, 500)
+
+// Then stop the timer.
+clearInterval(timer)
+
+// Start the timer again, by evaluating the code above.
+// Then change the value of counter, while the timer
+// is running. Also change the function display while
+// the timer is running.
+
+// Have fun!
+</div>
+
+<!--
+// -----------------------------------------------------
+//			Welcome to HyperReload Workbench
+// -----------------------------------------------------
+//
+// The Workbench has two parts. This part is a JavaScript
+// editor where you can evaluate selected code on connected
+// devices/browsers.
+//
+// The second part is the message panel below. Here log messages
+// from devices are displayed, and the result from evaluating
+// JavaScript code.
+//
+// Get started by selecting a line of the example code below,
+// then press the "Eval on Devices" button. This will run the
+// selected code on any connected devices/browsers.
+//
+// The button "Eval in NodeWebkit" is an experimental feature
+// that lets you to evaluate code locally in HyperReload, which
+// runs on top of node-webkit. This gives you full interactive
+// access to node-webkit and to node.js, a potentially very
+// powerful feature. This can be used for experimenting with
+// node.js and node-webkit, and for running scripted tests
+// on connected devices.
+// -----------------------------------------------------
+
+// Send log message from connected devices/browsers. Use this
+// in your application code for debugging.
+hyper.log('Hello World')
+
+// Replace the browser content with the given HTML. What do you
+// think will happen if you evaluate this with "Eval in Node"?
+document.body.innerHTML = '<h1>Hello World</h1>'
+-->
+
+<div id="result-editor-default-content" style="display:none;"
+>// This is the message area where log messages and errors
+// are displayed.
+//
+// Select one or more lines of code in the code area above.
+// Then press "Eval Selection" to evaluate (run the code)
+// on connected devices.
+//
+// "Node Eval" is special, it evaluates selected code in
+// node-webkit, the platform on which this software is running.
+// With this button, you can interactively develop and test
+// node.js servers and functions in node-webkit. This is a
+// very powerful feature.
+</div>
+
+<script>
+$(function()
+{
+	var OS = require('os')
+
+	// Main application window
+	var mMainWindow = window.opener
+
+	// Editor component.
+	var mEditor = CodeMirror.fromTextArea(document.getElementById('code-editor'),
+	{
+		mode: 'javascript',
+		indentUnit: 4,
+		autoMatchParens: true,
+		lineNumbers: true,
+		matchBrackets: true,
+		continueComments: 'Enter',
+		extraKeys: {'Ctrl-Q': 'toggleComment'}
+	})
+
+	// Result/log component.
+	var mResult = CodeMirror.fromTextArea(document.getElementById('result-editor'),
+	{
+	})
+
+	// Flag for toggling autoscroll of log view.
+	var mAutoScroll = true
+
+	$('#button-eval').click(function()
+	{
+		if (!mMainWindow)
+		{
+			showResult('ERR: Could not find main window - report to developer')
+			return
+		}
+
+		if (!mEditor.somethingSelected())
+		{
+			showResult('Select some code to evaluate')
+			return
+		}
+
+		var code = mEditor.getSelection()
+		mMainWindow.postMessage({ message: 'eval', code: code }, '*')
+	})
+
+	// Evaluate in node-webkit. Not used.
+	$('#button-eval-node').click(function()
+	{
+		if (!mMainWindow)
+		{
+			showResult('ERR: Could not find main window - report to developer')
+			return
+		}
+
+		if (!mEditor.somethingSelected())
+		{
+			showResult('Select some code to evaluate')
+			return
+		}
+
+		try
+		{
+			var code = mEditor.getSelection()
+			// TODO: Add runtime error handling.
+			var result = eval(code)
+			showResult('NODE: ' + result)
+		}
+		catch (err)
+		{
+			showResult('NODE: ' + err)
+		}
+	})
+
+	$('#button-undo').click(function()
+	{
+		mEditor.undo()
+	})
+
+	$('#button-redo').click(function()
+	{
+		mEditor.redo()
+	})
+
+	$('#button-clear-log').click(function()
+	{
+		mResult.setValue('')
+	})
+
+	$('#button-clear-editor').click(function()
+	{
+		mEditor.setValue('\n\n\n\n\n\n\n\n\n')
+	})
+
+	$('#button-toggle-autoscroll').click(function()
+	{
+		mAutoScroll = !mAutoScroll
+	})
+
+	$('#button-restore').click(function()
+	{
+		restoreState()
+	})
+
+	/*
+	$('input.buttonEvalInBrowser').click(function()
+	{
+		try
+		{
+			var code = mEditor.selection()
+			var res = eval(code)
+			showResult(res);
+		}
+		catch (error)
+		{
+			 showResult('Error: ' + error)
+		}
+	});
+	*/
+
+	function showResult(res)
+	{
+		mResult.setValue(mResult.getValue() + '\n' + res)
+		if (mAutoScroll)
+		{
+			mResult.scrollIntoView({ line: mResult.lastLine(), ch: 0 })
+		}
+	}
+
+	window.hyper = {}
+
+	window.hyper.log = function(message)
+	{
+		showResult('NODE: ' + message)
+	}
+
+	window.hyper.inspect = function(obj)
+	{
+		window.hyper.log('Object inspect:\n' +
+			window.hyper.objectToString(obj, [], '  '))
+	}
+
+	window.hyper.objectToString = function (obj, visited, level)
+	{
+		// Check for circular structures.
+		for (var i = 0; i < visited.length; ++i)
+		{
+			if (visited[i] === obj) { return level + '<circular reference>\n' }
+		}
+		visited.push(obj)
+
+		if (!level) { level = '' }
+
+		var s = ''
+
+		for (prop in obj)
+		{
+			if (obj.hasOwnProperty(prop))
+			{
+				var value = obj[prop]
+				if (typeof value === 'object')
+				{
+					s += level + prop + ':\n' +
+						window.hyper.objectToString(value, visited, level + '  ')
+				}
+				else
+				{
+					s += level + prop + ': ' + value + '\n'
+				}
+			}
+		}
+
+		return s
+	}
+
+	//$('body').layout({ applyDefaultStyles: true })
+	$('body').layout(
+	{
+		south: { size: 300 },
+		//center: { maskContents: true },
+		fxName: 'none'
+	})
+
+	function receiveMessage(event)
+	{
+		//console.log('Workbench got : ' + event.data.message)
+		if ('hyper.hello' == event.data.message)
+		{
+			mMainWindow = event.source
+		}
+		else if ('hyper.log' == event.data.message)
+		{
+			showResult('LOG: ' + event.data.logMessage)
+		}
+		else if ('hyper.result' == event.data.message)
+		{
+			showResult('RES: ' + event.data.result)
+		}
+	}
+
+	var GUI = require('nw.gui')
+
+	function saveUIState()
+	{
+		// Save editor and log content.
+
+		var maxStorageSize = 100000
+		var editorContent = mEditor.getValue()
+		var resultContent = mResult.getValue()
+		if (editorContent.length > maxStorageSize)
+		{
+			editorContent = editorContent.substring(0, maxStorageSize)
+		}
+		if (resultContent.length > maxStorageSize)
+		{
+			resultContent = resultContent.substring(0, maxStorageSize)
+		}
+
+		localStorage.setItem('workbench-code-editor-content', editorContent)
+		localStorage.setItem('workbench-result-editor-content', resultContent)
+
+		// Save window layout.
+
+		var win = GUI.Window.get()
+
+		// Do not save if window is minimized on Windows.
+		// On Windows an icon has x,y coords -32000 when
+		// window is minimized. On Linux and OS X the window
+		// coordinates and size are intact when minimized.
+		if (win.x < -1000)
+		{
+			return;
+		}
+
+		localStorage.setItem('workbench-window-geometry', JSON.stringify({
+			x: win.x,
+			y: win.y,
+			width: win.width,
+			height: win.height
+			})
+		)
+
+		var layout = $('body').layout()
+		localStorage.setItem('workbench-divider-position', layout.state.south.size)
+	}
+
+	// Save global reference to function.
+	window.saveUIState = saveUIState
+
+	function restoreSavedUIState()
+	{
+		var editorContent = localStorage.getItem('workbench-code-editor-content')
+			|| $('#code-editor-default-content').html()
+		var resultContent = localStorage.getItem('workbench-result-editor-content')
+			|| $('#result-editor-default-content').html()
+		mEditor.setValue(editorContent)
+		mResult.setValue(resultContent)
+
+		var geometry = localStorage.getItem('workbench-window-geometry')
+		if (geometry)
+		{
+			var win = GUI.Window.get()
+			var data = JSON.parse(geometry)
+
+			// Make sure top-left corner is visible.
+			var offsetY = 0
+			if ('darwin' == OS.platform())
+			{
+				offsetY = 22
+			}
+			data.x = Math.max(data.x, 1)
+			data.y = Math.max(data.y, 1 + offsetY)
+			data.x = Math.min(data.x, screen.width - 100)
+			data.y = Math.min(data.y, screen.height - 200)
+
+			// Set window size.
+			win.x = data.x
+			win.y = data.y
+			win.width = data.width
+			win.height = data.height
+		}
+
+		var size = localStorage.getItem('workbench-divider-position')
+		if (size)
+		{
+			var layout = $('body').layout()
+			layout.sizePane('south', size)
+		}
+	}
+
+	// Restore the original content of the panes.
+	function restoreState()
+	{
+		var editorContent = $('#code-editor-default-content').html()
+		var resultContent = $('#result-editor-default-content').html()
+		mEditor.setValue(editorContent)
+		mResult.setValue(resultContent)
+	}
+
+	// Set the save state since last session.
+	restoreSavedUIState()
+
+	window.addEventListener('message', receiveMessage, false)
+
+	var win = GUI.Window.get()
+	win.on('close', function()
+	{
+		saveUIState()
+		this.close(true)
+	})
+})
+</script>
+
+<script>
+	// Define exports before including settings.
+	var exports = exports || {}
+</script>
+<script src="../settings/settings.js"></script>
+<script>
+	// Set fonts based on settings.
+	setTimeout(function() {
+		$('.CodeMirror').css('font-family', exports.WorkbenchFontFamily)
+		$('.CodeMirror').css('font-size', exports.WorkbenchFontSize) }, 1)
+</script>
+
+</body>
+</html>

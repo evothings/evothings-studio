@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<!--
+File: hyper-client.html
+Description: This file is not used, it contains experimental
+code that loads application pages inside an iframe.
+The script injection method is used instead of this,
+because iframes add complexity and can behave inconsitenly
+on different platforms.
+Author: Mikael Kindborg
+Copyright (c) 2013 Mikael Kindborg
+License: Apache Version 2.0
+-->
+<head>
+	<meta charset="utf-8">
+	<title>HyperReload Connect</title>
+	<style>
+	html, body
+	{
+		margin: 0px;
+		padding: 0px;
+	}
+	iframe
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		bottom: 0px;
+		right: 0px;
+		width: 100%;
+		height: 100%;
+		border: none;
+		margin: 0px;
+		padding: 0px;
+		/*overflow: scroll;*/
+		/*z-index: 999999;*/
+	}
+	</style>
+</head>
+<body>
+<iframe scrolling="auto"></iframe>
+<script>
+// Open a connection to the server.
+var ConnectToHyper = function()
+{
+}
+
+var initialize = function(event)
+{
+	var hyper = {}
+
+	if (!window.hyper)
+	{
+		window.hyper = hyper
+	}
+
+	// Connection notifications.
+	hyper.isConnected = false
+	hyper.onConnectedFun = null
+	hyper.onConnected = function(fun)
+	{
+		if (hyper.isConnected)
+		{
+			// Already connected.
+			fun()
+		}
+		else
+		{
+			// Call when connected.
+			hyper.onConnectedFun = fun
+		}
+	}
+
+	// Send result of evaluating JS to the UI.
+	hyper.sendJsResult = function(result)
+	{
+		hyper.IoSocket.emit('hyper.result', result)
+	}
+
+	// Log to UI.
+	hyper.log = function(message)
+	{
+		hyper.IoSocket.emit('hyper.log', message)
+	}
+
+	// Called from native code.
+	hyper.nativeConsoleMessageCallBack = function(message)
+	{
+		hyper.IoSocket.emit('hyper.log', message)
+	}
+
+	var baseUrl = 'http://' + window.location.hostname
+
+	function connect()
+	{
+		var socket = io.connect(baseUrl + ':4043')
+		hyper.IoSocket = socket
+		socket.on('hyper.run', function(data)
+		{
+			window.frames[0].location.replace(data.url)
+		})
+		socket.on('hyper.reload', function(data)
+		{
+			window.frames[0].location.reload(true)
+		})
+		socket.on('hyper.eval', function(data)
+		{
+			try
+			{
+				var result = window.frames[0].eval(data)
+				hyper.sendJsResult(result)
+			}
+			catch (err)
+			{
+				hyper.sendJsResult('JSErr: ' + err)
+			}
+		})
+		socket.on('connect', function()
+		{
+			hyper.isConnected = true
+			if (hyper.onConnectedFun)
+			{
+				hyper.onConnectedFun()
+			}
+		})
+	}
+
+	// Load socket.io by inserting a script element.
+	// Call fun when loaded.
+	function loadSocketIoThen(fun)
+	{
+		var script = document.createElement('script')
+		//script.type = 'text/javascript' // Not needed by HTML5
+		script.src = baseUrl + ':4043/socket.io/socket.io.js'
+		script.onload = fun
+		document.body.appendChild(script)
+	}
+
+	// Display a status message.
+	window.frames[0].document.body.innerHTML =
+		'<h1 style="font-family: sans-serif;">Connecting...</h1>'
+
+	hyper.onConnected(function()
+	{
+		// Is there an initial page to show?
+		var hashParam = window.location.hash
+		if (hashParam.length > 1)
+		{
+			// Yes, load this page. First remove hash character.
+			var urlToLoad = location.href.replace('#', '')
+			console.log('url: ' + urlToLoad)
+			window.frames[0].location.assign(urlToLoad)
+		}
+		else
+		{
+			// If no page was specified, display connected message.
+			window.frames[0].document.body.innerHTML =
+				'<h1 style="font-family: sans-serif;">Connected</h1>' +
+				'<h3>Click the Run button in the HyperReload UI to run an app.</h3>'
+		}
+	})
+
+	// Load socket.io, then connect.
+	loadSocketIoThen(connect)
+}
+
+document.addEventListener("DOMContentLoaded", initialize)
+</script>
+</body>
+</html>

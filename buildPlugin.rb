@@ -14,7 +14,7 @@ def distCopyright
 end
 
 def distVersion
-	"1.2.0"
+	"1.3.0"
 end
 
 def root
@@ -129,6 +129,8 @@ def buildPreProcess
 	buildOSXIcons
 	# Commented out build of Evothings Client to make download package smaller.
 	#buildEvoThingsClient
+
+	# TODO: fetch libs, if needed.
 end
 
 def buildDocumentation

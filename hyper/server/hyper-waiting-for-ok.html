@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<!--
+File: hyper-waiting-for-ok.html
+Description: Loaded when a client not yet white or black listed makes a request.
+Author: Mikael Kindborg
+Copyright (c) 2014 Mikael Kindborg
+License: Apache Version 2.0
+-->
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=1">
+	<title>Waiting for OK</title>
+	<style>
+	body
+	{
+		font-family: sans-serif;
+	}
+	</style>
+</head>
+<body>
+	<div>
+		<h1>Waiting for OK</h1>
+		<p>Click the <strong>Allow</strong> button in the dialog box shown on your computer to
+		allow connections from this device.</p>
+		<p>The address of this device is: <strong>__CLIENT_IP__</strong></p>
+		<script>
+		setTimeout(function() {
+			window.location.reload(true) },
+			1000)
+		</script>
+	</div>
+<!--
+https://developer.mozilla.org/en-US/docs/Web/API/window.location?redirectlocale=en-US&redirectslug=DOM%2Fwindow.location#Methods
+
+http://stackoverflow.com/questions/16248003/javascript-reload-page
+
+The best way to be completely sure the page itself is reloaded, but the other cached elements are not is to change the location.search query string with a random parameter.
+
+For example,
+
+location.search='?'+Math.random();
+
+The cached is not bypassed, so all elements of the page will be loaded from cache, but the main page itself is forced to reload because HTTP requires another request to the server for each unique query string / location.search value.
+
+If your page is itself an application which uses a query string (like file.cgi?param=xyz&param2=abc...) then you will have to append to the query string rather than replace it completely:
+
+if (location.search.length > 1)
+location.search+='&'+Math.random();
+else
+location.search='?'+Math.random();
+-->
+</body>
+</html>
