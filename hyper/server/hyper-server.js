@@ -775,7 +775,7 @@ function createSocketIoServer(httpServer)
 
 		socket.on('hyper.log', function(data)
 		{
-			displayLogMessage(data)
+			displayLogMessage(String(data))
 		})
 
 		socket.on('hyper.result', function(data)

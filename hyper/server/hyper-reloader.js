@@ -47,7 +47,7 @@ window.hyper = (function(hyper, socketIoPort)
 	{
 		if (hyper.isConnected)
 		{
-			hyper.IoSocket.emit('hyper.log', message)
+			hyper.IoSocket.emit('hyper.log', String(message))
 		}
 		else
 		{

@@ -267,7 +267,8 @@ function CreateServerObject()
 		callbackFun(GetIpAddresses())
 	}
 
-	self.writeRespose = WriteResponse
+	self.writeRespose = WriteResponse	// obsolete misspelling.
+	self.writeResponse = WriteResponse	// spelled correctly.
 
 	self.writeResponsePageNotFound = function(response)
 	{

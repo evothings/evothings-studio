@@ -183,6 +183,7 @@ hyper.UI = {}
 			}
 			catch(e)
 			{
+				// app is closing; no way to handle errors beyond logging them.
 				window.console.log(e);
 			}
 
