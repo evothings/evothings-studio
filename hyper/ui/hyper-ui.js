@@ -172,11 +172,18 @@ hyper.UI = {}
 		// Listen to main window's close event
 		GUI.Window.get().on('close', function()
 		{
-			saveUIState()
-
-			if (mWorkbenchWindow && !mWorkbenchWindow.closed)
+			try
 			{
-				mWorkbenchWindow.window.saveUIState()
+				saveUIState()
+
+				if (mWorkbenchWindow && !mWorkbenchWindow.closed)
+				{
+					mWorkbenchWindow.window.saveUIState()
+				}
+			}
+			catch(e)
+			{
+				window.console.log(e);
 			}
 
 			GUI.App.quit()
@@ -195,6 +202,9 @@ hyper.UI = {}
 		{
 			return;
 		}
+
+		if(!localStorage)
+			return;
 
 		localStorage.setItem('project-window-geometry', JSON.stringify({
 			x: win.x,

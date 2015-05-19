@@ -66,8 +66,8 @@ def buildCopyHyperToDistDir
 
 	# Copy license file.
 	FileUtils.copy_entry(
-		pathSourceHyper + "LICENSE.md",
-		pathDistSource + "LICENSE.md")
+		pathSourceHyper + "HyperReload-LICENSE.md",
+		pathDistSource + "HyperReload-LICENSE.md")
 
 	# Create package.json for this version.
 	content = fileReadContent(pathSourcePackageJson)
@@ -234,8 +234,9 @@ end
 def buildZippedBinaries
 	zipPackage(distPackageLinux32)
 	zipPackage(distPackageLinux64)
-	zipPackage(distPackageMac)
-	zipPackage(distPackageWin)
+	zipPackage(distPackageMac64)
+	zipPackage(distPackageWin32)
+	zipPackage(distPackageWin64)
 end
 
 # Build distribution package.

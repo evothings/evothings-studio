@@ -1,17 +1,35 @@
 {
-  "main": "hyper/ui/hyper-ui.html",
-  "name": "Evothings Workbench",
-  "description": "HTML/JS IoT mobile app development tool",
-  "version": "__VERSION__",
-  "keywords": ["Evothings Studio", "mobile", "JavaScript"],
-  "window":
-  {
-    "title": "Evothings Workbench __VERSION__",
-    "toolbar": false,
-    "frame": true,
-    "width": 700,
-    "height": 600,
-    "position": "mouse",
-    "icon": "hyper/ui/images/evothings-icon.png"
-  }
+	"main": "hyper/ui/hyper-ui.html",
+	"name": "evothings-studio",
+	"description": "HTML/JS IoT mobile app development tool",
+	"version": "__VERSION__",
+	"keywords": ["Evothings", "mobile", "JavaScript"],
+	"homepage": "http://evothings.com/",
+	"bugs":
+	{
+		"url": "https://github.com/evothings/evothings-studio/issues",
+		"email": "info@evothings.com"
+	},
+	"license": "Apache-2.0",
+	"dependencies":
+	{
+		// these ones are handled by init.rb.
+		//"jquery": ">=2.1.0",
+		//"jquery-ui": ">=1.10.3",
+		//"codemirror": ">=3.15",
+		//"bootstrap": ">=3.1.1",
+
+		"socket.io": ">=1.2.0"
+	},
+	"private": true,
+	"window":
+	{
+		"title": "Evothings Workbench __VERSION__",
+		"toolbar": false,
+		"frame": true,
+		"width": 700,
+		"height": 600,
+		"position": "mouse",
+		"icon": "hyper/ui/images/evothings-icon.png"
+	}
 }

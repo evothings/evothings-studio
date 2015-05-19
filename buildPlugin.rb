@@ -33,7 +33,7 @@ end
 
 # Source of main HyperReload application code.
 def pathSourceHyper
-	root + "HyperReload/"
+	root + "evothings-studio/"
 end
 
 # Source file for package.json.
@@ -112,7 +112,6 @@ def buildGitVersionFile
 			'evothings-client',
 			'evothings-doc',
 			'evothings-examples',
-			'HyperReload',
 			'cordova-ble',
 		].each do |repo|
 			if(!File.exist?("#{root}#{repo}/.git"))
@@ -175,21 +174,6 @@ end
 def buildPostProcess
 	buildDocumentation
 
-	# Copy (overwrite) custom server files to dist.
-	FileUtils.copy_entry(
-		"./hyper/server",
-		pathDistSource + "hyper/server")
-
-	# Copy (overwrite) custom UI files to dist.
-	FileUtils.copy_entry(
-		"./hyper/ui",
-		pathDistSource + "hyper/ui")
-
-	# Copy (overwrite) custom settings files to dist.
-	FileUtils.copy_entry(
-		"./hyper/settings",
-		pathDistSource + "hyper/settings")
-
 	# Copy Evothings Examples UI resources to hyper/server.
 	# This is used by the hyper-connect.html page.
 	FileUtils.cp_r(
@@ -197,7 +181,6 @@ def buildPostProcess
 		pathDistSource + "hyper/server")
 
 	# Delete files that should not be in the dist.
-	FileUtils.remove_dir(pathDistSource + "hyper/demo", true)
 	FileUtils.remove_dir(pathDistSource + "documentation/.git", true)
 
 	# Build Evothings Examples.
@@ -207,11 +190,6 @@ def buildPostProcess
 	FileUtils.copy_entry(
 		root + "evothings-examples/examples",
 		pathDistSource + "examples")
-
-	# Rename HyperReload license file.
-	FileUtils.mv(
-		pathDistSource + "LICENSE.md",
-		pathDistSource + "HyperReload-LICENSE.md")
 
 	# Copy Evothings Studio license file.
 	FileUtils.copy_entry(
