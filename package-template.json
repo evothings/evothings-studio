@@ -13,13 +13,14 @@
 	"license": "Apache-2.0",
 	"dependencies":
 	{
-		// these ones are handled by init.rb.
-		//"jquery": ">=2.1.0",
-		//"jquery-ui": ">=1.10.3",
-		//"codemirror": ">=3.15",
-		//"bootstrap": ">=3.1.1",
-
 		"socket.io": ">=1.2.0"
+	},
+	"dependencies-not-used-handled-by-init-rb":
+	{
+		"jquery": ">=2.1.0",
+		"jquery-ui": ">=1.10.3",
+		"codemirror": ">=3.15",
+		"bootstrap": ">=3.1.1"
 	},
 	"private": true,
 	"window":
