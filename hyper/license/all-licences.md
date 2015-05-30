@@ -4,7 +4,7 @@ This file contains licenses for software included with HyperReload.
 
 ## HyperReload license
 
-See file named LICENSE.md or HyperReload-LICENSE.md
+See file named HyperReload-LICENSE.md
 
 ## node-webkit license
 
