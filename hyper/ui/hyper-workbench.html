@@ -266,6 +266,7 @@ $(function()
 {
 	var OS = require('os')
 	var SETTINGS = require('../settings/settings.js')
+	var LOGGER = require('../server/log.js')
 
 	// Main application window
 	var mMainWindow = window.opener
@@ -447,7 +448,7 @@ $(function()
 
 	function receiveMessage(event)
 	{
-		//console.log('Workbench got : ' + event.data.message)
+		//LOGGER.log('Workbench got : ' + event.data.message)
 		if ('hyper.hello' == event.data.message)
 		{
 			mMainWindow = event.source

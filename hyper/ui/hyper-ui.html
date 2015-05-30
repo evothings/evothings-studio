@@ -192,6 +192,7 @@ Copyright (c) 2013-2015 Evothings AB
 		var GUI = require('nw.gui')
 		var FILEUTIL = require('../server/fileutil.js')
 		var SETTINGS = require('../settings/settings.js')
+		var LOGGER = require('../server/log.js')
 
 		// ************** Documentation Button **************
 
@@ -297,7 +298,7 @@ Copyright (c) 2013-2015 Evothings AB
 				+ encodeURIComponent(json)
 
 			// TODO: For debugging, remove later on.
-			console.log('Version request: ' + json)
+			LOGGER.log('Version request: ' + json)
 
 			// Get version info from server.
 			FILEUTIL.downloadAsString(
@@ -322,7 +323,7 @@ Copyright (c) 2013-2015 Evothings AB
 			}
 			catch(e)
 			{
-				window.console.log("JSON.parse error: " + e)
+				LOGGER.log("JSON.parse error: " + e)
 				return
 			}
 

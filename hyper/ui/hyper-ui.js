@@ -34,6 +34,7 @@ var GUI = require('nw.gui')
 
 var FILEUTIL = require('../server/fileutil.js')
 var SETTINGS = require('../settings/settings.js')
+var LOGGER = require('../server/log.js')
 
 /*** Globals ***/
 
@@ -80,7 +81,7 @@ hyper.UI = {}
 			}
 			catch (ex)
 			{
-				window.console.log('Error creating OS X menubar: ' + ex.message);
+				LOGGER.log('Error creating OS X menubar: ' + ex.message);
 			}
 		}
 	}
@@ -183,7 +184,7 @@ hyper.UI = {}
 			catch(e)
 			{
 				// app is closing; no way to handle errors beyond logging them.
-				window.console.log(e);
+				LOGGER.log(e);
 			}
 
 			GUI.App.quit()
@@ -239,7 +240,7 @@ hyper.UI = {}
 
 	function receiveMessage(event)
 	{
-		//window.console.log('Main got : ' + event.data.message)
+		//LOGGER.log('Main got : ' + event.data.message)
 		if ('eval' == event.data.message)
 		{
 			hyper.SERVER.evalJS(event.data.code)
@@ -287,7 +288,7 @@ hyper.UI = {}
 		// Debug print.
 		/*for (var i = 0; i < files.length; ++i)
 		{
-			window.console.log(files[i].path);
+			LOGGER.log(files[i].path);
 		}*/
 
 		for (var i = 0; i < files.length; ++i)
@@ -341,7 +342,7 @@ hyper.UI = {}
 		if (!data)
 		{
 			// Return on error, skipping rest of the code.
-			window.console.log('createProjectEntry failed: ' + path)
+			LOGGER.log('createProjectEntry failed: ' + path)
 			return
 		}
 
@@ -363,7 +364,7 @@ hyper.UI = {}
 
 		// Create element.
 		var element = $(html)
-		//window.console.log(html)
+		//LOGGER.log(html)
 
 		// Insert element first in list.
 		$('#project-list').append(element)
@@ -485,7 +486,7 @@ hyper.UI = {}
 
 	hyper.UI.deleteEntry = function(obj)
 	{
-		window.console.log($(obj).parent())
+		LOGGER.log($(obj).parent())
 		$(obj).parent().remove()
 		updateProjectList()
 	}
@@ -625,7 +626,7 @@ hyper.UI = {}
 			path = mApplicationBasePath + '/' + path
 		}
 
-		window.console.log('runApp: ' + path)
+		LOGGER.log('runApp: ' + path)
 
 		SERVER.setAppPath(path)
 
@@ -744,7 +745,7 @@ hyper.UI = {}
 		}
 
 		// Debug logging.
-		window.console.log('Open folder: ' + path)
+		LOGGER.log('Open folder: ' + path)
 
 		GUI.Shell.showItemInFolder(path)
 	}

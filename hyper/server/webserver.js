@@ -18,7 +18,7 @@ server.create()
 server.start(port)
 server.getIpAddress(function(address)
 {
-	window.console.log(
+	LOGGER.log(
 		'Web server running at:\n' +
 		'http://' + address + ':' + port)
 })
@@ -47,6 +47,7 @@ var FS = require('fs')
 var OS = require('os')
 var PATH = require('path')
 var DNS = require('dns')
+var LOGGER = require('./log.js')
 
 // Global Mime type table.
 var MimeTypes = GetDefaultMimeTypes()
@@ -108,7 +109,7 @@ function CreateServerObject()
 		}
 		catch (error)
 		{
-			window.console.log('Could not create webserver: ' + error)
+			LOGGER.log('Could not create webserver: ' + error)
 			return null
 		}
 	}
@@ -124,7 +125,7 @@ function CreateServerObject()
 		}
 		catch (error)
 		{
-			window.console.log('Could not start webserver: ' + error)
+			LOGGER.log('Could not start webserver: ' + error)
 		}
 	}
 
@@ -139,7 +140,7 @@ function CreateServerObject()
 		}
 		catch (error)
 		{
-			window.console.log('Could not stop webserver: ' + error)
+			LOGGER.log('Could not stop webserver: ' + error)
 		}
 	}
 
@@ -278,10 +279,10 @@ function CreateServerObject()
 	// Handler for web server requests.
 	function HandleRequest(request, response)
 	{
-		//window.console.log('HandleRequest url: ' + request.url)
+		//LOGGER.log('HandleRequest url: ' + request.url)
 		//request.setEncoding('utf8')
 		var path = unescape(URL.parse(request.url).pathname)
-		//window.console.log(new Date().toTimeString() + ' SERVING: ' + path)
+		//LOGGER.log(new Date().toTimeString() + ' SERVING: ' + path)
 		if (null != mHookFun)
 		{
 			// If the hook function returns true it processed the request.
@@ -292,7 +293,7 @@ function CreateServerObject()
 
 	function ServeFile(path, response)
 	{
-		//window.console.log('ServeFile fillpath: ' + mBasePath + path)
+		//LOGGER.log('ServeFile fillpath: ' + mBasePath + path)
 		var file = GetFileStatus(mBasePath + path)
 		if (!file)
 		{
@@ -367,7 +368,7 @@ function GetFileStatus(fullPath)
 	}
 	catch (ex)
 	{
-		window.console.log('GetFileStatus exception: ' + ex)
+		LOGGER.log('GetFileStatus exception: ' + ex)
 		return null
 	}
 }

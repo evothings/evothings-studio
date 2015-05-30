@@ -29,6 +29,7 @@ var PATH = require('path')
 var FILEUTIL = require('./fileutil.js')
 var WEBSERVER = require('./webserver')
 var SETTINGS = require('../settings/settings.js')
+var LOGGER = require('./log.js')
 
 /*********************************/
 /***	   Server code		   ***/
@@ -112,7 +113,7 @@ function serveRootRequest(request, response)
 	// Root path is requested, send the current page if set.
 	if (mAppPath)
 	{
-		window.console.log('@@@ serving mAppPath: ' + mAppPath)
+		LOGGER.log('@@@ serving mAppPath: ' + mAppPath)
 		return serveHtmlFile(
 			request,
 			response,
@@ -342,7 +343,7 @@ function insertReloaderScript(html, request)
 		return false
 	}
 	var address = host.substr(0, host.indexOf(':'))
-	//window.console.log('address ' + address)
+	//LOGGER.log('address ' + address)
 	var script = createReloaderScriptTags(address)
 
 	// Is there a template tag? In that case, insert script there.
@@ -498,18 +499,18 @@ function setClientConnenctedCallbackFun(fun)
  */
 function startServers()
 {
-	window.console.log('Start servers')
+	LOGGER.log('Start servers')
 
 	if (SETTINGS.getServerDiscoveryEnabled())
 	{
-		window.console.log('Start UDP server')
+		LOGGER.log('Start UDP server')
 		startUDPServer(SETTINGS.getServerDiscoveryPort())
 	}
 
-	window.console.log('Start web server')
+	LOGGER.log('Start web server')
 	startWebServer(mBasePath, SETTINGS.getWebServerPort(), function(server)
 	{
-		window.console.log('Web server started')
+		LOGGER.log('Web server started')
 		mWebServer = server
 		mWebServer.getIpAddress(function(address)
 		{
@@ -524,19 +525,19 @@ function startServers()
  */
 function stopServers(callback)
 {
-	window.console.log('Stop servers')
+	LOGGER.log('Stop servers')
 	try
 	{
 		if (mWebServer)
 		{
 			mWebServer.stop(function()
 			{
-				window.console.log('Web server stopped.')
+				LOGGER.log('Web server stopped.')
 				if (mUDPServer)
 				{
-					window.console.log('Stop UDP server.')
+					LOGGER.log('Stop UDP server.')
 					mUDPServer.close()
-					window.console.log('UDP server stopped.')
+					LOGGER.log('UDP server stopped.')
 					callback && callback()
 				}
 			})
@@ -544,7 +545,7 @@ function stopServers(callback)
 	}
 	catch (error)
 	{
-		window.console.log('Error in stopServers: ' + error)
+		LOGGER.log('Error in stopServers: ' + error)
 	}
 }
 
@@ -553,7 +554,7 @@ function stopServers(callback)
  */
 function restartServers()
 {
-	window.console.log('Restart servers')
+	LOGGER.log('Restart servers')
 
 	// Callback passed to stop servers is not always reliable.
 	stopServers()
@@ -626,7 +627,7 @@ function createSocketIoServer(httpServer)
 	mIO.on('connection', function(socket)
 	{
 		// Debug logging.
-		window.console.log('Client connected')
+		LOGGER.log('Client connected')
 /*
 		if (!isWhiteListed(socket.ip))
 		{
@@ -637,13 +638,13 @@ function createSocketIoServer(httpServer)
 		socket.on('disconnect', function ()
 		{
 			// Debug logging.
-			window.console.log('Client disconnected')
+			LOGGER.log('Client disconnected')
 		})
 
 		socket.on('hyper.client-connected', function(data)
 		{
 			// Debug logging.
-			window.console.log('hyper.client-connected')
+			LOGGER.log('hyper.client-connected')
 
 			mClientConnectedCallback && mClientConnectedCallback()
 		})
@@ -655,8 +656,8 @@ function createSocketIoServer(httpServer)
 
 		socket.on('hyper.result', function(data)
 		{
-			//window.console.log('data result type: ' + (typeof data))
-			//window.console.log('data result : ' + data)
+			//LOGGER.log('data result type: ' + (typeof data))
+			//LOGGER.log('data result : ' + data)
 
 			// Functions cause a cloning error.
 			if (typeof data == 'function')
@@ -728,7 +729,7 @@ function startUDPServer(port)
 	server.on('listening', function ()
 	{
 		// Not used: var address = server.address()
-		window.console.log('UDP server listening')
+		LOGGER.log('UDP server listening')
 	})
 
 	// Bind server socket to port.
@@ -791,14 +792,14 @@ function fileSystemMonitor()
  */
 function fileSystemMonitorWorker(path, level)
 {
-	//window.console.log('fileSystemMonitorWorker path:level: ' + path + ':' + level)
+	//LOGGER.log('fileSystemMonitorWorker path:level: ' + path + ':' + level)
 	if (!path) { return false }
 	try
 	{
 		/*var files = FS.readdirSync(path)
 		for (var i in files)
 		{
-			window.console.log(path + files[i])
+			LOGGER.log(path + files[i])
 		}
 		return false*/
 
@@ -815,16 +816,16 @@ function fileSystemMonitorWorker(path, level)
 					++mFileCounter
 				}
 
-				//window.console.log('Checking file: ' + files[i] + ': ' + stat.mtime)
+				//LOGGER.log('Checking file: ' + files[i] + ': ' + stat.mtime)
 				if (stat.isFile() && t > mLastReloadTime)
 				{
-					//window.console.log('***** File has changed ***** ' + files[i])
+					//LOGGER.log('***** File has changed ***** ' + files[i])
 					mLastReloadTime = Date.now()
 					return true
 				}
 				else if (stat.isDirectory() && level > 0)
 				{
-					//window.console.log('Decending into: ' + path + files[i])
+					//LOGGER.log('Decending into: ' + path + files[i])
 					var changed = fileSystemMonitorWorker(
 						path + files[i] + '/',
 						level - 1)
@@ -833,22 +834,22 @@ function fileSystemMonitorWorker(path, level)
 			}
 			catch (err2)
 			{
-				window.console.log('***** ERROR2 fileSystemMonitorWorker ****** ' + err2)
+				LOGGER.log('***** ERROR2 fileSystemMonitorWorker ****** ' + err2)
 			}
 		}
 	}
 	catch(err1)
 	{
-		window.console.log('***** ERROR1 fileSystemMonitorWorker ****** ' + err1)
+		LOGGER.log('***** ERROR1 fileSystemMonitorWorker ****** ' + err1)
 	}
 	return false
 }
 
-/*window.console.log(mBasePath)
+/*LOGGER.log(mBasePath)
 var files = FS.readdirSync(mBasePath)
 for (var i in files)
 {
-	window.console.log(files[i])
+	LOGGER.log(files[i])
 }*/
 
 /*********************************/
