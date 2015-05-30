@@ -125,6 +125,7 @@ Copyright (c) 2013 Evothings AB
 	<script>
 	var GUI = require('nw.gui')
 	var PATH = require('path')
+	var SETTINGS = require('../settings/settings.js')
 
 	function openDocumentation()
 	{
@@ -139,12 +140,12 @@ Copyright (c) 2013 Evothings AB
 
 	function setShowWelcomeScreen(show)
 	{
-		localStorage.setItem('evo-show-welcome-screen', show ? 'yes' : 'no')
+		SETTINGS.setShowWelcomeScreen(show ? 'yes' : 'no')
 	}
 
 	function getShowWelcomeScreen()
 	{
-		return 'no' != localStorage.getItem('evo-show-welcome-screen')
+		return 'no' != SETTINGS.getShowWelcomeScreen()
 	}
 
 	$('#showScreenAtStartup').prop('checked', getShowWelcomeScreen())

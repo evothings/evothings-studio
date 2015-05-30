@@ -30,93 +30,6 @@ var FILEUTIL = require('./fileutil.js')
 var WEBSERVER = require('./webserver')
 var SETTINGS = require('../settings/settings.js')
 
-
-/*********************************/
-/***    Security interface     ***/
-/*********************************/
-
-// Used for white listing and for black listing ip addresses.
-var mWhiteList = {}
-var mUnknownIpHandlerFun = null
-
-/**
- * External.
- */
-function setUnknownIpHandler(fun)
-{
-	mUnknownIpHandlerFun = fun
-}
-
-/**
- * External.
- */
-function whiteListIp(ip)
-{
-	mWhiteList[ip] = 1 // Allow
-}
-
-/**
- * External.
- */
-function blackListIp(ip)
-{
-	mWhiteList[ip] = 2 // Deny
-}
-
-/**
- * Internal.
- *
- * Check that requesting client is authorized, and if not
- * serve status pages.
- *
- * TODO: Authorization is not implemented. Plan is to do this with a
- * pincode/password passed by the initial client request.
- */
-function authorizeRequest(request, response)
-{
-	// Is security setting is turned off, all connections are allowed.
-	if (!SETTINGS.AuthorizeConnections)
-	{
-		return true
-	}
-
-	// Is request whitelisted?
-	if (1 === mWhiteList[request.socket.remoteAddress])
-	{
-		return true
-	}
-
-	// Is request blacklisted?
-	if (2 === mWhiteList[request.socket.remoteAddress])
-	{
-		serveHtmlFilePlainlyWithoutReloaderScript(
-			request,
-			response,
-			'./hyper/server/hyper-unauthorized.html')
-		return false
-	}
-}
-
-/**
- * Internal.
- *
- * Serve HTML file without inserting reloader script.
- */
-function serveHtmlFilePlainlyWithoutReloaderScript(request, response, path)
-{
-	var content = FILEUTIL.readFileSync(path)
-	if (content)
-	{
-		file.replace('<!--hyper.reloader-->', script)
-		mWebServer.writeRespose(response, content, 'text/html')
-		return true
-	}
-	else
-	{
-		return false
-	}
-}
-
 /*********************************/
 /***	   Server code		   ***/
 /*********************************/
@@ -137,31 +50,6 @@ var mReloadCallback = null
 /*** Server functions ***/
 
 /**
- * NOT USED.
- *
- * Internal.
- *
- * Version of webserver hook function used for serving iframe version.
- */
-/*
-function webServerHookFunForIframe(request, response, path)
-{
-	// When the root is requested, we send the document with an
-	// iframe that will load application pages.
-	if (path == '/')
-	{
-		var page = FS.readFileSync('./hyper/server/hyper-client.html', {encoding: 'utf8'})
-		mWebServer.writeRespose(response, page, 'text/html')
-		return true
-	}
-	else
-	{
-		return false
-	}
-}
-*/
-
-/**
  * Internal.
  *
  * Version of the webserver hook function that inserts the reloader
@@ -169,13 +57,6 @@ function webServerHookFunForIframe(request, response, path)
  */
 function webServerHookFunForScriptInjection(request, response, path)
 {
-	// Check whitelist.
-	if (!authorizeRequest(request, response))
-	{
-		// Request was not allowed, but has been processed.
-		return true
-	}
-
 	// Update the server address on every request (overkill but simple).
 	// TODO: If connecting using 'localhost' or '127.0.0.1' this
 	// will break existing wifi connections! This should be fixed and/or
@@ -188,18 +69,12 @@ function webServerHookFunForScriptInjection(request, response, path)
 		return serveRootRequest(request, response)
 	}
 
-	// If other request than the root request, check for white listing.
-	if (false)//!mWhiteList[request.socket.remoteAddress])
-	{
-		return serveUnauthorizedRequest(request, response)
-	}
-
 	// Proceed serving requests.
 	if (path == '/hyper.reloader')
 	{
 		return serveReloaderScript(response)
 	}
-	else if (SETTINGS.ServeCordovaJsFiles &&
+	else if (SETTINGS.getServeCordovaJsFiles() &&
 		(path == '/cordova.js' ||
 		path == '/cordova_plugins.js' ||
 		path.indexOf('/plugins/') == 0))
@@ -266,7 +141,7 @@ function serveReloaderScript(response)
 	{
 		script = script.replace(
 			'__SOCKET_IO_PORT_INSERTED_BY_SERVER__',
-			SETTINGS.WebServerPort)
+			SETTINGS.getWebServerPort())
 		mWebServer.writeRespose(response, script, 'application/javascript')
 		return true
 	}
@@ -560,7 +435,7 @@ function getAppFileName()
  */
 function getAppFileURL()
 {
-	return 'http://' + mIpAddress + ':' + SETTINGS.WebServerPort + '/' + mAppFile
+	return 'http://' + mIpAddress + ':' + SETTINGS.getWebServerPort() + '/' + mAppFile
 }
 
 /**
@@ -568,7 +443,7 @@ function getAppFileURL()
  */
 function getServerBaseURL()
 {
-	return 'http://' + mIpAddress + ':' + SETTINGS.WebServerPort + '/'
+	return 'http://' + mIpAddress + ':' + SETTINGS.getWebServerPort() + '/'
 }
 
 /**
@@ -625,14 +500,14 @@ function startServers()
 {
 	window.console.log('Start servers')
 
-	if (SETTINGS.ServerDiscoveryEnabled)
+	if (SETTINGS.getServerDiscoveryEnabled())
 	{
 		window.console.log('Start UDP server')
-		startUDPServer(SETTINGS.ServerDiscoveryPort || 4088)
+		startUDPServer(SETTINGS.getServerDiscoveryPort())
 	}
 
 	window.console.log('Start web server')
-	startWebServer(mBasePath, SETTINGS.WebServerPort, function(server)
+	startWebServer(mBasePath, SETTINGS.getWebServerPort(), function(server)
 	{
 		window.console.log('Web server started')
 		mWebServer = server
@@ -816,7 +691,7 @@ function startUDPServer(port)
 		var serverData =
 		{
 			name: OS.hostname(),
-			port: SETTINGS.WebServerPort
+			port: SETTINGS.getWebServerPort()
 		}
 
 		var message = new Buffer(JSON.stringify(serverData))
@@ -998,6 +873,3 @@ exports.setReloadCallbackFun = setReloadCallbackFun
 exports.setTraverseNumDirectoryLevels = setTraverseNumDirectoryLevels
 exports.getNumberOfMonitoredFiles = getNumberOfMonitoredFiles
 exports.fileSystemMonitor = fileSystemMonitor
-exports.setUnknownIpHandler = setUnknownIpHandler
-exports.whiteListIp = whiteListIp
-exports.blackListIp = blackListIp

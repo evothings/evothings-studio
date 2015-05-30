@@ -4,7 +4,7 @@
 File: hyper-ui.html
 Description: Main application file. Defines the UI and starts the server.
 Author: Mikael Kindborg
-Copyright (c) 2013-2014 Evothings AB
+Copyright (c) 2013-2015 Evothings AB
 -->
 <!-- HTML 5 differences from HTML 4: http://www.w3.org/TR/2008/WD-html5-diff-20080122/ -->
 <head>
@@ -43,6 +43,7 @@ Copyright (c) 2013-2014 Evothings AB
 					<ul class="dropdown-menu">
 						<li><a href="javascript:void(0)"
 							onclick="hyper.showWelcomeScreen()">Welcome Screen</a></li>
+						<li><a href="javascript:void(0)" onclick="hyper.UI.showSettingsDialog()">Settings</a></li>
 					</ul>
 				</div>
 			</div>
@@ -109,6 +110,57 @@ Copyright (c) 2013-2014 Evothings AB
 				</div>
 			</div>
 
+			<!-- Modal dialog: dialog-settings -->
+			<div class="modal fade"
+				id="dialog-settings"
+				tabindex="-1"
+				role="dialog"
+				aria-labelledby="dialog-settings-label"
+				aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h4 class="modal-title" id="dialog-settings-label">
+								Settings Dialog
+							</h4>
+						</div>
+
+						<div class="modal-body">
+							<div class="form-group">
+								<label for="input-setting-javascript-workbench-font-size">
+									JavaScript Workbench font size:</label>
+								<input type="text"
+									id="input-setting-javascript-workbench-font-size"
+									class="form-control"
+									placeholder="18px"/>
+							</div>
+							<div class="form-group">
+								<label for="input-setting-number-of-directory-levels">
+									Number of directory levels to monitor for live reload:</label>
+								<input type="text"
+									id="input-setting-number-of-directory-levels"
+									class="form-control"
+									placeholder="3"/>
+							</div>
+						</div>
+
+						<div class="modal-footer">
+								<button type="button"
+									class="btn btn-success"
+									onclick="hyper.UI.saveSettings()">
+									Save
+								</button>
+							<button type="button"
+								class="btn btn-default"
+								data-dismiss="modal">
+								Dismiss
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
 			<!-- Project list -->
 			<div id="project-list"></div>
 		</div>
@@ -139,6 +191,7 @@ Copyright (c) 2013-2014 Evothings AB
 		var PATH = require('path')
 		var GUI = require('nw.gui')
 		var FILEUTIL = require('../server/fileutil.js')
+		var SETTINGS = require('../settings/settings.js')
 
 		// ************** Documentation Button **************
 
@@ -187,7 +240,7 @@ Copyright (c) 2013-2014 Evothings AB
 
 		function getShowWelcomeScreen()
 		{
-			return 'no' != localStorage.getItem('evo-show-welcome-screen')
+			return 'no' != SETTINGS.getShowWelcomeScreen()
 		}
 
 		// Display welcome screen on startup if the display
@@ -229,7 +282,7 @@ Copyright (c) 2013-2014 Evothings AB
 			var platform = platformTable[process.platform]
 
 			// Get saved GUID.
-			var guid = localStorage.getItem('evo-guid')
+			var guid = SETTINGS.getEvoGUID()
 
 			// Create JSON request data.
 			var json =
@@ -274,14 +327,13 @@ Copyright (c) 2013-2014 Evothings AB
 			}
 
 			// Store GUID.
-			localStorage.setItem('evo-guid', response.guid)
+			SETTINGS.setEvoGUID(response.guid)
 
 			// Get currently installed version.
 			var installedVersion = versionGetCurrent()
 
 			// Get value of version update user does not want to be reminded of.
-			var doNotShowVersion = localStorage.getItem(
-				'evo-version-check-do-not-show-version')
+			var doNotShowVersion = SETTINGS.getDoNotShowUpdateDialogForVersion()
 
 			// Show dialog with info about new version.
 			// Check that the available version is greater
@@ -316,7 +368,7 @@ Copyright (c) 2013-2014 Evothings AB
 		{
 			// Store the version info that we should not show dialog for.
 			var version = event.target.checked ? hyper.newAvailableVersion : null
-			localStorage.setItem('evo-version-check-do-not-show-version', version)
+			SETTINGS.setDoNotShowUpdateDialogForVersion(version)
 		})
 
 		// Do version check at start up.

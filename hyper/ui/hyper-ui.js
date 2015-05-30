@@ -32,7 +32,6 @@ var PATH = require('path')
 var OS = require('os')
 var GUI = require('nw.gui')
 
-require('../server/prepare-settings.js')
 var FILEUTIL = require('../server/fileutil.js')
 var SETTINGS = require('../settings/settings.js')
 
@@ -204,25 +203,20 @@ hyper.UI = {}
 			return;
 		}
 
-		if(!localStorage)
-			return;
-
-		localStorage.setItem('project-window-geometry', JSON.stringify({
+		SETTINGS.setProjectWindowGeometry({
 			x: win.x,
 			y: win.y,
 			width: win.width,
 			height: win.height
 			})
-		)
 	}
 
 	function restoreSavedUIState()
 	{
-		var geometry = localStorage.getItem('project-window-geometry')
+		var geometry = SETTINGS.getProjectWindowGeometry()
 		if (geometry)
 		{
 			var win = GUI.Window.get()
-			var data = JSON.parse(geometry)
 
 			// Make sure top-left corner is visible.
 			var offsetY = 0
@@ -230,16 +224,16 @@ hyper.UI = {}
 			{
 				offsetY = 22
 			}
-			data.x = Math.max(data.x, 1)
-			data.y = Math.max(data.y, 1 + offsetY)
-			data.x = Math.min(data.x, screen.width - 100)
-			data.y = Math.min(data.y, screen.height - 200)
+			geometry.x = Math.max(geometry.x, 1)
+			geometry.y = Math.max(geometry.y, 1 + offsetY)
+			geometry.x = Math.min(geometry.x, screen.width - 100)
+			geometry.y = Math.min(geometry.y, screen.height - 200)
 
 			// Set window size.
-			win.x = data.x
-			win.y = data.y
-			win.width = data.width
-			win.height = data.height
+			win.x = geometry.x
+			win.y = geometry.y
+			win.width = geometry.width
+			win.height = geometry.height
 		}
 	}
 
@@ -496,57 +490,23 @@ hyper.UI = {}
 		updateProjectList()
 	}
 
-	/*
-	//jQueryUI implementation. NOT USED.
-	hyper.UI.askForClientVerification = function(ip)
+	hyper.UI.showSettingsDialog = function(defaultServerAddress)
 	{
-		// Style buttons: http://stackoverflow.com/questions/1828010/apply-css-to-jquery-dialog-buttons
-		var isClosed = false
-		var html = '<div title="Client Connected">'
-        	+ '<p>Allow connection from <strong>' + ip + '</strong>?</p></div>'
-		$(html).dialog(
-		{
-			autoOpen: false,
-			width: 400,
-			open: function()
-			{
-        		$('.ui-dialog-buttonpane')
-        			.find('button:contains("Allow")')
-        				.css('background', 'rgb(0,175,0)')
-        				.css('color', 'rgb(255,255,255)')
-        		$('.ui-dialog-buttonpane')
-        			.find('button:contains("Deny")')
-        				.css('background', 'rgb(175,0,0)')
-        				.css('color', 'rgb(255,255,255)')
-        	},
-			close: function(event, ui)
-			{
-				if (!isClosed)
-				{
-					$(this).remove()
-					hyper.SERVER.blackListIp(ip)
-				}
-			},
-			buttons:
-			{
-				'Allow': function ()
-				{
-					isClosed = true
-					$(this).dialog('close')
-					$(this).remove()
-					hyper.SERVER.whiteListIp(ip)
-				},
-				'Deny': function ()
-				{
-					isClosed = true
-					$(this).dialog('close')
-					$(this).remove()
-					hyper.SERVER.blackListIp(ip)
-				}
-			}
-		}).dialog('open')
+		$('#input-setting-javascript-workbench-font-size').val(
+			SETTINGS.getWorkbenchFontSize())
+		$('#input-setting-number-of-directory-levels').val(
+			SETTINGS.getNumberOfDirecoryLevelsToTraverse())
+		$('#dialog-settings').modal('show')
 	}
-	*/
+
+	hyper.UI.saveSettings = function(defaultServerAddress)
+	{
+		SETTINGS.setWorkbenchFontSize(
+			$('#input-setting-javascript-workbench-font-size').val())
+		SETTINGS.setNumberOfDirecoryLevelsToTraverse(
+			parseInt($('#input-setting-number-of-directory-levels').val()))
+		$('#dialog-settings').modal('hide')
+	}
 
 	setupUI()
 })()
@@ -573,7 +533,7 @@ hyper.UI = {}
 		SERVER.startServers()
 
 		SERVER.setTraverseNumDirectoryLevels(
-			SETTINGS.NumberOfDirecoryLevelsToTraverse)
+			SETTINGS.getNumberOfDirecoryLevelsToTraverse())
 		SERVER.fileSystemMonitor()
 
 		// Populate the UI.
@@ -587,7 +547,6 @@ hyper.UI = {}
 
 		SERVER.setClientConnenctedCallbackFun(clientConnectedCallback)
 		SERVER.setReloadCallbackFun(reloadCallback)
-		SERVER.setUnknownIpHandler(hyper.UI.askForClientVerification)
 	}
 
 	// Check IP address and stop and start servers if it has changed.
@@ -624,7 +583,7 @@ hyper.UI = {}
 			var numAddresses = addresses.length
 			if (numAddresses == 0)
 			{
-				connectAddress = '127.0.0.1:' + SETTINGS.WebServerPort
+				connectAddress = '127.0.0.1:' + SETTINGS.getWebServerPort()
 			}
 			else
 			{
@@ -634,7 +593,7 @@ hyper.UI = {}
 				}
 				for (var i = 0; i < numAddresses; ++i)
 				{
-					connectAddress += addresses[i] + ':' + SETTINGS.WebServerPort
+					connectAddress += addresses[i] + ':' + SETTINGS.getWebServerPort()
 					if (i + 1 < numAddresses)
 					{
 						connectAddress += ' or '
@@ -717,7 +676,7 @@ hyper.UI = {}
 
 		// Update ip address in the UI to the actual ip used by the server.
 		SERVER.getIpAddress(function(address) {
-			hyper.UI.displayIpAddress(address + ':' + SETTINGS.WebServerPort)
+			hyper.UI.displayIpAddress(address + ':' + SETTINGS.getWebServerPort())
 		})
 	}
 

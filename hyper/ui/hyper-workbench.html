@@ -265,6 +265,7 @@ document.body.innerHTML = '<h1>Hello World</h1>'
 $(function()
 {
 	var OS = require('os')
+	var SETTINGS = require('../settings/settings.js')
 
 	// Main application window
 	var mMainWindow = window.opener
@@ -479,8 +480,8 @@ $(function()
 			resultContent = resultContent.substring(0, maxStorageSize)
 		}
 
-		localStorage.setItem('workbench-code-editor-content', editorContent)
-		localStorage.setItem('workbench-result-editor-content', resultContent)
+		SETTINGS.setWorkbenchCodeEditorContent(editorContent)
+		SETTINGS.setWorkbenchResultEditorContent(resultContent)
 
 		// Save window layout.
 
@@ -495,16 +496,15 @@ $(function()
 			return;
 		}
 
-		localStorage.setItem('workbench-window-geometry', JSON.stringify({
+		SETTINGS.setWorkbenchWindowGeometry({
 			x: win.x,
 			y: win.y,
 			width: win.width,
 			height: win.height
 			})
-		)
 
 		var layout = $('body').layout()
-		localStorage.setItem('workbench-divider-position', layout.state.south.size)
+		SETTINGS.getWorkbenchWindowDividerPosition(layout.state.south.size)
 	}
 
 	// Save global reference to function.
@@ -512,18 +512,17 @@ $(function()
 
 	function restoreSavedUIState()
 	{
-		var editorContent = localStorage.getItem('workbench-code-editor-content')
+		var editorContent = SETTINGS.getWorkbenchCodeEditorContent()
 			|| $('#code-editor-default-content').html()
-		var resultContent = localStorage.getItem('workbench-result-editor-content')
+		var resultContent = SETTINGS.getWorkbenchResultEditorContent()
 			|| $('#result-editor-default-content').html()
 		mEditor.setValue(editorContent)
 		mResult.setValue(resultContent)
 
-		var geometry = localStorage.getItem('workbench-window-geometry')
+		var geometry = SETTINGS.getWorkbenchWindowGeometry()
 		if (geometry)
 		{
 			var win = GUI.Window.get()
-			var data = JSON.parse(geometry)
 
 			// Make sure top-left corner is visible.
 			var offsetY = 0
@@ -531,19 +530,19 @@ $(function()
 			{
 				offsetY = 22
 			}
-			data.x = Math.max(data.x, 1)
-			data.y = Math.max(data.y, 1 + offsetY)
-			data.x = Math.min(data.x, screen.width - 100)
-			data.y = Math.min(data.y, screen.height - 200)
+			geometry.x = Math.max(geometry.x, 1)
+			geometry.y = Math.max(geometry.y, 1 + offsetY)
+			geometry.x = Math.min(geometry.x, screen.width - 100)
+			geometry.y = Math.min(geometry.y, screen.height - 200)
 
 			// Set window size.
-			win.x = data.x
-			win.y = data.y
-			win.width = data.width
-			win.height = data.height
+			win.x = geometry.x
+			win.y = geometry.y
+			win.width = geometry.width
+			win.height = geometry.height
 		}
 
-		var size = localStorage.getItem('workbench-divider-position')
+		var size = SETTINGS.getWorkbenchWindowDividerPosition()
 		if (size)
 		{
 			var layout = $('body').layout()
@@ -571,19 +570,14 @@ $(function()
 		saveUIState()
 		this.close(true)
 	})
-})
-</script>
 
-<script>
-	// Define exports before including settings.
-	var exports = exports || {}
-</script>
-<script src="../settings/settings.js"></script>
-<script>
 	// Set fonts based on settings.
 	setTimeout(function() {
-		$('.CodeMirror').css('font-family', exports.WorkbenchFontFamily)
-		$('.CodeMirror').css('font-size', exports.WorkbenchFontSize) }, 1)
+		$('.CodeMirror').css('font-family', SETTINGS.getWorkbenchFontFamily())
+		$('.CodeMirror').css('font-size', SETTINGS.getWorkbenchFontSize())
+		},
+		1)
+})
 </script>
 
 </body>
