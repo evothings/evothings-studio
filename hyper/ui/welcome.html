@@ -4,7 +4,7 @@
 File: welcome.html
 Description: Welcome page for Evothings Studio.
 Author: Eric Svensson
-Copyright (c) 2013 Evothings AB
+Copyright (c) 2013-2015 Evothings AB
 -->
 <head>
 
@@ -118,11 +118,12 @@ Copyright (c) 2013 Evothings AB
 		</div>
 	</div>
 
-	<script src="../libs/jquery/jquery-2.1.0.min.js"></script>
+	<script src="../libs/jquery/jquery-2.1.4.min.js"></script>
 
 	<script>
 	var GUI = require('nw.gui')
 	var PATH = require('path')
+	var SETTINGS = require('../settings/settings.js')
 
 	function openDocumentation()
 	{
@@ -143,12 +144,12 @@ Copyright (c) 2013 Evothings AB
 
 	function setShowWelcomeScreen(show)
 	{
-		localStorage.setItem('evo-show-welcome-screen-2', show ? 'yes' : 'no')
+		SETTINGS.setShowWelcomeScreen(show ? 'yes' : 'no')
 	}
 
 	function getShowWelcomeScreen()
 	{
-		return 'no' != localStorage.getItem('evo-show-welcome-screen-2')
+		return 'no' != SETTINGS.getShowWelcomeScreen()
 	}
 
 	$('#showScreenAtStartup').prop('checked', getShowWelcomeScreen())

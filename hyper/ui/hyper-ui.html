@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <!--
-File: evothings-ui.html
+File: hyper-ui.html
 Description: Main application file. Defines the UI and starts the server.
 Author: Mikael Kindborg
 Copyright (c) 2013-2015 Evothings AB
@@ -9,10 +9,10 @@ Copyright (c) 2013-2015 Evothings AB
 <!-- HTML 5 differences from HTML 4: http://www.w3.org/TR/2008/WD-html5-diff-20080122/ -->
 <head>
 	<meta charset="utf-8">
-	<link href="../libs/bootstrap-3.1.1/css/bootstrap.min.css" rel="stylesheet">
-	<script src="../libs/jquery/jquery-2.1.0.min.js"></script>
-	<script src="../libs/jquery/jquery-ui-1.10.3.custom.min.js"></script>
-	<script src="../libs/bootstrap-3.1.1/js/bootstrap.min.js"></script>
+	<link href="../libs/bootstrap-3.3.4-dist/css/bootstrap.min.css" rel="stylesheet">
+	<script src="../libs/jquery/jquery-2.1.4.min.js"></script>
+	<script src="../libs/jquery/jquery-ui.min.js"></script>
+	<script src="../libs/bootstrap-3.3.4-dist/js/bootstrap.min.js"></script>
 	<link href="hyper-ui.css" rel="stylesheet" />
 	<link href="hyper-workbench.css" rel="stylesheet" />
 	<style>
@@ -69,6 +69,7 @@ Copyright (c) 2013-2015 Evothings AB
 						<li><a href="javascript:void(0)" onclick="window.showSettingsDialog()">Settings</a></li>
 						<li><a href="javascript:void(0)"
 							onclick="hyper.showWelcomeScreen()">Welcome Screen</a></li>
+						<li><a href="javascript:void(0)" onclick="hyper.UI.showSettingsDialog()">Settings</a></li>
 					</ul>
 				</div>
 			</div>
@@ -215,7 +216,7 @@ Copyright (c) 2013-2015 Evothings AB
 								<input type="text"
 									id="input-setting-javascript-workbench-font-size"
 									class="form-control"
-									placeholder="24px"/>
+									placeholder="18px"/>
 							</div>
 							<div class="form-group">
 								<label for="input-setting-number-of-directory-levels">
@@ -273,10 +274,12 @@ Copyright (c) 2013-2015 Evothings AB
 		var PATH = require('path')
 		var GUI = require('nw.gui')
 		var FILEUTIL = require('../server/fileutil.js')
-		var WEBSERVER = require('../server/webserver.js')
+		var SETTINGS = require('../settings/settings.js')
 		var LOGGER = require('../server/log.js')
 
-		var mWebServer = WEBSERVER.create()
+		// TODO: Make running local web server an option.
+		//var WEBSERVER = require('../server/webserver.js')
+		//var mWebServer = WEBSERVER.create()
 
 		// ************** Documentation Button **************
 
@@ -325,7 +328,7 @@ Copyright (c) 2013-2015 Evothings AB
 
 		function getShowWelcomeScreen()
 		{
-			return 'no' != localStorage.getItem('evo-show-welcome-screen-2')
+			return 'no' != SETTINGS.getShowWelcomeScreen()
 		}
 
 		// Display welcome screen on startup if the display
@@ -367,7 +370,7 @@ Copyright (c) 2013-2015 Evothings AB
 			var platform = platformTable[process.platform]
 
 			// Get saved GUID.
-			var guid = localStorage.getItem('evo-guid')
+			var guid = SETTINGS.getEvoGUID()
 
 			// Create JSON request data.
 			var json =
@@ -412,14 +415,13 @@ Copyright (c) 2013-2015 Evothings AB
 			}
 
 			// Store GUID.
-			localStorage.setItem('evo-guid', response.guid)
+			SETTINGS.setEvoGUID(response.guid)
 
 			// Get currently installed version.
 			var installedVersion = versionGetCurrent()
 
 			// Get value of version update user does not want to be reminded of.
-			var doNotShowVersion = localStorage.getItem(
-				'evo-version-check-do-not-show-version')
+			var doNotShowVersion = SETTINGS.getDoNotShowUpdateDialogForVersion()
 
 			// Show dialog with info about new version.
 			// Check that the available version is greater
@@ -454,7 +456,7 @@ Copyright (c) 2013-2015 Evothings AB
 		{
 			// Store the version info that we should not show dialog for.
 			var version = event.target.checked ? hyper.newAvailableVersion : null
-			localStorage.setItem('evo-version-check-do-not-show-version', version)
+			SETTINGS.setDoNotShowUpdateDialogForVersion(version)
 		})
 
 		window.showConnectKeyDialog = function()

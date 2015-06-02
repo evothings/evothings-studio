@@ -1,4 +1,9 @@
 .DS_Store
-buildHyper.rb
-localConfig.rb
+/buildHyper.rb
+/localConfig.rb
 /build
+/hyper/libs
+/node_modules
+/package.json
+/hyper/server/ui
+/examples

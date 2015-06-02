@@ -4,8 +4,4 @@
 require "fileutils"
 require "pathname"
 
-FileUtils.copy_entry(
-	"../HyperReload/hyper/build/buildHyper.rb",
-	"./buildHyper.rb")
-
-load("buildHyper.rb")
+load("./hyper/build/buildHyper.rb")
