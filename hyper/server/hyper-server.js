@@ -1,11 +1,11 @@
 /*
-File: hyper-file-server.js
-Description: HyperReload local file server.
+File: hyper-server.js
+Description: HyperReload file server.
 Author: Mikael Kindborg
 
 License:
 
-Copyright (c) 2013-2015 Mikael Kindborg
+Copyright (c) 2013-2015 Evothings AB
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -29,9 +29,9 @@ var FS = require('fs')
 var PATH = require('path')
 var SOCKETIO_CLIENT = require('socket.io-client')
 var FILEUTIL = require('./fileutil.js')
-var SETTINGS = require('../settings/settings.js')
-var LOADER = require('./resource-loader.js')
+var LOADER = require('./fileloader.js')
 var LOGGER = require('./log.js')
+var SETTINGS = require('../settings/settings.js')
 
 /*********************************/
 /***     Server variables      ***/
@@ -529,7 +529,55 @@ function getUserKey()
 function runApp()
 {
 	serveUsingResponse200()
-	mSocket.emit('hyper.run', { key: mUserKey, url: getAppServerURL() })
+	mSocket.emit('hyper.run', {
+		key: mUserKey,
+		'app-uuid': getAppUUID(),
+		url: getAppServerURL() })
+}
+
+/**
+ * Internal.
+ *
+ * Get the app UUID.
+ *
+ * This is used by the server to identify apps.
+ *
+ * File evothings.json contains app settings. It can be used
+ * for other settings as well in the future.
+ */
+function getAppUUID()
+{
+	var path = mBasePath + '/' + 'evothings.json'
+	if (FS.existsSync(path))
+	{
+		var json = FILEUTIL.readFileSync(path)
+		var settings = JSON.parse(json)
+	}
+	else
+	{
+		var settings = { 'app-uuid': generateUUID() }
+		var json = JSON.stringify(settings)
+		FS.writeFileSync(path, json, {encoding: 'utf8'})
+	}
+	return settings['app-uuid']
+}
+
+/**
+ * Internal.
+ *
+ * http://stackoverflow.com/a/8809472/4940311
+ */
+function generateUUID()
+{
+	var d = new Date().getTime()
+	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(
+		/[xy]/g,
+		function(c)
+		{
+			var r = (d + Math.random()*16)%16 | 0
+			d = Math.floor(d/16)
+			return (c=='x' ? r : (r&0x3|0x8)).toString(16)
+		})
 }
 
 /**
@@ -540,7 +588,9 @@ function runApp()
 function reloadApp()
 {
 	serveUsingResponse304()
-	mSocket.emit('hyper.reload', { key: mUserKey })
+	mSocket.emit('hyper.reload', {
+		key: mUserKey,
+		'app-uuid': getAppUUID() })
 	mReloadCallback && mReloadCallback()
 }
 

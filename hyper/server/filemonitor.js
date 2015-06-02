@@ -1,5 +1,5 @@
 /*
-File: hyper-file-monitor.js
+File: filemonitor.js
 Description: File monitoring functionality
 Author: Mikael Kindborg
 

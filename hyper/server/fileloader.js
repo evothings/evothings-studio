@@ -1,6 +1,6 @@
 /*
-File: resource-loader.js
-Description: Module that reads file resources.
+File: fileloader.js
+Description: Module that loads file resources.
 Author: Mikael Kindborg
 
 License:

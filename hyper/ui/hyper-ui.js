@@ -545,8 +545,8 @@ hyper.UI = {}
 
 ;(function()
 {
-	var SERVER = require('../server/hyper-file-server.js')
-	var MONITOR = require('../server/hyper-file-monitor.js')
+	var SERVER = require('../server/hyper-server.js')
+	var MONITOR = require('../server/filemonitor.js')
 
 	hyper.SERVER = SERVER
 	hyper.MONITOR = MONITOR
