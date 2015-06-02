@@ -314,8 +314,12 @@ hyper.UI = {}
 		hyper.UI.displayProjectList()
 	}
 
-	function createProjectEntry(path)
+	function createProjectEntry(path, options)
 	{
+		options = options || {}
+		options.list = options.list || '#project-list'
+		if(options.haveDeleteButton !== false)
+			options.haveDeleteButton = true
 		// Template for project items.
 		var html =
 			'<div class="ui-state-default ui-corner-all">'
@@ -333,13 +337,18 @@ hyper.UI = {}
 				+ '</button>'
 				+ '<h4>__NAME__</h4>'
 				+ '<p>__PATH3__</p>'
-				+ '<button '
+		if(options.haveDeleteButton)
+		{
+			html +=
+				'<button '
 				+	'type="button" '
 				+	'class="close button-delete" '
 				+	'onclick="hyper.UI.deleteEntry(this)">'
 				+	'&times;'
 				+ '</button>'
-				+ '<div class="project-list-entry-path" style="display:none;">__PATH4__</div>'
+		}
+		html +=
+			'<div class="project-list-entry-path" style="display:none;">__PATH4__</div>'
 			+ '</div>'
 
 		// Get name of project, use title tag as first choise.
@@ -372,7 +381,7 @@ hyper.UI = {}
 		//window.console.log(html)
 
 		// Insert element first in list.
-		$('#project-list').append(element)
+		$(options.list).append(element)
 	}
 
 	function getTagContent(data, tag)
@@ -476,6 +485,20 @@ hyper.UI = {}
 		}
 	}
 
+	hyper.UI.displayExampleList = function()
+	{
+		// Clear current list.
+		$('#example-list').empty()
+
+		// Create new list.
+		var list = hyper.getExampleList()
+		for (var i = 0; i < list.length; ++i)
+		{
+			var path = list[i]
+			createProjectEntry(path, {list:'#example-list', haveDeleteButton:false})
+		}
+	}
+
 	hyper.UI.setServerMessageFun = function()
 	{
 		// Set server message callback to forward message to the Workbench.
@@ -561,6 +584,8 @@ hyper.UI = {}
 
 	var mProjectListFile = './hyper/settings/project-list.json'
 	var mProjectList = []
+	var mExampleListFile = './hyper/settings/example-list.json'
+	var mExampleList = []
 	var mApplicationBasePath = process.cwd()
 	var mRunAppGuardFlag = false
 	var mNumberOfConnectedClients = 0
@@ -578,8 +603,10 @@ hyper.UI = {}
 
 		// Populate the UI.
 		// TODO: Consider moving these calls to a function in hyper.UI.
+		mExampleList = readProjectListEx(mExampleListFile)
 		readProjectList()
 		hyper.UI.displayProjectList()
+		hyper.UI.displayExampleList()
 		hyper.UI.setServerMessageFun()
 
 		displayServerIpAddress()
@@ -726,6 +753,19 @@ hyper.UI = {}
 		mNumberOfConnectedClients = 0
 	}
 
+	function readProjectListEx(filename)
+	{
+		var json = FILEUTIL.readFileSync(filename)
+
+		// Replace slashes with backslashes on Windows.
+		if (process.platform === 'win32')
+		{
+			json = json.replace(/[\/]/g,'\\\\')
+		}
+
+		return JSON.parse(json)
+	}
+
 	function readProjectList()
 	{
 		/* Not used:
@@ -740,15 +780,7 @@ hyper.UI = {}
 		// Read project file.
 		if (FS.existsSync(mProjectListFile))
 		{
-			var json = FILEUTIL.readFileSync(mProjectListFile)
-
-			// Replace slashes with backslashes on Windows.
-			if (process.platform === 'win32')
-			{
-				json = json.replace(/[\/]/g,'\\\\')
-			}
-
-			mProjectList = JSON.parse(json)
+			mProjectList = readProjectListEx(mProjectListFile)
 		}
 	}
 
@@ -774,6 +806,11 @@ hyper.UI = {}
 	hyper.getProjectList = function()
 	{
 		return mProjectList
+	}
+
+	hyper.getExampleList = function()
+	{
+		return mExampleList
 	}
 
 	function openFolder(path)
