@@ -42,6 +42,7 @@ var mRemoteServerURL = ''
 var mSocket = null
 var mAppPath = null
 var mAppFile = null
+var mAppID = null
 var mMessageCallback = null
 var mClientConnectedCallback = null
 var mReloadCallback = null
@@ -114,6 +115,7 @@ function connectToRemoteServer()
 			{
 				id: data.id,
 				key: mUserKey,
+				appID: mAppID,
 				response: response
 			})
 	})
@@ -502,7 +504,7 @@ function getBasePath()
  */
 function getAppServerURL()
 {
-	return mRemoteServerURL + '/hyper/' + mUserKey + '/' + mAppFile
+	return mRemoteServerURL + '/hyper/' + mUserKey + '/' + mAppID + '/' + mAppFile
 }
 
 /**
@@ -528,24 +530,40 @@ function getUserKey()
  */
 function runApp()
 {
-	serveUsingResponse200()
+	//serveUsingResponse200()
+	serveUsingResponse304()
+	mAppID = getAppID()
 	mSocket.emit('hyper.run', {
 		key: mUserKey,
-		'app-uuid': getAppUUID(),
+		appID: mAppID,
 		url: getAppServerURL() })
+}
+
+/**
+ * External.
+ *
+ * Reloads the currently visible page of the browser.
+ */
+function reloadApp()
+{
+	serveUsingResponse304()
+	mSocket.emit('hyper.reload', {
+		key: mUserKey,
+		appID: mAppID })
+	mReloadCallback && mReloadCallback()
 }
 
 /**
  * Internal.
  *
- * Get the app UUID.
+ * Get the app ID.
  *
  * This is used by the server to identify apps.
  *
  * File evothings.json contains app settings. It can be used
  * for other settings as well in the future.
  */
-function getAppUUID()
+function getAppID()
 {
 	var path = mBasePath + '/' + 'evothings.json'
 	if (FS.existsSync(path))
@@ -578,20 +596,6 @@ function generateUUID()
 			d = Math.floor(d/16)
 			return (c=='x' ? r : (r&0x3|0x8)).toString(16)
 		})
-}
-
-/**
- * External.
- *
- * Reloads the currently visible page of the browser.
- */
-function reloadApp()
-{
-	serveUsingResponse304()
-	mSocket.emit('hyper.reload', {
-		key: mUserKey,
-		'app-uuid': getAppUUID() })
-	mReloadCallback && mReloadCallback()
 }
 
 /**

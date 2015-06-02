@@ -153,15 +153,14 @@ Copyright (c) 2013-2015 Evothings AB
 
 						<div class="modal-body">
 							<!-- This input box is hidden to reduce UI complexity
-								and avoid potential confusion. Hard coded value
-								is used for server address. -->
+								and avoid potential confusion. -->
 							<div class="form-group"
 								style="display:none;">
 								<label for="input-connect-url">Key Server:</label>
 								<input type="text"
 									id="input-connect-url"
 									class="form-control"
-									value="http://evothings.com:8080"
+									value=""
 									placeholder="Enter server URL"/>
 							</div>
 
@@ -469,7 +468,8 @@ Copyright (c) 2013-2015 Evothings AB
 
 			// Use server on evothings.com.
 			// TODO: Fetch server address from a PHP script at evothings.com
-			hyper.UI.showConnectDialog('http://evothings.com:8080')
+			//hyper.UI.showConnectDialog('http://evothings.com:8080')
+			hyper.UI.showConnectDialog('http://192.168.43.131:8080')
 		}
 
 		window.showSettingsDialog = function()
