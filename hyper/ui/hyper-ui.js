@@ -583,7 +583,6 @@ hyper.UI = {}
 
 	hyper.SERVER = SERVER
 
-	var mProjectListFile = './hyper/settings/project-list.json'
 	var mProjectList = []
 	var mExampleListFile = './hyper/settings/example-list.json'
 	var mExampleList = []
@@ -604,7 +603,7 @@ hyper.UI = {}
 
 		// Populate the UI.
 		// TODO: Consider moving these calls to a function in hyper.UI.
-		mExampleList = readProjectListEx(mExampleListFile)
+		mExampleList = parseProjectList(FILEUTIL.readFileSync(mExampleListFile))
 		readProjectList()
 		hyper.UI.displayProjectList()
 		hyper.UI.displayExampleList()
@@ -754,10 +753,8 @@ hyper.UI = {}
 		mNumberOfConnectedClients = 0
 	}
 
-	function readProjectListEx(filename)
+	function parseProjectList(json)
 	{
-		var json = FILEUTIL.readFileSync(filename)
-
 		// Replace slashes with backslashes on Windows.
 		if (process.platform === 'win32')
 		{
@@ -769,26 +766,17 @@ hyper.UI = {}
 
 	function readProjectList()
 	{
-		/* Not used:
-		// Create project file from template if it does not exist.
-		if (!FS.existsSync(mProjectListFile))
-		{
-			var data = FS.readFileSync(mProjectListTemplateFile, {encoding: 'utf8'})
-			FS.writeFileSync(mProjectListFile, data, {encoding: 'utf8'})
-		}
-		*/
-
 		// Read project file.
-		if (FS.existsSync(mProjectListFile))
+		var json = localStorage.getItem('project-list')
+		if (json)
 		{
-			mProjectList = readProjectListEx(mProjectListFile)
+			mProjectList = parseProjectList(json)
 		}
 	}
 
 	function saveProjectList()
 	{
-		var json = JSON.stringify(mProjectList)
-		FS.writeFileSync(mProjectListFile, json, {encoding: 'utf8'})
+		localStorage.setItem('project-list', JSON.stringify(mProjectList))
 	}
 
 	// TODO: Simplify, use updateProjectList instead.
