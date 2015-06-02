@@ -268,6 +268,7 @@ hyper.UI = {}
 		{
 			e.stopPropagation()
 			e.preventDefault()
+			hyper.showProjectList();
 			$('#drag-overlay').show();
 			enterTarget = event.target;
 		})

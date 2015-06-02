@@ -176,7 +176,7 @@ Copyright (c) 2013-2014 Evothings AB
 			$('#button-projects').show()
 		})
 
-		var projFunc = function()
+		hyper.showProjectList = function()
 		{
 			$('#project-list').show()
 			$('#example-list').hide()
@@ -185,7 +185,7 @@ Copyright (c) 2013-2014 Evothings AB
 		}
 
 		button = $('#button-projects')
-		button && button.click(projFunc) && button.hide() && projFunc()
+		button && button.click(hyper.showProjectList) && button.hide() && hyper.showProjectList()
 
 		// ************** Welcome Window **************
 
