@@ -701,13 +701,6 @@ hyper.UI = {}
 		// out Hyper by clicking the buttons in the user interface.
 		//GUI.Shell.openExternal(SERVER.getAppFileURL())
 		GUI.Shell.openExternal(SERVER.getAppServerURL())
-
-		/* This was used with iframe loading (see hyper-client.html)
-		GUI.Shell.openExternal(
-			SERVER.getServerBaseURL() +
-			'#' +
-			SERVER.getAppFileName())
-		*/
 	}
 
 	function clientConnectedCallback()

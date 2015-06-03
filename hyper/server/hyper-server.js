@@ -397,7 +397,7 @@ function createReloaderScriptTags()
 {
 	return ''
 		+ '<script src="/socket.io/socket.io.js"></script>'
-		+ '<script src="hyper.reloader"></script>'
+		+ '<script src="/hyper/' + mUserKey + '/systemcache/hyper.reloader"></script>'
 }
 
 /**
@@ -504,15 +504,7 @@ function getBasePath()
  */
 function getAppServerURL()
 {
-	return mRemoteServerURL + '/get/' + mUserKey + '/' + mAppID + '/' + mAppFile
-}
-
-/**
- * External.
- */
-function getServerBaseURL()
-{
-	return mRemoteServerURL + '/get/' + mUserKey + '/'
+	return mRemoteServerURL + '/hyper/' + mUserKey + '/' + mAppID + '/' + mAppFile
 }
 
 /**
@@ -673,7 +665,6 @@ exports.getAppPath = getAppPath
 exports.getBasePath = getBasePath
 exports.getAppFileName = getAppFileName
 exports.getAppServerURL = getAppServerURL
-exports.getServerBaseURL = getServerBaseURL
 exports.runApp = runApp
 exports.reloadApp = reloadApp
 exports.evalJS = evalJS
