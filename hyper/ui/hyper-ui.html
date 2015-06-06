@@ -224,6 +224,14 @@ Copyright (c) 2013-2015 Evothings AB
 									class="form-control"
 									placeholder="3"/>
 							</div>
+							<div class="form-group">
+								<label for="input-setting-reload-server-address">
+									Address of Reload Server:</label>
+								<input type="text"
+									id="input-setting-reload-server-address"
+									class="form-control"
+									placeholder=""/>
+							</div>
 						</div>
 
 						<div class="modal-footer">
@@ -466,11 +474,8 @@ Copyright (c) 2013-2015 Evothings AB
 			})
 			*/
 
-			// Use server on evothings.com.
-			// TODO: Fetch server address from a PHP script at evothings.com
-			//hyper.UI.showConnectDialog('http://evothings.com:8080')
-			//hyper.UI.showConnectDialog('http://192.168.43.131:8080')
-			hyper.UI.showConnectDialog('http://127.0.0.1:8080')
+			// TODO: Fetch reload server address from a PHP script at evothings.com
+			hyper.UI.showConnectDialog(SETTINGS.getReloadServerAddress())
 		}
 
 		window.showSettingsDialog = function()

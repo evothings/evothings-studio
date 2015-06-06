@@ -130,3 +130,8 @@ exports.setEvoGUID = function(value)
 {
 	window.localStorage.setItem('evo-guid', value)
 }
+
+/**
+ * Address of reload server.
+ */
+systemSetting('ReloadServerAddress', 'http://evothings.com:8081')

@@ -496,6 +496,8 @@ hyper.UI = {}
 			SETTINGS.getWorkbenchFontSize())
 		$('#input-setting-number-of-directory-levels').val(
 			SETTINGS.getNumberOfDirecoryLevelsToTraverse())
+		$('#input-setting-reload-server-address').val(
+			SETTINGS.getReloadServerAddress())
 		$('#dialog-settings').modal('show')
 	}
 
@@ -505,6 +507,8 @@ hyper.UI = {}
 			$('#input-setting-javascript-workbench-font-size').val())
 		SETTINGS.setNumberOfDirecoryLevelsToTraverse(
 			parseInt($('#input-setting-number-of-directory-levels').val()))
+		SETTINGS.setReloadServerAddress(
+			$('#input-setting-reload-server-address').val())
 		$('#dialog-settings').modal('hide')
 	}
 
