@@ -324,6 +324,10 @@ hyper.UI = {}
 		// Template for project items.
 		var html =
 			'<div class="ui-state-default ui-corner-all">'
+		if(options.imagePath)
+			html += '<img src="../../../evothings-examples/__IMAGE_PATH__" height="75px" style="float:left; margin-right: 10px;">'
+
+		html += ''
 				+ '<button '
 				+	'type="button" '
 				+	'class="button-open btn btn-default" '
@@ -376,6 +380,7 @@ hyper.UI = {}
 		html = html.replace('__PATH3__', getShortPathFromPath(path))
 		html = html.replace('__PATH4__', path)
 		html = html.replace('__NAME__', name)
+		html = html.replace('__IMAGE_PATH__', options.imagePath)
 
 		// Create element.
 		var element = $(html)
@@ -495,8 +500,8 @@ hyper.UI = {}
 		var list = hyper.getExampleList()
 		for (var i = 0; i < list.length; ++i)
 		{
-			var path = list[i]
-			createProjectEntry(path, {list:'#example-list', haveDeleteButton:false})
+			var entry = list[i]
+			createProjectEntry(entry.index, {list:'#example-list', haveDeleteButton:false, imagePath:entry.image})
 		}
 	}
 
