@@ -35,6 +35,8 @@ var FILEUTIL = require('../server/fileutil.js')
 var SETTINGS = require('../settings/settings.js')
 var LOGGER = require('../server/log.js')
 
+var AUTHCOLLECTOR = require('../server/auth-collector-service.js')
+
 /*** Globals ***/
 
 // Global object that holds globally available functions.
@@ -61,6 +63,7 @@ hyper.UI = {}
 		setWindowActions()
 		setUpFileDrop()
 		restoreSavedUIState()
+        startAuthCollector()
 	}
 
 	// System menus must be explicitly created on OS X,
@@ -84,6 +87,11 @@ hyper.UI = {}
 			}
 		}
 	}
+
+    function startAuthCollector()
+    {
+        AUTHCOLLECTOR.start()
+    }
 
 	// Helper function that returns the application name
 	// specified in package.json.

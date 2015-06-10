@@ -101,9 +101,13 @@ body {
 }
 
 #button-documentation {
-	width: 30%;
+	width: 20%;
+}
+
+#button-login {
+    width: 10%;
 }
 
 #button-workbench, #button-forum, #button-examples {
-	width: 23%;
+	width: 18%;
 }

@@ -75,8 +75,8 @@ Copyright (c) 2013-2015 Evothings AB
 
 			<div id="panel-tool-buttons">
 				<div class="btn-group btn-group-justified">
-                    <a id="loginbutton"
-                       class="btn btn-primary btn-hyper-toolbar et-btn-blue"
+                    <a id="button-login"
+                       class="btn btn-primary btn-hyper-toolbar et-btn-black"
                        href="javascript:void(0)">Login</a>
 					<a id="button-documentation"
 						class="btn btn-warning btn-hyper-toolbar et-btn-yellow"
@@ -292,16 +292,8 @@ Copyright (c) 2013-2015 Evothings AB
 
         // ************** Login Button **********************
 
-        $('#loginbutton').click(function()
+        $('#button-login').click(function()
         {
-            /*
-             https://accounts.google.com/o/oauth2/auth?
-             scope=email%20profile&
-             redirect_uri=http://localhost:9004&
-             response_type=code&
-             client_id=812741506391-h38jh0j4fv0ce1krdkiq0hfvt6n5amrf.apps.googleusercontent.com
-             */
-            //var cid = '961589450561-l2e5firjvkmf02eplbg3m7s51nb4jnga.apps.googleusercontent.com'
             var cid = '961589450561-cdoropsipq6t0pvevriqrio0rt6srng2.apps.googleusercontent.com'
             GUI.Shell.openExternal('https://accounts.google.com/o/oauth2/auth?scope=email%20profile&redirect_uri=http://localhost:9004&response_type=code&client_id='+cid)
         })
