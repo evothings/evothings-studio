@@ -12,6 +12,8 @@ Copyright (c) 2013-2015 Evothings AB
 	<link href="../libs/bootstrap-3.3.4-dist/css/bootstrap.min.css" rel="stylesheet">
 	<script src="../libs/jquery/jquery-2.1.4.min.js"></script>
 	<script src="../libs/jquery/jquery-ui.min.js"></script>
+    <script src="../libs/uuid.js"></script>
+    <script src="http://evothings.com:3003/socket.io/socket.io.js"></script>
 	<script src="../libs/bootstrap-3.3.4-dist/js/bootstrap.min.js"></script>
 	<link href="hyper-ui.css" rel="stylesheet" />
 	<link href="hyper-workbench.css" rel="stylesheet" />
@@ -285,6 +287,9 @@ Copyright (c) 2013-2015 Evothings AB
 		var FILEUTIL = require('../server/fileutil.js')
 		var SETTINGS = require('../settings/settings.js')
 		var LOGGER = require('../server/log.js')
+        var IO = require('socket.io-client')
+        var WS = IO('ws://evothings.com:3003')
+        var USER = null
 
 		// TODO: Make running local web server an option.
 		//var WEBSERVER = require('../server/webserver.js')
@@ -294,8 +299,43 @@ Copyright (c) 2013-2015 Evothings AB
 
         $('#button-login').click(function()
         {
-            var cid = '961589450561-cdoropsipq6t0pvevriqrio0rt6srng2.apps.googleusercontent.com'
-            GUI.Shell.openExternal('https://accounts.google.com/o/oauth2/auth?scope=email%20profile&redirect_uri=http://localhost:9004&response_type=code&client_id='+cid)
+            if(USER)
+            {
+                USER = null
+                $('#button-login').html('Login')
+            }
+            else
+            {
+                // Create window.
+                var w = window.open(
+                        'http://evothings.com:3003',
+                        {
+                            resizable: true
+                        })
+
+                var uuid = UUID()
+                WS.emit('message', JSON.stringify({target:'registerAuthCallback', uuid: uuid}))
+                WS.on('message', function(msg)
+                {
+                    console.log('got auth callback message');
+                    console.dir(msg);
+
+                    if(msg.user)
+                    {
+                        USER = msg.user
+                        console.log('setting user to "'+msg.user.name+'"')
+                        $('#button-login').html("<img style='height:30px' src='"+msg.user.picture+"'> Logout")
+                        w.close()
+                        console.dir(msg.user)
+                    }
+                })
+
+                w.resizeTo(550, 700)
+                w.moveTo(50, 50)
+                w.focus()
+
+                w.document.location = 'http://evothings.com:3003/#/login?uuid='+uuid
+            }
         })
 
 		// ************** Documentation Button **************

@@ -90,7 +90,16 @@ hyper.UI = {}
 
     function startAuthCollector()
     {
-        AUTHCOLLECTOR.start()
+        //AUTHCOLLECTOR.start()
+
+        /*
+        GUI.window.on('document-end', function()
+        {
+            console.log('window loaded. args ->')
+            console.dir(arguments)
+
+        })
+        */
     }
 
 	// Helper function that returns the application name
@@ -252,6 +261,11 @@ hyper.UI = {}
 		{
 			hyper.SERVER.evalJS(event.data.code)
 		}
+        else if ('setSession' == event.data.message)
+        {
+            console.log('==== session set to '+event.data.sid)
+
+        }
 	}
 
 	function setUpFileDrop()

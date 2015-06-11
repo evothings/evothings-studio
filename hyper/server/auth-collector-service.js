@@ -1,5 +1,5 @@
 var HTTP = require('http')
-var SOCKETIO = require('socket.io')
+var socket = require('socket.io-client')
 var LOGGER = require('./log.js')
 
 var authCollector = {}
@@ -13,7 +13,7 @@ authCollector.handleRequest = function(req, res)
     var code = req.url.replace('/?code=', '')
     console.log('code = '+code)
 
-    res.writeHead(200, {'Content-Type': 'text/plain'});
+    res.writeHead(200, {'Content-Type': 'text/html'});
     res.end('<h1>Login completed. You can close this window</h1>');
 
     authCollector.authenticate(code)
@@ -21,8 +21,8 @@ authCollector.handleRequest = function(req, res)
 
 authCollector.authenticate = function(code)
 {
-    var msg = {target:'authenticateUser', authCode: auth_code}
-    authCollector.mIO.emit('message')
+    var msg = {target:'authenticateUser', authCode: code}
+    authCollector.mIO.emit('message', msg)
 }
 
 authCollector.start = function()
@@ -36,12 +36,15 @@ authCollector.start = function()
             LOGGER.log('auth collector server started at port ' +authCollector.PORT)
         })
 
-        authCollector.mIO = SOCKETIO(authCollector.mHTTPServer)
+        authCollector.mIO = socket('ws://evothings.com:3003')
         // Handle socket connections.
-        authCollector.mIO.on('connection', function(socket)
+        authCollector.mIO.on('event', function(data)
         {
+            console.log('socket.io client got event')
+            console.dir(data)
 
-        }
+        })
+
         LOGGER.log('auth collector started')
     }
     catch (error)
