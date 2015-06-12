@@ -300,37 +300,33 @@ Copyright (c) 2013-2015 Evothings AB
 
         $('#button-login').click(function()
         {
+
             if(USER)
             {
                 USER = null
                 console.log('loggin out user. Setting USER to null')
                 $('#button-login').html('Login')
-                if(!w)
-                {
-                    w = window.open(
-                            'http://evothings.com:3003/logout',
-                            {
-                                resizable: true
-                            })
-                }
-                w.resizeTo(550, 700)
-                w.moveTo(50, 50)
-                w.focus()
-                w.document.location = 'http://evothings.com:3003/logout'
+                
             }
             else
             {
                 // Create window.
-                console.log('starting login sequence..')
                 if(!w)
                 {
+                    console.log('-- creating dialog window --')
                     var w = window.open(
-                            'http://evothings.com:3003',
+                            '',
                             {
                                 resizable: true
                             })
+                    w.resizeTo(550, 700)
+                    w.moveTo(50, 50)
+                    w.focus()
                 }
+                console.log('starting login sequence..')
                 var uuid = UUID()
+                w.location = 'http://evothings.com:3003/#/login?uuid='+uuid
+
                 console.log('sending registerAuthCallback to saas server for uuid '+uuid)
                 WS.emit('message', JSON.stringify({target:'registerAuthCallback', uuid: uuid}))
                 WS.on('message', function(msg)
@@ -347,12 +343,6 @@ Copyright (c) 2013-2015 Evothings AB
                         console.dir(msg.user)
                     }
                 })
-
-                w.resizeTo(550, 700)
-                w.moveTo(50, 50)
-                w.focus()
-
-                w.document.location = 'http://evothings.com:3003/#/login?uuid='+uuid
             }
         })
 
