@@ -288,7 +288,7 @@ Copyright (c) 2013-2015 Evothings AB
 		var SETTINGS = require('../settings/settings.js')
 		var LOGGER = require('../server/log.js')
         var IO = require('socket.io-client')
-        var WS = IO('ws://evothings.com:3003')
+        var WS = null
         var USER = null
         var w = null
 
@@ -327,22 +327,26 @@ Copyright (c) 2013-2015 Evothings AB
                 var uuid = UUID()
                 w.location = 'http://evothings.com:3003/#/login?uuid='+uuid
 
-                console.log('sending registerAuthCallback to saas server for uuid '+uuid)
-                WS.emit('message', JSON.stringify({target:'registerAuthCallback', uuid: uuid}))
-                WS.on('message', function(msg)
+                if(!WS)
                 {
-                    console.log('got auth callback message');
-                    console.dir(msg);
-
-                    if(msg.user)
+                    WS = IO('ws://evothings.com:3003')
+                    console.log('sending registerAuthCallback to saas server for uuid '+uuid)
+                    WS.emit('message', JSON.stringify({target:'registerAuthCallback', uuid: uuid}))
+                    WS.on('message', function(msg)
                     {
-                        USER = msg.user
-                        console.log('setting user to "'+msg.user.name+'"')
-                        $('#button-login').html("<img style='height:30px' src='"+msg.user.picture+"'> Logout")
-                        w.close()
-                        console.dir(msg.user)
-                    }
-                })
+                        console.log('got auth callback message');
+                        console.dir(msg);
+
+                        if(msg.user)
+                        {
+                            USER = msg.user
+                            console.log('setting user to "'+msg.user.name+'"')
+                            $('#button-login').html("<img style='height:30px' src='"+msg.user.picture+"'> Logout")
+                            w.close()
+                            console.dir(msg.user)
+                        }
+                    })
+                }
             }
         })
 
