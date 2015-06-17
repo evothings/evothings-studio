@@ -306,7 +306,7 @@ Copyright (c) 2013-2015 Evothings AB
                 USER = null
                 console.log('loggin out user. Setting USER to null')
                 $('#button-login').html('Login')
-                
+
             }
             else
             {
@@ -341,7 +341,13 @@ Copyright (c) 2013-2015 Evothings AB
                         {
                             USER = msg.user
                             console.log('setting user to "'+msg.user.name+'"')
-                            $('#button-login').html("<img style='height:30px' src='"+msg.user.picture+"'> Logout")
+                            var imageHTML =
+                            	'<img style="height:98%;with:auto;" '
+                            	+	'class="pull-left" '
+                            	+	'src="' + msg.user.picture + '">'
+                            var buttonText = 'Logout'
+                            var buttonHTML = imageHTML + buttonText
+                            $('#button-login').html(buttonHTML)
                             w.close()
                             console.dir(msg.user)
                         }
