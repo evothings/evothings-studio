@@ -276,8 +276,22 @@ Copyright (c) 2013-2015 Evothings AB
 
 	</div> <!-- panel-page -->
 
+	<!--
+	hyper-ui.js defines the global variable "hyper".
+	TODO: Change this to a module and import using require.
+	-->
 	<script src="hyper-ui.js"></script>
 	<script>
+	//
+	// TODO:
+	//
+	// The plan is to move more of the logic into hyper-ui.js and possibly
+	// create additional module files to make the code easier to read.
+	//
+	// Also import hyper-ui.js using "require". The idea is to make
+	// the code more modular.
+	//
+
 	// Setup UI button actions (using closure to make variables local).
 	;(function()
 	{
@@ -286,8 +300,7 @@ Copyright (c) 2013-2015 Evothings AB
 		var FILEUTIL = require('../server/fileutil.js')
 		var SETTINGS = require('../settings/settings.js')
 		var LOGGER = require('../server/log.js')
-        var IO = require('socket.io-client')
-        var UUID = require('../server/uuid.js')
+        var USER_HANDLER = require('../server/user-handler.js')
 
 		// TODO: Make running local web server an option.
 		//var WEBSERVER = require('../server/webserver.js')
@@ -295,83 +308,44 @@ Copyright (c) 2013-2015 Evothings AB
 
         // ************** Login Button **********************
 
-        var mLoginServer = null
-        var mUser = null
-        var mLoginWindow = null
-
-		function loginUser()
-		{
-			// Create login window if it does not exist.
-			if (!mLoginWindow)
-			{
-				console.log('LOGIN: creating login window')
-				var mLoginWindow = window.open(
-						'Login',
-						{
-							resizable: true
-						})
-				mLoginWindow.resizeTo(550, 700)
-				mLoginWindow.moveTo(50, 50)
-				mLoginWindow.focus()
-			}
-
-			console.log('LOGIN: starting login sequence..')
-
-			var uuid = UUID.generateUUID()
-			mLoginWindow.location = 'http://evothings.com:3003/#/login?uuid='+uuid
-
-			if (!mLoginServer)
-			{
-				mLoginServer = IO('ws://evothings.com:3003')
-				console.log('LOGIN: sending registerAuthCallback to saas server for uuid '+uuid)
-				mLoginServer.emit('message', JSON.stringify({target:'registerAuthCallback', uuid: uuid}))
-				mLoginServer.on('message', function(msg)
-				{
-					console.log('LOGIN: got auth callback message');
-					console.dir(msg);
-
-					if(msg.user)
-					{
-						mUser = msg.user
-						console.log('LOGIN: setting user to "'+msg.user.name+'"')
-						var imageHTML =
-							'<img style="height:98%;with:auto;" '
-							+	'class="pull-left" '
-							+	'src="' + msg.user.picture + '">'
-						var buttonText = 'Logout'
-						var buttonHTML = imageHTML + buttonText
-						$('#button-login').html(buttonHTML)
-						mLoginWindow.close()
-						console.log('LOGIN: Listing user object:')
-						console.dir(msg.user)
-					}
-				})
-			}
-		}
-
-		function logoutUser()
-		{
-            mUser = null
-            console.log('LOGIN: loggin out user. Setting USER to null')
-            $('#button-login').html('Login')
-            // TODO: Also logout the user from the server?
-		}
-
 		// Set login button action handler. The button
 		// toggles login/logout.
-        $('#button-login').click(function()
-        {
-            if (mUser)
-            {
-            	// If there is a user object we logout the user.
-                logoutUser()
-            }
-            else
-            {
-            	// If there is no user object we login a new user.
-                loginUser()
-            }
-        })
+		$('#button-login').click(function()
+		{
+			USER_HANDLER.loginButtonHandler()
+		})
+
+		USER_HANDLER.setUserLoginCallback(function(user)
+		{
+			// TODO: Pass user id to the Run/Reload messaging code (hyper-server.js).
+			LOGGER.log('*** User has logged in ***')
+			LOGGER.log(user)
+
+			// Show user picture on login button and change text to "Logout".
+			var imageHTML =
+				'<img style="height:98%;with:auto;" '
+				+	'class="pull-left" '
+				+	'src="' + user.picture + '">'
+			var buttonText = 'Logout'
+			var buttonHTML = imageHTML + buttonText
+			$('#button-login').html(buttonHTML)
+		})
+
+		USER_HANDLER.setUserLogoutCallback(function(user)
+		{
+			// TODO: Pass user id to the Run/Reload messaging code (hyper-server.js).
+			LOGGER.log('*** User has logged out ***')
+
+			// Set button text to "Login".
+			$('#button-login').html('Login')
+		})
+
+		// ************** Workbench Button **************
+
+		$('#button-workbench').click(function()
+		{
+			hyper.UI.showToolsWorkbenchWindow()
+		})
 
 		// ************** Documentation Button **************
 

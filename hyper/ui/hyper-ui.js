@@ -34,6 +34,7 @@ var GUI = require('nw.gui')
 var FILEUTIL = require('../server/fileutil.js')
 var SETTINGS = require('../settings/settings.js')
 var LOGGER = require('../server/log.js')
+var UUID = require('../server/uuid.js')
 
 var AUTHCOLLECTOR = require('../server/auth-collector-service.js')
 
@@ -129,38 +130,6 @@ hyper.UI = {}
 
 	function setUIActions()
 	{
-		var button = null
-
-		// Workbench button action.
-		button = $('#button-workbench')
-		button && button.click(function()
-		{
-			if (mWorkbenchWindow && !mWorkbenchWindow.closed)
-			{
-				// Bring existing window to front.
-				mWorkbenchWindow.focus()
-			}
-			else
-			{
-				// Create new window.
-				/* This does not work:
-				mWorkbenchWindow = GUI.Window.open('hyper-workbench.html', {
-					//position: 'mouse',
-					width: 901,
-					height: 600,
-					focus: true
-				})*/
-				mWorkbenchWindow = window.open(
-					'hyper-workbench.html',
-					'workbench',
-					'resizable=1,width=800,height=600')
-				mWorkbenchWindow.moveTo(50, 50)
-				mWorkbenchWindow.focus()
-				// Establish contact. Not really needed.
-				mWorkbenchWindow.postMessage({ message: 'hyper.hello' }, '*')
-			}
-		})
-
 		// Enable reorder of project list by drag and drop.
 		$(function()
 		{
@@ -460,6 +429,34 @@ hyper.UI = {}
 			}
 		})
 		hyper.setProjectList(projects)
+	}
+
+	hyper.UI.showToolsWorkbenchWindow = function()
+	{
+		if (mWorkbenchWindow && !mWorkbenchWindow.closed)
+		{
+			// Bring existing window to front.
+			mWorkbenchWindow.focus()
+		}
+		else
+		{
+			// Create new window.
+			/* This does not work:
+			mWorkbenchWindow = GUI.Window.open('hyper-workbench.html', {
+				//position: 'mouse',
+				width: 901,
+				height: 600,
+				focus: true
+			})*/
+			mWorkbenchWindow = window.open(
+				'hyper-workbench.html',
+				'workbench',
+				'resizable=1,width=800,height=600')
+			mWorkbenchWindow.moveTo(50, 50)
+			mWorkbenchWindow.focus()
+			// Establish contact. Not really needed.
+			mWorkbenchWindow.postMessage({ message: 'hyper.hello' }, '*')
+		}
 	}
 
 	hyper.UI.displayConnectStatus = function(status)
