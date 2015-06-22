@@ -616,6 +616,13 @@ hyper.UI = {}
 		SERVER.disconnectFromRemoteServer()
 		MONITOR.stopFileSystemMonitor()
 	}
+
+	hyper.setSessionID = function(sessionID)
+	{
+		// Pass session id to server.
+		SERVER.setSessionID(sessionID)
+	}
+
 /*
 	// Check IP address and stop and start servers if it has changed.
 	function checkServerIpAddressForRestart()

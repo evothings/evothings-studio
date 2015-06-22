@@ -49,6 +49,7 @@ var mClientConnectedCallback = null
 var mReloadCallback = null
 var mStatusCallback = null
 var mCheckIfModifiedSince = false
+var mSessionID = null
 
 // The current base directory. Must NOT end with a slash.
 var mBasePath = ''
@@ -75,13 +76,12 @@ function connectToRemoteServer()
 	// Connect function.
 	socket.on('connect', function()
 	{
-		// Send key to server to join room.
-		socket.emit(
-			'hyper.workbench-connected',
-			{
-				// Key is sent from server.
-				//key: mUserKey
-			})
+		// This message generates a user key on the server.
+		// The key is sent back to us using the message 'hyper.user-key'.
+		// The server creates a socket.io room for the user key.
+		// TODO: Perhaps we should use the session id in place of the
+		// user key? And not have both user key and session id?
+		socket.emit('hyper.workbench-connected', { })
 	})
 
 	socket.on('disconnect', function()
@@ -116,6 +116,7 @@ function connectToRemoteServer()
 			{
 				id: data.id,
 				key: mUserKey,
+				sessionID: mSessionID,
 				appID: mAppID,
 				response: response
 			})
@@ -528,6 +529,7 @@ function runApp()
 	mAppID = getAppID()
 	mSocket.emit('hyper.run', {
 		key: mUserKey,
+		sessionID: mSessionID,
 		appID: mAppID,
 		url: getAppServerURL() })
 }
@@ -542,6 +544,7 @@ function reloadApp()
 	serveUsingResponse304()
 	mSocket.emit('hyper.reload', {
 		key: mUserKey,
+		sessionID: mSessionID,
 		appID: mAppID })
 	mReloadCallback && mReloadCallback()
 }
@@ -578,7 +581,10 @@ function getAppID()
  */
 function evalJS(code)
 {
-	mSocket.emit('hyper.eval', { key: mUserKey, code: code })
+	mSocket.emit('hyper.eval', {
+		key: mUserKey,
+		sessionID: mSessionID,
+		code: code })
 }
 
 /**
@@ -639,6 +645,14 @@ function setRemoteServerURL(url)
 	mRemoteServerURL = url
 }
 
+/**
+ * External.
+ */
+function setSessionID(sessionID)
+{
+	mSessionID = sessionID
+}
+
 /*********************************/
 /***	  Module exports	   ***/
 /*********************************/
@@ -661,3 +675,4 @@ exports.disconnectFromRemoteServer = disconnectFromRemoteServer
 //exports.setUserKey = setUserKey
 exports.getUserKey = getUserKey
 exports.setRemoteServerURL = setRemoteServerURL
+exports.setSessionID = setSessionID

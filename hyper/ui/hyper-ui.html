@@ -329,6 +329,9 @@ Copyright (c) 2013-2015 Evothings AB
 			var buttonText = 'Logout'
 			var buttonHTML = imageHTML + buttonText
 			$('#button-login').html(buttonHTML)
+
+			// Pass the session id for the user to the server communication code.
+			hyper.setSessionID(user.sid)
 		})
 
 		USER_HANDLER.setUserLogoutCallback(function(user)
