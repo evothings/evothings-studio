@@ -7,7 +7,7 @@ Copyright (c) 2013-2014 Mikael Kindborg
 License: Apache Version 2.0
 */
 
-window.hyper = (function(hyper, userKey)
+window.hyper = (function(hyper, sessionID)
 {
 	// Buffer for storing hyper.log messages.
 	var hyperLogBuffer = []
@@ -39,7 +39,9 @@ window.hyper = (function(hyper, userKey)
 	hyper.sendJsResult = function(result)
 	{
 		hyper.isConnected &&
-			hyper.IoSocket.emit('hyper.result', { key: userKey, result: result })
+			hyper.IoSocket.emit('hyper.result', {
+				sessionID: sessionID,
+				result: result })
 	}
 
 	// Log to remote HyperReload Workbench window.
@@ -47,7 +49,9 @@ window.hyper = (function(hyper, userKey)
 	{
 		if (hyper.isConnected)
 		{
-			hyper.IoSocket.emit('hyper.log', { key: userKey, message: String(message) })
+			hyper.IoSocket.emit('hyper.log', {
+				sessionID: sessionID,
+				message: String(message) })
 		}
 		else
 		{
@@ -144,7 +148,7 @@ window.hyper = (function(hyper, userKey)
 		})
 		socket.on('connect', function()
 		{
-			socket.emit('hyper.client-connected', { key: userKey })
+			socket.emit('hyper.client-connected', { sessionID: sessionID })
 			hyper.isConnected = true
 			if (hyper.onConnectedFun)
 			{
@@ -218,4 +222,4 @@ window.hyper = (function(hyper, userKey)
 
 	return hyper
 
-})(window.hyper || {}, '__USER_KEY_INSERTED_BY_SERVER__')
+})(window.hyper || {}, '__SESSIONID_INSERTED_BY_SERVER__')

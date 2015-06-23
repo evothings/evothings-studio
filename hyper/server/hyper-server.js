@@ -38,7 +38,7 @@ var UUID = require('./uuid.js')
 /***     Server variables      ***/
 /*********************************/
 
-var mUserKey = 'DefaultUserKey'
+var mSessionID = 'DefaultSessionID'
 var mRemoteServerURL = ''
 var mSocket = null
 var mAppPath = null
@@ -49,7 +49,6 @@ var mClientConnectedCallback = null
 var mReloadCallback = null
 var mStatusCallback = null
 var mCheckIfModifiedSince = false
-var mSessionID = null
 
 // The current base directory. Must NOT end with a slash.
 var mBasePath = ''
@@ -76,11 +75,18 @@ function connectToRemoteServer()
 	// Connect function.
 	socket.on('connect', function()
 	{
-		// This message generates a user key on the server.
-		// The key is sent back to us using the message 'hyper.user-key'.
-		// The server creates a socket.io room for the user key.
-		// TODO: Perhaps we should use the session id in place of the
-		// user key? And not have both user key and session id?
+		//
+		// This message generates a connect key and session id on the server.
+		// These values are sent back to us using the message 'hyper.session-id'.
+		// The server creates a socket.io room for the session.
+		//
+		// TODO: Add session id here if set? So that we can get a new key
+		// for the same session? This requires rewriting the server start
+		// logic so that the server is not restarted when the Get Key
+		// button is pressed. Server should be stared on launch.
+		// By server is meant this file (technically it is a client
+		// but it serves files to the proxy server who served clients).
+		//
 		socket.emit('hyper.workbench-connected', { })
 	})
 
@@ -90,18 +96,19 @@ function connectToRemoteServer()
 			event: 'disconnected' })
 	})
 
-	socket.on('hyper.user-key', function(data)
+	socket.on('hyper.session-id', function(data)
 	{
-		mUserKey = data.key
+		mSessionID = data.sessionID
+		//mConnectKey = data.connectKey
 		mStatusCallback && mStatusCallback({
 			event: 'connected',
-			key: mUserKey })
+			connectKey: data.connectKey })
 	})
 
 	// Get resource function.
 	socket.on('hyper.resource-request', function(data)
 	{
-		//LOGGER.log('hyper.resource-request: ' + data.path)
+		LOGGER.log('hyper.resource-request: ' + data.path)
 
 		var ifModifiedSince =
 			mCheckIfModifiedSince
@@ -115,7 +122,6 @@ function connectToRemoteServer()
 			'hyper.resource-response',
 			{
 				id: data.id,
-				key: mUserKey,
 				sessionID: mSessionID,
 				appID: mAppID,
 				response: response
@@ -182,9 +188,9 @@ function serveResource(platform, path, ifModifiedSince)
 {
 	//LOGGER.log('serveResource: ' + path)
 
-	if (path == '/')
+	if (!path || path == '/')
 	{
-		// Serve the root request (Connect page).
+		// Serve the Connect page.
 		return serveRootRequest()
 	}
 	else if (path == '/hyper.reloader')
@@ -213,7 +219,6 @@ function serveResource(platform, path, ifModifiedSince)
 	}
 	else
 	{
-		// If base path is not set, serve the Connect page.
 		return serveRootRequest()
 	}
 }
@@ -246,8 +251,8 @@ function serveReloaderScript(ifModifiedSince)
 	if (script && stat)
 	{
 		script = script.replace(
-			'__USER_KEY_INSERTED_BY_SERVER__',
-			mUserKey)
+			'__SESSIONID_INSERTED_BY_SERVER__',
+			mSessionID)
 		return LOADER.createResponse(
 			script,
 			stat.mtime,
@@ -399,7 +404,7 @@ function createReloaderScriptTags()
 {
 	return ''
 		+ '<script src="/socket.io/socket.io.js"></script>'
-		+ '<script src="/hyper/' + mUserKey + '/systemcache/hyper.reloader"></script>'
+		+ '<script src="/hyper/' + mSessionID + '/systemcache/hyper.reloader"></script>'
 }
 
 /**
@@ -506,7 +511,7 @@ function getBasePath()
  */
 function getAppServerURL()
 {
-	return mRemoteServerURL + '/hyper/' + mUserKey + '/' + mAppID + '/' + mAppFile
+	return mRemoteServerURL + '/hyper/' + mSessionID + '/' + mAppID + '/' + mAppFile
 }
 
 /**
@@ -528,7 +533,6 @@ function runApp()
 	serveUsingResponse304()
 	mAppID = getAppID()
 	mSocket.emit('hyper.run', {
-		key: mUserKey,
 		sessionID: mSessionID,
 		appID: mAppID,
 		url: getAppServerURL() })
@@ -543,7 +547,6 @@ function reloadApp()
 {
 	serveUsingResponse304()
 	mSocket.emit('hyper.reload', {
-		key: mUserKey,
 		sessionID: mSessionID,
 		appID: mAppID })
 	mReloadCallback && mReloadCallback()
@@ -582,7 +585,6 @@ function getAppID()
 function evalJS(code)
 {
 	mSocket.emit('hyper.eval', {
-		key: mUserKey,
 		sessionID: mSessionID,
 		code: code })
 }

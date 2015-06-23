@@ -541,16 +541,16 @@ hyper.UI = {}
 	// Called when the Connect button in the Connect dialog is clicked.
 	hyper.UI.connectToServer = function()
 	{
-		//var key = $('#input-connect-key').val()
-		//hyper.setUserKey(key)
-
+		// Show spinner.
 		$('#connect-spinner').css('display', 'inline-block')
+
+		// Connect to server.
+		var serverURL = $('#input-connect-url').val()
 		hyper.stopServer()
-		var url = $('#input-connect-url').val()
-		hyper.setRemoteServerURL(url)
+		hyper.setRemoteServerURL(serverURL)
 		hyper.startServer()
 
-		// Let the user hide the dialog.
+		// TODO: Remove, let the user hide the dialog.
 		//$('#dialog-connect').modal('hide')
 	}
 
@@ -726,11 +726,7 @@ hyper.UI = {}
 
 	hyper.noClientConnectedHander = function()
 	{
-		// Open a local browser automatially if no clients are connected.
-		// This is done so that something will happen when you first try
-		// out Hyper by clicking the buttons in the user interface.
-		//GUI.Shell.openExternal(SERVER.getAppFileURL())
-		GUI.Shell.openExternal(SERVER.getAppServerURL())
+		// TODO: Add code that displays message box.
 	}
 
 	function clientConnectedCallback()
@@ -762,7 +758,7 @@ hyper.UI = {}
 	{
 		if (message.event == 'connected')
 		{
-			hyper.UI.displayConnectKey(message.key)
+			hyper.UI.displayConnectKey(message.connectKey)
 			hyper.UI.displayConnectStatus('Connected')
 		}
 		else if (message.event == 'disconnected')
@@ -846,13 +842,6 @@ hyper.UI = {}
 		// Show the file in the folder.
 		openFolder(path)
 	}
-
-	/*
-	hyper.setUserKey = function(key)
-	{
-		SERVER.setUserKey(key)
-	}
-	*/
 
 	hyper.setRemoteServerURL = function(url)
 	{

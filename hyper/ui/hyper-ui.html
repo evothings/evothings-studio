@@ -331,7 +331,9 @@ Copyright (c) 2013-2015 Evothings AB
 			$('#button-login').html(buttonHTML)
 
 			// Pass the session id for the user to the server communication code.
-			hyper.setSessionID(user.sid)
+			// TODO: Fix this, currently the session id is sent from the proxy server.
+			// Possibly remove this line.
+			//hyper.setSessionID(user.sid)
 		})
 
 		USER_HANDLER.setUserLogoutCallback(function(user)
@@ -342,6 +344,13 @@ Copyright (c) 2013-2015 Evothings AB
 			// Set button text to "Login".
 			$('#button-login').html('Login')
 		})
+
+		// Set default session id for debugging when running without
+		// authentication.
+		// TODO: Handle this in a better way and make so the system
+		// work without logging in. Create a UUID simply, as default.
+		// TODO: Remove.
+		//hyper.setSessionID('MikiTestSession')
 
 		// ************** Workbench Button **************
 
