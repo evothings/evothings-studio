@@ -28,8 +28,8 @@ end
 def getNodeWebkit(arch, pack)
 	fetchAndUnpack(pack,
 		'http://dl.node-webkit.org/v'+ETS.nodeWebKitVersion+'/node-webkit-v'+ETS.nodeWebKitVersion+'-'+arch+pack::Ending,
-		'../node-webkit-bin-'+ETS::nodeWebKitVersion,
-		'node-webkit-v'+ETS::nodeWebKitVersion + '-'+arch)
+		'../node-webkit-bin-'+ETS.nodeWebKitVersion,
+		'node-webkit-v'+ETS.nodeWebKitVersion + '-'+arch)
 end
 
 def getNodeWebkits
@@ -64,3 +64,8 @@ fetch('http://layout.jquery-dev.com/lib/js/jquery.layout-latest.js', 'hyper/libs
 fetch('http://layout.jquery-dev.com/lib/css/layout-default-latest.css', 'hyper/libs/jquery')
 fetch('http://code.jquery.com/jquery-2.1.4.min.js', 'hyper/libs/jquery')
 fetchAndUnzipSingleFile('http://jqueryui.com/resources/download/jquery-ui-1.11.4.zip', 'hyper/libs/jquery', 'jquery-ui-1.11.4/jquery-ui.min.js')
+
+# make links required for local execution
+mklink('documentation', '../evothings-doc')
+mklink('examples', '../evothings-examples/examples')
+mklink('hyper/server/ui', '../evothings-examples/resources/ui')

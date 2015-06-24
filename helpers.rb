@@ -92,3 +92,16 @@ def fetchAndUnzipSingleFile(url, container, source)
 	sh("unzip -o -q \"#{zipname}\" \"#{source}\" -d build")
 	mv('build/'+source, container+'/'+target)
 end
+
+# create a symbolic link pointing to target.
+def mklink(name, target)
+	return if(File.exist?(name))
+
+	if(HOST == :win32)
+		# Weird: mklink doesn't work on its own, but it works when wrapped in cmd /C.
+		# Perhaps it is not an executable but rather a built-in command in cmd.exe.
+		sh("cmd /C mklink /J \"#{name}\" \"#{target}\"")
+	else
+		sh("ln -s \"#{target}\" \"#{name}\"")
+	end
+end
