@@ -7,12 +7,4 @@
 /package.json
 /hyper/server/ui
 /examples
-/EvothingsWorkbench.app
-.idea/
-EvothingsWorkbench
-icudtl.dat
-libffmpegsumo.so
-libudev.so.0
-nw
-nw.pak
-
+/documentation
