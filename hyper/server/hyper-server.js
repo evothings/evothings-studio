@@ -32,6 +32,7 @@ var FILEUTIL = require('./fileutil.js')
 var LOADER = require('./fileloader.js')
 var LOGGER = require('./log.js')
 var SETTINGS = require('../settings/settings.js')
+var UUID = require('./uuid.js')
 
 /*********************************/
 /***     Server variables      ***/
@@ -565,29 +566,11 @@ function getAppID()
 	}
 	else
 	{
-		var settings = { 'app-uuid': generateUUID() }
+		var settings = { 'app-uuid': UUID.generateUUID() }
 		var json = JSON.stringify(settings)
 		FS.writeFileSync(path, json, {encoding: 'utf8'})
 	}
 	return settings['app-uuid']
-}
-
-/**
- * Internal.
- *
- * http://stackoverflow.com/a/8809472/4940311
- */
-function generateUUID()
-{
-	var d = new Date().getTime()
-	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(
-		/[xy]/g,
-		function(c)
-		{
-			var r = (d + Math.random()*16)%16 | 0
-			d = Math.floor(d/16)
-			return (c=='x' ? r : (r&0x3|0x8)).toString(16)
-		})
 }
 
 /**
