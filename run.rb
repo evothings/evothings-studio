@@ -35,4 +35,16 @@ def nodeWebKitPlatform
 	end
 end
 
-sh "../node-webkit-bin-#{ETS.nodeWebKitVersion}/node-webkit-v#{ETS.nodeWebKitVersion}-#{nodeWebKitPlatform}/nw.exe ."
+def nodeWebKitExecutable
+	if(HOST == :win32)
+		return 'nw.exe'
+	elsif(HOST == :linux)
+		return 'nw'
+	elsif(HOST == :darwin)
+		return 'node-webkit.app/Contents/MacOS/node-webkit'
+	else
+		raise "Unsupported HOST: #{HOST}"
+	end
+end
+
+sh "../node-webkit-bin-#{ETS.nodeWebKitVersion}/node-webkit-v#{ETS.nodeWebKitVersion}-#{nodeWebKitPlatform}/#{nodeWebKitExecutable} ."
