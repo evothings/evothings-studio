@@ -38,6 +38,7 @@ var UUID = require('./uuid.js')
 /***     Server variables      ***/
 /*********************************/
 
+var mIsConnected = false
 var mSessionID = 'DefaultSessionID'
 var mRemoteServerURL = ''
 var mSocket = null
@@ -75,31 +76,26 @@ function connectToRemoteServer()
 	// Connect function.
 	socket.on('connect', function()
 	{
-		//
-		// This message generates a connect key and session id on the server.
-		// These values are sent back to us using the message 'hyper.session-id'.
-		// The server creates a socket.io room for the session.
-		//
-		// TODO: Add session id here if set? So that we can get a new key
-		// for the same session? This requires rewriting the server start
-		// logic so that the server is not restarted when the Get Key
-		// button is pressed. Server should be stared on launch.
-		// By server is meant this file (technically it is a client
-		// but it serves files to the proxy server who served clients).
-		//
-		socket.emit('hyper.workbench-connected', { })
+		mIsConnected = true
+
+		requestConnectKey()
 	})
 
 	socket.on('disconnect', function()
 	{
+		mIsConnected = false
+
 		mStatusCallback && mStatusCallback({
 			event: 'disconnected' })
 	})
 
 	socket.on('hyper.session-id', function(data)
 	{
+		// Save the session id.
 		mSessionID = data.sessionID
-		//mConnectKey = data.connectKey
+
+		// Pass the connect key to the callback function,
+		// this displays the key in the UI.
 		mStatusCallback && mStatusCallback({
 			event: 'connected',
 			connectKey: data.connectKey })
@@ -108,7 +104,7 @@ function connectToRemoteServer()
 	// Get resource function.
 	socket.on('hyper.resource-request', function(data)
 	{
-		LOGGER.log('hyper.resource-request: ' + data.path)
+		//LOGGER.log('hyper.resource-request: ' + data.path)
 
 		var ifModifiedSince =
 			mCheckIfModifiedSince
@@ -150,6 +146,25 @@ function connectToRemoteServer()
 		mMessageCallback && mMessageCallback(
 			{ message: 'hyper.result', result: data })
 	})
+}
+
+/**
+ * External.
+ */
+function isConnected()
+{
+	return mIsConnected
+}
+
+/**
+ * External.
+ */
+function requestConnectKey()
+{
+	// This will respond with a valid session id first time we connect,
+	// and a connect key. Subsequent calls will pass a valid session id
+	// and get a new key as a result.
+	mSocket.emit('hyper.workbench-connected', { sessionID: mSessionID })
 }
 
 /**
@@ -212,7 +227,6 @@ function serveResource(platform, path, ifModifiedSince)
 	}
 	else if (mBasePath)
 	{
-		//LOGGER.log('place 2: ' + mBasePath + path.substr(1))
 		return LOADER.response(
 			mBasePath + path.substr(1),
 			ifModifiedSince)
@@ -244,7 +258,7 @@ function serveRootRequest()
  */
 function serveReloaderScript(ifModifiedSince)
 {
-	LOGGER.log('serveReloaderScript')
+	//LOGGER.log('serveReloaderScript')
 	var path = './hyper/server/hyper-reloader.js'
 	var script = FILEUTIL.readFileSync(path)
 	var stat = FILEUTIL.statSync(path)
@@ -283,7 +297,7 @@ function serveHtmlFileWithScriptInjection(filePath, ifModifiedSince)
  */
 function serveHtmlFile(path, ifModifiedSince)
 {
-	LOGGER.log('serveHtmlFile: ' + path)
+	//LOGGER.log('serveHtmlFile: ' + path)
 	var html = FILEUTIL.readFileSync(path)
 	var stat = FILEUTIL.statSync(path)
 	if (html && stat)
@@ -659,6 +673,8 @@ function setSessionID(sessionID)
 /***	  Module exports	   ***/
 /*********************************/
 
+exports.isConnected = isConnected
+exports.requestConnectKey = requestConnectKey
 exports.setAppPath = setAppPath
 exports.getAppPath = getAppPath
 exports.getBasePath = getBasePath

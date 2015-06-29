@@ -169,7 +169,7 @@ hyper.UI = {}
 			catch(e)
 			{
 				// app is closing; no way to handle errors beyond logging them.
-				LOGGER.log(e);
+				LOGGER.log('Error on window close: ' + e);
 			}
 
 			GUI.App.quit()
@@ -539,16 +539,25 @@ hyper.UI = {}
 	}
 
 	// Called when the Connect button in the Connect dialog is clicked.
-	hyper.UI.connectToServer = function()
+	hyper.UI.getConnectKeyFromServer = function()
 	{
 		// Show spinner.
 		$('#connect-spinner').css('display', 'inline-block')
 
-		// Connect to server.
-		var serverURL = $('#input-connect-url').val()
-		hyper.stopServer()
-		hyper.setRemoteServerURL(serverURL)
-		hyper.startServer()
+		if (!hyper.SERVER.isConnected())
+		{
+			// We are not connected, start the server connection.
+			// This will result in a key being sent to us.
+			var serverURL = $('#input-connect-url').val()
+			hyper.stopServer()
+			hyper.setRemoteServerURL(serverURL)
+			hyper.startServer()
+		}
+		else
+		{
+			// Already connected, request a new key.
+			hyper.SERVER.requestConnectKey()
+		}
 
 		// TODO: Remove, let the user hide the dialog.
 		//$('#dialog-connect').modal('hide')
