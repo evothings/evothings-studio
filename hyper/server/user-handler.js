@@ -29,7 +29,6 @@ var PATH = require('path')
 var IO = require('socket.io-client')
 var LOGGER = require('./log.js')
 var SETTINGS = require('../settings/settings.js')
-var UUID = require('./uuid.js')
 
 /*********************************/
 /***     Module variables      ***/
@@ -90,11 +89,11 @@ function loginUser()
 		})
 	}
 
-	LOGGER.log('LOGIN: starting login sequence..')
-	var uuid = UUID.generateUUID()
-	mLoginWindow.location = 'http://evothings.com:3003/#/login?uuid='+uuid
-	LOGGER.log('LOGIN: sending registerAuthCallback to saas server for uuid '+uuid)
-	mLoginServer.emit('message', JSON.stringify({target:'registerAuthCallback', uuid: uuid}))
+	var sessionId = global.mainHyper.sessionID
+    LOGGER.log('LOGIN: starting login sequence.')
+	mLoginWindow.location = 'http://evothings.com:3003/#/login?uuid='+sessionId
+	LOGGER.log('LOGIN: sending registerAuthCallback to saas server for uuid '+sessionId)
+	mLoginServer.emit('message', JSON.stringify({target:'registerAuthCallback', uuid: sessionId}))
 }
 
 /**

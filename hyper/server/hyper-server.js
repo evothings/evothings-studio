@@ -94,8 +94,14 @@ function connectToRemoteServer()
 		// Save the session id.
 		mSessionID = data.sessionID
 
+
 		// Pass the connect key to the callback function,
 		// this displays the key in the UI.
+
+        console.log('hyper-server got back sessionId from proxy server: '+mSessionID)
+        global.mainHyper.sessionID = mSessionID
+		//mConnectKey = data.connectKey
+
 		mStatusCallback && mStatusCallback({
 			event: 'connected',
 			connectKey: data.connectKey })
@@ -669,6 +675,11 @@ function setSessionID(sessionID)
 	mSessionID = sessionID
 }
 
+function getSessionID()
+{
+    return mSessionID
+}
+
 /*********************************/
 /***	  Module exports	   ***/
 /*********************************/
@@ -694,3 +705,4 @@ exports.disconnectFromRemoteServer = disconnectFromRemoteServer
 exports.getUserKey = getUserKey
 exports.setRemoteServerURL = setRemoteServerURL
 exports.setSessionID = setSessionID
+exports.getSessionID = getSessionID

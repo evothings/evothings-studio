@@ -36,8 +36,6 @@ var SETTINGS = require('../settings/settings.js')
 var LOGGER = require('../server/log.js')
 var UUID = require('../server/uuid.js')
 
-var AUTHCOLLECTOR = require('../server/auth-collector-service.js')
-
 /*** Globals ***/
 
 // Global object that holds globally available functions.
@@ -64,7 +62,6 @@ hyper.UI = {}
 		setWindowActions()
 		setUpFileDrop()
 		restoreSavedUIState()
-        startAuthCollector()
 	}
 
 	// System menus must be explicitly created on OS X,
@@ -88,20 +85,6 @@ hyper.UI = {}
 			}
 		}
 	}
-
-    function startAuthCollector()
-    {
-        //AUTHCOLLECTOR.start()
-
-        /*
-        GUI.window.on('document-end', function()
-        {
-            console.log('window loaded. args ->')
-            console.dir(arguments)
-
-        })
-        */
-    }
 
 	// Helper function that returns the application name
 	// specified in package.json.
