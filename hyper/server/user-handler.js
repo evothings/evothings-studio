@@ -54,6 +54,7 @@ function loginUser()
 	{
 		LOGGER.log('LOGIN: creating login window')
 		mLoginWindow = window.open(
+                'http://evothings.com:3003',
 				'Login',
 				{
 					resizable: true
@@ -91,7 +92,7 @@ function loginUser()
 
 	var sessionId = global.mainHyper.sessionID
     LOGGER.log('LOGIN: starting login sequence.')
-	mLoginWindow.location = 'http://evothings.com:3003/#/login?uuid='+sessionId
+	mLoginWindow.location = 'http://evothings.com:3003/#/login?uuid='+sessionId+'&opendirectly=true'
 	LOGGER.log('LOGIN: sending registerAuthCallback to saas server for uuid '+sessionId)
 	mLoginServer.emit('message', JSON.stringify({target:'registerAuthCallback', uuid: sessionId}))
 }
