@@ -69,3 +69,8 @@ fetchAndUnzipSingleFile('http://jqueryui.com/resources/download/jquery-ui-1.11.4
 mklink('documentation', '../evothings-doc')
 mklink('examples', '../evothings-examples/examples')
 mklink('hyper/server/ui', '../evothings-examples/resources/ui')
+
+# Create package.json for this version.
+content = open('package-template.json') do |file| file.read; end
+content.gsub!('__VERSION__', ETS.distVersion)
+open('package.json', 'w') do |file| file.write(content); end

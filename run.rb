@@ -20,10 +20,10 @@ def nodeWebKitPlatform
 			return 'win-ia32'
 		end
 	elsif(HOST == :linux)
-		lb = `getconf LONG_BIT`
-		if(lb == 64)
+		lb = `getconf LONG_BIT`.strip
+		if(lb == '64')
 			return 'linux-x64'
-		elsif(lb == 32)
+		elsif(lb == '32')
 			return 'linux-ia32'
 		else
 			raise "Could not find architecture (lb=#{lb})"
@@ -47,4 +47,9 @@ def nodeWebKitExecutable
 	end
 end
 
-sh "../node-webkit-bin-#{ETS.nodeWebKitVersion}/node-webkit-v#{ETS.nodeWebKitVersion}-#{nodeWebKitPlatform}/#{nodeWebKitExecutable} ."
+nw = File.expand_path("../node-webkit-bin-#{ETS.nodeWebKitVersion}/node-webkit-v#{ETS.nodeWebKitVersion}-#{nodeWebKitPlatform}/#{nodeWebKitExecutable}")
+if(HOST == :linux)
+	sh "./wrap-nw.sh #{nw}"
+else
+	sh "#{nw} ."
+end

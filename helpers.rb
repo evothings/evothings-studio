@@ -102,6 +102,9 @@ def mklink(name, target)
 		# Perhaps it is not an executable but rather a built-in command in cmd.exe.
 		sh("cmd /C mklink /J \"#{name}\" \"#{target}\"")
 	else
-		sh("ln -s \"#{target}\" \"#{name}\"")
+		# expand_path because link targets are not relative to the Current Working Directory
+		# at the time of link creation (as they are on windows), but rather
+		# relative to the link itself.
+		sh("ln -s \"#{File.expand_path(target)}\" \"#{name}\"")
 	end
 end
