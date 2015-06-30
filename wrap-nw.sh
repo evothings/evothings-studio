@@ -3,7 +3,12 @@
 # This script enables running node-webkit on newer distros that don't have libudev.so.0.
 
 # First, find out where we are.
-MYAPP_WRAPPER="`readlink -f "$0"`"
+if [ -f $1 ]
+then
+	MYAPP_WRAPPER=$1
+else
+	MYAPP_WRAPPER="`readlink -f "$0"`"
+fi
 HERE="`dirname "$MYAPP_WRAPPER"`"
 
 # If we don't already have a local symlink...
@@ -33,4 +38,10 @@ fi
 export LD_LIBRARY_PATH=$([ -n "$LD_LIBRARY_PATH" ] && echo "$HERE:$HERE/lib:$LD_LIBRARY_PATH" || echo "$HERE:$HERE/lib")
 
 # Finally, run node-webkit.
-exec -a "$0" "$HERE/nw"  "$@"
+if [ -f $1 ]
+then
+	echo $1 .
+	$1 .
+else
+	exec -a "$0" "$HERE/nw"  "$@"
+fi
