@@ -82,7 +82,7 @@ html, body
 	font-weight: bold;
 }
 
-#project-list
+.project-list
 {
 	position: relative;
 	margin: 0;
@@ -90,7 +90,7 @@ html, body
 	width: 100%;
 }
 
-#project-list div
+.project-list div
 {
 	position: relative;
 	margin: 5px;

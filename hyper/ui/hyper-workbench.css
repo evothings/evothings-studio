@@ -108,6 +108,6 @@ body {
     width: 15%;
 }
 
-#button-workbench, #button-forum, #button-examples {
-	width: 12%;
+#button-workbench, #button-forum, #button-examples, #button-projects {
+	width: 18%;
 }

@@ -1,0 +1,33 @@
+[
+{"index":"examples/hello-world/index.html", "image":"foo.jpg"},
+{"index":"examples/cordova-accelerometer/index.html", "image":"foo.jpg"},
+{"index":"examples/hue-lights/index.html", "image":"foo.jpg"},
+
+{"index":"examples/ble-scan/index.html", "image":"foo.jpg"},
+{"index":"examples/ibeacon-scan/index.html", "image":"foo.jpg"},
+{"index":"examples/estimote-beacons/index.html", "image":"resources/list/estimote_beacon.jpg"},
+{"index":"examples/estimote-nearables/index.html", "image":"foo.jpg"},
+{"index":"examples/ble-discovery/index.html", "image":"foo.jpg"},
+
+{"index":"examples/ti-sensortag-accelerometer/index.html", "image":"examples/ti-sensortag-accelerometer/TISensorTagCC2650.png"},
+{"index":"examples/ti-sensortag-sensors/index.html", "image":"examples/ti-sensortag-sensors/TISensorTagCC2650.png"},
+{"index":"examples/ti-sensortag-cc2650-demo/index.html", "image":"examples/ti-sensortag-cc2650-demo/TISensorTagCC2650.png"},
+{"index":"examples/ti-sensortag-cc2541-demo/index.html", "image":"examples/ti-sensortag-cc2541-demo/TISensorTagCC2541.png"},
+
+{"index":"examples/mbed-custom-gap/index.html", "image":"foo.jpg"},
+{"index":"examples/mbed-custom-gatt/index.html", "image":"foo.jpg"},
+{"index":"examples/nordic-nRF51-dk-ble/app/index.html", "image":"examples/nordic-nRF51-dk-ble/app/nRF51-DK.jpg"},
+
+{"index":"examples/arduino-led-onoff-tcp/app/index.html", "image":"resources/list/arduino-UNO.png"},
+{"index":"examples/arduino-led-onoff-ble/app/index.html", "image":"resources/list/arduino-UNO.png"},
+{"index":"examples/arduino-ble/app/index.html", "image":"resources/list/arduino-UNO.png"},
+{"index":"examples/arduino-scriptable-tcp/app/index.html", "image":"resources/list/arduino-UNO.png"},
+
+{"index":"examples/redbearlab-simplecontrol/index.html", "image":"resources/list/BlendMicro.jpg"},
+{"index":"examples/redbearlab-simplechat/index.html", "image":"resources/list/BlendMicro.jpg"},
+
+{"index":"examples/mediatek-linkit/app/index.html", "image":"examples/mediatek-linkit/app/img/mediatek-linkitone.jpg"},
+{"index":"examples/lightblue-bean-basic/app/index.html", "image":"foo.jpg"},
+{"index":"examples/rfduino-led-onoff/app/index.html", "image":"resources/list/rfduino.png"},
+{"index":"examples/bluno-helloworld/app/index.html", "image":"examples/bluno-helloworld/app/img/bluno.jpg"}
+]
