@@ -62,6 +62,9 @@ Copyright (c) 2013-2015 Evothings AB
 					<a id="button-examples"
 						class="btn btn-success btn-hyper-toolbar et-btn-green"
 						href="javascript:void(0)">Examples</a>
+					<a id="button-projects"
+						class="btn btn-success btn-hyper-toolbar et-btn-black"
+						href="javascript:void(0)">Projects</a>
 				</div>
 			</div>
 
@@ -162,7 +165,8 @@ Copyright (c) 2013-2015 Evothings AB
 			</div>
 
 			<!-- Project list -->
-			<div id="project-list"></div>
+			<div id="project-list" class="project-list"></div>
+			<div id="example-list" class="project-list"></div>
 		</div>
 
 		<div id="panel-bottom">
@@ -216,9 +220,26 @@ Copyright (c) 2013-2015 Evothings AB
 		button = $('#button-examples')
 		button && button.click(function()
 		{
-			var url = 'file://' + PATH.resolve('./documentation/examples/examples.html')
-			GUI.Shell.openExternal(url)
+			// hide project-list
+			$('#project-list').hide()
+			// show example-list
+			$('#example-list').show()
+			// hide examples button
+			$('#button-examples').hide()
+			// show projects button
+			$('#button-projects').show()
 		})
+
+		hyper.showProjectList = function()
+		{
+			$('#project-list').show()
+			$('#example-list').hide()
+			$('#button-examples').show()
+			$('#button-projects').hide()
+		}
+
+		button = $('#button-projects')
+		button && button.click(hyper.showProjectList) && button.hide() && hyper.showProjectList()
 
 		// ************** Welcome Window **************
 
@@ -312,6 +333,7 @@ Copyright (c) 2013-2015 Evothings AB
 			// Abort if the response is not valid.
 			if (200 != status)
 			{
+				console.log('Version response code: ' + status)
 				return
 			}
 
@@ -319,6 +341,7 @@ Copyright (c) 2013-2015 Evothings AB
 			var response
 			try
 			{
+				console.log('Version response: ' + data)
 				response = JSON.parse(data)
 			}
 			catch(e)

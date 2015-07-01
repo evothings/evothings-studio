@@ -263,6 +263,7 @@ hyper.UI = {}
 		{
 			e.stopPropagation()
 			e.preventDefault()
+			hyper.showProjectList();
 			$('#drag-overlay').show();
 			enterTarget = event.target;
 		})
@@ -309,11 +310,19 @@ hyper.UI = {}
 		hyper.UI.displayProjectList()
 	}
 
-	function createProjectEntry(path)
+	function createProjectEntry(path, options)
 	{
+		options = options || {}
+		options.list = options.list || '#project-list'
+		if(options.haveDeleteButton !== false)
+			options.haveDeleteButton = true
 		// Template for project items.
 		var html =
 			'<div class="ui-state-default ui-corner-all">'
+		if(options.imagePath)
+			html += '<img src="../../../evothings-examples/__IMAGE_PATH__" height="75px" style="float:left; margin-right: 10px;">'
+
+		html += ''
 				+ '<button '
 				+	'type="button" '
 				+	'class="button-open btn btn-default" '
@@ -328,13 +337,18 @@ hyper.UI = {}
 				+ '</button>'
 				+ '<h4>__NAME__</h4>'
 				+ '<p>__PATH3__</p>'
-				+ '<button '
+		if(options.haveDeleteButton)
+		{
+			html +=
+				'<button '
 				+	'type="button" '
 				+	'class="close button-delete" '
 				+	'onclick="hyper.UI.deleteEntry(this)">'
 				+	'&times;'
 				+ '</button>'
-				+ '<div class="project-list-entry-path" style="display:none;">__PATH4__</div>'
+		}
+		html +=
+			'<div class="project-list-entry-path" style="display:none;">__PATH4__</div>'
 			+ '</div>'
 
 		// Get name of project, use title tag as first choise.
@@ -361,13 +375,14 @@ hyper.UI = {}
 		html = html.replace('__PATH3__', getShortPathFromPath(path))
 		html = html.replace('__PATH4__', path)
 		html = html.replace('__NAME__', name)
+		html = html.replace('__IMAGE_PATH__', options.imagePath)
 
 		// Create element.
 		var element = $(html)
 		//LOGGER.log(html)
 
 		// Insert element first in list.
-		$('#project-list').append(element)
+		$(options.list).append(element)
 	}
 
 	function getTagContent(data, tag)
@@ -471,6 +486,20 @@ hyper.UI = {}
 		}
 	}
 
+	hyper.UI.displayExampleList = function()
+	{
+		// Clear current list.
+		$('#example-list').empty()
+
+		// Create new list.
+		var list = hyper.getExampleList()
+		for (var i = 0; i < list.length; ++i)
+		{
+			var entry = list[i]
+			createProjectEntry(entry.index, {list:'#example-list', haveDeleteButton:false, imagePath:entry.image})
+		}
+	}
+
 	hyper.UI.setServerMessageFun = function()
 	{
 		// Set server message callback to forward message to the Workbench.
@@ -520,8 +549,9 @@ hyper.UI = {}
 
 	hyper.SERVER = SERVER
 
-	var mProjectListFile = './hyper/settings/project-list.json'
 	var mProjectList = []
+	var mExampleListFile = './hyper/settings/example-list.json'
+	var mExampleList = []
 	var mApplicationBasePath = process.cwd()
 	var mRunAppGuardFlag = false
 	var mNumberOfConnectedClients = 0
@@ -539,8 +569,10 @@ hyper.UI = {}
 
 		// Populate the UI.
 		// TODO: Consider moving these calls to a function in hyper.UI.
+		mExampleList = parseProjectList(FILEUTIL.readFileSync(mExampleListFile))
 		readProjectList()
 		hyper.UI.displayProjectList()
+		hyper.UI.displayExampleList()
 		hyper.UI.setServerMessageFun()
 
 		displayServerIpAddress()
@@ -686,36 +718,30 @@ hyper.UI = {}
 		mNumberOfConnectedClients = 0
 	}
 
+	function parseProjectList(json)
+	{
+		// Replace slashes with backslashes on Windows.
+		if (process.platform === 'win32')
+		{
+			json = json.replace(/[\/]/g,'\\\\')
+		}
+
+		return JSON.parse(json)
+	}
+
 	function readProjectList()
 	{
-		/* Not used:
-		// Create project file from template if it does not exist.
-		if (!FS.existsSync(mProjectListFile))
-		{
-			var data = FS.readFileSync(mProjectListTemplateFile, {encoding: 'utf8'})
-			FS.writeFileSync(mProjectListFile, data, {encoding: 'utf8'})
-		}
-		*/
-
 		// Read project file.
-		if (FS.existsSync(mProjectListFile))
+		var json = localStorage.getItem('project-list')
+		if (json)
 		{
-			var json = FILEUTIL.readFileSync(mProjectListFile)
-
-			// Replace slashes with backslashes on Windows.
-			if (process.platform === 'win32')
-			{
-				json = json.replace(/[\/]/g,'\\\\')
-			}
-
-			mProjectList = JSON.parse(json)
+			mProjectList = parseProjectList(json)
 		}
 	}
 
 	function saveProjectList()
 	{
-		var json = JSON.stringify(mProjectList)
-		FS.writeFileSync(mProjectListFile, json, {encoding: 'utf8'})
+		localStorage.setItem('project-list', JSON.stringify(mProjectList))
 	}
 
 	// TODO: Simplify, use updateProjectList instead.
@@ -734,6 +760,11 @@ hyper.UI = {}
 	hyper.getProjectList = function()
 	{
 		return mProjectList
+	}
+
+	hyper.getExampleList = function()
+	{
+		return mExampleList
 	}
 
 	function openFolder(path)
