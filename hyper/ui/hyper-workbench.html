@@ -15,6 +15,7 @@ jQuery Layout: http://layout.jquery-dev.net/
 
 <link href="../libs/bootstrap-3.3.4-dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="../libs/jquery/layout-default-latest.css" />
+<link rel="stylesheet" href="hyper-common.css" />
 <link rel="stylesheet" href="hyper-workbench.css" />
 
 <script src="../libs/jquery/jquery-2.1.4.min.js"></script>
@@ -28,85 +29,6 @@ jQuery Layout: http://layout.jquery-dev.net/
 <script src="../libs/codemirror-3.24/addon/comment/continuecomment.js"></script>
 <script src="../libs/codemirror-3.24/mode/javascript/javascript.js"></script>
 
-<style>
-.CodeMirror
-{
-	font-family: monospace;
-	font-size: 18px;
-	height: 100%;
-}
-
-.ui-layout-pane
-{
-	background: #FFF;
-	border: 1px solid #BBB;
-	padding: 0px;
-	overflow: auto;
-}
-
-#toolbar
-{
-	color: #111111;
-	background-color: rgb(230,230,230);
-	border: 0px solid #BBB;
-	border-bottom-style: solid;
-	border-bottom-width: 0px;
-	border-bottom-color: #BBB;
-	padding: 0px;
-	font-size: 0.8em;
-	font-family: Sans-serif;
-}
-
-.unused-btn
-{
-	-webkit-border-radius: 0;
-	-moz-border-radius: 0;
-	border-radius: 0;
-}
-
-#code-area
-{
-/*
-	position: absolute;
-	left: 0px;
-	top: 0px;
-	right: 0px;
-	bottom: 0px;
-	padding: 0px;
-	*/
-}
-
-#result-area
-{
-/*
-	position: absolute;
-	left: 100px;
-	top: 2.5em;
-	right: 0px;
-	bottom: 0px;
-	padding: 0px;
-*/
-	padding: 0px;
-	margin: 0px;
-}
-
-#result-editor
-{
-/*
-	position: absolute;
-	left: 100px;
-	top: 2.5em;
-	right: 0px;
-	bottom: 0px;
-	padding: 0px;
-*/
-}
-
-button
-{
-	line-height: normal;
-}
-</style>
 </head>
 
 <body>
@@ -158,14 +80,14 @@ button
 -->
 
 <div id="toolbar">
-	<a href="javascript:void(0)" id="button-eval" class="btn btn-success">Eval Selection</a>
-	<a href="javascript:void(0)" id="button-undo" class="btn btn-primary">Undo</a>
-	<a href="javascript:void(0)" id="button-redo" class="btn btn-primary">Redo</a>
-	<a href="javascript:void(0)" id="button-toggle-autoscroll" class="btn btn-info">Toggle AutoScroll</a>
-	<a href="javascript:void(0)" id="button-clear-log" class="btn btn-danger">Clear Log</a>
-	<a href="javascript:void(0)" id="button-clear-editor" class="btn btn-danger">Clear Editor</a>
-	<a href="javascript:void(0)" id="button-restore" class="btn btn-warning">Restore</a>
-	<a href="javascript:void(0)" id="button-eval-node" class="btn btn-success">Node Eval</a>
+	<a href="javascript:void(0)" id="button-eval" class="btn et-btn-green">Eval Selection</a>
+	<a href="javascript:void(0)" id="button-undo" class="btn et-btn-blue">Undo</a>
+	<a href="javascript:void(0)" id="button-redo" class="btn et-btn-blue">Redo</a>
+	<a href="javascript:void(0)" id="button-toggle-autoscroll" class="btn et-btn-indigo">Toggle AutoScroll</a>
+	<a href="javascript:void(0)" id="button-clear-log" class="btn et-btn-red">Clear Log</a>
+	<a href="javascript:void(0)" id="button-clear-editor" class="btn  et-btn-red">Clear Editor</a>
+	<a href="javascript:void(0)" id="button-restore" class="btn et-btn-yellow">Restore</a>
+	<a href="javascript:void(0)" id="button-eval-node" class="btn et-btn-green">Node Eval</a>
 </div>
 
 
