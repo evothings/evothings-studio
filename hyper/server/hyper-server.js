@@ -5,7 +5,7 @@ Author: Mikael Kindborg
 
 License:
 
-Copyright (c) 2013-2015 Evothings AB
+Copyright (c) 2015 Evothings AB
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -35,8 +35,10 @@ var SETTINGS = require('../settings/settings.js')
 var UUID = require('./uuid.js')
 
 /*********************************/
-/***     Server variables      ***/
+/***     Module variables      ***/
 /*********************************/
+
+var mProtocolVersion = 1
 
 var mIsConnected = false
 var mSessionID = 'DefaultSessionID'
@@ -65,17 +67,30 @@ function connectToRemoteServer()
 {
 	LOGGER.log('Connecting to remote server')
 
-	// Create socket.
+	// Message handler table.
+	var messageHandlers =
+	{
+		// Messages from the server to the Workbench.
+		'workbench.client-connected': onMessageWorkbenchClientConnected,
+		'workbench.set-session-id': onMessageWorkbenchSetSessionID,
+		'workbench.get-resource': onMessageWorkbenchGetResource,
+		'workbench.log': onMessageWorkbenchLog,
+		'workbench.javascript-result': onMessageWorkbenchJavaScriptResult
+	}
+
+	// Create socket.io instance.
 	var socket = SOCKETIO_CLIENT(
 		mRemoteServerURL,
 		{ 'force new connection': true })
 
-	// Global reference
+	// Save global reference to socket.io object.
 	mSocket = socket
 
 	// Connect function.
 	socket.on('connect', function()
 	{
+		LOGGER.log('Connected to server')
+
 		mIsConnected = true
 
 		requestConnectKey()
@@ -89,69 +104,84 @@ function connectToRemoteServer()
 			event: 'disconnected' })
 	})
 
-	socket.on('hyper.session-id', function(data)
+	socket.on('hyper-workbench-message', function(message)
 	{
-		// Save the session id.
-		mSessionID = data.sessionID
-
-
-		// Pass the connect key to the callback function,
-		// this displays the key in the UI.
-
-        console.log('hyper-server got back sessionId from proxy server: '+mSessionID)
-        global.mainHyper.sessionID = mSessionID
-		//mConnectKey = data.connectKey
-
-		mStatusCallback && mStatusCallback({
-			event: 'connected',
-			connectKey: data.connectKey })
+		messageHandlers[message.name](socket, message.data)
 	})
+}
 
-	// Get resource function.
-	socket.on('hyper.resource-request', function(data)
-	{
-		//LOGGER.log('hyper.resource-request: ' + data.path)
+function sendMessageToServer(socket, name, data)
+{
+	socket.emit('hyper-workbench-message', {
+		protocolVersion: mProtocolVersion,
+		name: name,
+		data: data })
+}
 
-		var ifModifiedSince =
-			mCheckIfModifiedSince
-				? data.ifModifiedSince
-				: null
-		var response = serveResource(
-			data.platform,
-			data.path,
-			ifModifiedSince)
-		socket.emit(
-			'hyper.resource-response',
-			{
-				id: data.id,
-				sessionID: mSessionID,
-				appID: mAppID,
-				response: response
-			})
-	})
+function onMessageWorkbenchClientConnected(socket, data)
+{
+	// Notify UI that a client has connected.
+	mClientConnectedCallback && mClientConnectedCallback()
+}
 
-	socket.on('hyper.client-connected', function(data)
-	{
-		// Notify UI callback that a client has connected.
-		mClientConnectedCallback && mClientConnectedCallback()
-	})
+function onMessageWorkbenchSetSessionID(socket, data)
+{
+	//LOGGER.log('onMessageWorkbenchSetSessionID: ' + data.sessionID)
 
-	socket.on('hyper.log', function(data)
-	{
-		mMessageCallback && mMessageCallback(
-			{ message: 'hyper.log', logMessage: data })
-	})
+	// Save the session id.
+	mSessionID = data.sessionID
 
-	socket.on('hyper.result', function(data)
-	{
-		// Functions cause a cloning error, just send the type.
-		if (typeof data == 'function')
+	// Save sessionID in global reference.
+	global.mainHyper.sessionID = mSessionID
+
+	// Pass the connect key to the callback function,
+	// this displays the key in the UI.
+	mStatusCallback && mStatusCallback({
+		event: 'connected',
+		connectKey: data.connectKey })
+}
+
+function onMessageWorkbenchGetResource(socket, data)
+{
+	//LOGGER.log('onMessageWorkbenchGetResource: ' + data.path)
+
+	var ifModifiedSince =
+		mCheckIfModifiedSince
+			? data.ifModifiedSince
+			: null
+
+	var response = serveResource(
+		data.platform,
+		data.path,
+		ifModifiedSince)
+
+	sendMessageToServer(socket, 'workbench.resource-response',
 		{
-			data = typeof data
-		}
-		mMessageCallback && mMessageCallback(
-			{ message: 'hyper.result', result: data })
-	})
+			id: data.id,
+			sessionID: mSessionID,
+			appID: mAppID,
+			response: response
+		})
+}
+
+function onMessageWorkbenchLog(socket, data)
+{
+	// Pass message to Tools window.
+	mMessageCallback && mMessageCallback(
+		{ message: 'hyper.log', logMessage: data })
+}
+
+function onMessageWorkbenchJavaScriptResult(socket, data)
+{
+	// Functions cause a cloning error, as a fix just use the type.
+	if (typeof data == 'function')
+	{
+		data = typeof data
+	}
+
+	// Pass message to Tools window.
+	mMessageCallback && mMessageCallback(
+		{ message: 'hyper.result', result: data })
 }
 
 /**
@@ -170,7 +200,7 @@ function requestConnectKey()
 	// This will respond with a valid session id first time we connect,
 	// and a connect key. Subsequent calls will pass a valid session id
 	// and get a new key as a result.
-	mSocket.emit('hyper.workbench-connected', { sessionID: mSessionID })
+	sendMessageToServer(mSocket, 'workbench.connected', { sessionID: mSessionID })
 }
 
 /**
@@ -552,10 +582,12 @@ function runApp()
 	//serveUsingResponse200()
 	serveUsingResponse304()
 	mAppID = getAppID()
-	mSocket.emit('hyper.run', {
-		sessionID: mSessionID,
-		appID: mAppID,
-		url: getAppServerURL() })
+	sendMessageToServer(mSocket, 'workbench.run',
+		{
+			sessionID: mSessionID,
+			appID: mAppID,
+			url: getAppServerURL()
+		})
 }
 
 /**
@@ -566,9 +598,11 @@ function runApp()
 function reloadApp()
 {
 	serveUsingResponse304()
-	mSocket.emit('hyper.reload', {
-		sessionID: mSessionID,
-		appID: mAppID })
+	sendMessageToServer(mSocket, 'workbench.reload',
+		{
+			sessionID: mSessionID,
+			appID: mAppID
+		})
 	mReloadCallback && mReloadCallback()
 }
 
@@ -604,9 +638,11 @@ function getAppID()
  */
 function evalJS(code)
 {
-	mSocket.emit('hyper.eval', {
-		sessionID: mSessionID,
-		code: code })
+	sendMessageToServer(mSocket, 'workbench.eval',
+		{
+			sessionID: mSessionID,
+			code: code
+		})
 }
 
 /**

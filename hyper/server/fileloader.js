@@ -71,8 +71,6 @@ function fileResponse(fullPath, ifModifiedSince)
 
 function createResponse(data, mtime, contentType, ifModifiedSince)
 {
-	LOGGER.log('resource-loader.createResponse')
-
 	// If resource is not updated send 304.
 	if (ifModifiedSince)
 	{

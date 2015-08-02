@@ -9,8 +9,118 @@ License: Apache Version 2.0
 
 window.hyper = (function(hyper, sessionID)
 {
+	// Version of the message protocol.
+	var mProtocolVersion = 1
+
 	// Buffer for storing hyper.log messages.
-	var hyperLogBuffer = []
+	var mHyperLogBuffer = []
+
+	// Functions that handle messages from the server.
+	var mMessageHandlers = {}
+
+	// Not used.
+	//var mBaseUrl = 'http://' + window.location.hostname
+
+	function sendMessageToServer(socket, name, data)
+	{
+		socket.emit('hyper-workbench-message', {
+			protocolVersion: mProtocolVersion,
+			name: name,
+			data: data })
+	}
+
+	function sendBufferedHyperLogMessages()
+	{
+		for (var i = 0; i < mHyperLogBuffer.length; ++ i)
+		{
+			hyper.log(mHyperLogBuffer[i])
+		}
+		mHyperLogBuffer = []
+	}
+
+	function connect()
+	{
+		// Only connect in the topmost window!
+		if (window !== window.top) { return }
+
+		defineMessageHandlers()
+
+		initialiseSocketIo()
+	}
+
+	function initialiseSocketIo()
+	{
+		var socket = io()
+
+		hyper.IoSocket = socket
+
+		socket.on('connect', function()
+		{
+			sendMessageToServer(socket, 'client.connected', { sessionID: sessionID })
+			hyper.isConnected = true
+
+			if (hyper.onConnectedFun)
+			{
+				hyper.onConnectedFun()
+			}
+			sendBufferedHyperLogMessages()
+		})
+
+		socket.on('hyper-client-message', function(message)
+		{
+			mMessageHandlers[message.name](socket, message.data)
+		})
+	}
+
+	function defineMessageHandlers()
+	{
+		mMessageHandlers['client.run'] = function(socket, data)
+		{
+			if (!hyper.isReloading)
+			{
+				hyper.isReloading = true
+
+				// Show the loading toast.
+				hyper.showMessage('Loading')
+
+				// Variable data is the url.
+				setTimeout(function() {
+					window.location.replace(data) },
+					300)
+			}
+		}
+
+		mMessageHandlers['client.reload'] = function(socket, data)
+		{
+			if (!hyper.isReloading)
+			{
+				hyper.isReloading = true
+
+				// Show the loading toast.
+				hyper.showMessage('Loading')
+
+				setTimeout(function() {
+					//window.location.reload(true)
+					// Omitting true enables use of the web view cache.
+					window.location.reload() },
+					300)
+			}
+		}
+
+		mMessageHandlers['client.eval'] = function(socket, data)
+		{
+			try
+			{
+				// Variable data is JS code to eval.
+				var result = eval(data)
+				hyper.sendJsResult(result)
+			}
+			catch (error)
+			{
+				hyper.sendJsResult('[ERR] ' + error)
+			}
+		}
+	}
 
 	// This variable is true if we are connected to the server.
 	hyper.isConnected = false
@@ -38,10 +148,14 @@ window.hyper = (function(hyper, sessionID)
 	// Send result of evaluating JS to the UI.
 	hyper.sendJsResult = function(result)
 	{
-		hyper.isConnected &&
-			hyper.IoSocket.emit('hyper.result', {
-				sessionID: sessionID,
-				result: result })
+		if (hyper.isConnected)
+		{
+			sendMessageToServer(hyper.IoSocket, 'client.javascript-result',
+				{
+					sessionID: sessionID,
+					result: result
+				})
+		}
 	}
 
 	// Log to remote HyperReload Workbench window.
@@ -49,27 +163,19 @@ window.hyper = (function(hyper, sessionID)
 	{
 		if (hyper.isConnected)
 		{
-			hyper.IoSocket.emit('hyper.log', {
-				sessionID: sessionID,
-				message: String(message) })
+			sendMessageToServer(hyper.IoSocket, 'client.log',
+				{
+					sessionID: sessionID,
+					message: String(message)
+				})
 		}
 		else
 		{
-			hyperLogBuffer.push(message)
+			mHyperLogBuffer.push(message)
 		}
 	}
 
-	// If you want, you can set hyper.log to console.log in your code.
 	hyper.log = hyper.log || hyper.rlog
-
-	function sendBufferedHyperLogMessages()
-	{
-		for (var i = 0; i < hyperLogBuffer.length; ++ i)
-		{
-			hyper.log(hyperLogBuffer[i])
-		}
-		hyperLogBuffer = []
-	}
 
 	// Called from native code. NOT USED.
 	/*hyper.nativeConsoleMessageCallBack = function(message)
@@ -91,71 +197,6 @@ window.hyper = (function(hyper, sessionID)
 		var errorMessage = '[ERR] ' + msg + ' [' + file + ': ' + linenumber + ']'
 		hyper.log(errorMessage)
 		return true
-	}
-
-	var baseUrl = 'http://' + window.location.hostname
-
-	function connect()
-	{
-		// Only connect in the topmost window!
-		if (window !== window.top) { return }
-
-		var socket = io()
-		hyper.IoSocket = socket
-		socket.on('hyper.run', function(data)
-		{
-			if (!hyper.isReloading)
-			{
-				hyper.isReloading = true
-
-				// Show the loading toast.
-				hyper.showMessage('Loading')
-
-				// Variable data is the url.
-				setTimeout(function() {
-					window.location.replace(data) },
-					300)
-			}
-		})
-		socket.on('hyper.reload', function(data)
-		{
-			if (!hyper.isReloading)
-			{
-				hyper.isReloading = true
-
-				// Show the loading toast.
-				hyper.showMessage('Loading')
-
-				setTimeout(function() {
-					//window.location.reload(true)
-					// Omitting true enables use of the web view cache.
-					window.location.reload() },
-					300)
-			}
-		})
-		socket.on('hyper.eval', function(data)
-		{
-			try
-			{
-				// Variable data is JS code to eval.
-				var result = eval(data)
-				hyper.sendJsResult(result)
-			}
-			catch (err)
-			{
-				hyper.sendJsResult('[ERR] ' + err)
-			}
-		})
-		socket.on('connect', function()
-		{
-			socket.emit('hyper.client-connected', { sessionID: sessionID })
-			hyper.isConnected = true
-			if (hyper.onConnectedFun)
-			{
-				hyper.onConnectedFun()
-			}
-			sendBufferedHyperLogMessages()
-		})
 	}
 
 	/**
