@@ -77,9 +77,9 @@ function createResponse(data, mtime, contentType, ifModifiedSince)
 		var ifModifiedSinceTime = new Date(ifModifiedSince).getTime()
 		var modifiedTime = mtime.getTime()
 
-		LOGGER.log('ifModifiedSince: ' + ifModifiedSince)
-		LOGGER.log('ifModifiedSinceTime: ' + ifModifiedSinceTime)
-		LOGGER.log('modifiedTime: ' + modifiedTime)
+		//LOGGER.log('ifModifiedSince: ' + ifModifiedSince)
+		//LOGGER.log('ifModifiedSinceTime: ' + ifModifiedSinceTime)
+		//LOGGER.log('modifiedTime: ' + modifiedTime)
 
 		if (modifiedTime <= ifModifiedSinceTime)
 		{
