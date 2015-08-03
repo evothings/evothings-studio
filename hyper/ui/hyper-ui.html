@@ -38,24 +38,27 @@ Copyright (c) 2013-2015 Evothings AB
 
 			<div id="panel-tool-buttons">
 				<div class="btn-group btn-group-justified">
-                    <a id="button-login"
+                    <!-- <a id="button-login"
                        class="btn btn-hyper-toolbar et-btn-blue"
-                       href="javascript:void(0)">Login</a>
-					<a id="button-documentation"
-						class="btn btn-hyper-toolbar et-btn-yellow"
-						href="javascript:void(0)">Documentation</a>
-					<a id="button-workbench"
-						class="btn btn-hyper-toolbar et-btn-red"
-						href="javascript:void(0)">Tools</a>
-					<a id="button-forum"
-						class="btn btn-hyper-toolbar et-btn-blue"
-						href="javascript:void(0)">Forum</a>
+                       href="javascript:void(0)">Login</a> -->
+                    <a id="button-connect"
+                       class="btn btn-hyper-toolbar et-btn-blue"
+                       href="javascript:void(0)">Connect</a>
 					<a id="button-examples"
 						class="btn btn-hyper-toolbar et-btn-green"
 						href="javascript:void(0)">Examples</a>
 					<a id="button-projects"
 						class="btn btn-hyper-toolbar et-btn-green"
 						href="javascript:void(0)">Projects</a>
+					<a id="button-tools"
+						class="btn btn-hyper-toolbar et-btn-red"
+						href="javascript:void(0)">Tools</a>
+					<a id="button-documentation"
+						class="btn btn-hyper-toolbar et-btn-yellow"
+						href="javascript:void(0)">Docs</a>
+					<a id="button-forum"
+						class="btn btn-hyper-toolbar et-btn-blue"
+						href="javascript:void(0)">Forum</a>
 				</div>
 			</div>
 
@@ -219,8 +222,15 @@ Copyright (c) 2013-2015 Evothings AB
 				</div>
 			</div>
 
+			<!-- Connect screen -->
+			<div id="connect-screen" class="project-list">
+				<p>Hello World</p>
+			</div>
+
 			<!-- Project list -->
 			<div id="project-list" class="project-list"></div>
+
+			<!-- Example list -->
 			<div id="example-list" class="project-list"></div>
 		</div>
 
@@ -274,6 +284,8 @@ Copyright (c) 2013-2015 Evothings AB
 
         // ************** Login Button **********************
 
+		// TODO: Move login to the connect tab.
+/*
 		// Set login button action handler. The button
 		// toggles login/logout.
 		$('#button-login').click(function()
@@ -296,10 +308,7 @@ Copyright (c) 2013-2015 Evothings AB
 			var buttonHTML = imageHTML + buttonText
 			$('#button-login').html(buttonHTML)
 
-			// Pass the session id for the user to the server communication code.
-			// TODO: Fix this, currently the session id is sent from the proxy server.
-			// Possibly remove this line.
-			//hyper.setSessionID(user.sid)
+			// TODO: Pass the user.sid to the server?
 		})
 
 		USER_HANDLER.setUserLogoutCallback(function(user)
@@ -310,17 +319,45 @@ Copyright (c) 2013-2015 Evothings AB
 			// Set button text to "Login".
 			$('#button-login').html('Login')
 		})
+*/
 
-		// Set default session id for debugging when running without
-		// authentication.
-		// TODO: Handle this in a better way and make so the system
-		// work without logging in. Create a UUID simply, as default.
-		// TODO: Remove.
-		//hyper.setSessionID('MikiTestSession')
+		// ************** Connect Tab Button **************
 
-		// ************** Workbench Button **************
+		$('#button-connect').click(function()
+		{
+			$('#connect-screen').show()
+			$('#example-list').hide()
+			$('#project-list').hide()
+		})
 
-		$('#button-workbench').click(function()
+		// ************** Examples Tab Button **************
+
+
+		$('#button-examples').click(function()
+		{
+			$('#connect-screen').hide()
+			$('#example-list').show()
+			$('#project-list').hide()
+		})
+
+		// ************** Projects Tab Button **************
+
+		$('#button-projects').click(function()
+		{
+			$('#connect-screen').hide()
+			$('#example-list').hide()
+			$('#project-list').show()
+		})
+
+		// ************** Initial Tab Visibility **************
+
+		$('#connect-screen').show()
+		$('#example-list').hide()
+		$('#project-list').hide()
+
+		// ************** Tools Button **************
+
+		$('#button-tools').click(function()
 		{
 			hyper.UI.showToolsWorkbenchWindow()
 		})
@@ -341,32 +378,6 @@ Copyright (c) 2013-2015 Evothings AB
 		{
 			GUI.Shell.openExternal('http://forum.evothings.com/')
 		})
-
-		// ************** Examples Button **************
-
-		button = $('#button-examples')
-		button && button.click(function()
-		{
-			// hide project-list
-			$('#project-list').hide()
-			// show example-list
-			$('#example-list').show()
-			// hide examples button
-			$('#button-examples').hide()
-			// show projects button
-			$('#button-projects').show()
-		})
-
-		hyper.showProjectList = function()
-		{
-			$('#project-list').show()
-			$('#example-list').hide()
-			$('#button-examples').show()
-			$('#button-projects').hide()
-		}
-
-		button = $('#button-projects')
-		button && button.click(hyper.showProjectList) && button.hide() && hyper.showProjectList()
 
 		// ************** Welcome Window **************
 

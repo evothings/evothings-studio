@@ -287,13 +287,21 @@ hyper.UI = {}
 	{
 		options = options || {}
 		options.list = options.list || '#project-list'
+
 		if(options.haveDeleteButton !== false)
+		{
 			options.haveDeleteButton = true
+		}
+
 		// Template for project items.
 		var html =
 			'<div class="ui-state-default ui-corner-all">'
+
 		if(options.imagePath)
+		{
+			// TODO: Set path to point to local folder.
 			html += '<img src="../../../evothings-examples/__IMAGE_PATH__" height="75px" style="float:left; margin-right: 10px;">'
+		}
 
 		html += ''
 				+ '<button '
@@ -497,7 +505,13 @@ hyper.UI = {}
 		for (var i = 0; i < list.length; ++i)
 		{
 			var entry = list[i]
-			createProjectEntry(entry.index, {list:'#example-list', haveDeleteButton:false, imagePath:entry.image})
+			createProjectEntry(
+				entry.index,
+				{
+					list: '#example-list',
+					haveDeleteButton: false,
+					imagePath: entry.image
+				})
 		}
 	}
 
@@ -639,12 +653,6 @@ hyper.UI = {}
 		// Stop server tasks.
 		SERVER.disconnectFromRemoteServer()
 		MONITOR.stopFileSystemMonitor()
-	}
-
-	hyper.setSessionID = function(sessionID)
-	{
-		// Pass session id to server.
-		SERVER.setSessionID(sessionID)
 	}
 
 /*

@@ -137,6 +137,9 @@ html, body
 	top: 2px;
 }
 
+/*
+TODO: Remove, use automatic width for all buttons.
+
 #button-documentation
 {
 	width: 18%;
@@ -147,10 +150,11 @@ html, body
     width: 15%;
 }
 
-#button-workbench, #button-forum, #button-examples, #button-projects
+#button-tools, #button-forum, #button-examples, #button-projects
 {
 	width: 18%;
 }
+*/
 
 #drag-overlay
 {
