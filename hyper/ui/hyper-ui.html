@@ -28,7 +28,6 @@ Copyright (c) 2013-2015 Evothings AB
 						<span class="glyphicon glyphicon-align-justify"></span>
 					</button>
 					<ul class="dropdown-menu">
-						<li><a href="javascript:void(0)" onclick="window.showConnectKeyDialog()">Connect Key</a></li>
 						<li><a href="javascript:void(0)" onclick="window.showSettingsDialog()">Settings</a></li>
 						<li><a href="javascript:void(0)"
 							onclick="hyper.showWelcomeScreen()">Welcome Screen</a></li>
@@ -45,19 +44,19 @@ Copyright (c) 2013-2015 Evothings AB
                        class="btn btn-hyper-toolbar et-btn-blue"
                        href="javascript:void(0)">Connect</a>
 					<a id="button-examples"
-						class="btn btn-hyper-toolbar et-btn-green"
+						class="btn btn-hyper-toolbar et-btn-blue"
 						href="javascript:void(0)">Examples</a>
 					<a id="button-projects"
-						class="btn btn-hyper-toolbar et-btn-green"
+						class="btn btn-hyper-toolbar et-btn-blue"
 						href="javascript:void(0)">Projects</a>
 					<a id="button-tools"
-						class="btn btn-hyper-toolbar et-btn-red"
+						class="btn btn-hyper-toolbar btn-toolbar et-btn-indigo"
 						href="javascript:void(0)">Tools</a>
 					<a id="button-documentation"
-						class="btn btn-hyper-toolbar et-btn-yellow"
+						class="btn btn-hyper-toolbar btn-toolbar et-btn-indigo"
 						href="javascript:void(0)">Docs</a>
 					<a id="button-forum"
-						class="btn btn-hyper-toolbar et-btn-blue"
+						class="btn btn-hyper-toolbar btn-toolbar et-btn-indigo"
 						href="javascript:void(0)">Forum</a>
 				</div>
 			</div>
@@ -102,62 +101,6 @@ Copyright (c) 2013-2015 Evothings AB
 
 						<div class="modal-footer">
 							<button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<!-- Modal dialog: dialog-connect -->
-			<div class="modal fade"
-				id="dialog-connect"
-				tabindex="-1"
-				role="dialog"
-				aria-labelledby="dialog-connect-label"
-				aria-hidden="true">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-							<h4 class="modal-title" id="dialog-connect-label">
-								Connect Key Dialog
-							</h4>
-						</div>
-
-						<div class="modal-body">
-							<!-- This input box is hidden to reduce UI complexity
-								and avoid potential confusion. -->
-							<div class="form-group"
-								style="display:none;">
-								<label for="input-connect-url">Key Server:</label>
-								<input type="text"
-									id="input-connect-url"
-									class="form-control"
-									value=""
-									placeholder="Enter server URL"/>
-							</div>
-
-							<p>To connect to the Workbench from the Evothings Studio mobile app, you need Internet access and a connect key.</p>
-
-							<p>Click "Get Key" to obtain a connect key. Use this key when connecting from the Evothings Studio mobile app.</p>
-
-							<p>Click "Close" to close this dialog box. If you need to find your key again, open this dialog from the menu icon in the upper-left corner of the Workbench window.</p>
-							<p id="connect-key-paragraph">Your key is:</p>
-							<div class="well">
-								<span id="connect-key">[Click "Get Key"]</span>
-							</div>
-						</div>
-
-						<div class="modal-footer">
-								<button type="button"
-									class="btn btn-success"
-									onclick="hyper.UI.getConnectKeyFromServer()">
-									Get Key <span id="connect-spinner" class="glyphicon glyphicon-refresh glyphicon-spin"></span>
-								</button>
-							<button type="button"
-								class="btn btn-default"
-								data-dismiss="modal">
-								Close
-							</button>
 						</div>
 					</div>
 				</div>
@@ -223,15 +166,39 @@ Copyright (c) 2013-2015 Evothings AB
 			</div>
 
 			<!-- Connect screen -->
-			<div id="connect-screen" class="project-list">
-				<p>Hello World</p>
+			<div id="screen-connect">
+				<div class="panel">
+					<div class="panel-body">
+						<h2>Connect</h2>
+
+						<p>To connect to the Workbench from the Evothings Viewer mobile app, you need Internet access and a connect key.</p>
+
+						<p>Click the "Get Key" button to obtain a connect key. Use this key when connecting from the Evothings Viewer app.</p>
+
+						<p>The connect key is valid for 60 seconds. Click "Get Key" again if the key has timed out.</p>
+
+						<p id="connect-key-paragraph">Your key is:</p>
+						<div class="well">
+							<span id="connect-key">Click GET KEY</span>
+						</div>
+
+						<div>
+							<button type="button"
+								class="btn btn-success"
+								onclick="hyper.UI.getConnectKeyFromServer()">
+								Get Key <span id="connect-spinner" class="glyphicon glyphicon-refresh glyphicon-spin"></span>
+							</button>
+						</div>
+
+					</div>
+				</div>
 			</div>
 
 			<!-- Project list -->
-			<div id="project-list" class="project-list"></div>
+			<div id="screen-projects" class="project-list"></div>
 
 			<!-- Example list -->
-			<div id="example-list" class="project-list"></div>
+			<div id="screen-examples" class="project-list"></div>
 		</div>
 
 		<div id="panel-bottom">
@@ -321,13 +288,30 @@ Copyright (c) 2013-2015 Evothings AB
 		})
 */
 
+		// ************** Tab Button Handling **************
+
+		function showTab(tabname)
+		{
+			// Hide all screens and set unselected colour for buttons.
+			$('#screen-connect').hide()
+			$('#screen-examples').hide()
+			$('#screen-projects').hide()
+			$('#button-connect').removeClass('et-btn-green').addClass('et-btn-blue')
+			$('#button-examples').removeClass('et-btn-green').addClass('et-btn-blue')
+			$('#button-projects').removeClass('et-btn-green').addClass('et-btn-blue')
+
+			// Show selected tab.
+			var screenId = '#screen-' + tabname
+			var buttonId = '#button-' + tabname
+			$(screenId).show()
+			$(buttonId).removeClass('et-btn-blue').addClass('et-btn-green')
+		}
+
 		// ************** Connect Tab Button **************
 
 		$('#button-connect').click(function()
 		{
-			$('#connect-screen').show()
-			$('#example-list').hide()
-			$('#project-list').hide()
+			showTab('connect')
 		})
 
 		// ************** Examples Tab Button **************
@@ -335,25 +319,19 @@ Copyright (c) 2013-2015 Evothings AB
 
 		$('#button-examples').click(function()
 		{
-			$('#connect-screen').hide()
-			$('#example-list').show()
-			$('#project-list').hide()
+			showTab('examples')
 		})
 
 		// ************** Projects Tab Button **************
 
 		$('#button-projects').click(function()
 		{
-			$('#connect-screen').hide()
-			$('#example-list').hide()
-			$('#project-list').show()
+			showTab('projects')
 		})
 
-		// ************** Initial Tab Visibility **************
+		// ************** Show Initial Tab **************
 
-		$('#connect-screen').show()
-		$('#example-list').hide()
-		$('#project-list').hide()
+		showTab('connect')
 
 		// ************** Tools Button **************
 
@@ -533,19 +511,6 @@ Copyright (c) 2013-2015 Evothings AB
 			SETTINGS.setDoNotShowUpdateDialogForVersion(version)
 		})
 
-		window.showConnectKeyDialog = function()
-		{
-			/*
-			// Use with server running on the same machine as the Workbench.
-			mWebServer.getIpAddress(function (address) {
-				hyper.UI.showConnectDialog('http://' + address + ':8080')
-			})
-			*/
-
-			// TODO: Fetch reload server address from a PHP script at evothings.com
-			hyper.UI.showConnectDialog(SETTINGS.getReloadServerAddress())
-		}
-
 		window.showSettingsDialog = function()
 		{
 			hyper.UI.showSettingsDialog()
@@ -556,7 +521,8 @@ Copyright (c) 2013-2015 Evothings AB
 		hyper.setUpServer()
 
 		// Display the Connect dialog box.
-		setTimeout(window.showConnectKeyDialog, 100)
+		// TODO: Auto get key?
+// 		setTimeout(window.showConnectKeyDialog, 100)
 
 		// Do version check at start up.
 		// VERSION CHECK DISABLED!

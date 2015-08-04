@@ -57,6 +57,11 @@ html, body
 	border-radius: 0;
 }
 
+.btn-toolbar
+{
+	margin-left: 5px;
+}
+
 #panel-middle
 {
 	position: absolute;
@@ -182,25 +187,48 @@ TODO: Remove, use automatic width for all buttons.
 	border-radius: 4px;
 }
 
-#connect-key {
+#connect-key
+{
 	font-size: 125%;
-	font-weight: bold; }
+	font-weight: bold;
+}
+
+#connect-spinner
+{
+	display: none;
+}
+
+#screen-connect p
+{
+	/* Make text i bit bigger than the default. */
+	font-size: 120% !important;
+}
 
 /* For spinning icon on the Get Key button */
-.glyphicon-spin {
+.glyphicon-spin
+{
 	-webkit-animation: spin 1000ms infinite linear;
-	animation: spin 1000ms infinite linear; }
-@-webkit-keyframes spin {
+	animation: spin 1000ms infinite linear;
+}
+@-webkit-keyframes spin
+{
 	0% {
 		-webkit-transform: rotate(0deg);
-		transform: rotate(0deg); }
+		transform: rotate(0deg);
+	}
 	100% {
 		-webkit-transform: rotate(359deg);
-		transform: rotate(359deg); } }
-@keyframes spin {
+		transform: rotate(359deg);
+	}
+}
+@keyframes spin
+{
 	0% {
 		-webkit-transform: rotate(0deg);
-		transform: rotate(0deg); }
+		transform: rotate(0deg);
+	}
 	100% {
 		-webkit-transform: rotate(359deg);
-		transform: rotate(359deg); } }
+		transform: rotate(359deg);
+	}
+}

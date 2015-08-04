@@ -116,14 +116,14 @@ hyper.UI = {}
 		// Enable reorder of project list by drag and drop.
 		$(function()
 		{
-			$('#project-list').sortable(
+			$('#screen-projects').sortable(
 			{
 				stop: function()
 				{
 					updateProjectList()
 				}
 			})
-			$('#project-list').disableSelection()
+			$('#screen-projects').disableSelection()
 		})
 
 		// Message handler.
@@ -286,7 +286,7 @@ hyper.UI = {}
 	function createProjectEntry(path, options)
 	{
 		options = options || {}
-		options.list = options.list || '#project-list'
+		options.list = options.list || '#screen-projects'
 
 		if(options.haveDeleteButton !== false)
 		{
@@ -425,7 +425,7 @@ hyper.UI = {}
 	function updateProjectList()
 	{
 		var projects = []
-		var elements = $('#project-list .project-list-entry-path')
+		var elements = $('#screen-projects .project-list-entry-path')
 		elements.each(function(index, element)
 		{
 			var path = $(element).text()
@@ -484,7 +484,7 @@ hyper.UI = {}
 	hyper.UI.displayProjectList = function()
 	{
 		// Clear current list.
-		$('#project-list').empty()
+		$('#screen-projects').empty()
 
 		// Create new list.
 		var projectList = hyper.getProjectList()
@@ -498,7 +498,7 @@ hyper.UI = {}
 	hyper.UI.displayExampleList = function()
 	{
 		// Clear current list.
-		$('#example-list').empty()
+		$('#screen-examples').empty()
 
 		// Create new list.
 		var list = hyper.getExampleList()
@@ -506,9 +506,9 @@ hyper.UI = {}
 		{
 			var entry = list[i]
 			createProjectEntry(
-				entry.index,
+				entry.path,
 				{
-					list: '#example-list',
+					list: '#screen-examples',
 					haveDeleteButton: false,
 					imagePath: entry.image
 				})
@@ -557,13 +557,6 @@ hyper.UI = {}
 		$('#dialog-settings').modal('hide')
 	}
 
-	hyper.UI.showConnectDialog = function(defaultServerAddress)
-	{
-		$('#input-connect-url').val(defaultServerAddress)
-		$('#connect-spinner').css('display', 'none')
-		$('#dialog-connect').modal('show')
-	}
-
 	// Called when the Connect button in the Connect dialog is clicked.
 	hyper.UI.getConnectKeyFromServer = function()
 	{
@@ -574,7 +567,7 @@ hyper.UI = {}
 		{
 			// We are not connected, start the server connection.
 			// This will result in a key being sent to us.
-			var serverURL = $('#input-connect-url').val()
+			var serverURL = SETTINGS.getReloadServerAddress()
 			hyper.stopServer()
 			hyper.setRemoteServerURL(serverURL)
 			hyper.startServer()
@@ -584,9 +577,6 @@ hyper.UI = {}
 			// Already connected, request a new key.
 			hyper.SERVER.requestConnectKey()
 		}
-
-		// TODO: Remove, let the user hide the dialog.
-		//$('#dialog-connect').modal('hide')
 	}
 
 	// Called from connect status callback.

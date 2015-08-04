@@ -134,4 +134,4 @@ exports.setEvoGUID = function(value)
 /**
  * Address of reload server.
  */
-systemSetting('ReloadServerAddress', 'http://evothings.com:8081')
+systemSetting('ReloadServerAddress', 'http://staging.evothings.com:8081')
