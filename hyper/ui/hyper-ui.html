@@ -169,6 +169,7 @@ Copyright (c) 2013-2015 Evothings AB
 			<div id="screen-connect">
 				<div class="panel">
 					<div class="panel-body">
+
 						<h2>Connect</h2>
 
 						<p>To connect to the Workbench from the Evothings Viewer mobile app, you need Internet access and a connect key.</p>
@@ -194,11 +195,12 @@ Copyright (c) 2013-2015 Evothings AB
 				</div>
 			</div>
 
+			<!-- Example list -->
+			<div id="screen-examples" class="project-list"></div>
+
 			<!-- Project list -->
 			<div id="screen-projects" class="project-list"></div>
 
-			<!-- Example list -->
-			<div id="screen-examples" class="project-list"></div>
 		</div>
 
 		<div id="panel-bottom">
@@ -290,7 +292,7 @@ Copyright (c) 2013-2015 Evothings AB
 
 		// ************** Tab Button Handling **************
 
-		function showTab(tabname)
+		hyper.showTab = function(tabname)
 		{
 			// Hide all screens and set unselected colour for buttons.
 			$('#screen-connect').hide()
@@ -311,7 +313,7 @@ Copyright (c) 2013-2015 Evothings AB
 
 		$('#button-connect').click(function()
 		{
-			showTab('connect')
+			hyper.showTab('connect')
 		})
 
 		// ************** Examples Tab Button **************
@@ -319,19 +321,19 @@ Copyright (c) 2013-2015 Evothings AB
 
 		$('#button-examples').click(function()
 		{
-			showTab('examples')
+			hyper.showTab('examples')
 		})
 
 		// ************** Projects Tab Button **************
 
 		$('#button-projects').click(function()
 		{
-			showTab('projects')
+			hyper.showTab('projects')
 		})
 
 		// ************** Show Initial Tab **************
 
-		showTab('connect')
+		hyper.showTab('connect')
 
 		// ************** Tools Button **************
 

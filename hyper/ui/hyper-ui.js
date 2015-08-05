@@ -216,7 +216,6 @@ hyper.UI = {}
         else if ('setSession' == event.data.message)
         {
             console.log('==== session set to '+event.data.sid)
-
         }
 	}
 
@@ -236,23 +235,23 @@ hyper.UI = {}
 		{
 			e.stopPropagation()
 			e.preventDefault()
-			hyper.showProjectList();
-			$('#drag-overlay').show();
-			enterTarget = event.target;
+			hyper.showTab('projects')
+			$('#drag-overlay').show()
+			enterTarget = event.target
 		})
 		dropTarget.on('dragleave', function(e)
 		{
 			if (enterTarget == event.target) {
 				e.stopPropagation()
 				e.preventDefault()
-				$('#drag-overlay').hide();
+				$('#drag-overlay').hide()
 			}
 		})
 		dropTarget.on('drop', function(e)
 		{
 			e.stopPropagation()
 			e.preventDefault()
-			$('#drag-overlay').hide();
+			$('#drag-overlay').hide()
 			handleFileDrop(e.originalEvent.dataTransfer.files)
 		})
 	}
@@ -297,11 +296,19 @@ hyper.UI = {}
 		var html =
 			'<div class="ui-state-default ui-corner-all">'
 
+		/*
+		// TODO: Commented out images in examples list.
+		// Images of uniform size are needed for all examples.
+		// Paths to images need to be to a directory within
+		// the application to produce a stand-alone package.
+		// Images can be placed in a shared folder inside examples
+		// or inside each app folder.
 		if(options.imagePath)
 		{
 			// TODO: Set path to point to local folder.
 			html += '<img src="../../../evothings-examples/__IMAGE_PATH__" height="75px" style="float:left; margin-right: 10px;">'
 		}
+		*/
 
 		html += ''
 				+ '<button '
@@ -486,12 +493,26 @@ hyper.UI = {}
 		// Clear current list.
 		$('#screen-projects').empty()
 
-		// Create new list.
+		// Get list of projects and check if we have any items to show.
 		var projectList = hyper.getProjectList()
-		for (var i = 0; i < projectList.length; ++i)
+		if (projectList.length > 0)
 		{
-			var path = projectList[i]
-			createProjectEntry(path)
+			// Show items.
+			for (var i = 0; i < projectList.length; ++i)
+			{
+				var path = projectList[i]
+				createProjectEntry(path)
+			}
+		}
+		else
+		{
+			// No items in list, show help text.
+			var html =
+				'<div style="padding: 0px 10px 10px 10px;">' +
+				'<h2>Create your projects here</h2>' +
+				'<p>Drag and drop an .html file here to create a new project entry (typically index.html).</p>' +
+				'</div>'
+			$('#screen-projects').append(html)
 		}
 	}
 
@@ -533,6 +554,7 @@ hyper.UI = {}
 		LOGGER.log($(obj).parent())
 		$(obj).parent().remove()
 		updateProjectList()
+		hyper.UI.displayProjectList()
 	}
 
 	hyper.UI.showSettingsDialog = function(defaultServerAddress)
