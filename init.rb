@@ -68,12 +68,13 @@ if(!File.exist?('node_modules/socket.io'))
 	sh 'npm install socket.io'
 end
 
-if(!File.exist?('node_modules/flatten-packages'))
-	sh 'npm install flatten-packages'
-end
+puts 'Flattening node packages. If module flatten-packages is not found,'
+puts 'please install it with this command (sudo if needed):'
+puts '  npm install -g flatten-packages'
+puts 'Then run init.rb again.'
 
 if(File.exist?('node_modules/socket.io/node_modules'))
-	sh 'node_modules/flatten-packages/bin/flatten'
+	sh 'flatten-packages'
 end
 
 ### Download JavaScript libraries.
