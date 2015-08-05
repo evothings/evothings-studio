@@ -4,4 +4,4 @@
 require "fileutils"
 require "pathname"
 
-load("./hyper/build/buildHyper.rb")
+load("./buildHyper.rb")

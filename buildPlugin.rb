@@ -14,7 +14,7 @@ def distCopyright
 end
 
 def distVersion
-	"2.0.0 Alpha 2"
+	"2.0.0"
 end
 
 def root
