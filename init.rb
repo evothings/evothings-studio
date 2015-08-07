@@ -27,9 +27,9 @@ end
 
 def getNodeWebkit(arch, pack)
 	fetchAndUnpack(pack,
-		'http://dl.node-webkit.org/v'+ETS.nodeWebKitVersion+'/node-webkit-v'+ETS.nodeWebKitVersion+'-'+arch+pack::Ending,
+		'http://dl.nwjs.io/v'+ETS.nodeWebKitVersion+'/'+ETS.nodeWebKitName+'-v'+ETS.nodeWebKitVersion+'-'+arch+pack::Ending,
 		'../node-webkit-bin-'+ETS.nodeWebKitVersion,
-		'node-webkit-v'+ETS.nodeWebKitVersion + '-'+arch)
+		ETS.nodeWebKitName+'-v'+ETS.nodeWebKitVersion + '-'+arch)
 end
 
 def getNodeWebkits

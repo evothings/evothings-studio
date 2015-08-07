@@ -47,7 +47,13 @@ def pathSourceDoc
 end
 
 def nodeWebKitVersion
-	"0.11.2"
+	"0.12.3"
+end
+
+# "node-webkit" for 0.11 and earlier.
+# "nwjs" for 0.12.
+def nodeWebKitName
+	"nwjs"
 end
 
 def pathNodeWebkitLinux32
