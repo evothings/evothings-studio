@@ -38,10 +38,16 @@ var UUID = require('./uuid.js')
 /***     Module variables      ***/
 /*********************************/
 
+// Workbench version code should be incremented on each new release.
+// The version code can be used by the server to display info.
+var mWorkbenchVersionCode = 2
+
+// Version of the server message protocol implemented on top of socket.io.
+// Increment when the protocol has changed.
 var mProtocolVersion = 1
 
 var mIsConnected = false
-var mSessionID = 'DefaultSessionID'
+var mSessionID = null
 var mRemoteServerURL = ''
 var mSocket = null
 var mAppPath = null
@@ -71,11 +77,12 @@ function connectToRemoteServer()
 	var messageHandlers =
 	{
 		// Messages from the server to the Workbench.
-		'workbench.client-connected': onMessageWorkbenchClientConnected,
 		'workbench.set-session-id': onMessageWorkbenchSetSessionID,
+		'workbench.client-connected': onMessageWorkbenchClientConnected,
 		'workbench.get-resource': onMessageWorkbenchGetResource,
 		'workbench.log': onMessageWorkbenchLog,
-		'workbench.javascript-result': onMessageWorkbenchJavaScriptResult
+		'workbench.javascript-result': onMessageWorkbenchJavaScriptResult,
+		'workbench.user-message': onMessageWorkbenchUserMessage
 	}
 
 	// Create socket.io instance.
@@ -106,7 +113,7 @@ function connectToRemoteServer()
 
 	socket.on('hyper-workbench-message', function(message)
 	{
-		messageHandlers[message.name](socket, message.data)
+		messageHandlers[message.name](socket, message)
 	})
 }
 
@@ -114,45 +121,60 @@ function sendMessageToServer(socket, name, data)
 {
 	socket.emit('hyper-workbench-message', {
 		protocolVersion: mProtocolVersion,
+		workbenchVersionCode: mWorkbenchVersionCode,
 		name: name,
 		data: data })
 }
 
-function onMessageWorkbenchClientConnected(socket, data)
+function onMessageWorkbenchSetSessionID(socket, message)
+{
+	//LOGGER.log('onMessageWorkbenchSetSessionID: ' + data.sessionID)
+
+	// Set/display session id if we got it.
+	if (message.data.sessionID)
+	{
+		// Save the session id.
+		mSessionID = message.data.sessionID
+
+		// Save sessionID in global reference.
+		global.mainHyper.sessionID = mSessionID
+
+		// Pass the connect key to the callback function,
+		// this displays the key in the UI.
+		mStatusCallback && mStatusCallback({
+			event: 'connected',
+			connectKey: message.data.connectKey })
+	}
+
+	// Display message if we gone one.
+	if (message.userMessage)
+	{
+		// Pass the message to the callback function,
+		// this displays the message in the UI.
+		mStatusCallback && mStatusCallback({
+			event: 'user-message',
+			userMessage: message.userMessage })
+	}
+}
+
+function onMessageWorkbenchClientConnected(socket, message)
 {
 	// Notify UI that a client has connected.
 	mClientConnectedCallback && mClientConnectedCallback()
 }
 
-function onMessageWorkbenchSetSessionID(socket, data)
-{
-	//LOGGER.log('onMessageWorkbenchSetSessionID: ' + data.sessionID)
-
-	// Save the session id.
-	mSessionID = data.sessionID
-
-	// Save sessionID in global reference.
-	global.mainHyper.sessionID = mSessionID
-
-	// Pass the connect key to the callback function,
-	// this displays the key in the UI.
-	mStatusCallback && mStatusCallback({
-		event: 'connected',
-		connectKey: data.connectKey })
-}
-
-function onMessageWorkbenchGetResource(socket, data)
+function onMessageWorkbenchGetResource(socket, message)
 {
 	//LOGGER.log('onMessageWorkbenchGetResource: ' + data.path)
 
 	var ifModifiedSince =
 		mCheckIfModifiedSince
-			? data.ifModifiedSince
+			? message.data.ifModifiedSince
 			: null
 
 	var response = serveResource(
-		data.platform,
-		data.path,
+		message.data.platform,
+		message.data.path,
 		ifModifiedSince)
 
 	sendMessageToServer(socket, 'workbench.resource-response',
@@ -164,15 +186,17 @@ function onMessageWorkbenchGetResource(socket, data)
 		})
 }
 
-function onMessageWorkbenchLog(socket, data)
+function onMessageWorkbenchLog(socket, message)
 {
 	// Pass message to Tools window.
 	mMessageCallback && mMessageCallback(
-		{ message: 'hyper.log', logMessage: data })
+		{ message: 'hyper.log', logMessage: message.data })
 }
 
-function onMessageWorkbenchJavaScriptResult(socket, data)
+function onMessageWorkbenchJavaScriptResult(socket, message)
 {
+	var data = message.data
+
 	// Functions cause a cloning error, as a fix just use the type.
 	if (typeof data == 'function')
 	{
@@ -182,6 +206,19 @@ function onMessageWorkbenchJavaScriptResult(socket, data)
 	// Pass message to Tools window.
 	mMessageCallback && mMessageCallback(
 		{ message: 'hyper.result', result: data })
+}
+
+function onMessageWorkbenchUserMessage(socket, message)
+{
+	// Display message if we gone one.
+	if (message.userMessage)
+	{
+		// Pass the message to the callback function,
+		// this displays the message in the UI.
+		mStatusCallback && mStatusCallback({
+			event: 'user-message',
+			userMessage: message.userMessage })
+	}
 }
 
 /**

@@ -193,6 +193,13 @@ TODO: Remove, use automatic width for all buttons.
 	display: none;
 }
 
+#connect-screen-message
+{
+	padding-top: 20px;
+	font-size: 125%;
+	font-weight: bold;
+}
+
 #screen-connect p
 {
 	/* Make text i bit bigger than the default. */

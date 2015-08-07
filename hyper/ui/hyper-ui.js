@@ -599,13 +599,24 @@ hyper.UI = {}
 			// Already connected, request a new key.
 			hyper.SERVER.requestConnectKey()
 		}
+
+		// Set timeout for connect key display.
+		setTimeout(function() {
+			hyper.UI.displayConnectKey(
+				'Key has timed out. Click GET KEY to get a new one') },
+			60000)
 	}
 
-	// Called from connect status callback.
 	hyper.UI.displayConnectKey = function(key)
 	{
 		$('#connect-spinner').css('display', 'none')
 		$('#connect-key').html(key)
+	}
+
+	hyper.UI.displayConnectScreenMessage = function(message)
+	{
+		$('#connect-spinner').css('display', 'none')
+		$('#connect-screen-message').html(message)
 	}
 
 	setupUI()
@@ -808,6 +819,11 @@ hyper.UI = {}
 		else if (message.event == 'disconnected')
 		{
 			hyper.UI.displayConnectStatus('Disconnected')
+		}
+		else if (message.event == 'user-message')
+		{
+			// Display a message for the user.
+			hyper.UI.displayConnectScreenMessage(message.userMessage)
 		}
 	}
 

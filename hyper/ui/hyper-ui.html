@@ -174,11 +174,8 @@ Copyright (c) 2013-2015 Evothings AB
 
 						<p>To connect to the Workbench from the Evothings Viewer mobile app, you need Internet access and a connect key.</p>
 
-						<p>Click the "Get Key" button to obtain a connect key. Use this key when connecting from the Evothings Viewer app.</p>
+						<p>Click the "Get Key" button to obtain a connect key. Use this key when connecting from the Evothings Viewer app. The connect key is valid for 60 seconds. Click "Get Key" again if the key has timed out.</p>
 
-						<p>The connect key is valid for 60 seconds. Click "Get Key" again if the key has timed out.</p>
-
-						<p id="connect-key-paragraph">Your key is:</p>
 						<div class="well">
 							<span id="connect-key">Click GET KEY</span>
 						</div>
@@ -189,6 +186,10 @@ Copyright (c) 2013-2015 Evothings AB
 								onclick="hyper.UI.getConnectKeyFromServer()">
 								Get Key <span id="connect-spinner" class="glyphicon glyphicon-refresh glyphicon-spin"></span>
 							</button>
+						</div>
+
+						<div>
+							<p id="connect-screen-message"></p>
 						</div>
 
 					</div>
