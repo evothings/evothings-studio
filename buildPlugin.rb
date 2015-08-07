@@ -47,36 +47,42 @@ def pathSourceDoc
 end
 
 def nodeWebKitVersion
-	"0.11.2"
+	"0.12.3"
+end
+
+# "node-webkit" for 0.11 and earlier.
+# "nwjs" for 0.12.
+def nodeWebKitName
+	"nwjs"
 end
 
 def pathNodeWebkitLinux32
 	root + "node-webkit-bin-" + nodeWebKitVersion +
-		"/node-webkit-v" + nodeWebKitVersion +
+		"/nwjs-v" + nodeWebKitVersion +
 		"-linux-ia32/"
 end
 
 def pathNodeWebkitLinux64
 	root + "node-webkit-bin-" + nodeWebKitVersion +
-		"/node-webkit-v" + nodeWebKitVersion +
+		"/nwjs-v" + nodeWebKitVersion +
 		"-linux-x64/"
 end
 
 def pathNodeWebkitWin32
 	root + "node-webkit-bin-" + nodeWebKitVersion +
-		"/node-webkit-v" + nodeWebKitVersion +
+		"/nwjs-v" + nodeWebKitVersion +
 		"-win-ia32/"
 end
 
 def pathNodeWebkitWin64
 	root + "node-webkit-bin-" + nodeWebKitVersion +
-		"/node-webkit-v" + nodeWebKitVersion +
+		"/nwjs-v" + nodeWebKitVersion +
 		"-win-x64/"
 end
 
 def pathNodeWebkitMac64
 	root + "node-webkit-bin-" + nodeWebKitVersion +
-		"/node-webkit-v" + nodeWebKitVersion +
+		"/nwjs-v" + nodeWebKitVersion +
 		"-osx-x64/"
 end
 

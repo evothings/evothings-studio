@@ -41,13 +41,13 @@ def nodeWebKitExecutable
 	elsif(HOST == :linux)
 		return 'nw'
 	elsif(HOST == :darwin)
-		return 'node-webkit.app/Contents/MacOS/node-webkit'
+		return "#{ETS.nodeWebKitName}.app/Contents/MacOS/#{ETS.nodeWebKitName}"
 	else
 		raise "Unsupported HOST: #{HOST}"
 	end
 end
 
-nw = File.expand_path("../node-webkit-bin-#{ETS.nodeWebKitVersion}/node-webkit-v#{ETS.nodeWebKitVersion}-#{nodeWebKitPlatform}/#{nodeWebKitExecutable}")
+nw = File.expand_path("../node-webkit-bin-#{ETS.nodeWebKitVersion}/#{ETS.nodeWebKitName}-v#{ETS.nodeWebKitVersion}-#{nodeWebKitPlatform}/#{nodeWebKitExecutable}")
 if(HOST == :linux)
 	sh "./wrap-nw.sh #{nw}"
 else

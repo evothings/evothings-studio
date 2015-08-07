@@ -158,7 +158,7 @@ def buildDistBinaryMac64
 
 	# Copy files.
 	FileUtils.copy_entry(
-		sourceBin + "node-webkit.app",
+		sourceBin + "nwjs.app",
 		appPath)
 	FileUtils.copy_entry(
 		sourceBin + "credits.html",
@@ -212,8 +212,8 @@ def buildDistBinaryWin(sourcePath, targetPath, sourceBin)
 		sourceBin + "nw.pak",
 		targetPath + "nw.pak")
 	FileUtils.copy_entry(
-		sourceBin + "d3dcompiler_46.dll",
-		targetPath + "d3dcompiler_46.dll")
+		sourceBin + "d3dcompiler_47.dll",
+		targetPath + "d3dcompiler_47.dll")
 	FileUtils.copy_entry(
 		sourceBin + "ffmpegsumo.dll",
 		targetPath + "ffmpegsumo.dll")
