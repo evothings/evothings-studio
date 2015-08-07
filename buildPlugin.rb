@@ -102,8 +102,8 @@ def buildOSXIcons
 	]
 	FileUtils.mkdir_p('build/icon.iconset')
 	osxIcons.each do |size|
-		updateFile("build/icon.iconset/icon_#{size}x#{size}.png", "#{root}evothings-client/config/icons/icon-#{size}.png")
-		updateFile("build/icon.iconset/icon_#{size}x#{size}@2x.png", "#{root}evothings-client/config/icons/icon-#{size*2}.png")
+		updateFile("build/icon.iconset/icon_#{size}x#{size}.png", "#{root}evothings-viewer/config/icons/icon-#{size}.png")
+		updateFile("build/icon.iconset/icon_#{size}x#{size}@2x.png", "#{root}evothings-viewer/config/icons/icon-#{size*2}.png")
 	end
 	# Only on OSX.
 	if(RUBY_PLATFORM =~ /darwin/)
@@ -115,7 +115,7 @@ def buildGitVersionFile
 	open(pathDistSource + 'gitVersions.txt', 'w') do |file|
 		[
 			'evothings-studio',
-			'evothings-client',
+			'evothings-viewer',
 			'evothings-doc',
 			'evothings-examples',
 			'cordova-ble',
@@ -132,10 +132,6 @@ end
 def buildPreProcess
 	buildGitVersionFile
 	buildOSXIcons
-	# Commented out build of Evothings Client to make download package smaller.
-	#buildEvoThingsClient
-
-	# TODO: fetch libs, if needed.
 end
 
 def buildDocumentation

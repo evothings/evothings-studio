@@ -28,29 +28,27 @@ module ETS
 	#p ETS.methods
 end
 
-### Load custom settings from localConfig.rb
+### Create package.json.
 
-#puts "looking for localConfig..."
-
-# allow override of defined functions
-if(File.exist?('./localConfig.rb'))
-	load './localConfig.rb'
+def createPackageJson
+	content = open('package-template.json') do |file| file.read; end
+	content.gsub!('__VERSION__', ETS.distVersion)
+	open('package.json', 'w') do |file| file.write(content); end
 end
 
-### Create package.json for this version.
-
-content = open('package-template.json') do |file| file.read; end
-content.gsub!('__VERSION__', ETS.distVersion)
-open('package.json', 'w') do |file| file.write(content); end
-
-### Get Node Webkit runtimes (TODO: update to fetch mw.js?)
+### Get Node Webkit runtimes.
 
 def getNodeWebkit(arch, pack)
-	fetchAndUnpack(pack,
-		'http://dl.nwjs.io/v'+ETS.nodeWebKitVersion+'/'+ETS.nodeWebKitName+'-v'+ETS.nodeWebKitVersion+'-'+arch+pack::Ending,
+	fetchAndUnpack(
+		pack,
+		'http://dl.nwjs.io/v'+ETS.nodeWebKitVersion+'/'+
+		ETS.nodeWebKitName+'-v'+ETS.nodeWebKitVersion+'-'+
+		arch+pack::Ending,
 		'../node-webkit-bin-'+ETS.nodeWebKitVersion,
-		ETS.nodeWebKitName+'-v'+ETS.nodeWebKitVersion + '-'+arch)
+		ETS.nodeWebKitName+'-v'+ETS.nodeWebKitVersion+'-'+arch)
 end
+
+### Get nwjs.
 
 def getNodeWebkits
 	getNodeWebkit('linux-ia32', TGZ)
@@ -60,34 +58,63 @@ def getNodeWebkits
 	getNodeWebkit('osx-x64', ZIP)
 end
 
-getNodeWebkits
-
 ### Install and flatten node modules.
 
-if(!File.exist?('node_modules/socket.io'))
-	sh 'npm install socket.io'
-end
+def installNodeModules
+	if(!File.exist?('node_modules/socket.io'))
+		sh 'npm install socket.io'
+	end
 
-puts 'Flattening node packages. If module flatten-packages is not found,'
-puts 'please install it with this command (sudo if needed):'
-puts '  npm install -g flatten-packages'
-puts 'Then run init.rb again.'
+	puts 'Flattening node packages. If module flatten-packages is not found,'
+	puts 'please install it with this command (sudo if needed):'
+	puts '  npm install -g flatten-packages'
+	puts 'Then run init.rb again.'
 
-if(File.exist?('node_modules/socket.io/node_modules'))
-	sh 'flatten-packages'
+	if(File.exist?('node_modules/socket.io/node_modules'))
+		sh 'flatten-packages'
+	end
 end
 
 ### Download JavaScript libraries.
 
-fetchAndUnpack(ZIP, 'http://codemirror.net/codemirror-3.24.zip', 'hyper/libs', 'codemirror-3.24')
-fetchAndUnpack(ZIP, 'https://github.com/twbs/bootstrap/releases/download/v3.3.5/bootstrap-3.3.5-dist.zip', 'hyper/libs', 'bootstrap-3.3.5-dist')
-fetch('http://layout.jquery-dev.com/lib/js/jquery.layout-latest.js', 'hyper/libs/jquery')
-fetch('http://layout.jquery-dev.com/lib/css/layout-default-latest.css', 'hyper/libs/jquery')
-fetch('http://code.jquery.com/jquery-2.1.4.min.js', 'hyper/libs/jquery')
-fetchAndUnzipSingleFile('http://jqueryui.com/resources/download/jquery-ui-1.11.4.zip', 'hyper/libs/jquery', 'jquery-ui-1.11.4/jquery-ui.min.js')
+def downloadJavaScriptLibraries
+	fetchAndUnpack(ZIP,
+		'http://codemirror.net/codemirror-3.24.zip', 'hyper/libs',
+		'codemirror-3.24')
+	fetchAndUnpack(ZIP,
+		'https://github.com/twbs/bootstrap/releases/download/v3.3.5/bootstrap-3.3.5-dist.zip',
+		'hyper/libs', 'bootstrap-3.3.5-dist')
+	fetch('http://layout.jquery-dev.com/lib/js/jquery.layout-latest.js',
+		'hyper/libs/jquery')
+	fetch('http://layout.jquery-dev.com/lib/css/layout-default-latest.css',
+		'hyper/libs/jquery')
+	fetch('http://code.jquery.com/jquery-2.1.4.min.js', 'hyper/libs/jquery')
+	fetchAndUnzipSingleFile('http://jqueryui.com/resources/download/jquery-ui-1.11.4.zip',
+		'hyper/libs/jquery',
+		'jquery-ui-1.11.4/jquery-ui.min.js')
+end
 
-### Make links required for local execution.
+### Make links required for running Evothings Studio without building a package.
 
-mklink('documentation', '../evothings-doc')
-mklink('examples', '../evothings-examples/examples')
-mklink('hyper/server/ui', '../evothings-examples/resources/ui')
+def makeLinksForDevelopment
+	mklink('documentation', '../evothings-doc')
+	mklink('examples', '../evothings-examples/examples')
+	mklink('hyper/server/ui', '../evothings-examples/resources/ui')
+end
+
+### Load custom settings from localConfig.rb
+
+#puts "looking for localConfig..."
+
+# allow override of defined functions
+if(File.exist?('./localConfig.rb'))
+	load './localConfig.rb'
+end
+
+### Run all steps.
+
+createPackageJson
+getNodeWebkits
+installNodeModules
+downloadJavaScriptLibraries
+makeLinksForDevelopment
