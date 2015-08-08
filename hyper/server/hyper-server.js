@@ -179,7 +179,7 @@ function onMessageWorkbenchGetResource(socket, message)
 
 	sendMessageToServer(socket, 'workbench.resource-response',
 		{
-			id: data.id,
+			id: message.data.id,
 			sessionID: mSessionID,
 			appID: mAppID,
 			response: response

@@ -510,7 +510,8 @@ hyper.UI = {}
 			var html =
 				'<div style="padding: 0px 10px 10px 10px;">' +
 				'<h2>Create your projects here</h2>' +
-				'<p>Drag and drop an .html file here to create a new project entry (typically index.html).</p>' +
+				'<p>Drag and drop an .html file (typically index.html) here to add a project.</p>' +
+				'<p>Move projects using drag and drop. Delete a project using the close icon (x) (this does not delete your files, only the project list item).</p>' +
 				'</div>'
 			$('#screen-projects').append(html)
 		}

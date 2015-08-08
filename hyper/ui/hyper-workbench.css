@@ -1,3 +1,29 @@
+@import '../server/ui/fonts/ProximaNova.css';
+
+body
+{
+	font-family: 'Proxima Nova Regular';
+}
+
+.btn
+{
+	text-transform: uppercase;
+	/*font-weight: bold;*/
+}
+
+.et-btn-white
+{
+	color: #111111 !important;
+}
+.et-btn-white:hover,
+.et-btn-white:active,
+.btn-group.open .et-btn-white
+{
+	border-color: #dddddd !important;
+	background-color: #dddddd !important;
+	color: #111111 !important;
+}
+
 .CodeMirror
 {
 	font-family: monospace;
@@ -31,53 +57,32 @@
 	text-transform: uppercase !important;
 }
 
+/*
 button
 {
 	line-height: normal;
 }
 
-.unused-btn
+.btn
 {
 	-webkit-border-radius: 0;
 	-moz-border-radius: 0;
 	border-radius: 0;
 }
+*/
 
 #code-area
 {
-/*
-	position: absolute;
-	left: 0px;
-	top: 0px;
-	right: 0px;
-	bottom: 0px;
 	padding: 0px;
-	*/
+	margin: 0px;
 }
 
 #result-area
 {
-/*
-	position: absolute;
-	left: 100px;
-	top: 2.5em;
-	right: 0px;
-	bottom: 0px;
-	padding: 0px;
-*/
 	padding: 0px;
 	margin: 0px;
 }
 
 #result-editor
 {
-/*
-	position: absolute;
-	left: 100px;
-	top: 2.5em;
-	right: 0px;
-	bottom: 0px;
-	padding: 0px;
-*/
 }
-
