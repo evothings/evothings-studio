@@ -128,8 +128,8 @@ function sendMessageToServer(socket, name, data)
 
 function onMessageWorkbenchSetSessionID(socket, message)
 {
-	//LOGGER.log('onMessageWorkbenchSetSessionID: ' + data.sessionID)
-
+	LOGGER.log('- onMessageWorkbenchSetSessionID: ' + message.data.sessionID)
+    console.dir(message)
 	// Set/display session id if we got it.
 	if (message.data.sessionID)
 	{
@@ -141,9 +141,8 @@ function onMessageWorkbenchSetSessionID(socket, message)
 
 		// Pass the connect key to the callback function,
 		// this displays the key in the UI.
-		mStatusCallback && mStatusCallback({
-			event: 'connected',
-			connectKey: message.data.connectKey })
+        message.data.event = "connected"
+		mStatusCallback && mStatusCallback(message.data)
 	}
 
 	// Display message if we gone one.
@@ -210,6 +209,7 @@ function onMessageWorkbenchJavaScriptResult(socket, message)
 
 function onMessageWorkbenchUserMessage(socket, message)
 {
+    console.log('------ onMessageWorkbenchUserMessage')
 	// Display message if we gone one.
 	if (message.userMessage)
 	{
