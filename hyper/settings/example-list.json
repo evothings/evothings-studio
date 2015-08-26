@@ -4,6 +4,7 @@
 {"path":"examples/hue-lights/index.html", "image":"foo.jpg"},
 
 {"path":"examples/ble-scan/index.html", "image":"foo.jpg"},
+{"path":"examples/eddystone-scan/index.html", "image":"foo.jpg"},
 {"path":"examples/ibeacon-scan/index.html", "image":"foo.jpg"},
 {"path":"examples/estimote-beacons/index.html", "image":"resources/list/estimote_beacon.jpg"},
 {"path":"examples/estimote-nearables/index.html", "image":"foo.jpg"},
