@@ -164,8 +164,12 @@ def buildDistBinaryMac64
 		sourceBin + "credits.html",
 		targetPath + "hyper/license/node-webkit-credits.html")
 
+	# Copy icons.
+	FileUtils.copy_entry(
+		pathIconsMac64,
+		appPath + "/Contents/Resources/nw.icns")
+
 	# Patch Info.plist.
-	# TODO: Add icon patch.
 	infoPlistPath = appPath + "/Contents/Info.plist"
 	info = fileReadContent(infoPlistPath)
 	#puts(info)

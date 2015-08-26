@@ -86,6 +86,10 @@ def pathNodeWebkitMac64
 		"-osx-x64/"
 end
 
+def pathIconsMac64
+	"./build/nw.icns"
+end
+
 def updateFile(tar, src)
 	if(!FileUtils.uptodate?(tar, [src]))
 		FileUtils::Verbose.cp(src, tar)
@@ -93,20 +97,20 @@ def updateFile(tar, src)
 end
 
 def buildOSXIcons
-	osxIcons = [
-		16,
-		32,
-		128,
-		256,
-		512,
-	]
-	FileUtils.mkdir_p('build/icon.iconset')
-	osxIcons.each do |size|
-		updateFile("build/icon.iconset/icon_#{size}x#{size}.png", "#{root}evothings-viewer/config/icons/icon-#{size}.png")
-		updateFile("build/icon.iconset/icon_#{size}x#{size}@2x.png", "#{root}evothings-viewer/config/icons/icon-#{size*2}.png")
-	end
 	# Only on OSX.
 	if(RUBY_PLATFORM =~ /darwin/)
+		osxIcons = [
+			16,
+			32,
+			128,
+			256,
+			512,
+		]
+		FileUtils.mkdir_p('build/icon.iconset')
+		osxIcons.each do |size|
+			updateFile("build/icon.iconset/icon_#{size}x#{size}.png", "#{root}evothings-viewer/config/icons/icon-#{size}.png")
+			updateFile("build/icon.iconset/icon_#{size}x#{size}@2x.png", "#{root}evothings-viewer/config/icons/icon-#{size*2}.png")
+		end
 		sh 'iconutil -c icns --output build/nw.icns build/icon.iconset'
 	end
 end
@@ -130,7 +134,7 @@ def buildGitVersionFile
 end
 
 def buildPreProcess
-	buildGitVersionFile
+## TODO MIKI	buildGitVersionFile
 	buildOSXIcons
 end
 
@@ -174,7 +178,7 @@ def buildEvoThingsClient
 end
 
 def buildPostProcess
-	buildDocumentation
+## TODO MIKI	buildDocumentation
 
 	# Copy Evothings Examples UI resources to hyper/server.
 	# This is used by the hyper-connect.html page.
