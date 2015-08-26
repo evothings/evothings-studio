@@ -614,7 +614,7 @@ hyper.UI = {}
 		// Set timeout for connect key display.
 		mConnectKeyTimer = setTimeout(function() {
 			hyper.UI.displayConnectKey(
-				'Key has timed out. Click GET KEY to get a new one') },
+				'Key has timed out. Click GET KEY to get a new one.') },
 			timeout)
 	}
 
@@ -824,9 +824,6 @@ hyper.UI = {}
 	{
 		if (message.event == 'connected')
 		{
-            console.log('------statusCallback')
-            console.dir(message)
-
 			hyper.UI.setConnectKeyTimeout(message.timeout)
 			hyper.UI.displayConnectKey(message.connectKey)
 			hyper.UI.displayConnectStatus('Connected')

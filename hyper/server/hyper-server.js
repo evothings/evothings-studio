@@ -128,8 +128,8 @@ function sendMessageToServer(socket, name, data)
 
 function onMessageWorkbenchSetSessionID(socket, message)
 {
-	LOGGER.log('- onMessageWorkbenchSetSessionID: ' + message.data.sessionID)
-    console.dir(message)
+	//LOGGER.log('onMessageWorkbenchSetSessionID: ' + message.data.sessionID)
+
 	// Set/display session id if we got it.
 	if (message.data.sessionID)
 	{
@@ -209,7 +209,6 @@ function onMessageWorkbenchJavaScriptResult(socket, message)
 
 function onMessageWorkbenchUserMessage(socket, message)
 {
-    console.log('------ onMessageWorkbenchUserMessage')
 	// Display message if we gone one.
 	if (message.userMessage)
 	{
