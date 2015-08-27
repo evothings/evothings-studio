@@ -63,6 +63,13 @@ function webServerHookFunForScriptInjection(request, response, path)
 	// will break existing wifi connections! This should be fixed and/or
 	// documented.
 	mIpAddress = request.socket.address().address
+	if(mIpAddress.startsWith('::ffff:')) {
+		// Node adds this ipv6 prefix to an ipv4 address.
+		// Breaks reloads (causes client to exit silently.)
+		// Get rid of it.
+		mIpAddress = mIpAddress.substring(7)
+	}
+	LOGGER.log('mIpAddress = '+mIpAddress)
 
 	if (path == '/')
 	{
@@ -453,7 +460,9 @@ function getServerBaseURL()
  */
 function runApp()
 {
-	mIO.emit('hyper.run', {url: getAppFileURL()})
+	var url = getAppFileURL()
+	LOGGER.log("hyper.run("+url+")")
+	mIO.emit('hyper.run', {url: url})
 }
 
 /**
@@ -515,6 +524,7 @@ function startServers()
 		mWebServer.getIpAddress(function(address)
 		{
 			mIpAddress = ensureIpAddress(address)
+			LOGGER.log('mIpAddress = '+mIpAddress)
 		})
 		mWebServer.setHookFun(webServerHookFunForScriptInjection)
 	})
