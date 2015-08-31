@@ -30,6 +30,8 @@ var IO = require('socket.io-client')
 var LOGGER = require('./log.js')
 var SETTINGS = require('../settings/settings.js')
 
+var EVO_SERVER = 'hacking.evothings.com'
+
 /*********************************/
 /***     Module variables      ***/
 /*********************************/
@@ -49,26 +51,12 @@ var mUserLogoutCallback = null
  */
 function loginUser()
 {
-	// Create login window if it does not exist.
-	if (!mLoginWindow)
-	{
-		LOGGER.log('LOGIN: creating login window')
-		mLoginWindow = window.open(
-                'http://evothings.com:3003',
-				'Login',
-				{
-					resizable: true
-				})
-		mLoginWindow.resizeTo(550, 700)
-		mLoginWindow.moveTo(50, 50)
-		mLoginWindow.focus()
-	}
 
 	// Create connection to login sever (SAAS server).
 	if (!mLoginServer)
 	{
 		LOGGER.log('LOGIN: connecting to SAAS server');
-		mLoginServer = IO('ws://evothings.com:3003')
+		mLoginServer = IO('wss://'+EVO_SERVER)
 		mLoginServer.on('message', function(msg)
 		{
 			LOGGER.log('LOGIN: got auth callback message:');
@@ -90,11 +78,27 @@ function loginUser()
 		})
 	}
 
+    mLoginServer.emit('message', JSON.stringify({target:'registerAuthCallback', uuid: sessionId}))
+
 	var sessionId = global.mainHyper.sessionID
+
     LOGGER.log('LOGIN: starting login sequence.')
-	mLoginWindow.location = 'http://evothings.com:3003/#/login?uuid='+sessionId+'&opendirectly=true'
+    // Create login window if it does not exist.
+    if (!mLoginWindow || mLoginWindow.closed)
+    {
+        LOGGER.log('LOGIN: creating login window')
+        mLoginWindow = window.open(
+            'https://'+EVO_SERVER+'?uuid='+sessionId+'&loginonly=true',
+            'Login',
+            {
+                resizable: true
+            })
+        mLoginWindow.resizeTo(550, 700)
+        mLoginWindow.moveTo(50, 50)
+        mLoginWindow.focus()
+    }
 	LOGGER.log('LOGIN: sending registerAuthCallback to saas server for uuid '+sessionId)
-	mLoginServer.emit('message', JSON.stringify({target:'registerAuthCallback', uuid: sessionId}))
+
 }
 
 /**

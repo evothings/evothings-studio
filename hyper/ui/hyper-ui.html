@@ -37,9 +37,9 @@ Copyright (c) 2013-2015 Evothings AB
 
 			<div id="panel-tool-buttons">
 				<div class="btn-group btn-group-justified" role="group">
-                    <!-- <a id="button-login"
+                    <a id="button-login"
                        class="btn btn-hyper-toolbar et-btn-blue"
-                       href="javascript:void(0)">Login</a> -->
+                       href="javascript:void(0)">Login</a>
                     <a id="button-connect"
                        class="btn btn-hyper-toolbar et-btn-stone-light"
                        href="javascript:void(0)">Connect</a>
@@ -255,7 +255,7 @@ Copyright (c) 2013-2015 Evothings AB
         // ************** Login Button **********************
 
 		// TODO: Move login to the connect tab.
-/*
+
 		// Set login button action handler. The button
 		// toggles login/logout.
 		$('#button-login').click(function()
@@ -289,7 +289,7 @@ Copyright (c) 2013-2015 Evothings AB
 			// Set button text to "Login".
 			$('#button-login').html('Login')
 		})
-*/
+
 
 		// ************** Tab Button Handling **************
 
@@ -522,6 +522,7 @@ Copyright (c) 2013-2015 Evothings AB
 		// Initialize the file server (socket.io client that
 		// handles file requests).
 		hyper.setUpServer()
+        hyper.UI.connect()
 
 		// Display the Connect dialog box.
 		// TODO: Auto get key?

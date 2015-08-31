@@ -580,6 +580,14 @@ hyper.UI = {}
 		$('#dialog-settings').modal('hide')
 	}
 
+    hyper.UI.connect = function()
+    {
+        var serverURL = SETTINGS.getReloadServerAddress()
+        hyper.stopServer()
+        hyper.setRemoteServerURL(serverURL)
+        hyper.startServer()
+    }
+
 	// Called when the Connect button in the Connect dialog is clicked.
 	hyper.UI.getConnectKeyFromServer = function()
 	{
@@ -590,10 +598,7 @@ hyper.UI = {}
 		{
 			// We are not connected, start the server connection.
 			// This will result in a key being sent to us.
-			var serverURL = SETTINGS.getReloadServerAddress()
-			hyper.stopServer()
-			hyper.setRemoteServerURL(serverURL)
-			hyper.startServer()
+			hyper.UI.connect()
 		}
 		else
 		{
@@ -668,6 +673,7 @@ hyper.UI = {}
 		SERVER.setClientConnenctedCallbackFun(clientConnectedCallback)
 		SERVER.setReloadCallbackFun(reloadCallback)
 		SERVER.setStatusCallbackFun(statusCallback)
+        SERVER.setRequestKeyCallbackFun(requestKeyCallback)
 
 		MONITOR.setFileSystemChangedCallbackFun(
 			function() { SERVER.reloadApp() })
@@ -827,8 +833,6 @@ hyper.UI = {}
             console.log('------statusCallback')
             console.dir(message)
 
-			hyper.UI.setConnectKeyTimeout(message.timeout)
-			hyper.UI.displayConnectKey(message.connectKey)
 			hyper.UI.displayConnectStatus('Connected')
 		}
 		else if (message.event == 'disconnected')
@@ -841,6 +845,15 @@ hyper.UI = {}
 			hyper.UI.displayConnectScreenMessage(message.userMessage)
 		}
 	}
+
+    function requestKeyCallback(message)
+    {
+
+        LOGGER.log('requestKeyCallback called for message')
+        console.dir(message)    
+        hyper.UI.setConnectKeyTimeout(message.data.timeout)
+        hyper.UI.displayConnectKey(message.data.connectKey)
+    }
 
 	function parseProjectList(json)
 	{
