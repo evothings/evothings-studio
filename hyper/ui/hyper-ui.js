@@ -558,26 +558,51 @@ hyper.UI = {}
 		hyper.UI.displayProjectList()
 	}
 
-	hyper.UI.showSettingsDialog = function(defaultServerAddress)
+	hyper.UI.showSettingsDialog = function()
 	{
+		// Populate input fields.
 		$('#input-setting-javascript-workbench-font-size').val(
 			SETTINGS.getWorkbenchFontSize())
 		$('#input-setting-number-of-directory-levels').val(
 			SETTINGS.getNumberOfDirecoryLevelsToTraverse())
 		$('#input-setting-reload-server-address').val(
 			SETTINGS.getReloadServerAddress())
+
+		// Show settings dialog.
 		$('#dialog-settings').modal('show')
 	}
 
-	hyper.UI.saveSettings = function(defaultServerAddress)
+	hyper.UI.saveSettings = function()
 	{
+		// Hide settings dialog.
+		$('#dialog-settings').modal('hide')
+
+		// TODO: Make this take effect instantly.
 		SETTINGS.setWorkbenchFontSize(
 			$('#input-setting-javascript-workbench-font-size').val())
+
+		// TODO: Make this take effect instantly.
 		SETTINGS.setNumberOfDirecoryLevelsToTraverse(
 			parseInt($('#input-setting-number-of-directory-levels').val()))
-		SETTINGS.setReloadServerAddress(
-			$('#input-setting-reload-server-address').val())
-		$('#dialog-settings').modal('hide')
+
+		// Check if server address has been changed.
+		var updatedServerAddress = $('#input-setting-reload-server-address').val()
+		if (updatedServerAddress != SETTINGS.getReloadServerAddress())
+		{
+			// Save address.
+			SETTINGS.setReloadServerAddress(updatedServerAddress)
+
+			// Restart server.
+			hyper.UI.connect()
+
+			// Show connect screen.
+			hyper.showTab('connect')
+
+			// Display message.
+			hyper.UI.displayConnectKey(
+				'Server address has been changed. Click GET KEY to get a new connect key.')
+		}
+
 	}
 
     hyper.UI.connect = function()
