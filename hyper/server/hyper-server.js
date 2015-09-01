@@ -57,6 +57,7 @@ var mMessageCallback = null
 var mClientConnectedCallback = null
 var mReloadCallback = null
 var mStatusCallback = null
+var mRequestKeyCallback = null
 var mCheckIfModifiedSince = false
 
 // The current base directory. Must NOT end with a slash.
@@ -78,6 +79,7 @@ function connectToRemoteServer()
 	{
 		// Messages from the server to the Workbench.
 		'workbench.set-session-id': onMessageWorkbenchSetSessionID,
+        'workbench.set-request-key': onMessageWorkbenchSetRequestKey,
 		'workbench.client-connected': onMessageWorkbenchClientConnected,
 		'workbench.get-resource': onMessageWorkbenchGetResource,
 		'workbench.log': onMessageWorkbenchLog,
@@ -100,7 +102,8 @@ function connectToRemoteServer()
 
 		mIsConnected = true
 
-		requestConnectKey()
+		//requestConnectKey()
+        sendMessageToServer(mSocket, 'workbench.connected', {  })
 	})
 
 	socket.on('disconnect', function()
@@ -113,6 +116,8 @@ function connectToRemoteServer()
 
 	socket.on('hyper-workbench-message', function(message)
 	{
+        LOGGER.log('hyper workbench message received')
+        console.dir(message)
 		messageHandlers[message.name](socket, message)
 	})
 }
@@ -154,6 +159,13 @@ function onMessageWorkbenchSetSessionID(socket, message)
 			event: 'user-message',
 			userMessage: message.userMessage })
 	}
+}
+
+function onMessageWorkbenchSetRequestKey(socket, message)
+{
+    LOGGER.log('- onMessageWorkbenchSetRequestKey: ' + message.data.connectKey)
+    //console.dir(message)
+    mRequestKeyCallback && mRequestKeyCallback(message)
 }
 
 function onMessageWorkbenchClientConnected(socket, message)
@@ -236,7 +248,8 @@ function requestConnectKey()
 	// This will respond with a valid session id first time we connect,
 	// and a connect key. Subsequent calls will pass a valid session id
 	// and get a new key as a result.
-	sendMessageToServer(mSocket, 'workbench.connected', { sessionID: mSessionID })
+    LOGGER.log('requesting key from server')
+	sendMessageToServer(mSocket, 'workbench.request.key', { sessionID: mSessionID })
 }
 
 /**
@@ -723,6 +736,16 @@ function setStatusCallbackFun(fun)
 
 /**
  * External.
+ *
+ * Callback form: fun(message)
+ */
+function setRequestKeyCallbackFun(fun)
+{
+    mRequestKeyCallback = fun
+}
+
+/**
+ * External.
  */
 /*
 function setUserKey(key)
@@ -756,6 +779,7 @@ exports.evalJS = evalJS
 exports.setMessageCallbackFun = setMessageCallbackFun
 exports.setClientConnenctedCallbackFun = setClientConnenctedCallbackFun
 exports.setStatusCallbackFun = setStatusCallbackFun
+exports.setRequestKeyCallbackFun =setRequestKeyCallbackFun
 exports.setReloadCallbackFun = setReloadCallbackFun
 exports.serveResource = serveResource
 exports.connectToRemoteServer = connectToRemoteServer
