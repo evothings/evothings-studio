@@ -29,6 +29,7 @@ var PATH = require('path')
 var IO = require('socket.io-client')
 var LOGGER = require('./log.js')
 var SETTINGS = require('../settings/settings.js')
+var SERVER = require('../server/hyper-server.js')
 
 var EVO_SERVER = 'hacking.evothings.com'
 
@@ -51,7 +52,6 @@ var mUserLogoutCallback = null
  */
 function loginUser()
 {
-
 	// Create connection to login sever (SAAS server).
 	if (!mLoginServer)
 	{
@@ -78,7 +78,9 @@ function loginUser()
 		})
 	}
 
-    mLoginServer.emit('message', JSON.stringify({target:'registerAuthCallback', uuid: sessionId}))
+    var uid = SERVER.getSessionId()
+    console.log('sessionID = '+uid)
+    mLoginServer.emit('message', JSON.stringify({target:'registerAuthCallback', uuid: uid }))
 
 	var sessionId = global.mainHyper.sessionID
 

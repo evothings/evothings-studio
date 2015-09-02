@@ -762,6 +762,11 @@ function setRemoteServerURL(url)
 	mRemoteServerURL = url
 }
 
+function getSessionId()
+{
+    return mSessionID
+}
+
 /*********************************/
 /***	  Module exports	   ***/
 /*********************************/
@@ -787,3 +792,4 @@ exports.disconnectFromRemoteServer = disconnectFromRemoteServer
 //exports.setUserKey = setUserKey
 exports.getUserKey = getUserKey
 exports.setRemoteServerURL = setRemoteServerURL
+exports.getSessionId = getSessionId
