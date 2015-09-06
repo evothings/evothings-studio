@@ -58,7 +58,6 @@ window.hyper = (function(hyper, sessionID)
 		{
 			sendMessageToServer(socket, 'client.connected', { sessionID: sessionID })
 			hyper.isConnected = true
-
 			if (hyper.onConnectedFun)
 			{
 				hyper.onConnectedFun()
@@ -68,7 +67,11 @@ window.hyper = (function(hyper, sessionID)
 
 		socket.on('hyper-client-message', function(message)
 		{
-			mMessageHandlers[message.name](socket, message.data)
+			var handler = mMessageHandlers[message.name]
+			if (handler)
+			{
+				handler(socket, message.data)
+			}
 		})
 	}
 

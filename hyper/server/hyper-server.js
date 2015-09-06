@@ -79,7 +79,7 @@ function connectToRemoteServer()
 	{
 		// Messages from the server to the Workbench.
 		'workbench.set-session-id': onMessageWorkbenchSetSessionID,
-        'workbench.set-request-key': onMessageWorkbenchSetRequestKey,
+        'workbench.set-connect-key': onMessageWorkbenchSetConnectKey,
 		'workbench.client-connected': onMessageWorkbenchClientConnected,
 		'workbench.get-resource': onMessageWorkbenchGetResource,
 		'workbench.log': onMessageWorkbenchLog,
@@ -103,7 +103,7 @@ function connectToRemoteServer()
 		mIsConnected = true
 
 		//requestConnectKey()
-        sendMessageToServer(mSocket, 'workbench.connected', {  })
+        sendMessageToServer(mSocket, 'workbench.connected', { sessionID: mSessionID })
 	})
 
 	socket.on('disconnect', function()
@@ -116,9 +116,13 @@ function connectToRemoteServer()
 
 	socket.on('hyper-workbench-message', function(message)
 	{
-        LOGGER.log('hyper workbench message received')
-        console.dir(message)
-		messageHandlers[message.name](socket, message)
+        //LOGGER.log('hyper workbench message received')
+        //console.dir(message)
+        var handler = messageHandlers[message.name]
+        if (handler)
+        {
+        	handler(socket, message)
+        }
 	})
 }
 
@@ -161,9 +165,9 @@ function onMessageWorkbenchSetSessionID(socket, message)
 	}
 }
 
-function onMessageWorkbenchSetRequestKey(socket, message)
+function onMessageWorkbenchSetConnectKey(socket, message)
 {
-    LOGGER.log('- onMessageWorkbenchSetRequestKey: ' + message.data.connectKey)
+    LOGGER.log('- onMessageWorkbenchSetConnectKey: ' + message.data.connectKey)
     //console.dir(message)
     mRequestKeyCallback && mRequestKeyCallback(message)
 }
@@ -245,11 +249,11 @@ function isConnected()
  */
 function requestConnectKey()
 {
-	// This will respond with a valid session id first time we connect,
-	// and a connect key. Subsequent calls will pass a valid session id
-	// and get a new key as a result.
-    LOGGER.log('requesting key from server')
-	sendMessageToServer(mSocket, 'workbench.request.key', { sessionID: mSessionID })
+	// On first call mSessionID will be null, if server goes down
+	// and we connect again we will pass our session id so the server
+	// can restore our session.
+    LOGGER.log('requesting connect key from server')
+	sendMessageToServer(mSocket, 'workbench.request-connect-key', { sessionID: mSessionID })
 }
 
 /**
