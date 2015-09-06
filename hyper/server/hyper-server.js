@@ -57,7 +57,7 @@ var mMessageCallback = null
 var mClientConnectedCallback = null
 var mReloadCallback = null
 var mStatusCallback = null
-var mRequestKeyCallback = null
+var mRequestConnectKeyCallback = null
 var mCheckIfModifiedSince = false
 
 // The current base directory. Must NOT end with a slash.
@@ -150,7 +150,7 @@ function onMessageWorkbenchSetSessionID(socket, message)
 
 		// Pass the connect key to the callback function,
 		// this displays the key in the UI.
-        message.data.event = "connected"
+        message.data.event = 'connected'
 		mStatusCallback && mStatusCallback(message.data)
 	}
 
@@ -169,7 +169,7 @@ function onMessageWorkbenchSetConnectKey(socket, message)
 {
     LOGGER.log('- onMessageWorkbenchSetConnectKey: ' + message.data.connectKey)
     //console.dir(message)
-    mRequestKeyCallback && mRequestKeyCallback(message)
+    mRequestConnectKeyCallback && mRequestConnectKeyCallback(message)
 }
 
 function onMessageWorkbenchClientConnected(socket, message)
@@ -743,9 +743,9 @@ function setStatusCallbackFun(fun)
  *
  * Callback form: fun(message)
  */
-function setRequestKeyCallbackFun(fun)
+function setRequestConnectKeyCallbackFun(fun)
 {
-    mRequestKeyCallback = fun
+    mRequestConnectKeyCallback = fun
 }
 
 /**
@@ -783,7 +783,7 @@ exports.evalJS = evalJS
 exports.setMessageCallbackFun = setMessageCallbackFun
 exports.setClientConnenctedCallbackFun = setClientConnenctedCallbackFun
 exports.setStatusCallbackFun = setStatusCallbackFun
-exports.setRequestKeyCallbackFun =setRequestKeyCallbackFun
+exports.setRequestConnectKeyCallbackFun =setRequestConnectKeyCallbackFun
 exports.setReloadCallbackFun = setReloadCallbackFun
 exports.serveResource = serveResource
 exports.connectToRemoteServer = connectToRemoteServer
