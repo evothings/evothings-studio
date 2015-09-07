@@ -40,11 +40,11 @@ var UUID = require('./uuid.js')
 
 // Workbench version code should be incremented on each new release.
 // The version code can be used by the server to display info.
-var mWorkbenchVersionCode = 2
+var mWorkbenchVersionCode = 3
 
 // Version of the server message protocol implemented on top of socket.io.
 // Increment when the protocol has changed.
-var mProtocolVersion = 1
+var mProtocolVersion = 2
 
 var mIsConnected = false
 var mSessionID = null
