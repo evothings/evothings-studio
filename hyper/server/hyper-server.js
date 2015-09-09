@@ -391,7 +391,9 @@ function serveHtmlFile(path, ifModifiedSince)
 	var stat = FILEUTIL.statSync(path)
 	if (html && stat)
 	{
-		var data = insertReloaderScript(html)
+		// Removed script injection, this is done by the server.
+		//var data = insertReloaderScript(html)
+		var data = html
 		return LOADER.createResponse(
 			data,
 			stat.mtime,
