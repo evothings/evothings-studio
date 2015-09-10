@@ -40,11 +40,11 @@ var UUID = require('./uuid.js')
 
 // Workbench version code should be incremented on each new release.
 // The version code can be used by the server to display info.
-var mWorkbenchVersionCode = 2
+var mWorkbenchVersionCode = 3
 
 // Version of the server message protocol implemented on top of socket.io.
 // Increment when the protocol has changed.
-var mProtocolVersion = 1
+var mProtocolVersion = 2
 
 var mIsConnected = false
 var mSessionID = null
@@ -57,7 +57,7 @@ var mMessageCallback = null
 var mClientConnectedCallback = null
 var mReloadCallback = null
 var mStatusCallback = null
-var mRequestKeyCallback = null
+var mRequestConnectKeyCallback = null
 var mCheckIfModifiedSince = false
 
 // The current base directory. Must NOT end with a slash.
@@ -79,7 +79,7 @@ function connectToRemoteServer()
 	{
 		// Messages from the server to the Workbench.
 		'workbench.set-session-id': onMessageWorkbenchSetSessionID,
-        'workbench.set-request-key': onMessageWorkbenchSetRequestKey,
+        'workbench.set-connect-key': onMessageWorkbenchSetConnectKey,
 		'workbench.client-connected': onMessageWorkbenchClientConnected,
 		'workbench.get-resource': onMessageWorkbenchGetResource,
 		'workbench.log': onMessageWorkbenchLog,
@@ -103,7 +103,7 @@ function connectToRemoteServer()
 		mIsConnected = true
 
 		//requestConnectKey()
-        sendMessageToServer(mSocket, 'workbench.connected', {  })
+        sendMessageToServer(mSocket, 'workbench.connected', { sessionID: mSessionID })
 	})
 
 	socket.on('disconnect', function()
@@ -116,9 +116,13 @@ function connectToRemoteServer()
 
 	socket.on('hyper-workbench-message', function(message)
 	{
-        LOGGER.log('hyper workbench message received')
-        console.dir(message)
-		messageHandlers[message.name](socket, message)
+        //LOGGER.log('hyper workbench message received')
+        //console.dir(message)
+        var handler = messageHandlers[message.name]
+        if (handler)
+        {
+        	handler(socket, message)
+        }
 	})
 }
 
@@ -146,7 +150,7 @@ function onMessageWorkbenchSetSessionID(socket, message)
 
 		// Pass the connect key to the callback function,
 		// this displays the key in the UI.
-        message.data.event = "connected"
+        message.data.event = 'connected'
 		mStatusCallback && mStatusCallback(message.data)
 	}
 
@@ -161,11 +165,11 @@ function onMessageWorkbenchSetSessionID(socket, message)
 	}
 }
 
-function onMessageWorkbenchSetRequestKey(socket, message)
+function onMessageWorkbenchSetConnectKey(socket, message)
 {
-    LOGGER.log('- onMessageWorkbenchSetRequestKey: ' + message.data.connectKey)
+    LOGGER.log('- onMessageWorkbenchSetConnectKey: ' + message.data.connectKey)
     //console.dir(message)
-    mRequestKeyCallback && mRequestKeyCallback(message)
+    mRequestConnectKeyCallback && mRequestConnectKeyCallback(message)
 }
 
 function onMessageWorkbenchClientConnected(socket, message)
@@ -245,11 +249,11 @@ function isConnected()
  */
 function requestConnectKey()
 {
-	// This will respond with a valid session id first time we connect,
-	// and a connect key. Subsequent calls will pass a valid session id
-	// and get a new key as a result.
-    LOGGER.log('requesting key from server')
-	sendMessageToServer(mSocket, 'workbench.request.key', { sessionID: mSessionID })
+	// On first call mSessionID will be null, if server goes down
+	// and we connect again we will pass our session id so the server
+	// can restore our session.
+    LOGGER.log('requesting connect key from server')
+	sendMessageToServer(mSocket, 'workbench.request-connect-key', { sessionID: mSessionID })
 }
 
 /**
@@ -387,7 +391,9 @@ function serveHtmlFile(path, ifModifiedSince)
 	var stat = FILEUTIL.statSync(path)
 	if (html && stat)
 	{
-		var data = insertReloaderScript(html)
+		// Removed script injection, this is done by the server.
+		//var data = insertReloaderScript(html)
+		var data = html
 		return LOADER.createResponse(
 			data,
 			stat.mtime,
@@ -739,9 +745,9 @@ function setStatusCallbackFun(fun)
  *
  * Callback form: fun(message)
  */
-function setRequestKeyCallbackFun(fun)
+function setRequestConnectKeyCallbackFun(fun)
 {
-    mRequestKeyCallback = fun
+    mRequestConnectKeyCallback = fun
 }
 
 /**
@@ -784,7 +790,7 @@ exports.evalJS = evalJS
 exports.setMessageCallbackFun = setMessageCallbackFun
 exports.setClientConnenctedCallbackFun = setClientConnenctedCallbackFun
 exports.setStatusCallbackFun = setStatusCallbackFun
-exports.setRequestKeyCallbackFun =setRequestKeyCallbackFun
+exports.setRequestConnectKeyCallbackFun =setRequestConnectKeyCallbackFun
 exports.setReloadCallbackFun = setReloadCallbackFun
 exports.serveResource = serveResource
 exports.connectToRemoteServer = connectToRemoteServer

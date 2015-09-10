@@ -698,7 +698,7 @@ hyper.UI = {}
 		SERVER.setClientConnenctedCallbackFun(clientConnectedCallback)
 		SERVER.setReloadCallbackFun(reloadCallback)
 		SERVER.setStatusCallbackFun(statusCallback)
-        SERVER.setRequestKeyCallbackFun(requestKeyCallback)
+        SERVER.setRequestConnectKeyCallbackFun(requestConnectKeyCallback)
 
 		MONITOR.setFileSystemChangedCallbackFun(
 			function() { SERVER.reloadApp() })
@@ -855,8 +855,6 @@ hyper.UI = {}
 	{
 		if (message.event == 'connected')
 		{
-			hyper.UI.setConnectKeyTimeout(message.timeout)
-			hyper.UI.displayConnectKey(message.connectKey)
 			hyper.UI.displayConnectStatus('Connected')
 		}
 		else if (message.event == 'disconnected')
@@ -870,11 +868,11 @@ hyper.UI = {}
 		}
 	}
 
-    function requestKeyCallback(message)
+	// Called when a connect key is sent from the server.
+    function requestConnectKeyCallback(message)
     {
-
-        LOGGER.log('requestKeyCallback called for message')
-        console.dir(message)
+        //LOGGER.log('requestConnectKeyCallback called for message')
+        //console.dir(message)
         hyper.UI.setConnectKeyTimeout(message.data.timeout)
         hyper.UI.displayConnectKey(message.data.connectKey)
     }
