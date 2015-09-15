@@ -3,7 +3,7 @@
 # This script enables running node-webkit on newer distros that don't have libudev.so.0.
 
 # First, find out where we are.
-if [ -f $1 ]
+if [[ -f $1 ]]
 then
 	MYAPP_WRAPPER=$1
 else
@@ -12,7 +12,7 @@ fi
 HERE="`dirname "$MYAPP_WRAPPER"`"
 
 # If we don't already have a local symlink...
-if [ ! -h "$HERE/libudev.so.0" ]
+if [[ ! -h "$HERE/libudev.so.0" ]]
 then
 	# Search these paths to find the new version of libudev.
 	paths=(
@@ -24,7 +24,7 @@ then
 	for i in "${paths[@]}"
 	do
 		# The first one found is the target of the local symlink.
-		if [ -f $i ]
+		if [[ -f $i ]]
 		then
 			# Any existing file is overwritten.
 			ln -sf "$i" "$HERE/libudev.so.0"
@@ -35,10 +35,10 @@ fi
 
 # Always use our local versions of libs.
 # This also makes RPMs find our library symlinks.
-export LD_LIBRARY_PATH=$([ -n "$LD_LIBRARY_PATH" ] && echo "$HERE:$HERE/lib:$LD_LIBRARY_PATH" || echo "$HERE:$HERE/lib")
+export LD_LIBRARY_PATH=$([[ -n "$LD_LIBRARY_PATH" ]] && echo "$HERE:$HERE/lib:$LD_LIBRARY_PATH" || echo "$HERE:$HERE/lib")
 
 # Finally, run node-webkit.
-if [ -f $1 ]
+if [[ -f $1 ]]
 then
 	echo $1 .
 	$1 .
