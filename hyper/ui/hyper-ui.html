@@ -300,16 +300,15 @@ Copyright (c) 2013-2015 Evothings AB
             mUser = user
 		})
 
-		USER_HANDLER.setUserLogoutCallback(function(user)
-		{
-			// TODO: Pass user id to the Run/Reload messaging code (hyper-server.js).
-			LOGGER.log('*** User has logged out ***')
-			// Set button text to "Login".
-			$('#button-login').html('Login')
+        EVENTS.subscribe(EVENTS.LOGOUT, function(user)
+        {
+            // TODO: Pass user id to the Run/Reload messaging code (hyper-server.js).
+            LOGGER.log('*** User has logged out ***')
+            // Set button text to "Login".
+            $('#button-login').html('Login')
             $('#login-info').html('Not Logged In')
             mUser = undefined
-		})
-
+        })
 
 		// ************** Tab Button Handling **************
 

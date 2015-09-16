@@ -945,7 +945,7 @@ hyper.UI = {}
     // Event handlers
     //
     //---------------------------------------------------------------------------------------------------------
-    
+
     EVENTS.subscribe(EVENTS.CONNECT, function(obj)
     {
         hyper.UI.displayConnectStatus('Connected')

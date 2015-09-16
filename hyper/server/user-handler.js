@@ -29,7 +29,8 @@ var PATH = require('path')
 var IO = require('socket.io-client')
 var LOGGER = require('./log.js')
 var SETTINGS = require('../settings/settings.js')
-var SERVER = require('../server/hyper-server.js')
+var SERVER = require('./hyper-server.js')
+var EVENTS = require('./events')
 
 var EVO_SERVER = SETTINGS.getReloadServerAddress()
 if(EVO_SERVER.indexOf('http://') > -1)
@@ -112,7 +113,6 @@ function loginUser()
         mLoginWindow.focus()
     }
 	LOGGER.log('LOGIN: sending registerAuthCallback to saas server for uuid '+sessionId)
-
 }
 
 /**
@@ -121,12 +121,10 @@ function loginUser()
 function logoutUser()
 {
 	LOGGER.log('LOGIN: loggin out user. Setting mUser to null')
-
 	mUser = null
-
 	// TODO: Logout user from the server?
-
 	// Notify logged out callback.
+    EVENTS.publish(EVENTS.LOGOUT, {event: 'logout'})
 	mUserLogoutCallback && mUserLogoutCallback()
 }
 
@@ -160,14 +158,6 @@ function setUserLoginCallback(fun)
 	mUserLoginCallback = fun
 }
 
-/**
- * External.
- */
-function setUserLogoutCallback(fun)
-{
-	mUserLogoutCallback = fun
-}
-
 /*********************************/
 /***	  Module exports	   ***/
 /*********************************/
@@ -175,8 +165,12 @@ function setUserLogoutCallback(fun)
 exports.loginButtonHandler = loginButtonHandler
 exports.logoutUser = logoutUser
 exports.setUserLoginCallback = setUserLoginCallback
-exports.setUserLogoutCallback = setUserLogoutCallback
 exports.getUser = function()
 {
     return mUser
 }
+
+EVENTS.subscribe(EVENTS.DISCONNECT, function(obj)
+{
+    logoutUser()
+})
