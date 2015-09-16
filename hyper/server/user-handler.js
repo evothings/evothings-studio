@@ -31,7 +31,18 @@ var LOGGER = require('./log.js')
 var SETTINGS = require('../settings/settings.js')
 var SERVER = require('../server/hyper-server.js')
 
-var EVO_SERVER = 'hacking.evothings.com'
+var EVO_SERVER = SETTINGS.getReloadServerAddress()
+console.log(EVO_SERVER)
+if(EVO_SERVER.indexOf('http://') > -1)
+{
+    EVO_SERVER = EVO_SERVER.replace('http://', '')
+}
+console.log(EVO_SERVER)
+if(EVO_SERVER.indexOf(':') > -1)
+{
+    EVO_SERVER = EVO_SERVER.substring(0, EVO_SERVER.indexOf(':'))
+}
+console.log('EVO_SERVER = '+EVO_SERVER)
 
 /*********************************/
 /***     Module variables      ***/
@@ -55,8 +66,9 @@ function loginUser()
 	// Create connection to login sever (SAAS server).
 	if (!mLoginServer)
 	{
-		LOGGER.log('LOGIN: connecting to SAAS server');
-		mLoginServer = IO('wss://'+EVO_SERVER)
+		LOGGER.log('LOGIN: connecting to login server '+EVO_SERVER);
+        var wss_string = EVO_SERVER == 'localhost' ? 'ws://'+EVO_SERVER : 'wss://'+EVO_SERVER
+		mLoginServer = IO(wss_string)
 		mLoginServer.on('message', function(msg)
 		{
 			LOGGER.log('LOGIN: got auth callback message:');
@@ -66,6 +78,7 @@ function loginUser()
 			{
 				// User is now logged in.
 				mUser = msg.user
+                mUser.EVO_SERVER = EVO_SERVER == 'localhost' ? 'http://' + EVO_SERVER : 'https://'+EVO_SERVER
 				LOGGER.log('LOGIN: setting user to "'+msg.user.name+'"')
 				mLoginWindow.close()
 				mLoginWindow = null
@@ -85,12 +98,13 @@ function loginUser()
 	var sessionId = global.mainHyper.sessionID
 
     LOGGER.log('LOGIN: starting login sequence.')
+    var login_string = EVO_SERVER == 'localhost' ? 'http://'+EVO_SERVER+'?uuid='+sessionId+'&loginonly=true' : 'https://'+EVO_SERVER+'?uuid='+sessionId+'&loginonly=true'
     // Create login window if it does not exist.
     if (!mLoginWindow || mLoginWindow.closed)
     {
         LOGGER.log('LOGIN: creating login window')
         mLoginWindow = window.open(
-            'https://'+EVO_SERVER+'?uuid='+sessionId+'&loginonly=true',
+            login_string,
             'Login',
             {
                 resizable: true

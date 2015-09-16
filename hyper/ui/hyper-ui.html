@@ -189,7 +189,7 @@ Copyright (c) 2013-2015 Evothings AB
 							<p id="connect-screen-message"></p>
 						</div>
 
-						<div style="display:none;">
+						<div >
 							<button id="button-login"
 								type="button"
 								class="btn et-btn-blue">
@@ -212,6 +212,7 @@ Copyright (c) 2013-2015 Evothings AB
 		<div id="panel-bottom">
 			<div>
 				<p style="float:left;">Status: <b><span id="connect-address">Waiting to connect</span></b></p>
+                <p style="float:left;margin-left:25px"><b><span id="login-info">Not Logged In</span></b></p>
 				<p style="float:right;">Clients: <b><span id="connect-counter">0</span></b> Files: <b><span id="files-counter">0</span></b></p>
 			</div>
 		</div>
@@ -274,16 +275,18 @@ Copyright (c) 2013-2015 Evothings AB
 			LOGGER.log('*** User has logged in ***')
 			LOGGER.log(user)
 
+            if(user.picture.indexOf('http') == -1)
+            {
+                user.picture = user.EVO_SERVER + '/' + user.picture
+            }
 			// Show user picture on login button and change text to "Logout".
 			var imageHTML =
-				'<img style="height:98%;with:auto;" '
+				'<img style="height:30px;with:auto;margin-right:5px;margin-top:-3px" '
 				+	'class="pull-left" '
 				+	'src="' + user.picture + '">'
-			var buttonText = 'Logout'
+			var buttonText = 'Logged in as '+user.name
 			var buttonHTML = imageHTML + buttonText
-			$('#button-login').html(buttonHTML)
-
-			// TODO: Pass the user.sid to the server?
+			$('#login-info').html(buttonHTML)
 		})
 
 		USER_HANDLER.setUserLogoutCallback(function(user)
