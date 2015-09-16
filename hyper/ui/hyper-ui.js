@@ -35,6 +35,7 @@ var FILEUTIL = require('../server/fileutil.js')
 var SETTINGS = require('../settings/settings.js')
 var LOGGER = require('../server/log.js')
 var UUID = require('../server/uuid.js')
+var EVENTS = require('../server/events')
 
 /*** Globals ***/
 
@@ -697,7 +698,6 @@ hyper.UI = {}
 
 		SERVER.setClientConnenctedCallbackFun(clientConnectedCallback)
 		SERVER.setReloadCallbackFun(reloadCallback)
-		SERVER.setStatusCallbackFun(statusCallback)
         SERVER.setRequestConnectKeyCallbackFun(requestConnectKeyCallback)
 
 		MONITOR.setFileSystemChangedCallbackFun(
@@ -851,23 +851,6 @@ hyper.UI = {}
 		mNumberOfConnectedClients = 0
 	}
 
-	function statusCallback(message)
-	{
-		if (message.event == 'connected')
-		{
-			hyper.UI.displayConnectStatus('Connected')
-		}
-		else if (message.event == 'disconnected')
-		{
-			hyper.UI.displayConnectStatus('Disconnected')
-		}
-		else if (message.event == 'user-message')
-		{
-			// Display a message for the user.
-			hyper.UI.displayConnectScreenMessage(message.userMessage)
-		}
-	}
-
 	// Called when a connect key is sent from the server.
     function requestConnectKeyCallback(message)
     {
@@ -956,4 +939,28 @@ hyper.UI = {}
 	{
 		SERVER.setRemoteServerURL(url)
 	}
+
+    //---------------------------------------------------------------------------------------------------------
+    //
+    // Event handlers
+    //
+    //---------------------------------------------------------------------------------------------------------
+    
+    EVENTS.subscribe(EVENTS.CONNECT, function(obj)
+    {
+        hyper.UI.displayConnectStatus('Connected')
+    })
+
+    EVENTS.subscribe(EVENTS.DISCONNECT, function(obj)
+    {
+        hyper.UI.displayConnectStatus('Disconnected')
+    })
+
+    EVENTS.subscribe(EVENTS.USERMESSAGE, function(obj)
+    {
+        // Display a message for the user.
+        hyper.UI.displayConnectScreenMessage(message.userMessage)
+    })
+
+
 })()

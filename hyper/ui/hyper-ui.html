@@ -258,6 +258,8 @@ Copyright (c) 2013-2015 Evothings AB
 		//var WEBSERVER = require('../server/webserver.js')
 		//var mWebServer = WEBSERVER.create()
 
+        var mUser = undefined
+
         // ************** Login Button **********************
 
 		// TODO: Move login to the connect tab.
@@ -266,7 +268,14 @@ Copyright (c) 2013-2015 Evothings AB
 		// toggles login/logout.
 		$('#button-login').click(function()
 		{
-			USER_HANDLER.loginButtonHandler()
+            if(USER_HANDLER.getUser())
+            {
+                USER_HANDLER.logoutUser()
+            }
+            else
+            {
+                USER_HANDLER.loginButtonHandler()
+            }
 		})
 
 		USER_HANDLER.setUserLoginCallback(function(user)
@@ -287,15 +296,18 @@ Copyright (c) 2013-2015 Evothings AB
 			var buttonText = 'Logged in as '+user.name
 			var buttonHTML = imageHTML + buttonText
 			$('#login-info').html(buttonHTML)
+            $('#button-login').html('Logout')
+            mUser = user
 		})
 
 		USER_HANDLER.setUserLogoutCallback(function(user)
 		{
 			// TODO: Pass user id to the Run/Reload messaging code (hyper-server.js).
 			LOGGER.log('*** User has logged out ***')
-
 			// Set button text to "Login".
 			$('#button-login').html('Login')
+            $('#login-info').html('Not Logged In')
+            mUser = undefined
 		})
 
 

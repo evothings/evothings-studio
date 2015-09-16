@@ -33,6 +33,7 @@ var LOADER = require('./fileloader.js')
 var LOGGER = require('./log.js')
 var SETTINGS = require('../settings/settings.js')
 var UUID = require('./uuid.js')
+var EVENTS = require('./events')
 
 /*********************************/
 /***     Module variables      ***/
@@ -99,9 +100,8 @@ function connectToRemoteServer()
 	socket.on('connect', function()
 	{
 		LOGGER.log('Connected to server')
-
 		mIsConnected = true
-
+        EVENTS.publish(EVENTS.CONNECT, {event: 'connected' })
 		//requestConnectKey()
         sendMessageToServer(mSocket, 'workbench.connected', { sessionID: mSessionID })
 	})
@@ -109,7 +109,7 @@ function connectToRemoteServer()
 	socket.on('disconnect', function()
 	{
 		mIsConnected = false
-
+        EVENTS.publish(EVENTS.DISCONNECT, {event: 'disconnected' })
 		mStatusCallback && mStatusCallback({
 			event: 'disconnected' })
 	})
@@ -138,7 +138,6 @@ function sendMessageToServer(socket, name, data)
 function onMessageWorkbenchSetSessionID(socket, message)
 {
 	//LOGGER.log('onMessageWorkbenchSetSessionID: ' + message.data.sessionID)
-
 	// Set/display session id if we got it.
 	if (message.data.sessionID)
 	{
@@ -147,7 +146,7 @@ function onMessageWorkbenchSetSessionID(socket, message)
 
 		// Save sessionID in global reference.
 		global.mainHyper.sessionID = mSessionID
-
+        EVENTS.publish(EVENTS.SETSESSIONID, mSessionID)
 		// Pass the connect key to the callback function,
 		// this displays the key in the UI.
         message.data.event = 'connected'
@@ -162,6 +161,7 @@ function onMessageWorkbenchSetSessionID(socket, message)
 		mStatusCallback && mStatusCallback({
 			event: 'user-message',
 			userMessage: message.userMessage })
+        EVENTS.publish(EVENTS.USERMESSAGE, message.userMessage)
 	}
 }
 
