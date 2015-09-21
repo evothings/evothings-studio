@@ -101,8 +101,11 @@ function connectToRemoteServer()
 	{
 		LOGGER.log('Connected to server')
 		mIsConnected = true
-        EVENTS.publish(EVENTS.CONNECT, {event: 'connected' })
+        EVENTS.publish(EVENTS.CONNECT, { event: 'connected' })
 		//requestConnectKey()
+		mSessionID = SETTINGS.getSessionID()
+
+	console.log('workbench.connected session: ' + mSessionID)
         sendMessageToServer(mSocket, 'workbench.connected', { sessionID: mSessionID })
 	})
 
@@ -137,16 +140,21 @@ function sendMessageToServer(socket, name, data)
 
 function onMessageWorkbenchSetSessionID(socket, message)
 {
-	//LOGGER.log('onMessageWorkbenchSetSessionID: ' + message.data.sessionID)
+	LOGGER.log('onMessageWorkbenchSetSessionID: ' + message.data.sessionID)
 	// Set/display session id if we got it.
 	if (message.data.sessionID)
 	{
 		// Save the session id.
 		mSessionID = message.data.sessionID
 
+		// Save session id in settings.
+		SETTINGS.setSessionID(mSessionID)
+
 		// Save sessionID in global reference.
+		// TODO: Can we pass session id some other way than a global variable?
 		global.mainHyper.sessionID = mSessionID
         EVENTS.publish(EVENTS.SETSESSIONID, mSessionID)
+
 		// Pass the connect key to the callback function,
 		// this displays the key in the UI.
         message.data.event = 'connected'
@@ -174,6 +182,7 @@ function onMessageWorkbenchSetConnectKey(socket, message)
 
 function onMessageWorkbenchClientConnected(socket, message)
 {
+	console.log('onMessageWorkbenchClientConnected')
 	// Notify UI that a client has connected.
 	mClientConnectedCallback && mClientConnectedCallback()
 }

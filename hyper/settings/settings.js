@@ -135,3 +135,8 @@ exports.setEvoGUID = function(value)
  * Address of reload server.
  */
 systemSetting('ReloadServerAddress', 'http://staging.evothings.com:8081')
+
+/**
+ * Session ID.
+ */
+systemSetting('SessionID', null)
