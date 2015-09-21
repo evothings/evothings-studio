@@ -620,6 +620,14 @@ function getAppServerURL()
 }
 
 /**
+ * Internal.
+ */
+function getAppURL()
+{
+	return '/' + mAppID + '/' + mAppFile
+}
+
+/**
  * External.
  */
 function getUserKey()
@@ -641,7 +649,7 @@ function runApp()
 		{
 			sessionID: mSessionID,
 			appID: mAppID,
-			url: getAppServerURL()
+			url: getAppURL()
 		})
 }
 
