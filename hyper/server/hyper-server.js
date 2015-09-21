@@ -205,14 +205,14 @@ function onMessageWorkbenchLog(socket, message)
 {
 	// Pass message to Tools window.
 	mMessageCallback && mMessageCallback(
-		{ message: 'hyper.log', logMessage: message.data })
+		{ message: 'hyper.log', logMessage: message.data.message })
 }
 
 function onMessageWorkbenchJavaScriptResult(socket, message)
 {
-	var data = message.data
+	var data = message.data.result
 
-	// Functions cause a cloning error, as a fix just use the type.
+	// Functions cause a cloning error, as a fix just show the type.
 	if (typeof data == 'function')
 	{
 		data = typeof data
