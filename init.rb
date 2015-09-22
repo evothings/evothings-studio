@@ -65,13 +65,16 @@ def installNodeModules
 		sh 'npm install socket.io'
 	end
 
-	puts 'Flattening node packages. If module flatten-packages is not found,'
-	puts 'please install it with this command (sudo if needed):'
-	puts '  npm install -g flatten-packages'
-	puts 'Then run init.rb again.'
-
 	if(File.exist?('node_modules/socket.io/node_modules'))
-		sh 'flatten-packages'
+		begin
+			sh 'flatten-packages'
+		rescue => e
+			puts 'flatten-packages failed. If module flatten-packages is not found,'
+			puts 'please install it with this command (sudo if needed):'
+			puts '  npm install -g flatten-packages'
+			puts 'Then run init.rb again.'
+			exit(1)
+		end
 	end
 end
 
