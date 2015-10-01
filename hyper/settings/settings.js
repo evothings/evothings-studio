@@ -104,11 +104,13 @@ systemSetting('WorkbenchResultEditorContent')
 
 /**
  * Web server port.
+ * Not used.
  */
 systemSetting('WebServerPort', 4042)
 
 /**
  * Settings for UDP server discovery.
+ * Not used.
  */
 systemSetting('ServerDiscoveryEnabled', true)
 systemSetting('ServerDiscoveryPort', 4088)
@@ -134,7 +136,7 @@ exports.setEvoGUID = function(value)
 /**
  * Address of reload server.
  */
-systemSetting('ReloadServerAddress', 'http://staging.evothings.com:8081')
+systemSetting('ReloadServerAddress', 'https://deploy.evothings.com')
 
 /**
  * Session ID.

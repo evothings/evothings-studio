@@ -88,6 +88,8 @@ function connectToRemoteServer()
 		'workbench.user-message': onMessageWorkbenchUserMessage
 	}
 
+	console.log('connecting to server: ' + mRemoteServerURL)
+
 	// Create socket.io instance.
 	var socket = SOCKETIO_CLIENT(
 		mRemoteServerURL,
@@ -105,8 +107,13 @@ function connectToRemoteServer()
 		//requestConnectKey()
 		mSessionID = SETTINGS.getSessionID()
 
-	console.log('workbench.connected session: ' + mSessionID)
+		console.log('workbench.connected session: ' + mSessionID)
         sendMessageToServer(mSocket, 'workbench.connected', { sessionID: mSessionID })
+	})
+
+	socket.on('error', function(error)
+	{
+		LOGGER.log('[hyper-server.js] socket error: ' + error)
 	})
 
 	socket.on('disconnect', function()
