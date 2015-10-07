@@ -680,7 +680,7 @@ hyper.UI = {}
 	var mApplicationBasePath = process.cwd()
 	var mRunAppGuardFlag = false
 	var mNumberOfConnectedClients = 0
-	var mConnectedCounterTimer = 0
+	//var mConnectedCounterTimer = 0
 	//var mIpAddressString = null
 
 	hyper.setUpServer = function()
@@ -696,9 +696,10 @@ hyper.UI = {}
 		//displayServerIpAddress()
 		//setInterval(checkServerIpAddressForRestart, 10000)
 
-		SERVER.setClientConnenctedCallbackFun(clientConnectedCallback)
-		SERVER.setReloadCallbackFun(reloadCallback)
+		SERVER.setClientInfoCallbackFun(clientInfoCallback)
         SERVER.setRequestConnectKeyCallbackFun(requestConnectKeyCallback)
+		// TODO: Remove.
+		// SERVER.setReloadCallbackFun(reloadCallback)
 
 		MONITOR.setFileSystemChangedCallbackFun(
 			function() { SERVER.reloadApp() })
@@ -776,6 +777,7 @@ hyper.UI = {}
 		})
 	}
 */
+
 	// The Run button in the UI has been clicked.
 	// Clicking too fast can cause muliple windows
 	// to open. Guard against this case.
@@ -785,6 +787,7 @@ hyper.UI = {}
 		{
 			mRunAppGuardFlag = true
 			hyper.runApp(path)
+			setTimeout(function() { mRunAppGuardFlag = false }, 500)
 		}
 	}
 
@@ -804,7 +807,7 @@ hyper.UI = {}
 
 		if (mNumberOfConnectedClients <= 0)
 		{
-			mRunAppGuardFlag = false
+			// This function is defined in hyper-ui.html.
 			hyper.noClientConnectedHander()
 		}
 		else
@@ -813,20 +816,26 @@ hyper.UI = {}
 			SERVER.runApp()
 		}
 
-		mNumberOfConnectedClients = 0
+		//mNumberOfConnectedClients = 0
 
-		clearTimeout(mConnectedCounterTimer)
-		mConnectedCounterTimer = setTimeout(function() {
-			hyper.UI.setConnectedCounter(mNumberOfConnectedClients) },
-			5000)
+		//clearTimeout(mConnectedCounterTimer)
+		//mConnectedCounterTimer = setTimeout(function() {
+		//	hyper.UI.setConnectedCounter(mNumberOfConnectedClients) },
+		//	5000)
 	}
 
-	hyper.noClientConnectedHander = function()
+	function clientInfoCallback(message)
 	{
-		// TODO: Add code that displays message box.
+		console.log('------ got client info')
+		console.dir(message)
+
+		mNumberOfConnectedClients = parseInt(message.data.numberOfConnectedClients, 10)
+		console.log('Num connected clients: ' + mNumberOfConnectedClients)
+		hyper.UI.setConnectedCounter(mNumberOfConnectedClients)
 	}
 
-	function clientConnectedCallback()
+	/*
+	function clientsConnectedCallback()
 	{
 		mRunAppGuardFlag = false
 
@@ -838,18 +847,18 @@ hyper.UI = {}
 			1000)
 
 		// Update ip address in the UI to the actual ip used by the server.
-		/*
-		SERVER.getIpAddress(function(address) {
-			hyper.UI.displayIpAddress(address + ':' +
-			SETTINGS.getWebServerPort())
-		})
-		*/
+		//SERVER.getIpAddress(function(address) {
+		//	hyper.UI.displayIpAddress(address + ':' +
+		//	SETTINGS.getWebServerPort())
+		//})
 	}
+	*/
 
-	function reloadCallback()
-	{
-		mNumberOfConnectedClients = 0
-	}
+	// TODO: Remove.
+	//function reloadCallback()
+	//{
+	//	mNumberOfConnectedClients = 0
+	//}
 
 	// Called when a connect key is sent from the server.
     function requestConnectKeyCallback(message)
@@ -940,11 +949,11 @@ hyper.UI = {}
 		SERVER.setRemoteServerURL(url)
 	}
 
-    //---------------------------------------------------------------------------------------------------------
+    //---------------------------------------------------
     //
     // Event handlers
     //
-    //---------------------------------------------------------------------------------------------------------
+    //---------------------------------------------------
 
     EVENTS.subscribe(EVENTS.CONNECT, function(obj)
     {
@@ -961,6 +970,5 @@ hyper.UI = {}
         // Display a message for the user.
         hyper.UI.displayConnectScreenMessage(message.userMessage)
     })
-
 
 })()

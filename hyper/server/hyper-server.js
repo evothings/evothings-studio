@@ -55,7 +55,7 @@ var mAppPath = null
 var mAppFile = null
 var mAppID = null
 var mMessageCallback = null
-var mClientConnectedCallback = null
+var mClientInfoCallback = null
 var mReloadCallback = null
 var mStatusCallback = null
 var mRequestConnectKeyCallback = null
@@ -71,7 +71,7 @@ var mBasePath = ''
 /**
  * External.
  */
-function connectToRemoteServer()
+exports.connectToRemoteServer = function()
 {
 	LOGGER.log('Connecting to remote server')
 
@@ -81,7 +81,7 @@ function connectToRemoteServer()
 		// Messages from the server to the Workbench.
 		'workbench.set-session-id': onMessageWorkbenchSetSessionID,
         'workbench.set-connect-key': onMessageWorkbenchSetConnectKey,
-		'workbench.client-connected': onMessageWorkbenchClientConnected,
+		'workbench.client-info': onMessageWorkbenchClientInfo,
 		'workbench.get-resource': onMessageWorkbenchGetResource,
 		'workbench.log': onMessageWorkbenchLog,
 		'workbench.javascript-result': onMessageWorkbenchJavaScriptResult,
@@ -104,7 +104,7 @@ function connectToRemoteServer()
 		LOGGER.log('Connected to server')
 		mIsConnected = true
         EVENTS.publish(EVENTS.CONNECT, { event: 'connected' })
-		//requestConnectKey()
+		//exports.requestConnectKey()
 		mSessionID = SETTINGS.getSessionID()
 
 		console.log('workbench.connected session: ' + mSessionID)
@@ -187,11 +187,11 @@ function onMessageWorkbenchSetConnectKey(socket, message)
     mRequestConnectKeyCallback && mRequestConnectKeyCallback(message)
 }
 
-function onMessageWorkbenchClientConnected(socket, message)
+function onMessageWorkbenchClientInfo(socket, message)
 {
-	console.log('onMessageWorkbenchClientConnected')
-	// Notify UI that a client has connected.
-	mClientConnectedCallback && mClientConnectedCallback()
+	console.log('--------- onMessageWorkbenchClientInfo')
+	// Notify UI about clients.
+	mClientInfoCallback && mClientInfoCallback(message)
 }
 
 function onMessageWorkbenchGetResource(socket, message)
@@ -255,7 +255,7 @@ function onMessageWorkbenchUserMessage(socket, message)
 /**
  * External.
  */
-function isConnected()
+exports.isConnected = function()
 {
 	return mIsConnected
 }
@@ -263,7 +263,7 @@ function isConnected()
 /**
  * External.
  */
-function requestConnectKey()
+exports.requestConnectKey = function()
 {
 	// On first call mSessionID will be null, if server goes down
 	// and we connect again we will pass our session id so the server
@@ -275,7 +275,7 @@ function requestConnectKey()
 /**
  * External.
  */
-function disconnectFromRemoteServer()
+exports.disconnectFromRemoteServer = function()
 {
 	LOGGER.log('Disconnecting from remote server')
 
@@ -350,7 +350,7 @@ function serveResource(platform, path, ifModifiedSince)
 function serveRootRequest()
 {
 	// Set the app path so that the server/ui directory can be accessed.
-	setAppPath(process.cwd() + '/hyper/server/hyper-connect.html')
+	exports.setAppPath(process.cwd() + '/hyper/server/hyper-connect.html')
 
 	// Always serve the connect page for the root url.
 	return serveHtmlFile('./hyper/server/hyper-connect.html', null)
@@ -590,7 +590,7 @@ function insertReloaderScript(html)
 /**
  * External.
  */
-function setAppPath(appPath)
+exports.setAppPath = function(appPath)
 {
 	if (appPath != mAppPath)
 	{
@@ -606,7 +606,7 @@ function setAppPath(appPath)
  *
  * Return the name of the main HTML file of the application.
  */
-function getAppFileName()
+exports.getAppFileName = function()
 {
 	return mAppFile
 }
@@ -614,7 +614,7 @@ function getAppFileName()
 /**
  * External.
  */
-function getAppPath()
+exports.getAppPath = function()
 {
 	return mAppPath
 }
@@ -622,7 +622,7 @@ function getAppPath()
 /**
  * External.
  */
-function getBasePath()
+exports.getBasePath = function()
 {
 	return mBasePath
 }
@@ -630,7 +630,7 @@ function getBasePath()
 /**
  * External.
  */
-function getAppServerURL()
+exports.getAppServerURL = function()
 {
 	return mRemoteServerURL + '/hyper/' + mSessionID + '/' + mAppID + '/' + mAppFile
 }
@@ -646,7 +646,7 @@ function getAppURL()
 /**
  * External.
  */
-function getUserKey()
+exports.getUserKey = function()
 {
 	return mUserKey
 }
@@ -656,7 +656,7 @@ function getUserKey()
  *
  * Reloads the main HTML file of the current app.
  */
-function runApp()
+exports.runApp = function()
 {
 	//serveUsingResponse200()
 	serveUsingResponse304()
@@ -674,7 +674,7 @@ function runApp()
  *
  * Reloads the currently visible page of the browser.
  */
-function reloadApp()
+exports.reloadApp = function()
 {
 	serveUsingResponse304()
 	sendMessageToServer(mSocket, 'workbench.reload',
@@ -715,7 +715,7 @@ function getAppID()
 /**
  * External.
  */
-function evalJS(code)
+exports.evalJS = function(code)
 {
 	sendMessageToServer(mSocket, 'workbench.eval',
 		{
@@ -729,7 +729,7 @@ function evalJS(code)
  *
  * Callback form: fun(object)
  */
-function setMessageCallbackFun(fun)
+exports.setMessageCallbackFun = function(fun)
 {
 	mMessageCallback = fun
 }
@@ -737,11 +737,11 @@ function setMessageCallbackFun(fun)
 /**
  * External.
  *
- * Callback form: fun()
+ * Callback form: fun(message)
  */
-function setClientConnenctedCallbackFun(fun)
+exports.setClientInfoCallbackFun = function(fun)
 {
-	mClientConnectedCallback = fun
+	mClientInfoCallback = fun
 }
 
 /**
@@ -749,7 +749,7 @@ function setClientConnenctedCallbackFun(fun)
  *
  * Callback form: fun()
  */
-function setReloadCallbackFun(fun)
+exports.setReloadCallbackFun = function(fun)
 {
 	mReloadCallback = fun
 }
@@ -759,7 +759,7 @@ function setReloadCallbackFun(fun)
  *
  * Callback form: fun(message)
  */
-function setStatusCallbackFun(fun)
+exports.setStatusCallbackFun = function(fun)
 {
 	mStatusCallback = fun
 }
@@ -769,7 +769,7 @@ function setStatusCallbackFun(fun)
  *
  * Callback form: fun(message)
  */
-function setRequestConnectKeyCallbackFun(fun)
+exports.setRequestConnectKeyCallbackFun = function(fun)
 {
     mRequestConnectKeyCallback = fun
 }
@@ -787,39 +787,17 @@ function setUserKey(key)
 /**
  * External.
  */
-function setRemoteServerURL(url)
+exports.setRemoteServerURL = function(url)
 {
 	mRemoteServerURL = url
 }
 
-function getSessionId()
+/**
+ * External.
+ */
+/*
+exports.getSessionId = function()
 {
     return mSessionID
 }
-
-/*********************************/
-/***	  Module exports	   ***/
-/*********************************/
-
-exports.isConnected = isConnected
-exports.requestConnectKey = requestConnectKey
-exports.setAppPath = setAppPath
-exports.getAppPath = getAppPath
-exports.getBasePath = getBasePath
-exports.getAppFileName = getAppFileName
-exports.getAppServerURL = getAppServerURL
-exports.runApp = runApp
-exports.reloadApp = reloadApp
-exports.evalJS = evalJS
-exports.setMessageCallbackFun = setMessageCallbackFun
-exports.setClientConnenctedCallbackFun = setClientConnenctedCallbackFun
-exports.setStatusCallbackFun = setStatusCallbackFun
-exports.setRequestConnectKeyCallbackFun =setRequestConnectKeyCallbackFun
-exports.setReloadCallbackFun = setReloadCallbackFun
-exports.serveResource = serveResource
-exports.connectToRemoteServer = connectToRemoteServer
-exports.disconnectFromRemoteServer = disconnectFromRemoteServer
-//exports.setUserKey = setUserKey
-exports.getUserKey = getUserKey
-exports.setRemoteServerURL = setRemoteServerURL
-exports.getSessionId = getSessionId
+*/
