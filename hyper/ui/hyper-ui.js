@@ -826,11 +826,7 @@ hyper.UI = {}
 
 	function clientInfoCallback(message)
 	{
-		console.log('------ got client info')
-		console.dir(message)
-
 		mNumberOfConnectedClients = parseInt(message.data.numberOfConnectedClients, 10)
-		console.log('Num connected clients: ' + mNumberOfConnectedClients)
 		hyper.UI.setConnectedCounter(mNumberOfConnectedClients)
 	}
 

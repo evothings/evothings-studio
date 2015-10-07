@@ -182,22 +182,18 @@ function onMessageWorkbenchSetSessionID(socket, message)
 
 function onMessageWorkbenchSetConnectKey(socket, message)
 {
-    LOGGER.log('- onMessageWorkbenchSetConnectKey: ' + message.data.connectKey)
     //console.dir(message)
     mRequestConnectKeyCallback && mRequestConnectKeyCallback(message)
 }
 
 function onMessageWorkbenchClientInfo(socket, message)
 {
-	console.log('--------- onMessageWorkbenchClientInfo')
 	// Notify UI about clients.
 	mClientInfoCallback && mClientInfoCallback(message)
 }
 
 function onMessageWorkbenchGetResource(socket, message)
 {
-	//LOGGER.log('onMessageWorkbenchGetResource: ' + data.path)
-
 	var ifModifiedSince =
 		mCheckIfModifiedSince
 			? message.data.ifModifiedSince
