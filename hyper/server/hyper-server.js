@@ -306,12 +306,9 @@ function serveResource(platform, path, ifModifiedSince)
 
 	if (!path || path == '/')
 	{
-		// Serve the Connect page.
-		return serveRootRequest()
-	}
-	else if (path == '/hyper.reloader')
-	{
-		return serveReloaderScript(ifModifiedSince)
+		// TODO: Serve something else? A default page?
+		// Handle this case in the server?
+		LOADER.createResponse404(path)
 	}
 	else if (SETTINGS.getServeCordovaJsFiles() &&
 		(path == '/cordova.js' ||
@@ -320,96 +317,10 @@ function serveResource(platform, path, ifModifiedSince)
 	{
 		return serveCordovaFile(platform, path, ifModifiedSince)
 	}
-	else if (mBasePath && FILEUTIL.fileIsHTML(path))
-	{
-		return serveHtmlFileWithScriptInjection(
-			mBasePath + path.substr(1),
-			ifModifiedSince)
-	}
 	else if (mBasePath)
 	{
 		return LOADER.response(
 			mBasePath + path.substr(1),
-			ifModifiedSince)
-	}
-	else
-	{
-		return serveRootRequest()
-	}
-}
-
-/**
- * Internal.
- *
- * Serve root file.
- */
-function serveRootRequest()
-{
-	// Set the app path so that the server/ui directory can be accessed.
-	exports.setAppPath(process.cwd() + '/hyper/server/hyper-connect.html')
-
-	// Always serve the connect page for the root url.
-	return serveHtmlFile('./hyper/server/hyper-connect.html', null)
-}
-
-/**
- * Internal.
- *
- * Serve reloader script.
- */
-function serveReloaderScript(ifModifiedSince)
-{
-	//LOGGER.log('serveReloaderScript')
-	var path = './hyper/server/hyper-reloader.js'
-	var script = FILEUTIL.readFileSync(path)
-	var stat = FILEUTIL.statSync(path)
-	if (script && stat)
-	{
-		script = script.replace(
-			'__SESSIONID_INSERTED_BY_SERVER__',
-			mSessionID)
-		return LOADER.createResponse(
-			script,
-			stat.mtime,
-			'application/javascript',
-			ifModifiedSince)
-	}
-	else
-	{
-		return LOADER.createResponse404(path)
-	}
-}
-
-/**
- * Internal.
- *
- * Serve HTML file. Will insert reloader script.
- */
-function serveHtmlFileWithScriptInjection(filePath, ifModifiedSince)
-{
-	return serveHtmlFile(filePath, ifModifiedSince)
-}
-
-/**
- * Internal.
- *
- * If file exists, serve it and return true, otherwise return false.
- * Insert the reloader script if file exists.
- */
-function serveHtmlFile(path, ifModifiedSince)
-{
-	//LOGGER.log('serveHtmlFile: ' + path)
-	var html = FILEUTIL.readFileSync(path)
-	var stat = FILEUTIL.statSync(path)
-	if (html && stat)
-	{
-		// Removed script injection, this is done by the server.
-		//var data = insertReloaderScript(html)
-		var data = html
-		return LOADER.createResponse(
-			data,
-			stat.mtime,
-			'text/html',
 			ifModifiedSince)
 	}
 	else
@@ -510,77 +421,6 @@ function serveCordovaFile(platform, path)
 	}
 
 	return cordovaJsFile || LOADER.createResponse404(path)
-}
-
-/**
- * Internal.
- *
- * Return script tags for reload functionality.
- */
-function createReloaderScriptTags()
-{
-	return ''
-		+ '<script src="/socket.io/socket.io.js"></script>'
-		+ '<script src="/hyper/' + mSessionID + '/systemcache/hyper.reloader"></script>'
-}
-
-/**
- * Internal.
- *
- * Insert the script at the template tag, if no template tag is
- * found, insert at alternative locations in the document.
- *
- * It is desirable to have script tags inserted as early as possible,
- * to enable hyper.log and error reporting during document loading.
- *
- * Applications can use the tag <!--hyper.reloader--> to specify
- * where to insert the reloader script, in case of reload problems.
- */
-function insertReloaderScript(html)
-{
-	// Create HTML tags for the reloader script.
-	var script = createReloaderScriptTags()
-
-	// Is there a template tag? In that case, insert script there.
-	var hasTemplateTag = (-1 != html.indexOf('<!--hyper.reloader-->'))
-	if (hasTemplateTag)
-	{
-		return html.replace('<!--hyper.reloader-->', script)
-	}
-
-	// Insert after title tag.
-	var pos = html.indexOf('</title>')
-	if (pos > -1)
-	{
-		return html.replace('</title>', '</title>' + script)
-	}
-
-	// Insert last in head.
-	var pos = html.indexOf('</head>')
-	if (pos > -1)
-	{
-		return html.replace('</head>', script + '</head>')
-	}
-
-	// Fallback: Insert first in body.
-	// TODO: Rewrite to use regular expressions to capture more cases.
-	pos = html.indexOf('<body>')
-	if (pos > -1)
-	{
-		return html.replace('<body>', '<body>' + script)
-	}
-
-	// Insert last in body.
-	pos = html.indexOf('</body>')
-	if (pos > -1)
-	{
-		return html.replace('</body>', script + '</body>')
-	}
-
-	// If no place to insert the reload script, just return the HTML unmodified.
-	// TODO: We could insert the script tag last in the document,
-	// as a last resort.
-	return html
 }
 
 /**
@@ -769,16 +609,6 @@ exports.setRequestConnectKeyCallbackFun = function(fun)
 {
     mRequestConnectKeyCallback = fun
 }
-
-/**
- * External.
- */
-/*
-function setUserKey(key)
-{
-	mUserKey = key
-}
-*/
 
 /**
  * External.
