@@ -32,22 +32,11 @@ var SETTINGS = require('../settings/settings.js')
 var SERVER = require('./hyper-server.js')
 var EVENTS = require('./events')
 
-var EVO_SERVER = SETTINGS.getReloadServerAddress()
-if(EVO_SERVER.indexOf('http://') > -1)
-{
-    EVO_SERVER = EVO_SERVER.replace('http://', '')
-}
-if(EVO_SERVER.indexOf(':') > -1)
-{
-    EVO_SERVER = EVO_SERVER.substring(0, EVO_SERVER.indexOf(':'))
-}
-console.log('EVO_SERVER = '+EVO_SERVER)
-
 /*********************************/
 /***     Module variables      ***/
 /*********************************/
 
-var mLoginServer = null
+var mLoginClient = null
 var mUser = null
 var mLoginWindow = null
 var mUserLoginCallback = null
@@ -62,13 +51,23 @@ var mUserLogoutCallback = null
  */
 function loginUser()
 {
+	createLoginClient()
+	openLoginWindow()
+}
+
+function createLoginClient()
+{
 	// Create connection to login sever (SAAS server).
-	if (!mLoginServer)
+	if (!mLoginClient)
 	{
-		LOGGER.log('LOGIN: connecting to login server '+EVO_SERVER);
-        var wss_string = (EVO_SERVER == 'localhost' || EVO_SERVER.indexOf('192.168') > -1) ? 'ws://'+EVO_SERVER : 'wss://'+EVO_SERVER
-		mLoginServer = IO(wss_string)
-		mLoginServer.on('message', function(msg)
+		var serverAddress = getLoginServerAddress()
+		LOGGER.log('LOGIN: connecting to login server '+serverAddress);
+
+		// Create login client.
+        var serverURL = serverAddress.replace('https', 'wss')
+		mLoginClient = IO(serverURL)
+
+		mLoginClient.on('message', function(msg)
 		{
 			LOGGER.log('LOGIN: got auth callback message:');
 			LOGGER.log(msg);
@@ -77,33 +76,39 @@ function loginUser()
 			{
 				// User is now logged in.
 				mUser = msg.user
-                mUser.EVO_SERVER = (EVO_SERVER == 'localhost' || EVO_SERVER.indexOf('192.168') > -1) ? 'http://' + EVO_SERVER : 'https://'+EVO_SERVER
 				LOGGER.log('LOGIN: setting user to "'+msg.user.name+'"')
-				mLoginWindow.close()
-				mLoginWindow = null
 				LOGGER.log('LOGIN: Listing user object:')
 				LOGGER.log(msg.user)
+
+				mLoginWindow.close()
+				mLoginWindow = null
 
 				// Notify logged in callback.
 				mUserLoginCallback && mUserLoginCallback(mUser)
 			}
 		})
 	}
+}
 
-    var uid = SERVER.getSessionID()
-    console.log('sessionID = '+uid)
-    mLoginServer.emit('message', JSON.stringify({target:'registerAuthCallback', uuid: uid }))
-
-	var sessionId = global.mainHyper.sessionID
+function openLoginWindow()
+{
+    var sessionID = SERVER.getSessionID()
+    console.log('sessionID = '+sessionID)
+    mLoginClient.emit(
+    	'message',
+    	JSON.stringify({target:'registerAuthCallback', uuid: sessionID }))
 
     LOGGER.log('LOGIN: starting login sequence.')
-    var login_string = (EVO_SERVER == 'localhost' || EVO_SERVER.indexOf('192.168') > -1) ? 'http://'+EVO_SERVER+'?uuid='+sessionId+'&loginonly=true' : 'https://'+EVO_SERVER+'?uuid='+sessionId+'&loginonly=true'
+    var serverAddress = getLoginServerAddress()
+    var loginURL = serverAddress+'/?uuid='+sessionID+'&loginonly=true'
+    console.log('loginURL = '+loginURL)
+
     // Create login window if it does not exist.
     if (!mLoginWindow || mLoginWindow.closed)
     {
         LOGGER.log('LOGIN: creating login window')
         mLoginWindow = window.open(
-            login_string,
+            loginURL,
             'Login',
             {
                 resizable: true
@@ -112,12 +117,10 @@ function loginUser()
         mLoginWindow.moveTo(50, 50)
         mLoginWindow.focus()
     }
-	LOGGER.log('LOGIN: sending registerAuthCallback to saas server for uuid '+sessionId)
+
+	LOGGER.log('LOGIN: sending registerAuthCallback to saas server for uuid '+sessionID)
 }
 
-/**
- * Internal.
- */
 exports.logoutUser = function()
 {
 	LOGGER.log('LOGIN: loggin out user. Setting mUser to null')
@@ -126,6 +129,16 @@ exports.logoutUser = function()
 	// Notify logged out callback.
     EVENTS.publish(EVENTS.LOGOUT, {event: 'logout'})
 	mUserLogoutCallback && mUserLogoutCallback()
+}
+
+/**
+ * Internal.
+ */
+function getLoginServerAddress()
+{
+	var serverAddress = SETTINGS.getReloadServerAddress()
+	var serverAddress = serverAddress + ':3003'
+	return serverAddress
 }
 
 // ************** Login Button **********************
