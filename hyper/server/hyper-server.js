@@ -791,9 +791,7 @@ exports.setRemoteServerURL = function(url)
 /**
  * External.
  */
-/*
-exports.getSessionId = function()
+exports.getSessionID = function()
 {
     return mSessionID
 }
-*/

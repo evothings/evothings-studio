@@ -90,7 +90,7 @@ function loginUser()
 		})
 	}
 
-    var uid = SERVER.getSessionId()
+    var uid = SERVER.getSessionID()
     console.log('sessionID = '+uid)
     mLoginServer.emit('message', JSON.stringify({target:'registerAuthCallback', uuid: uid }))
 
@@ -118,7 +118,7 @@ function loginUser()
 /**
  * Internal.
  */
-function logoutUser()
+exports.logoutUser = function()
 {
 	LOGGER.log('LOGIN: loggin out user. Setting mUser to null')
 	mUser = null
@@ -133,14 +133,14 @@ function logoutUser()
 /**
  * External.
  */
-function loginButtonHandler()
+exports.loginButtonHandler = function()
 {
 	LOGGER.log('LOGIN: Clicked Login button')
 	if (mUser)
 	{
 		// If there is a user object we logout the user.
 		LOGGER.log('LOGIN: Logout user')
-		logoutUser()
+		exports.logoutUser()
 	}
 	else
 	{
@@ -153,18 +153,14 @@ function loginButtonHandler()
 /**
  * External.
  */
-function setUserLoginCallback(fun)
+exports.setUserLoginCallback = function(fun)
 {
 	mUserLoginCallback = fun
 }
 
-/*********************************/
-/***	  Module exports	   ***/
-/*********************************/
-
-exports.loginButtonHandler = loginButtonHandler
-exports.logoutUser = logoutUser
-exports.setUserLoginCallback = setUserLoginCallback
+/**
+ * External.
+ */
 exports.getUser = function()
 {
     return mUser
@@ -172,5 +168,5 @@ exports.getUser = function()
 
 EVENTS.subscribe(EVENTS.DISCONNECT, function(obj)
 {
-    logoutUser()
+    exports.logoutUser()
 })
