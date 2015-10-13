@@ -38,24 +38,12 @@ var EVENTS = require('./events')
 
 var mLoginClient = null
 var mUser = null
-var mLoginWindow = null
-var mUserLoginCallback = null
-var mUserLogoutCallback = null
 
 /*********************************/
 /***        Functions          ***/
 /*********************************/
 
-/**
- * Internal.
- */
-function loginUser()
-{
-	createLoginClient()
-	openLoginWindow()
-}
-
-function createLoginClient()
+exports.createLoginClient = function()
 {
 	// Create connection to login sever (SAAS server).
 	if (!mLoginClient)
@@ -80,16 +68,56 @@ function createLoginClient()
 				LOGGER.log('LOGIN: Listing user object:')
 				LOGGER.log(msg.user)
 
-				mLoginWindow.close()
-				mLoginWindow = null
-
 				// Notify logged in callback.
-				mUserLoginCallback && mUserLoginCallback(mUser)
+				EVENTS.publish(EVENTS.LOGIN, {event: 'login'})
 			}
 		})
 	}
 }
 
+exports.startLoginSequence = function()
+{
+    var sessionID = SERVER.getSessionID()
+
+    mLoginClient.emit(
+    	'message',
+    	JSON.stringify({target:'registerAuthCallback', uuid: sessionID }))
+}
+
+exports.getLoginURL = function()
+{
+    var sessionID = SERVER.getSessionID()
+
+    var serverAddress = getLoginServerAddress()
+    var loginURL = serverAddress+'/?uuid='+sessionID+'&loginonly=true'
+
+    console.log('LOGIN: loginURL = '+loginURL)
+
+	return loginURL
+}
+
+exports.logoutUser = function()
+{
+	LOGGER.log('LOGIN: loggin out user. Setting mUser to null')
+	mUser = null
+	// TODO: Logout user from the server?
+	// Notify logged out callback.
+    EVENTS.publish(EVENTS.LOGOUT, {event: 'logout'})
+}
+
+exports.getUser = function()
+{
+    return mUser
+}
+
+function getLoginServerAddress()
+{
+	var serverAddress = SETTINGS.getReloadServerAddress()
+	var serverAddress = serverAddress + ':3003'
+	return serverAddress
+}
+
+/* UNUSED
 function openLoginWindow()
 {
     var sessionID = SERVER.getSessionID()
@@ -120,66 +148,4 @@ function openLoginWindow()
 
 	LOGGER.log('LOGIN: sending registerAuthCallback to saas server for uuid '+sessionID)
 }
-
-exports.logoutUser = function()
-{
-	LOGGER.log('LOGIN: loggin out user. Setting mUser to null')
-	mUser = null
-	// TODO: Logout user from the server?
-	// Notify logged out callback.
-    EVENTS.publish(EVENTS.LOGOUT, {event: 'logout'})
-	mUserLogoutCallback && mUserLogoutCallback()
-}
-
-/**
- * Internal.
- */
-function getLoginServerAddress()
-{
-	var serverAddress = SETTINGS.getReloadServerAddress()
-	var serverAddress = serverAddress + ':3003'
-	return serverAddress
-}
-
-// ************** Login Button **********************
-
-/**
- * External.
- */
-exports.loginButtonHandler = function()
-{
-	LOGGER.log('LOGIN: Clicked Login button')
-	if (mUser)
-	{
-		// If there is a user object we logout the user.
-		LOGGER.log('LOGIN: Logout user')
-		exports.logoutUser()
-	}
-	else
-	{
-		// If there is no user object we login a new user.
-		LOGGER.log('LOGIN: Login user')
-		loginUser()
-	}
-}
-
-/**
- * External.
- */
-exports.setUserLoginCallback = function(fun)
-{
-	mUserLoginCallback = fun
-}
-
-/**
- * External.
- */
-exports.getUser = function()
-{
-    return mUser
-}
-
-EVENTS.subscribe(EVENTS.DISCONNECT, function(obj)
-{
-    exports.logoutUser()
-})
+*/

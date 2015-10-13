@@ -197,6 +197,12 @@ Copyright (c) 2013-2015 Evothings AB
 							</button>
 						</div>
 
+						<div id="connect-screen-login">
+							<iframe id="connect-screen-login-iframe"
+								src="" nwdisable nwfaketop>
+							</iframe>
+						</div>
+
 					</div>
 				</div>
 			</div>
@@ -258,8 +264,6 @@ Copyright (c) 2013-2015 Evothings AB
 		//var WEBSERVER = require('../server/webserver.js')
 		//var mWebServer = WEBSERVER.create()
 
-        var mUser = undefined
-
         // ************** Login Button **********************
 
 		// TODO: Move login to the connect tab.
@@ -268,36 +272,62 @@ Copyright (c) 2013-2015 Evothings AB
 		// toggles login/logout.
 		$('#button-login').click(function()
 		{
-            if(USER_HANDLER.getUser())
+            if (USER_HANDLER.getUser())
             {
-                USER_HANDLER.logoutUser()
+                logoutUser()
             }
             else
             {
-                USER_HANDLER.loginButtonHandler()
+                loginUser()
             }
 		})
 
-		USER_HANDLER.setUserLoginCallback(function(user)
+		function loginUser()
 		{
-			// TODO: Pass user id to the Run/Reload messaging code (hyper-server.js).
-			LOGGER.log('*** User has logged in ***')
-			LOGGER.log(user)
+			USER_HANDLER.createLoginClient()
+			USER_HANDLER.startLoginSequence()
+			var loginURL = USER_HANDLER.getLoginURL()
+			$('#connect-screen-login').show()
+			$('#connect-screen-login-iframe').attr('src', loginURL)
+		}
 
-            if(user.picture.indexOf('http') == -1)
-            {
-                user.picture = user.EVO_SERVER + '/' + user.picture
+		function logoutUser()
+		{
+			USER_HANDLER.logoutUser()
+		}
+
+		EVENTS.subscribe(EVENTS.LOGIN, function(user)
+		{
+			// TODO: Pass user id to the Run/Reload messaging code (hyper-server.js) ??
+			console.log('*** User has logged in: ' + user)
+			console.dir(user)
+
+			// Close login UI.
+			$('#connect-screen-login').hide()
+
+			if (user && user.name && user.picture)
+			{
+				// Display user data.
+				if(user.picture.indexOf('http') == -1)
+				{
+					user.picture = user.EVO_SERVER + '/' + user.picture
+				}
+				// Show user picture on login button and change text to "Logout".
+				var imageHTML =
+					'<img style="height:30px;with:auto;margin-right:5px;margin-top:-3px" '
+					+	'class="pull-left" '
+					+	'src="' + user.picture + '">'
+				var infoText = 'Logged in as '+user.name
+				var infoHTML = imageHTML + infoText
+				$('#login-info').html(infoHTML)
+
+				// Change login button text to logout.
+				$('#button-login').html('Logout')
             }
-			// Show user picture on login button and change text to "Logout".
-			var imageHTML =
-				'<img style="height:30px;with:auto;margin-right:5px;margin-top:-3px" '
-				+	'class="pull-left" '
-				+	'src="' + user.picture + '">'
-			var buttonText = 'Logged in as '+user.name
-			var buttonHTML = imageHTML + buttonText
-			$('#login-info').html(buttonHTML)
-            $('#button-login').html('Logout')
-            mUser = user
+            else
+            {
+            	$('#login-info').html('Could not log in')
+            }
 		})
 
         EVENTS.subscribe(EVENTS.LOGOUT, function(user)
@@ -307,8 +337,12 @@ Copyright (c) 2013-2015 Evothings AB
             // Set button text to "Login".
             $('#button-login').html('Login')
             $('#login-info').html('Not Logged In')
-            mUser = undefined
         })
+
+		EVENTS.subscribe(EVENTS.DISCONNECT, function(obj)
+		{
+			logoutUser()
+		})
 
 		// ************** Tab Button Handling **************
 
