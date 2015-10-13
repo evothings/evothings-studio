@@ -197,7 +197,14 @@ Copyright (c) 2013-2015 Evothings AB
 							</button>
 						</div>
 
+						<div style="padding-top:10px;">
+							<p>Login to get a quick connect button in Evothings Viewer. This button is displayed when you restart the Viewer and allows you to reconnect to the Workbench where you are logged in.</p>
+						</div>
+
 						<div id="connect-screen-login">
+							<button id="connect-screen-login-close-button" class="btn btn-hyper-toolbar et-btn-stone-light">
+								Close
+							</button>
 							<iframe id="connect-screen-login-iframe"
 								src="" nwdisable nwfaketop>
 							</iframe>
@@ -246,9 +253,6 @@ Copyright (c) 2013-2015 Evothings AB
 	// The plan is to move more of the logic into hyper-ui.js and possibly
 	// create additional module files to make the code easier to read.
 	//
-	// Also import hyper-ui.js using "require". The idea is to make
-	// the code more modular.
-	//
 
 	// Setup UI button actions (using closure to make variables local).
 	;(function()
@@ -280,6 +284,11 @@ Copyright (c) 2013-2015 Evothings AB
             {
                 loginUser()
             }
+		})
+
+		$('#connect-screen-login-close-button').click(function()
+		{
+            $('#connect-screen-login').hide()
 		})
 
 		function loginUser()
