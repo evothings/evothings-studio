@@ -10,7 +10,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,7 +20,7 @@ limitations under the License.
 */
 
 /*********************************/
-/***     Imported modules      ***/
+/***	 Imported modules	  ***/
 /*********************************/
 
 var OS = require('os')
@@ -33,14 +33,14 @@ var SERVER = require('./hyper-server.js')
 var EVENTS = require('./events')
 
 /*********************************/
-/***     Module variables      ***/
+/***	 Module variables	  ***/
 /*********************************/
 
 var mLoginClient = null
 var mUser = null
 
 /*********************************/
-/***        Functions          ***/
+/***		Functions		  ***/
 /*********************************/
 
 exports.createLoginClient = function()
@@ -52,7 +52,7 @@ exports.createLoginClient = function()
 		LOGGER.log('LOGIN: connecting to login server '+serverAddress);
 
 		// Create login client.
-        var serverURL = serverAddress.replace('https', 'wss')
+		var serverURL = serverAddress.replace('https', 'wss')
 		mLoginClient = IO(serverURL)
 
 		mLoginClient.on('message', function(msg)
@@ -77,21 +77,21 @@ exports.createLoginClient = function()
 
 exports.startLoginSequence = function()
 {
-    var sessionID = SERVER.getSessionID()
+	var sessionID = SERVER.getSessionID()
 
-    mLoginClient.emit(
-    	'message',
-    	JSON.stringify({target:'registerAuthCallback', uuid: sessionID }))
+	mLoginClient.emit(
+		'message',
+		JSON.stringify({target:'registerAuthCallback', uuid: sessionID }))
 }
 
 exports.getLoginURL = function()
 {
-    var sessionID = SERVER.getSessionID()
+	var sessionID = SERVER.getSessionID()
 
-    var serverAddress = getLoginServerAddress()
-    var loginURL = serverAddress+'/?uuid='+sessionID+'&loginonly=true'
+	var serverAddress = getLoginServerAddress()
+	var loginURL = serverAddress+'/?uuid='+sessionID+'&loginonly=true'
 
-    console.log('LOGIN: loginURL = '+loginURL)
+	console.log('LOGIN: loginURL = '+loginURL)
 
 	return loginURL
 }
@@ -102,12 +102,12 @@ exports.logoutUser = function()
 	mUser = null
 	// TODO: Logout user from the server?
 	// Notify logged out callback.
-    EVENTS.publish(EVENTS.LOGOUT, {event: 'logout'})
+	EVENTS.publish(EVENTS.LOGOUT, {event: 'logout'})
 }
 
 exports.getUser = function()
 {
-    return mUser
+	return mUser
 }
 
 function getLoginServerAddress()
@@ -120,31 +120,31 @@ function getLoginServerAddress()
 /* UNUSED
 function openLoginWindow()
 {
-    var sessionID = SERVER.getSessionID()
-    console.log('sessionID = '+sessionID)
-    mLoginClient.emit(
-    	'message',
-    	JSON.stringify({target:'registerAuthCallback', uuid: sessionID }))
+	var sessionID = SERVER.getSessionID()
+	console.log('sessionID = '+sessionID)
+	mLoginClient.emit(
+		'message',
+		JSON.stringify({target:'registerAuthCallback', uuid: sessionID }))
 
-    LOGGER.log('LOGIN: starting login sequence.')
-    var serverAddress = getLoginServerAddress()
-    var loginURL = serverAddress+'/?uuid='+sessionID+'&loginonly=true'
-    console.log('loginURL = '+loginURL)
+	LOGGER.log('LOGIN: starting login sequence.')
+	var serverAddress = getLoginServerAddress()
+	var loginURL = serverAddress+'/?uuid='+sessionID+'&loginonly=true'
+	console.log('loginURL = '+loginURL)
 
-    // Create login window if it does not exist.
-    if (!mLoginWindow || mLoginWindow.closed)
-    {
-        LOGGER.log('LOGIN: creating login window')
-        mLoginWindow = window.open(
-            loginURL,
-            'Login',
-            {
-                resizable: true
-            })
-        mLoginWindow.resizeTo(550, 700)
-        mLoginWindow.moveTo(50, 50)
-        mLoginWindow.focus()
-    }
+	// Create login window if it does not exist.
+	if (!mLoginWindow || mLoginWindow.closed)
+	{
+		LOGGER.log('LOGIN: creating login window')
+		mLoginWindow = window.open(
+			loginURL,
+			'Login',
+			{
+				resizable: true
+			})
+		mLoginWindow.resizeTo(550, 700)
+		mLoginWindow.moveTo(50, 50)
+		mLoginWindow.focus()
+	}
 
 	LOGGER.log('LOGIN: sending registerAuthCallback to saas server for uuid '+sessionID)
 }

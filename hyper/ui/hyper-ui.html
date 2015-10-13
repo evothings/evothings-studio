@@ -37,9 +37,9 @@ Copyright (c) 2013-2015 Evothings AB
 
 			<div id="panel-tool-buttons">
 				<div class="btn-group btn-group-justified" role="group">
-                    <a id="button-connect"
-                       class="btn btn-hyper-toolbar et-btn-stone-light"
-                       href="javascript:void(0)">Connect</a>
+					<a id="button-connect"
+					   class="btn btn-hyper-toolbar et-btn-stone-light"
+					   href="javascript:void(0)">Connect</a>
 					<a id="button-examples"
 						class="btn btn-hyper-toolbar et-btn-stone-light"
 						href="javascript:void(0)">Examples</a>
@@ -225,7 +225,7 @@ Copyright (c) 2013-2015 Evothings AB
 		<div id="panel-bottom">
 			<div>
 				<p style="float:left;">Status: <b><span id="connect-address">Waiting to connect</span></b></p>
-                <p style="float:left;margin-left:25px"><b><span id="login-info">Not Logged In</span></b></p>
+				<p style="float:left;margin-left:25px"><b><span id="login-info">Not Logged In</span></b></p>
 				<p style="float:right;">Clients: <b><span id="connect-counter">0</span></b> Files: <b><span id="files-counter">0</span></b></p>
 			</div>
 		</div>
@@ -262,13 +262,13 @@ Copyright (c) 2013-2015 Evothings AB
 		var FILEUTIL = require('../server/fileutil.js')
 		var SETTINGS = require('../settings/settings.js')
 		var LOGGER = require('../server/log.js')
-        var USER_HANDLER = require('../server/user-handler.js')
+		var USER_HANDLER = require('../server/user-handler.js')
 
 		// TODO: Make running local web server an option.
 		//var WEBSERVER = require('../server/webserver.js')
 		//var mWebServer = WEBSERVER.create()
 
-        // ************** Login Button **********************
+		// ************** Login Button **********************
 
 		// TODO: Move login to the connect tab.
 
@@ -276,19 +276,19 @@ Copyright (c) 2013-2015 Evothings AB
 		// toggles login/logout.
 		$('#button-login').click(function()
 		{
-            if (USER_HANDLER.getUser())
-            {
-                logoutUser()
-            }
-            else
-            {
-                loginUser()
-            }
+			if (USER_HANDLER.getUser())
+			{
+				logoutUser()
+			}
+			else
+			{
+				loginUser()
+			}
 		})
 
 		$('#connect-screen-login-close-button').click(function()
 		{
-            $('#connect-screen-login').hide()
+			$('#connect-screen-login').hide()
 		})
 
 		function loginUser()
@@ -332,21 +332,21 @@ Copyright (c) 2013-2015 Evothings AB
 
 				// Change login button text to logout.
 				$('#button-login').html('Logout')
-            }
-            else
-            {
-            	$('#login-info').html('Could not log in')
-            }
+			}
+			else
+			{
+				$('#login-info').html('Could not log in')
+			}
 		})
 
-        EVENTS.subscribe(EVENTS.LOGOUT, function(user)
-        {
-            // TODO: Pass user id to the Run/Reload messaging code (hyper-server.js).
-            LOGGER.log('*** User has logged out ***')
-            // Set button text to "Login".
-            $('#button-login').html('Login')
-            $('#login-info').html('Not Logged In')
-        })
+		EVENTS.subscribe(EVENTS.LOGOUT, function(user)
+		{
+			// TODO: Pass user id to the Run/Reload messaging code (hyper-server.js).
+			LOGGER.log('*** User has logged out ***')
+			// Set button text to "Login".
+			$('#button-login').html('Login')
+			$('#login-info').html('Not Logged In')
+		})
 
 		EVENTS.subscribe(EVENTS.DISCONNECT, function(obj)
 		{
@@ -584,7 +584,7 @@ Copyright (c) 2013-2015 Evothings AB
 		// Initialize the file server (socket.io client that
 		// handles file requests).
 		hyper.setUpServer()
-        hyper.UI.connect()
+		hyper.UI.connect()
 
 		// Display the Connect dialog box.
 		// TODO: Auto get key?
