@@ -60,6 +60,16 @@ exports.createLoginClient = function()
 			LOGGER.log('LOGIN: got auth callback message:');
 			LOGGER.log(msg);
 
+			if (msg.logout)
+			{
+				// User is now logged out.
+				LOGGER.log('LOGIN: loggin out user. Setting mUser to null')
+				mUser = null
+
+				// Notify logged out callback.
+				EVENTS.publish(EVENTS.LOGOUT, {event: 'logout'})
+			}
+			else
 			if (msg.user)
 			{
 				// User is now logged in.
@@ -96,13 +106,16 @@ exports.getLoginURL = function()
 	return loginURL
 }
 
-exports.logoutUser = function()
+exports.getLogoutURL = function()
 {
-	LOGGER.log('LOGIN: loggin out user. Setting mUser to null')
-	mUser = null
-	// TODO: Logout user from the server?
-	// Notify logged out callback.
-	EVENTS.publish(EVENTS.LOGOUT, {event: 'logout'})
+	var sessionID = SERVER.getSessionID()
+
+	var serverAddress = getLoginServerAddress()
+	var logoutURL = serverAddress+'/?uuid='+sessionID+'&logout=true'
+
+	console.log('LOGOUT: loginURL = '+logoutURL)
+
+	return logoutURL
 }
 
 exports.getUser = function()

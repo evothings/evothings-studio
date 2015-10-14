@@ -302,12 +302,13 @@ Copyright (c) 2013-2015 Evothings AB
 
 		function logoutUser()
 		{
-			USER_HANDLER.logoutUser()
+			var logoutURL = USER_HANDLER.getLogoutURL()
+			$('#connect-screen-login').show()
+			$('#connect-screen-login-iframe').attr('src', logoutURL)
 		}
 
 		EVENTS.subscribe(EVENTS.LOGIN, function(user)
 		{
-			// TODO: Pass user id to the Run/Reload messaging code (hyper-server.js) ??
 			console.log('*** User has logged in: ' + user)
 			console.dir(user)
 
