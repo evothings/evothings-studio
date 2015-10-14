@@ -69,7 +69,7 @@ exports.createLoginClient = function()
 				LOGGER.log(msg.user)
 
 				// Notify logged in callback.
-				EVENTS.publish(EVENTS.LOGIN, {event: 'login'})
+				EVENTS.publish(EVENTS.LOGIN, msg.user)
 			}
 		})
 	}
