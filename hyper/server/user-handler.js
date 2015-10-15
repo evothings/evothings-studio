@@ -111,7 +111,7 @@ exports.getLogoutURL = function()
 	var sessionID = SERVER.getSessionID()
 
 	var serverAddress = getLoginServerAddress()
-	var logoutURL = serverAddress+'/?uuid='+sessionID+'&logout=true'
+	var logoutURL = serverAddress+'/?uuid='+sessionID+'&loginonly=true&logout=true'
 
 	console.log('LOGOUT: loginURL = '+logoutURL)
 

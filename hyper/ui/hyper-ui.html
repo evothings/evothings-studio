@@ -303,6 +303,7 @@ Copyright (c) 2013-2015 Evothings AB
 		function logoutUser()
 		{
 			var logoutURL = USER_HANDLER.getLogoutURL()
+			console.log('LOGOUT: logoutURL is '+logoutURL)
 			$('#connect-screen-login').show()
 			$('#connect-screen-login-iframe').attr('src', logoutURL)
 		}
@@ -347,6 +348,7 @@ Copyright (c) 2013-2015 Evothings AB
 			// Set button text to "Login".
 			$('#button-login').html('Login')
 			$('#login-info').html('Not Logged In')
+			$('#connect-screen-login').hide()
 		})
 
 		EVENTS.subscribe(EVENTS.DISCONNECT, function(obj)
