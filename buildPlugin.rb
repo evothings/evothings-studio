@@ -180,12 +180,6 @@ end
 def buildPostProcess
 ## TODO MIKI	buildDocumentation
 
-	# Copy Evothings Examples UI resources to hyper/server.
-	# This is used by the hyper-connect.html page.
-	FileUtils.cp_r(
-		Dir[root + "evothings-examples/resources/ui"],
-		pathDistSource + "hyper/server")
-
 	# Delete files that should not be in the dist.
 	FileUtils.remove_dir(pathDistSource + "documentation/.git", true)
 
