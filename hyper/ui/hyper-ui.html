@@ -302,10 +302,13 @@ Copyright (c) 2013-2015 Evothings AB
 
 		function logoutUser()
 		{
-			var logoutURL = USER_HANDLER.getLogoutURL()
-			console.log('LOGOUT: logoutURL is '+logoutURL)
-			$('#connect-screen-login').show()
-			$('#connect-screen-login-iframe').attr('src', logoutURL)
+			if (USER_HANDLER.getUser())
+			{
+				var logoutURL = USER_HANDLER.getLogoutURL()
+				console.log('LOGOUT: logoutURL is ' + logoutURL)
+				$('#connect-screen-login').show()
+				$('#connect-screen-login-iframe').attr('src', logoutURL)
+			}
 		}
 
 		EVENTS.subscribe(EVENTS.LOGIN, function(user)
@@ -353,10 +356,7 @@ Copyright (c) 2013-2015 Evothings AB
 
 		EVENTS.subscribe(EVENTS.DISCONNECT, function(obj)
 		{
-			if (USER_HANDLER.getUser())
-			{
-				logoutUser()
-			}
+			logoutUser()
 		})
 
 		// ************** Tab Button Handling **************
