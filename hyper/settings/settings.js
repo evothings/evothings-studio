@@ -136,7 +136,24 @@ exports.setEvoGUID = function(value)
 /**
  * Address of reload server.
  */
-systemSetting('ReloadServerAddress', 'https://deploy.evothings.com')
+//systemSetting('ReloadServerAddress', 'https://deploy.evothings.com')
+
+var defaultValue = 'https://deploy.evothings.com'
+
+// Incrementing this number resets the value to default.
+var currentVersion = '1'
+
+exports.getReloadServerAddress = function() {
+	if(exports.get('ReloadServerAddressVersion') === currentVersion)
+		return exports.get('ReloadServerAddress') || defaultValue
+	else
+		return defaultValue
+}
+
+exports.setReloadServerAddress = function(value) {
+	exports.set('ReloadServerAddress', value)
+	exports.set('ReloadServerAddressVersion', currentVersion)
+}
 
 /**
  * Session ID.
