@@ -6,17 +6,13 @@
 
 require 'fileutils'
 require './helpers.rb'
+require './sibling-repos.rb'
 
 include FileUtils::Verbose
 
 ### Clone Git repos required for the build, if they do not exist.
 
-clone('evothings-client')
-clone('evothings-doc')
-clone('evothings-examples')
-clone('cordova-plugin-ibeacon', 'https://github.com/petermetz/cordova-plugin-ibeacon')
-#cordova-http-digest	# no ios version yet
-clone('cordova-ble')
+doSiblingRepos
 
 ### Load EvoThingsStudio settings into a namespace where they won't conflict with our globals.
 

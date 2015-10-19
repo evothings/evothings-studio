@@ -87,8 +87,7 @@ def buildDistBinaries
 	puts "Building Linux64"
 	buildDistBinaryLinux64
 
-	# If this function doesn't work, we can't build for Mac.
-	if(pathIconsMac64)
+	if(canBuildMac)
 		puts "Building Mac64"
 		buildDistBinaryMac64
 	end
@@ -96,7 +95,7 @@ def buildDistBinaries
 	puts "Building Win32"
 	buildDistBinaryWin32
 
-	puts "Building Win64"
+	#puts "Building Win64"
 	#buildDistBinaryWin64
 
 	# Delete hidden OS X files.
@@ -147,6 +146,11 @@ def buildDistBinaryLinux(sourcePath, targetPath, sourceBin, wrap)
 	FileUtils.copy_entry(
 		sourceBin + "credits.html",
 		targetPath + "hyper/license/node-webkit-credits.html")
+end
+
+def canBuildMac
+	# If this function doesn't work, we can't build for Mac.
+	return !!pathIconsMac64
 end
 
 def buildDistBinaryMac64
@@ -241,9 +245,11 @@ end
 def buildZippedBinaries
 	zipPackage(distPackageLinux32)
 	zipPackage(distPackageLinux64)
-	zipPackage(distPackageMac64)
+	if(canBuildMac)
+		zipPackage(distPackageMac64)
+	end
 	zipPackage(distPackageWin32)
-	zipPackage(distPackageWin64)
+	#zipPackage(distPackageWin64)
 end
 
 # Build distribution package.
