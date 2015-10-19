@@ -87,7 +87,11 @@ def pathNodeWebkitMac64
 end
 
 def pathIconsMac64
-	"./build/nw.icns"
+	if(RUBY_PLATFORM =~ /darwin/)
+		return "./build/nw.icns"
+	else
+		return nil
+	end
 end
 
 def updateFile(tar, src)
@@ -134,6 +138,7 @@ def buildGitVersionFile
 end
 
 def buildPreProcess
+	sh "ruby ./init.rb"
 ## TODO MIKI	buildGitVersionFile
 	buildOSXIcons
 end

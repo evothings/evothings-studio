@@ -87,14 +87,17 @@ def buildDistBinaries
 	puts "Building Linux64"
 	buildDistBinaryLinux64
 
-	puts "Building Mac64"
-	buildDistBinaryMac64
+	# If this function doesn't work, we can't build for Mac.
+	if(pathIconsMac64)
+		puts "Building Mac64"
+		buildDistBinaryMac64
+	end
 
 	puts "Building Win32"
 	buildDistBinaryWin32
 
 	puts "Building Win64"
-	buildDistBinaryWin64
+	#buildDistBinaryWin64
 
 	# Delete hidden OS X files.
 	fileDeleteAll(pathDist + "**/.DS_Store")

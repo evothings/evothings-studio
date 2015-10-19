@@ -54,7 +54,7 @@ def getNodeWebkits
 	getNodeWebkit('linux-ia32', TGZ)
 	getNodeWebkit('linux-x64', TGZ)
 	getNodeWebkit('win-ia32', ZIP)
-	getNodeWebkit('win-x64', ZIP)
+	#getNodeWebkit('win-x64', ZIP)
 	getNodeWebkit('osx-x64', ZIP)
 end
 
