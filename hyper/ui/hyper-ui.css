@@ -244,6 +244,7 @@ TODO: Remove, use automatic width for all buttons.
 	bottom: 60px;
 	/*border: 1px black solid;*/
 	display: none;
+	background: rgb(200,200,200);
 }
 
 #connect-screen-login-iframe
@@ -258,4 +259,11 @@ TODO: Remove, use automatic width for all buttons.
 	right: 2px;
 	top: 2px;
 	text-transform: none !important;
+}
+
+#connect-screen-login-loading-message
+{
+	position: absolute;
+	left:20px;
+	top:0px;
 }

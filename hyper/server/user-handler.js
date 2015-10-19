@@ -55,9 +55,24 @@ exports.createLoginClient = function()
 		var serverURL = serverAddress.replace('https', 'wss')
 		mLoginClient = IO(serverURL)
 
+		mLoginClient.on('connect', function()
+		{
+			LOGGER.log('[user-handler.js] Connected to login server')
+		})
+
+		mLoginClient.on('error', function(error)
+		{
+			LOGGER.log('[user-handler.js] Login server error: ' + error)
+		})
+
+		mLoginClient.on('disconnect', function()
+		{
+			LOGGER.log('[user-handler.js] Disconnected from login server')
+		})
+
 		mLoginClient.on('message', function(msg)
 		{
-			LOGGER.log('LOGIN: got auth callback message:');
+			LOGGER.log('LOGIN: got auth callback message:')
 			LOGGER.log(msg);
 
 			if (msg.logout)

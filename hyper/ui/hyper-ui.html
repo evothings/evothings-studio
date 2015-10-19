@@ -201,15 +201,21 @@ Copyright (c) 2013-2015 Evothings AB
 							<p>Login to get a quick connect button in Evothings Viewer. This button is displayed when you restart the Viewer and allows you to reconnect to the Workbench where you are logged in.</p>
 						</div>
 
+						<!-- Div that holds the login iframe -->
 						<div id="connect-screen-login">
 							<button id="connect-screen-login-close-button" class="btn btn-hyper-toolbar et-btn-stone-light">
 								Close
 							</button>
-							<iframe id="connect-screen-login-iframe"
-								src="" nwdisable nwfaketop>
+							<iframe id="connect-screen-login-iframe" nwdisable nwfaketop>
 							</iframe>
+							<h1 id="connect-screen-login-loading-message">Loading...</h1>
 						</div>
 
+						<!-- Hidden logout iframe -->
+						<iframe id="connect-screen-logout-iframe"
+							style="display:none;"
+							src="" nwdisable nwfaketop>
+						</iframe>
 					</div>
 				</div>
 			</div>
@@ -305,9 +311,8 @@ Copyright (c) 2013-2015 Evothings AB
 			if (USER_HANDLER.getUser())
 			{
 				var logoutURL = USER_HANDLER.getLogoutURL()
-				console.log('LOGOUT: logoutURL is ' + logoutURL)
-				$('#connect-screen-login').show()
-				$('#connect-screen-login-iframe').attr('src', logoutURL)
+				// Open url in hidden logout iframe.
+				$('#connect-screen-logout-iframe').attr('src', logoutURL)
 			}
 		}
 
