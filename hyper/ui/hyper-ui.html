@@ -270,6 +270,9 @@ Copyright (c) 2013-2015 Evothings AB
 		var LOGGER = require('../server/log.js')
 		var USER_HANDLER = require('../server/user-handler.js')
 
+		var DISCONNECT_DELAY = 30000
+		var mDisconnectTimer = 0
+
 		// TODO: Make running local web server an option.
 		//var WEBSERVER = require('../server/webserver.js')
 		//var mWebServer = WEBSERVER.create()
@@ -290,6 +293,16 @@ Copyright (c) 2013-2015 Evothings AB
 			{
 				loginUser()
 			}
+		})
+
+		EVENTS.subscribe(EVENTS.LOGINCONNECT, function(obj)
+		{
+			$('#button-login').removeAttr('disabled')
+		})
+
+		EVENTS.subscribe(EVENTS.LOGINDISCONNECT, function(obj)
+		{
+			$('#button-login').attr('disabled','disabled')
 		})
 
 		$('#connect-screen-login-close-button').click(function()
@@ -359,9 +372,26 @@ Copyright (c) 2013-2015 Evothings AB
 			$('#connect-screen-login').hide()
 		})
 
+		EVENTS.subscribe(EVENTS.CONNECT, function(obj)
+		{
+			LOGGER.log('socket.io connect')
+			if(mDisconnectTimer)
+			{
+				clearTimeout(mDisconnectTimer)
+				mDisconnectTimer = undefined
+			}
+		})
+
 		EVENTS.subscribe(EVENTS.DISCONNECT, function(obj)
 		{
-			logoutUser()
+			LOGGER.log('socket.io disconnect')
+			mDisconnectTimer = setTimeout(function()
+			{
+				logoutUser()
+				EVENTS.publish(EVENTS.LOGOUT, {event: 'logout'})
+				USER_HANDLER.clearUser()
+			}, DISCONNECT_DELAY)
+
 		})
 
 		// ************** Tab Button Handling **************

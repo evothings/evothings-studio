@@ -38,6 +38,7 @@ var EVENTS = require('./events')
 
 var mLoginClient = null
 var mUser = null
+var mLoginConnected = false
 
 /*********************************/
 /***		Functions		  ***/
@@ -58,6 +59,8 @@ exports.createLoginClient = function()
 		mLoginClient.on('connect', function()
 		{
 			LOGGER.log('[user-handler.js] Connected to login server')
+			mLoginConnected = true
+			EVENTS.publish(EVENTS.LOGINCONNECT, {event: 'loginconnect'})
 		})
 
 		mLoginClient.on('error', function(error)
@@ -68,6 +71,8 @@ exports.createLoginClient = function()
 		mLoginClient.on('disconnect', function()
 		{
 			LOGGER.log('[user-handler.js] Disconnected from login server')
+			mLoginConnected = false
+			EVENTS.publish(EVENTS.LOGINDISCONNECT, {event: 'logindisconnect'})
 		})
 
 		mLoginClient.on('message', function(msg)
@@ -103,7 +108,7 @@ exports.createLoginClient = function()
 exports.startLoginSequence = function()
 {
 	var sessionID = SERVER.getSessionID()
-
+	console.log('LOGIN: starting Login Sequence')
 	mLoginClient.emit(
 		'message',
 		JSON.stringify({target:'registerAuthCallback', uuid: sessionID }))
@@ -133,9 +138,19 @@ exports.getLogoutURL = function()
 	return logoutURL
 }
 
+exports.isConnectedToLoginServer = function()
+{
+	return mLoginConnected
+}
+
 exports.getUser = function()
 {
 	return mUser
+}
+
+exports.clearUser = function()
+{
+	mUser = undefined
 }
 
 function getLoginServerAddress()

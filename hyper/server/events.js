@@ -8,6 +8,8 @@ var Events =
     LOGOUT:         'logout',
     SETSESSIONID:   'setsessionid',
     USERMESSAGE:    'usermessage',
+	LOGINCONNECT:   'loginconnect',
+	LOGINDISCONNECT:'logindisconnect',
 
     listeners:  [],
 
