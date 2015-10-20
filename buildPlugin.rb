@@ -183,7 +183,7 @@ def buildEvoThingsClient
 end
 
 def buildPostProcess
-## TODO MIKI	buildDocumentation
+	buildDocumentation
 
 	# Delete files that should not be in the dist.
 	FileUtils.remove_dir(pathDistSource + "documentation/.git", true)
