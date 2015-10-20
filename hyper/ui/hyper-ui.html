@@ -303,6 +303,8 @@ Copyright (c) 2013-2015 Evothings AB
 		EVENTS.subscribe(EVENTS.LOGINDISCONNECT, function(obj)
 		{
 			$('#button-login').attr('disabled','disabled')
+			$('#login-info').html('Not Logged In')
+			$('#connect-screen-login').hide()
 		})
 
 		$('#connect-screen-login-close-button').click(function()
@@ -326,6 +328,15 @@ Copyright (c) 2013-2015 Evothings AB
 				var logoutURL = USER_HANDLER.getLogoutURL()
 				// Open url in hidden logout iframe.
 				$('#connect-screen-logout-iframe').attr('src', logoutURL)
+				// TODO: Find better solution for managing double logouts, when server can't find us and reply back
+				setTimeout(function()
+				{
+					if (USER_HANDLER.getUser())
+					{
+						EVENTS.publish(EVENTS.LOGOUT, {event: 'logout'})
+						USER_HANDLER.clearUser()
+					}
+				}, 1000)
 			}
 		}
 
