@@ -8,16 +8,13 @@ require './sibling-repos.rb'
 
 include FileUtils::Verbose
 
-# Override function "clone" from helpers.rb
-def clone(name, url=nil)
-	path = '../'+name
+cwd = FileUtils.pwd
+siblingRepos.each do |sr|
+	path = '../'+sr.name
 	return if(!Dir::exist?(path))
 	chdir(path)
 	sh 'git pull --ff-only'
 end
-
-cwd = FileUtils.pwd
-doSiblingRepos
 chdir(cwd)
 
 sh 'git pull --ff-only'

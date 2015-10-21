@@ -1,6 +1,8 @@
 # Build plugin for Evothings Studio.
 # Author: Mikael Kindborg
 
+require './sibling-repos.rb'
+
 def distPackageName
 	"EvothingsStudio"
 end
@@ -31,9 +33,13 @@ def pathDistSource
 	pathDist + "source/"
 end
 
+def cwdName
+	File.basename(File.dirname(File.expand_path(__FILE__)))
+end
+
 # Source of main HyperReload application code.
 def pathSourceHyper
-	root + "evothings-studio/"
+	root + cwdName + "/"
 end
 
 # Source file for package.json.
@@ -121,25 +127,20 @@ end
 
 def buildGitVersionFile
 	open(pathDistSource + 'gitVersions.txt', 'w') do |file|
-		[
-			'evothings-studio',
-			'evothings-viewer',
-			'evothings-doc',
-			'evothings-examples',
-			'cordova-ble',
-		].each do |repo|
-			if(!File.exist?("#{root}#{repo}/.git"))
-				raise "Missing source directory: #{root}#{repo}"
+		([SiblingRepo.new(cwdName)]+siblingRepos).each do |repo|
+			path = root+repo.name
+			if(!File.exist?("#{path}/.git"))
+				raise "Missing source directory: #{path}"
 			end
-			o = `git --git-dir=#{root}#{repo}/.git rev-parse HEAD`
-			file.puts "#{repo}: #{o.strip}"
+			o = `git --git-dir=#{path}/.git rev-parse HEAD`
+			file.puts "#{repo.name}: #{o.strip}"
 		end
 	end
 end
 
 def buildPreProcess
 	sh "ruby ./init.rb"
-## TODO MIKI	buildGitVersionFile
+	buildGitVersionFile
 	buildOSXIcons
 end
 

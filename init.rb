@@ -12,7 +12,9 @@ include FileUtils::Verbose
 
 ### Clone Git repos required for the build, if they do not exist.
 
-doSiblingRepos
+siblingRepos.each do |sr|
+	clone(sr.name, sr.url)
+end
 
 ### Load EvoThingsStudio settings into a namespace where they won't conflict with our globals.
 
