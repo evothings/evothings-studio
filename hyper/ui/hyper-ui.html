@@ -208,7 +208,7 @@ Copyright (c) 2013-2015 Evothings AB
 							</button>
 							<iframe id="connect-screen-login-iframe" nwdisable nwfaketop>
 							</iframe>
-							<h1 id="connect-screen-login-loading-message">Loading...</h1>
+							<h1 style="display:none;" id="connect-screen-login-loading-message">Loading...</h1>
 						</div>
 
 						<!-- Hidden logout iframe -->
@@ -254,10 +254,7 @@ Copyright (c) 2013-2015 Evothings AB
 	<script src="hyper-ui.js"></script>
 	<script>
 	//
-	// TODO:
-	//
-	// The plan is to move more of the logic into hyper-ui.js and possibly
-	// create additional module files to make the code easier to read.
+	// TODO: Move this script block to a separate file.
 	//
 
 	// Setup UI button actions (using closure to make variables local).
@@ -279,7 +276,7 @@ Copyright (c) 2013-2015 Evothings AB
 
 		// ************** Login Button **********************
 
-		// TODO: Move login to the connect tab.
+		// TODO: Move login UI code to separate file to reduce size of this file.
 
 		// Set login button action handler. The button
 		// toggles login/logout.
@@ -295,21 +292,56 @@ Copyright (c) 2013-2015 Evothings AB
 			}
 		})
 
+		$('#connect-screen-login-close-button').click(function()
+		{
+			hideLoginScreen()
+		})
+
 		EVENTS.subscribe(EVENTS.LOGINCONNECT, function(obj)
 		{
-			$('#button-login').removeAttr('disabled')
+			enableLoginButton()
 		})
 
 		EVENTS.subscribe(EVENTS.LOGINDISCONNECT, function(obj)
 		{
-			$('#button-login').attr('disabled','disabled')
-			$('#login-info').html('Not Logged In')
-			$('#connect-screen-login').hide()
+			displayLoginButton()
+			disableLoginButton()
 		})
 
-		$('#connect-screen-login-close-button').click(function()
+		EVENTS.subscribe(EVENTS.LOGIN, function(user)
 		{
-			$('#connect-screen-login').hide()
+			console.log('*** User has logged in: ' + user)
+			console.dir(user)
+
+			hideLoginScreen()
+			showUserInfo(user)
+		})
+
+		EVENTS.subscribe(EVENTS.LOGOUT, function()
+		{
+			// TODO: Pass user id to the Run/Reload messaging code (hyper-server.js).
+			LOGGER.log('*** User has logged out ***')
+
+			displayLoginButton()
+		})
+
+		EVENTS.subscribe(EVENTS.CONNECT, function(obj)
+		{
+			LOGGER.log('socket.io connect')
+			if(mDisconnectTimer)
+			{
+				clearTimeout(mDisconnectTimer)
+				mDisconnectTimer = undefined
+			}
+		})
+
+		EVENTS.subscribe(EVENTS.DISCONNECT, function(obj)
+		{
+			LOGGER.log('socket.io disconnect')
+			mDisconnectTimer = setTimeout(function()
+			{
+				logoutUser()
+			}, DISCONNECT_DELAY)
 		})
 
 		function loginUser()
@@ -317,37 +349,60 @@ Copyright (c) 2013-2015 Evothings AB
 			USER_HANDLER.createLoginClient()
 			USER_HANDLER.startLoginSequence()
 			var loginURL = USER_HANDLER.getLoginURL()
-			$('#connect-screen-login').show()
-			$('#connect-screen-login-iframe').attr('src', loginURL)
+			showLoginScreen(loginURL)
 		}
 
 		function logoutUser()
 		{
 			if (USER_HANDLER.getUser())
 			{
+				// Open logout url in hidden logout iframe.
 				var logoutURL = USER_HANDLER.getLogoutURL()
-				// Open url in hidden logout iframe.
 				$('#connect-screen-logout-iframe').attr('src', logoutURL)
+
 				// TODO: Find better solution for managing double logouts, when server can't find us and reply back
 				setTimeout(function()
 				{
 					if (USER_HANDLER.getUser())
 					{
-						EVENTS.publish(EVENTS.LOGOUT, {event: 'logout'})
 						USER_HANDLER.clearUser()
+						EVENTS.publish(EVENTS.LOGOUT, {event: 'logout'})
 					}
 				}, 1000)
 			}
 		}
 
-		EVENTS.subscribe(EVENTS.LOGIN, function(user)
+		function disableLoginButton()
 		{
-			console.log('*** User has logged in: ' + user)
-			console.dir(user)
+			$('#button-login').attr('disabled','disabled')
+		}
 
-			// Close login UI.
+		function enableLoginButton()
+		{
+			$('#button-login').removeAttr('disabled')
+		}
+
+		function displayLoginButton()
+		{
+			$('#button-login').html('Login')
+			$('#login-info').html('Not Logged In')
 			$('#connect-screen-login').hide()
+		}
 
+		function showLoginScreen(loginURL)
+		{
+			$('#connect-screen-login').show()
+			//$('#connect-screen-login-loading-message').show()
+			$('#connect-screen-login-iframe').attr('src', loginURL)
+		}
+
+		function hideLoginScreen()
+		{
+			$('#connect-screen-login').hide()
+		}
+
+		function showUserInfo(user)
+		{
 			if (user && user.name && user.picture)
 			{
 				// Display user data.
@@ -371,39 +426,7 @@ Copyright (c) 2013-2015 Evothings AB
 			{
 				$('#login-info').html('Could not log in')
 			}
-		})
-
-		EVENTS.subscribe(EVENTS.LOGOUT, function(user)
-		{
-			// TODO: Pass user id to the Run/Reload messaging code (hyper-server.js).
-			LOGGER.log('*** User has logged out ***')
-			// Set button text to "Login".
-			$('#button-login').html('Login')
-			$('#login-info').html('Not Logged In')
-			$('#connect-screen-login').hide()
-		})
-
-		EVENTS.subscribe(EVENTS.CONNECT, function(obj)
-		{
-			LOGGER.log('socket.io connect')
-			if(mDisconnectTimer)
-			{
-				clearTimeout(mDisconnectTimer)
-				mDisconnectTimer = undefined
-			}
-		})
-
-		EVENTS.subscribe(EVENTS.DISCONNECT, function(obj)
-		{
-			LOGGER.log('socket.io disconnect')
-			mDisconnectTimer = setTimeout(function()
-			{
-				logoutUser()
-				EVENTS.publish(EVENTS.LOGOUT, {event: 'logout'})
-				USER_HANDLER.clearUser()
-			}, DISCONNECT_DELAY)
-
-		})
+		}
 
 		// ************** Tab Button Handling **************
 
