@@ -4,11 +4,11 @@
 {"path":"examples/hue-lights/index.html", "image":"foo.jpg"},
 
 {"path":"examples/ble-scan/index.html", "image":"foo.jpg"},
+{"path":"examples/ble-discovery/index.html", "image":"foo.jpg"},
 {"path":"examples/eddystone-scan/index.html", "image":"foo.jpg"},
 {"path":"examples/ibeacon-scan/index.html", "image":"foo.jpg"},
 {"path":"examples/estimote-beacons/index.html", "image":"resources/list/estimote_beacon.jpg"},
 {"path":"examples/estimote-nearables/index.html", "image":"foo.jpg"},
-{"path":"examples/ble-discovery/index.html", "image":"foo.jpg"},
 
 {"path":"examples/ti-sensortag-accelerometer/index.html", "image":"examples/ti-sensortag-accelerometer/TISensorTagCC2650.png"},
 {"path":"examples/ti-sensortag-sensors/index.html", "image":"examples/ti-sensortag-sensors/TISensorTagCC2650.png"},
