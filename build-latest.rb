@@ -11,7 +11,7 @@ include FileUtils::Verbose
 cwd = FileUtils.pwd
 siblingRepos.each do |sr|
 	path = '../'+sr.name
-	return if(!Dir::exist?(path))
+	next if(!Dir::exist?(path))
 	chdir(path)
 	sh 'git pull --ff-only'
 end
