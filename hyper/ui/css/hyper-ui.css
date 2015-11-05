@@ -182,9 +182,22 @@ TODO: Remove, use automatic width for all buttons.
 	border-radius: 4px;
 }
 
+#screen-connect p
+{
+	/* Make text a bit bigger than the default. */
+	font-size: 120%;
+}
+
+#screen-connect button
+{
+	/* Make button text bigger than the default. */
+	font-size: 150%;
+}
+
 #connect-key
 {
-	font-size: 135%;
+	padding-top: 20px;
+	font-size: 255% !important;
 	font-weight: bold;
 }
 
@@ -198,12 +211,6 @@ TODO: Remove, use automatic width for all buttons.
 	padding-top: 20px;
 	font-size: 125%;
 	font-weight: bold;
-}
-
-#screen-connect p
-{
-	/* Make text i bit bigger than the default. */
-	font-size: 120% !important;
 }
 
 /* For spinning icon on the Get Key button */
@@ -266,4 +273,28 @@ TODO: Remove, use automatic width for all buttons.
 	position: absolute;
 	left:20px;
 	top:0px;
+}
+
+.screen-start-logotype
+{
+	position: absolute;
+	width: 100px;
+	height: auto;
+	top: 15px;
+	right: 15px;
+}
+
+.screen-start-help
+{
+	display: none;
+}
+
+#button-toogle-help
+{
+	position: absolute;
+	width: 130px;
+	height: auto;
+	top: 15px;
+	right: 145px;
+	font-size: 100% !important;
 }

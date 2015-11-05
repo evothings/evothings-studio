@@ -25,6 +25,12 @@ limitations under the License.
 // eventual headless version of HyperReload. Code currently
 // contains serveral dependencies, however.
 
+// Wrapping everything in a closure since this file is included
+// with a script tag in hyper-ui.html and therefore man affect the
+// global browser scope.
+;(function()
+{
+
 /*** Imported modules ***/
 
 var FS = require('fs')
@@ -36,6 +42,7 @@ var SETTINGS = require('../settings/settings.js')
 var LOGGER = require('../server/log.js')
 var UUID = require('../server/uuid.js')
 var EVENTS = require('../server/events')
+var USER_HANDLER = require('../server/user-handler.js')
 
 /*** Globals ***/
 
@@ -43,19 +50,38 @@ var EVENTS = require('../server/events')
 var hyper = {}
 
 // Global Node.js reference to the main hyper object.
-// Useful for e.g. access from the JavaScript interactive tools.
-global.mainHyper = hyper
+// Useful for e.g. access from the JavaScript interactive tools window.
+global.hyper = hyper
+
+window.hyper = hyper
 
 // UI-related functions.
 hyper.UI = {}
 
+/*** Main setup function ***/
+
+// This function is called at the end of this file.
+hyper.main = function()
+{
+	hyper.UI.defineUIFunctions()
+	hyper.defineServerFunctions()
+
+	hyper.UI.setupUI()
+	hyper.UI.setupUIEvents()
+	hyper.UI.setStartScreenHelpVisibility()
+
+	hyper.setupServer()
+	hyper.UI.connect()
+}
+
 /*** UI setup ***/
 
-;(function()
+hyper.UI.defineUIFunctions = function()
 {
 	var mWorkbenchWindow = null
+	var mConnectKeyTimer
 
-	function setupUI()
+	hyper.UI.setupUI = function()
 	{
 		createSystemMenuForOSX()
 		styleUI()
@@ -315,13 +341,13 @@ hyper.UI = {}
 				+ '<button '
 				+	'type="button" '
 				+	'class="button-open btn et-btn-aluminium" '
-				+	'onclick="hyper.openFileFolder(\'__PATH1__\')">'
+				+	'onclick="window.hyper.openFileFolder(\'__PATH1__\')">'
 				+	'Code'
 				+ '</button>'
 				+ '<button '
 				+	'type="button" '
 				+	'class="button-run btn et-btn-green" '
-				+	'onclick="hyper.runAppGuard(\'__PATH2__\')">'
+				+	'onclick="window.hyper.runAppGuard(\'__PATH2__\')">'
 				+	'Run'
 				+ '</button>'
 				+ '<h4>__NAME__</h4>'
@@ -332,7 +358,7 @@ hyper.UI = {}
 				'<button '
 				+	'type="button" '
 				+	'class="close button-delete" '
-				+	'onclick="hyper.UI.deleteEntry(this)">'
+				+	'onclick="window.hyper.UI.deleteEntry(this)">'
 				+	'&times;'
 				+ '</button>'
 		}
@@ -603,7 +629,63 @@ hyper.UI = {}
 			hyper.UI.displayConnectKey(
 				'Server address has been changed. Click GET KEY to get a new connect key.')
 		}
+	}
 
+	hyper.UI.openDocumentation = function()
+	{
+		var url = 'file://' + PATH.resolve('./documentation/index.html')
+		hyper.UI.openInBrowser(url)
+	}
+
+	hyper.UI.openReleaseNotes = function()
+	{
+		var url = 'file://' + PATH.resolve('./documentation/studio/release-notes.html')
+		hyper.UI.openInBrowser(url)
+	}
+
+	hyper.UI.openInBrowser = function(url)
+	{
+		GUI.Shell.openExternal(url)
+	}
+
+	hyper.UI.setStartScreenHelpVisibility = function()
+	{
+		var show = SETTINGS.getShowStartScreenHelp()
+		if (show)
+		{
+			hyper.UI.showStartScreenHelp()
+		}
+		else
+		{
+			hyper.UI.hideStartScreenHelp()
+		}
+	}
+
+	hyper.UI.toogleStartScreenHelp = function()
+	{
+		var show = SETTINGS.getShowStartScreenHelp()
+		if (show)
+		{
+			hyper.UI.hideStartScreenHelp()
+		}
+		else
+		{
+			hyper.UI.showStartScreenHelp()
+		}
+	}
+
+	hyper.UI.showStartScreenHelp = function()
+	{
+		SETTINGS.setShowStartScreenHelp(true)
+		$('#button-toogle-help').html('Hide Help')
+		$('.screen-start-help').show()
+	}
+
+	hyper.UI.hideStartScreenHelp = function()
+	{
+		SETTINGS.setShowStartScreenHelp(false)
+		$('#button-toogle-help').html('Show Help')
+		$('.screen-start-help').hide()
 	}
 
     hyper.UI.connect = function()
@@ -633,8 +715,6 @@ hyper.UI = {}
 		}
 	}
 
-	var mConnectKeyTimer
-
 	hyper.UI.setConnectKeyTimeout = function(timeout)
 	{
 		if (mConnectKeyTimer)
@@ -660,13 +740,11 @@ hyper.UI = {}
 		$('#connect-spinner').css('display', 'none')
 		$('#connect-screen-message').html(message)
 	}
-
-	setupUI()
-})()
+}
 
 /*** Server setup ***/
 
-;(function()
+hyper.defineServerFunctions = function()
 {
 	var SERVER = require('../server/hyper-server.js')
 	var MONITOR = require('../server/filemonitor.js')
@@ -680,10 +758,10 @@ hyper.UI = {}
 	var mApplicationBasePath = process.cwd()
 	var mRunAppGuardFlag = false
 	var mNumberOfConnectedClients = 0
-	//var mConnectedCounterTimer = 0
-	//var mIpAddressString = null
 
-	hyper.setUpServer = function()
+	// Initialize the file server (the socket.io client
+	// that handles file requests).
+	hyper.setupServer = function()
 	{
 		// Populate the UI.
 		// TODO: Consider moving these calls to a function in hyper.UI.
@@ -830,32 +908,6 @@ hyper.UI = {}
 		hyper.UI.setConnectedCounter(mNumberOfConnectedClients)
 	}
 
-	/*
-	function clientsConnectedCallback()
-	{
-		mRunAppGuardFlag = false
-
-		++mNumberOfConnectedClients
-
-		clearTimeout(mConnectedCounterTimer)
-		mConnectedCounterTimer = setTimeout(function() {
-			hyper.UI.setConnectedCounter(mNumberOfConnectedClients) },
-			1000)
-
-		// Update ip address in the UI to the actual ip used by the server.
-		//SERVER.getIpAddress(function(address) {
-		//	hyper.UI.displayIpAddress(address + ':' +
-		//	SETTINGS.getWebServerPort())
-		//})
-	}
-	*/
-
-	// TODO: Remove.
-	//function reloadCallback()
-	//{
-	//	mNumberOfConnectedClients = 0
-	//}
-
 	// Called when a connect key is sent from the server.
     function requestConnectKeyCallback(message)
     {
@@ -944,12 +996,298 @@ hyper.UI = {}
 	{
 		SERVER.setRemoteServerURL(url)
 	}
+}
 
-    //---------------------------------------------------
-    //
-    // Event handlers
-    //
-    //---------------------------------------------------
+/*** Additional UI setup ***/
+
+// TODO: Structure this in a better way that is easier to read.
+// For instance compose into functions, integrate into code above etc.
+
+// Setup UI button actions.
+hyper.UI.setupUIEvents = function()
+{
+	var DISCONNECT_DELAY = 30000
+	var mDisconnectTimer = 0
+
+	// ************** Connect Key Button **********************
+
+	$('#button-get-connect-key').click(function()
+	{
+		hyper.UI.getConnectKeyFromServer()
+	})
+
+	// ************** UI Buttons/Links **********************
+
+	$('#button-show-settings-dialog').click(function()
+	{
+		hyper.UI.showSettingsDialog()
+	})
+
+	$('#button-show-release-notes').click(function()
+	{
+		hyper.UI.openReleaseNotes()
+	})
+
+	$('#button-save-settings').click(function()
+	{
+		hyper.UI.saveSettings()
+	})
+
+	$('#button-open-documentation').click(function()
+	{
+		hyper.UI.openDocumentation()
+	})
+
+	// ************** Start Screen Toggle Help Button **********************
+
+	$('#button-toogle-help').click(function()
+	{
+		hyper.UI.toogleStartScreenHelp()
+	})
+
+	// ************** Login Button **********************
+
+	// Set login button action handler. The button
+	// toggles login/logout.
+	$('#button-login').click(function()
+	{
+		if (USER_HANDLER.getUser())
+		{
+			logoutUser()
+		}
+		else
+		{
+			loginUser()
+		}
+	})
+
+	$('#connect-screen-login-close-button').click(function()
+	{
+		hideLoginScreen()
+	})
+
+	EVENTS.subscribe(EVENTS.LOGINCONNECT, function(obj)
+	{
+		enableLoginButton()
+	})
+
+	EVENTS.subscribe(EVENTS.LOGINDISCONNECT, function(obj)
+	{
+		displayLoginButton()
+		disableLoginButton()
+	})
+
+	EVENTS.subscribe(EVENTS.LOGIN, function(user)
+	{
+		console.log('*** User has logged in: ' + user)
+		console.dir(user)
+
+		hideLoginScreen()
+		showUserInfo(user)
+	})
+
+	EVENTS.subscribe(EVENTS.LOGOUT, function()
+	{
+		// TODO: Pass user id to the Run/Reload messaging code (hyper-server.js).
+		LOGGER.log('*** User has logged out ***')
+
+		displayLoginButton()
+	})
+
+	EVENTS.subscribe(EVENTS.CONNECT, function(obj)
+	{
+		LOGGER.log('socket.io connect')
+		if(mDisconnectTimer)
+		{
+			clearTimeout(mDisconnectTimer)
+			mDisconnectTimer = undefined
+		}
+	})
+
+	EVENTS.subscribe(EVENTS.DISCONNECT, function(obj)
+	{
+		LOGGER.log('socket.io disconnect')
+		mDisconnectTimer = setTimeout(function()
+		{
+			logoutUser()
+		}, DISCONNECT_DELAY)
+	})
+
+	function loginUser()
+	{
+		USER_HANDLER.createLoginClient()
+		USER_HANDLER.startLoginSequence()
+		var loginURL = USER_HANDLER.getLoginURL()
+		showLoginScreen(loginURL)
+	}
+
+	function logoutUser()
+	{
+		if (USER_HANDLER.getUser())
+		{
+			// Open logout url in hidden logout iframe.
+			var logoutURL = USER_HANDLER.getLogoutURL()
+			$('#connect-screen-logout-iframe').attr('src', logoutURL)
+
+			// TODO: Find better solution for managing double logouts, when server can't find us and reply back
+			setTimeout(function()
+			{
+				if (USER_HANDLER.getUser())
+				{
+					USER_HANDLER.clearUser()
+					EVENTS.publish(EVENTS.LOGOUT, {event: 'logout'})
+				}
+			}, 1000)
+		}
+	}
+
+	function disableLoginButton()
+	{
+		$('#button-login').attr('disabled','disabled')
+	}
+
+	function enableLoginButton()
+	{
+		$('#button-login').removeAttr('disabled')
+	}
+
+	function displayLoginButton()
+	{
+		$('#button-login').html('Login')
+		$('#login-info').html('Not Logged In')
+		$('#connect-screen-login').hide()
+	}
+
+	function showLoginScreen(loginURL)
+	{
+		$('#connect-screen-login').show()
+		//$('#connect-screen-login-loading-message').show()
+		$('#connect-screen-login-iframe').attr('src', loginURL)
+	}
+
+	function hideLoginScreen()
+	{
+		$('#connect-screen-login').hide()
+	}
+
+	function showUserInfo(user)
+	{
+		if (user && user.name && user.picture)
+		{
+			// Display user data.
+			if(user.picture.indexOf('http') == -1)
+			{
+				user.picture = user.EVO_SERVER + '/' + user.picture
+			}
+			// Show user picture on login button and change text to "Logout".
+			var imageHTML =
+				'<img style="height:30px;with:auto;margin-right:5px;margin-top:-3px" '
+				+	'class="pull-left" '
+				+	'src="' + user.picture + '">'
+			var infoText = 'Logged in as '+user.name
+			var infoHTML = imageHTML + infoText
+			$('#login-info').html(infoHTML)
+
+			// Change login button text to logout.
+			$('#button-login').html('Logout')
+		}
+		else
+		{
+			$('#login-info').html('Could not log in')
+		}
+	}
+
+	// ************** Tab Button Handling **************
+
+	hyper.showTab = function(tabname)
+	{
+		// Hide all screens and set unselected colour for buttons.
+		$('#screen-connect').hide()
+		$('#screen-examples').hide()
+		$('#screen-projects').hide()
+		$('#button-connect, #button-examples, #button-projects')
+			.removeClass('et-btn-stone')
+			.addClass('et-btn-stone-light')
+
+		// Show selected tab.
+		var screenId = '#screen-' + tabname
+		var buttonId = '#button-' + tabname
+		$(screenId).show()
+		$(buttonId).removeClass('et-btn-stone-light').addClass('et-btn-stone')
+	}
+
+	// ************** Connect Tab Button **************
+
+	$('#button-connect').click(function()
+	{
+		hyper.showTab('connect')
+	})
+
+	// ************** Examples Tab Button **************
+
+
+	$('#button-examples').click(function()
+	{
+		hyper.showTab('examples')
+	})
+
+	// ************** Projects Tab Button **************
+
+	$('#button-projects').click(function()
+	{
+		hyper.showTab('projects')
+	})
+
+	// ************** Show Initial Tab **************
+
+	hyper.showTab('connect')
+
+	// ************** Tools Button **************
+
+	$('#button-tools').click(function()
+	{
+		hyper.UI.showToolsWorkbenchWindow()
+	})
+
+	// ************** Documentation Button **************
+
+	var button = $('#button-documentation')
+	button && button.click(function()
+	{
+		hyper.UI.openDocumentation()
+	})
+
+	// ************** Forum Button **************
+
+	button = $('#button-forum')
+	button && button.click(function()
+	{
+		hyper.UI.openInBrowser('http://forum.evothings.com/')
+	})
+
+	// ************** No Client Connected Event **************
+
+	// Called when you press Run and no client is connected.
+	hyper.noClientConnectedHander = function()
+	{
+		$('#ModalDialog-NoClientConnected').modal('show')
+	}
+
+	// Click handler for link in the ModalDialog-NoClientConnected dialog.
+	$('#ModalDialog-NoClientConnected-ClientAppLink').click(function()
+	{
+		var url = 'file://' + PATH.resolve('./documentation/studio/mobile-app.html')
+		hyper.UI.openInBrowser(url)
+	})
+
+	// Make settings dialog available in global scope.
+	// TODO: Where is this used? Change to hyper scope.
+	/*window.showSettingsDialog = function()
+	{
+		hyper.UI.showSettingsDialog()
+	}*/
+
+    // ************** Additional event handlers **************
 
     EVENTS.subscribe(EVENTS.CONNECT, function(obj)
     {
@@ -966,5 +1304,10 @@ hyper.UI = {}
         // Display a message for the user.
         hyper.UI.displayConnectScreenMessage(message.userMessage)
     })
+}
 
-})()
+// Call main function to setup UI and server.
+hyper.main()
+
+})() // End of closure wrapper.
+

@@ -90,7 +90,7 @@ systemSetting('ProjectWindowGeometry')
 /**
  * Welcome screen setting.
  */
-systemSetting('ShowWelcomeScreen')
+systemSetting('ShowStartScreenHelp', true)
 
 /**
  * Workbench window settings.
