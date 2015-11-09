@@ -663,8 +663,8 @@ hyper.UI.defineUIFunctions = function()
 
 	hyper.UI.toogleStartScreenHelp = function()
 	{
-		var show = SETTINGS.getShowStartScreenHelp()
-		if (show)
+		var visible = SETTINGS.getShowStartScreenHelp()
+		if (visible)
 		{
 			hyper.UI.hideStartScreenHelp()
 		}
@@ -684,6 +684,7 @@ hyper.UI.defineUIFunctions = function()
 	hyper.UI.hideStartScreenHelp = function()
 	{
 		SETTINGS.setShowStartScreenHelp(false)
+		var show = SETTINGS.getShowStartScreenHelp()
 		$('#button-toogle-help').html('Show Help')
 		$('.screen-start-help').hide()
 	}
@@ -729,10 +730,33 @@ hyper.UI.defineUIFunctions = function()
 			timeout)
 	}
 
+	// Variable key is a string, it is either a connect key or a
+	// message from the server.
 	hyper.UI.displayConnectKey = function(key)
 	{
-		$('#connect-spinner').css('display', 'none')
+		// Adjust font size depending on the length of the key.
+		// A connect key currently is 8 characters, a message is
+		// probably longer.
+		if (key.length > 8)
+		{
+			// Message longer than 8 chars.
+			$('#connect-key').css('display', 'block')
+			$('#connect-key').css('font-size', '22px')
+			$('#connect-key').css('color', 'black')
+		}
+		else
+		{
+			// Display connect key with bigger font and after the Get Key button.
+			$('#connect-key').css('display', 'inline')
+			$('#connect-key').css('font-size', '36px')
+			$('#connect-key').css('color', 'black')
+		}
+
+		// Show connect key field text.
 		$('#connect-key').html(key)
+
+		// Hide button spinner.
+		$('#connect-spinner').css('display', 'none')
 	}
 
 	hyper.UI.displayConnectScreenMessage = function(message)
@@ -1118,6 +1142,7 @@ hyper.UI.setupUIEvents = function()
 		USER_HANDLER.createLoginClient()
 		USER_HANDLER.startLoginSequence()
 		var loginURL = USER_HANDLER.getLoginURL()
+		console.log('loginURL : ' + loginURL)
 		showLoginScreen(loginURL)
 	}
 

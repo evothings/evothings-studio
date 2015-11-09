@@ -192,13 +192,32 @@ TODO: Remove, use automatic width for all buttons.
 {
 	/* Make button text bigger than the default. */
 	font-size: 150%;
+	margin-right: 10px;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+.valign
+{
+    vertical-align: middle;
+    display: inline;
 }
 
 #connect-key
 {
-	padding-top: 20px;
-	font-size: 255% !important;
+	display: none;
 	font-weight: bold;
+	padding: 5px 10px;
+	background: white;
+	/*
+	font-size: 255% !important;
+	padding: 20px;
+	border: 1px solid #888888;
+	background-color: rgb(255,255,255);
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+	*/
 }
 
 #connect-spinner

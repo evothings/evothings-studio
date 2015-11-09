@@ -50,7 +50,14 @@ function defineSettingFuns(name, defaultValue)
 
 	exports[getter] = function()
 	{
-		return exports.get(name) || defaultValue
+		if (name in window.localStorage)
+		{
+			return exports.get(name)
+		}
+		else
+		{
+			return defaultValue
+		}
 	}
 
 	exports[setter] = function(value)
