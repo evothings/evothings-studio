@@ -37,6 +37,8 @@ var FS = require('fs')
 var PATH = require('path')
 var OS = require('os')
 var GUI = require('nw.gui')
+var PATH = require('path')
+var FSEXTRA = require('fs-extra')
 var FILEUTIL = require('../server/fileutil.js')
 var SETTINGS = require('../settings/settings.js')
 var LOGGER = require('../server/log.js')
@@ -309,19 +311,19 @@ hyper.UI.defineUIFunctions = function()
 		hyper.UI.displayProjectList()
 	}
 
+	/**
+	 * Possible options include:
+	 *   options.screen
+	 *   options.copyButton
+	 *   options.openButton
+	 *   options.deleteButton
+	 */
 	function createProjectEntry(path, options)
 	{
 		options = options || {}
-		options.list = options.list || '#screen-projects'
-
-		if(options.haveDeleteButton !== false)
-		{
-			options.haveDeleteButton = true
-		}
 
 		// Template for project items.
-		var html =
-			'<div class="ui-state-default ui-corner-all">'
+		var html = '<div class="ui-state-default ui-corner-all">'
 
 		/*
 		// TODO: Commented out images in examples list.
@@ -337,22 +339,40 @@ hyper.UI.defineUIFunctions = function()
 		}
 		*/
 
-		html += ''
-				+ '<button '
+		if (options.copyButton)
+		{
+			html +=
+				'<button '
 				+	'type="button" '
-				+	'class="button-open btn et-btn-aluminium" '
-				+	'onclick="window.hyper.openFileFolder(\'__PATH1__\')">'
+				+	'class="button-open btn et-btn-blue" '
+				+	'onclick="window.hyper.copyExample(\'__PATH1__\')">'
+				+	'Copy'
+				+ '</button>'
+		}
+
+		if (options.openButton)
+		{
+			html +=
+				'<button '
+				+	'type="button" '
+				+	'class="button-open btn et-btn-stone" '
+				+	'onclick="window.hyper.openFileFolder(\'__PATH2__\')">'
 				+	'Code'
 				+ '</button>'
-				+ '<button '
-				+	'type="button" '
-				+	'class="button-run btn et-btn-green" '
-				+	'onclick="window.hyper.runAppGuard(\'__PATH2__\')">'
-				+	'Run'
-				+ '</button>'
-				+ '<h4>__NAME__</h4>'
-				+ '<p>__PATH3__</p>'
-		if(options.haveDeleteButton)
+		}
+
+		// Run button.
+		html +=
+			'<button '
+			+	'type="button" '
+			+	'class="button-run btn et-btn-green" '
+			+	'onclick="window.hyper.runAppGuard(\'__PATH3__\')">'
+			+	'Run'
+			+ '</button>'
+			+ '<h4>__NAME__</h4>'
+			+ '<p>__PATH4__</p>'
+
+		if (options.deleteButton)
 		{
 			html +=
 				'<button '
@@ -362,8 +382,9 @@ hyper.UI.defineUIFunctions = function()
 				+	'&times;'
 				+ '</button>'
 		}
+
 		html +=
-			'<div class="project-list-entry-path" style="display:none;">__PATH4__</div>'
+			'<div class="project-list-entry-path" style="display:none;">__PATH5__</div>'
 			+ '</div>'
 
 		// Get name of project, use title tag as first choise.
@@ -387,8 +408,9 @@ hyper.UI.defineUIFunctions = function()
 		// Replace fields in template.
 		html = html.replace('__PATH1__', escapedPath)
 		html = html.replace('__PATH2__', escapedPath)
-		html = html.replace('__PATH3__', getShortPathFromPath(path))
-		html = html.replace('__PATH4__', path)
+		html = html.replace('__PATH3__', escapedPath)
+		html = html.replace('__PATH4__', getShortPathFromPath(path))
+		html = html.replace('__PATH5__', path)
 		html = html.replace('__NAME__', name)
 		html = html.replace('__IMAGE_PATH__', options.imagePath)
 
@@ -397,7 +419,7 @@ hyper.UI.defineUIFunctions = function()
 		//LOGGER.log(html)
 
 		// Insert element first in list.
-		$(options.list).append(element)
+		options.screen && $(options.screen).append(element)
 	}
 
 	function getTagContent(data, tag)
@@ -528,7 +550,13 @@ hyper.UI.defineUIFunctions = function()
 			for (var i = 0; i < projectList.length; ++i)
 			{
 				var path = projectList[i]
-				createProjectEntry(path)
+				createProjectEntry(
+					path,
+					{
+						screen: '#screen-projects',
+						openButton: true,
+						deleteButton: true
+					})
 			}
 		}
 		else
@@ -557,8 +585,8 @@ hyper.UI.defineUIFunctions = function()
 			createProjectEntry(
 				entry.path,
 				{
-					list: '#screen-examples',
-					haveDeleteButton: false,
+					screen: '#screen-examples',
+					copyButton: true,
 					imagePath: entry.image
 				})
 		}
@@ -1014,6 +1042,74 @@ hyper.defineServerFunctions = function()
 
 		// Show the file in the folder.
 		openFolder(path)
+	}
+
+	hyper.copyExample = function(path)
+	{
+		// Prepend base path if this is not an absolute path.
+		if (!FILEUTIL.isPathAbsolute(path))
+		{
+			path = mApplicationBasePath + '/' + path
+		}
+
+		// Show the file in the folder.
+		copyExampleToUserApps(path)
+	}
+
+	function copyExampleToUserApps(fullExamplePath)
+	{
+		try
+		{
+			console.log('@@@ copyExampleToUserApps')
+
+			var userDir =
+				process.env.HOME ||
+				process.env.HOMEPATH ||
+				process.env.USERPROFILE
+
+			var indexFile = PATH.basename(fullExamplePath)
+			var exampleDir = PATH.dirname(fullExamplePath)
+			var exampleFolderName = PATH.basename(exampleDir)
+			var targetDir = PATH.join(
+				userDir, 'EvothingsStudio', 'MyApps', exampleFolderName)
+
+			console.log('userDir: ' + userDir)
+			//console.log('exampleDir: ' + exampleDir)
+			//console.log('exampleFolderName: ' + exampleFolderName)
+			//console.log('targetDir: ' + targetDir)
+
+			// Copy example. Ask for target path, present targetDir as default.
+			var userTargetDir = window.prompt('Copy example to folder', targetDir)
+			if (userTargetDir)
+			{
+				var overwrite = true
+				var exists = FILEUTIL.statSync(userTargetDir)
+				if (exists)
+				{
+					overwrite = window.confirm('Folder exists, do you want to overwrite it?')
+				}
+
+				if (overwrite)
+				{
+					// Copy.
+					FSEXTRA.copySync(exampleDir, userTargetDir)
+
+					// Add path of index.html to my apps.
+					var fullTargetPath = PATH.join(userTargetDir, indexFile)
+					console.log('fullTargetPath: ' + fullTargetPath)
+					hyper.addProject(fullTargetPath)
+
+					// Show my apps.
+					hyper.showTab('projects')
+					hyper.UI.displayProjectList()
+				}
+			}
+		}
+		catch (error)
+		{
+			window.alert('Something went wrong, could not copy example app.')
+			console.log('Error in copyExampleToUserApps: ' + error)
+		}
 	}
 
 	hyper.setRemoteServerURL = function(url)
