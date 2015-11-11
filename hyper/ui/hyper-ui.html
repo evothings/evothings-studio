@@ -13,8 +13,8 @@ Copyright (c) 2013-2015 Evothings AB
 	<script src="../libs/jquery/jquery-2.1.4.min.js"></script>
 	<script src="../libs/jquery/jquery-ui.min.js"></script>
 	<script src="../libs/bootstrap-3.3.5-dist/js/bootstrap.min.js"></script>
-	<link href="hyper-common.css" rel="stylesheet" />
-	<link href="hyper-ui.css" rel="stylesheet" />
+	<link href="css/hyper-common.css" rel="stylesheet" />
+	<link href="css/hyper-ui.css" rel="stylesheet" />
 </head>
 <body>
 	<div id="panel-page">
@@ -28,9 +28,8 @@ Copyright (c) 2013-2015 Evothings AB
 						<span class="glyphicon glyphicon-align-justify"></span>
 					</button>
 					<ul class="dropdown-menu">
-						<li><a href="javascript:void(0)" onclick="window.showSettingsDialog()">Settings</a></li>
-						<li><a href="javascript:void(0)"
-							onclick="hyper.showWelcomeScreen()">Welcome Screen</a></li>
+						<li><a id="button-show-settings-dialog" href="javascript:void(0)">Settings</a></li>
+						<li><a id="button-show-release-notes" href="javascript:void(0)">Release Notes</a></li>
 					</ul>
 				</div>
 			</div>
@@ -39,13 +38,13 @@ Copyright (c) 2013-2015 Evothings AB
 				<div class="btn-group btn-group-justified" role="group">
 					<a id="button-connect"
 					   class="btn btn-hyper-toolbar et-btn-stone-light"
-					   href="javascript:void(0)">Connect</a>
+					   href="javascript:void(0)">Start</a>
 					<a id="button-examples"
 						class="btn btn-hyper-toolbar et-btn-stone-light"
 						href="javascript:void(0)">Examples</a>
 					<a id="button-projects"
 						class="btn btn-hyper-toolbar et-btn-stone-light"
-						href="javascript:void(0)">Projects</a>
+						href="javascript:void(0)">My Apps</a>
 					<a id="button-tools"
 						class="btn btn-hyper-toolbar btn-toolbar et-btn-white"
 						href="javascript:void(0)" style="border-left">Tools</a>
@@ -74,30 +73,6 @@ Copyright (c) 2013-2015 Evothings AB
 						</div>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<!-- ModalDialog-NewVersionAvailable--->
-			<div class="modal fade" id="ModalDialog-NewVersionAvailable" tabindex="-1" role="dialog" aria-labelledby="ModalDialog-NewVersionAvailable-Label" aria-hidden="true">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-							<h4 class="modal-title" id="ModalDialog-NewVersionAvailable-Label">New Version Available!</h4>
-						</div>
-						<div class="modal-body">
-							<p>New version <span id="ModalDialog-NewVersionAvailable-VersionNumber"></span>
-							of Evothings Studio is available! Get it at the
-							<a href="javascript:void(0)" id="ModalDialog-NewVersionAvailable-DownloadLink">download page</a>.</p>
-							<div class="checkbox">
-								<input id="ModalDialog-NewVersionAvailable-DoNotShowCheckbox" type="checkbox"> Do not show again for this version.
-							</div>
-						</div>
-
-						<div class="modal-footer">
-							<button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
 						</div>
 					</div>
 				</div>
@@ -147,9 +122,9 @@ Copyright (c) 2013-2015 Evothings AB
 						</div>
 
 						<div class="modal-footer">
-								<button type="button"
-									class="btn btn-success"
-									onclick="hyper.UI.saveSettings()">
+								<button id="button-save-settings"
+									type="button"
+									class="btn btn-success">
 									Save
 								</button>
 							<button type="button"
@@ -162,45 +137,60 @@ Copyright (c) 2013-2015 Evothings AB
 				</div>
 			</div>
 
-			<!-- Connect screen -->
+			<!-- Start screen -->
 			<div id="screen-connect">
 				<div class="panel">
 					<div class="panel-body">
 
-						<h2>Connect</h2>
+						<button id="button-toogle-help"
+							type="button"
+							class="btn et-btn-charcoal">
+							Hide Help
+						</button>
 
-						<p>To connect to the Workbench from the Evothings Viewer mobile app, you need Internet access and a connect key.</p>
+						<img class="screen-start-logotype"
+							src="images/logo.svg" alt="Evothings" />
 
-						<p>Click the "Get Key" button to obtain a connect key. Use this key when connecting from the Evothings Viewer app. Click "Get Key" again if the key has timed out. Once connected, your session has no time limit.</p>
-
-						<div class="well">
-							<span id="connect-key">Click GET KEY</span>
+						<div class="screen-start-help">
+							<h1>Getting Started</h1>
+							<p>Evothings Studio consists of two connected parts, Evothings Workbench and the Evothings Viewer app. Install <strong>Evothings Viewer</strong> on your mobile devices from Google Play and Apple App Store.</p>
+							<p>From the Workbench you can run apps in connected Viewers. The currently running app will be reloaded automatically when saving edited code files.</p>
+							<p><strong>To connect to the Workbench from Evothings Viewer, you need Internet access and a connect key.</strong></p>
+							<p><strong>Click the "Get Key" button below to obtain a connect key.</strong> Use this key when connecting from the Viewer. Click "Get Key" again if the key times out. Once connected, your session has no time limit.</p>
+							<p>Login to get a quick connect button in Evothings Viewer. This button is displayed when you restart the Viewer and allows you to reconnect to the Workbench where you are logged in, without entering a connect code.</p>
+							<p>For further details and a Getting Started guide, <a id="button-open-documentation" href="javascript:void(0)">visit the documentation</a>.</p>
 						</div>
 
 						<div>
-							<button type="button"
-								class="btn et-btn-green"
-								onclick="hyper.UI.getConnectKeyFromServer()">
+							<button id="button-login"
+								type="button"
+								class="btn et-btn-blue valign">
+								Login
+							</button>
+							<button id="button-get-connect-key"
+								type="button"
+								class="btn et-btn-green valign">
 								Get Key <span id="connect-spinner" class="glyphicon glyphicon-refresh glyphicon-spin"></span>
 							</button>
+							<div id="connect-key" class="well well-sm valign"></div>
 						</div>
 
+						<div>
+						</div>
+<!--
+						<div>
+							<p id="connect-key"></p>
+						</div>
+-->
 						<div>
 							<p id="connect-screen-message"></p>
 						</div>
 
-						<div >
-							<button id="button-login"
-								type="button"
-								class="btn et-btn-blue">
-								Login
-							</button>
-						</div>
-
+<!--
 						<div style="padding-top:10px;">
-							<p>Login to get a quick connect button in Evothings Viewer. This button is displayed when you restart the Viewer and allows you to reconnect to the Workbench where you are logged in.</p>
+							<p class="screen-start-ui-help">Login to get a quick connect button in Evothings Viewer. This button is displayed when you restart the Viewer and allows you to reconnect to the Workbench where you are logged in.</p>
 						</div>
-
+-->
 						<!-- Div that holds the login iframe -->
 						<div id="connect-screen-login">
 							<button id="connect-screen-login-close-button" class="btn btn-hyper-toolbar et-btn-stone-light">
@@ -219,11 +209,12 @@ Copyright (c) 2013-2015 Evothings AB
 					</div>
 				</div>
 			</div>
+			<!-- End of Start screen -->
 
-			<!-- Example list -->
+			<!-- Example screen -->
 			<div id="screen-examples" class="project-list"></div>
 
-			<!-- Project list -->
+			<!-- My apps screen -->
 			<div id="screen-projects" class="project-list"></div>
 
 		</div>
@@ -247,429 +238,6 @@ Copyright (c) 2013-2015 Evothings AB
 
 	</div> <!-- panel-page -->
 
-	<!--
-	hyper-ui.js defines the global variable "hyper".
-	TODO: Change this to a module and import using require.
-	-->
 	<script src="hyper-ui.js"></script>
-	<script>
-	//
-	// TODO: Move this script block to a separate file.
-	//
-
-	// Setup UI button actions (using closure to make variables local).
-	;(function()
-	{
-		var PATH = require('path')
-		var GUI = require('nw.gui')
-		var FILEUTIL = require('../server/fileutil.js')
-		var SETTINGS = require('../settings/settings.js')
-		var LOGGER = require('../server/log.js')
-		var USER_HANDLER = require('../server/user-handler.js')
-
-		var DISCONNECT_DELAY = 30000
-		var mDisconnectTimer = 0
-
-		// TODO: Make running local web server an option.
-		//var WEBSERVER = require('../server/webserver.js')
-		//var mWebServer = WEBSERVER.create()
-
-		// ************** Login Button **********************
-
-		// TODO: Move login UI code to separate file to reduce size of this file.
-
-		// Set login button action handler. The button
-		// toggles login/logout.
-		$('#button-login').click(function()
-		{
-			if (USER_HANDLER.getUser())
-			{
-				logoutUser()
-			}
-			else
-			{
-				loginUser()
-			}
-		})
-
-		$('#connect-screen-login-close-button').click(function()
-		{
-			hideLoginScreen()
-		})
-
-		EVENTS.subscribe(EVENTS.LOGINCONNECT, function(obj)
-		{
-			enableLoginButton()
-		})
-
-		EVENTS.subscribe(EVENTS.LOGINDISCONNECT, function(obj)
-		{
-			displayLoginButton()
-			disableLoginButton()
-		})
-
-		EVENTS.subscribe(EVENTS.LOGIN, function(user)
-		{
-			console.log('*** User has logged in: ' + user)
-			console.dir(user)
-
-			hideLoginScreen()
-			showUserInfo(user)
-		})
-
-		EVENTS.subscribe(EVENTS.LOGOUT, function()
-		{
-			// TODO: Pass user id to the Run/Reload messaging code (hyper-server.js).
-			LOGGER.log('*** User has logged out ***')
-
-			displayLoginButton()
-		})
-
-		EVENTS.subscribe(EVENTS.CONNECT, function(obj)
-		{
-			LOGGER.log('socket.io connect')
-			if(mDisconnectTimer)
-			{
-				clearTimeout(mDisconnectTimer)
-				mDisconnectTimer = undefined
-			}
-		})
-
-		EVENTS.subscribe(EVENTS.DISCONNECT, function(obj)
-		{
-			LOGGER.log('socket.io disconnect')
-			mDisconnectTimer = setTimeout(function()
-			{
-				logoutUser()
-			}, DISCONNECT_DELAY)
-		})
-
-		function loginUser()
-		{
-			USER_HANDLER.createLoginClient()
-			USER_HANDLER.startLoginSequence()
-			var loginURL = USER_HANDLER.getLoginURL()
-			showLoginScreen(loginURL)
-		}
-
-		function logoutUser()
-		{
-			if (USER_HANDLER.getUser())
-			{
-				// Open logout url in hidden logout iframe.
-				var logoutURL = USER_HANDLER.getLogoutURL()
-				$('#connect-screen-logout-iframe').attr('src', logoutURL)
-
-				// TODO: Find better solution for managing double logouts, when server can't find us and reply back
-				setTimeout(function()
-				{
-					if (USER_HANDLER.getUser())
-					{
-						USER_HANDLER.clearUser()
-						EVENTS.publish(EVENTS.LOGOUT, {event: 'logout'})
-					}
-				}, 1000)
-			}
-		}
-
-		function disableLoginButton()
-		{
-			$('#button-login').attr('disabled','disabled')
-		}
-
-		function enableLoginButton()
-		{
-			$('#button-login').removeAttr('disabled')
-		}
-
-		function displayLoginButton()
-		{
-			$('#button-login').html('Login')
-			$('#login-info').html('Not Logged In')
-			$('#connect-screen-login').hide()
-		}
-
-		function showLoginScreen(loginURL)
-		{
-			$('#connect-screen-login').show()
-			//$('#connect-screen-login-loading-message').show()
-			$('#connect-screen-login-iframe').attr('src', loginURL)
-		}
-
-		function hideLoginScreen()
-		{
-			$('#connect-screen-login').hide()
-		}
-
-		function showUserInfo(user)
-		{
-			if (user && user.name && user.picture)
-			{
-				// Display user data.
-				if(user.picture.indexOf('http') == -1)
-				{
-					user.picture = user.EVO_SERVER + '/' + user.picture
-				}
-				// Show user picture on login button and change text to "Logout".
-				var imageHTML =
-					'<img style="height:30px;with:auto;margin-right:5px;margin-top:-3px" '
-					+	'class="pull-left" '
-					+	'src="' + user.picture + '">'
-				var infoText = 'Logged in as '+user.name
-				var infoHTML = imageHTML + infoText
-				$('#login-info').html(infoHTML)
-
-				// Change login button text to logout.
-				$('#button-login').html('Logout')
-			}
-			else
-			{
-				$('#login-info').html('Could not log in')
-			}
-		}
-
-		// ************** Tab Button Handling **************
-
-		hyper.showTab = function(tabname)
-		{
-			// Hide all screens and set unselected colour for buttons.
-			$('#screen-connect').hide()
-			$('#screen-examples').hide()
-			$('#screen-projects').hide()
-			$('#button-connect, #button-examples, #button-projects')
-				.removeClass('et-btn-stone')
-				.addClass('et-btn-stone-light')
-
-			// Show selected tab.
-			var screenId = '#screen-' + tabname
-			var buttonId = '#button-' + tabname
-			$(screenId).show()
-			$(buttonId).removeClass('et-btn-stone-light').addClass('et-btn-stone')
-		}
-
-		// ************** Connect Tab Button **************
-
-		$('#button-connect').click(function()
-		{
-			hyper.showTab('connect')
-		})
-
-		// ************** Examples Tab Button **************
-
-
-		$('#button-examples').click(function()
-		{
-			hyper.showTab('examples')
-		})
-
-		// ************** Projects Tab Button **************
-
-		$('#button-projects').click(function()
-		{
-			hyper.showTab('projects')
-		})
-
-		// ************** Show Initial Tab **************
-
-		hyper.showTab('connect')
-
-		// ************** Tools Button **************
-
-		$('#button-tools').click(function()
-		{
-			hyper.UI.showToolsWorkbenchWindow()
-		})
-
-		// ************** Documentation Button **************
-
-		var button = $('#button-documentation')
-		button && button.click(function()
-		{
-			var url = 'file://' + PATH.resolve('./documentation/index.html')
-			GUI.Shell.openExternal(url)
-		})
-
-		// ************** Forum Button **************
-
-		button = $('#button-forum')
-		button && button.click(function()
-		{
-			GUI.Shell.openExternal('http://forum.evothings.com/')
-		})
-
-		// ************** Welcome Window **************
-
-		// Reference to Welcome window, used for preventing opening it
-		// multiple times and instead focusing it if already opened.
-		var mWelcomeWindow = null
-
-		hyper.showWelcomeScreen = function()
-		{
-			// Create window.
-			mWelcomeWindow = window.open(
-				'welcome.html',
-				{
-					resizable: true
-				})
-			mWelcomeWindow.resizeTo(550, 700)
-			mWelcomeWindow.moveTo(50, 50)
-			mWelcomeWindow.focus()
-		}
-
-		function getShowWelcomeScreen()
-		{
-			return 'no' != SETTINGS.getShowWelcomeScreen()
-		}
-
-		// Display welcome screen on startup if the display
-		// setting is not turned off.
-		if (getShowWelcomeScreen())
-		{
-			hyper.showWelcomeScreen()
-		}
-
-		// ************** No Client Connected Event **************
-
-		// Called when you press Run and no client is connected.
-		hyper.noClientConnectedHander = function()
-		{
-			$('#ModalDialog-NoClientConnected').modal('show')
-		}
-
-		// Click handler for link in the ModalDialog-NoClientConnected dialog.
-		$('#ModalDialog-NoClientConnected-ClientAppLink').click(function()
-		{
-			var url = 'file://' + PATH.resolve('./documentation/studio/mobile-app.html')
-			GUI.Shell.openExternal(url)
-		})
-
-		// ************** Version Check **************
-
-		function versionCheck()
-		{
-			// Get currently installed version.
-			var installedVersion = versionGetCurrent()
-
-			// Get platform string.
-			var platformTable =
-			{
-				'linux':'linux',
-				'win32':'windows',
-				'darwin':'macosx'
-			}
-			var platform = platformTable[process.platform]
-
-			// Get saved GUID.
-			var guid = SETTINGS.getEvoGUID()
-
-			// Create JSON request data.
-			var json =
-				'{"platform":"' + platform + '",'
-				+ '"version":"' + installedVersion + '"'
-			if (guid) { json += ',"guid":"' + guid + '"' }
-			json += '}'
-
-			// Create URL for the request.
-			var requestURL =
-				'http://evothings.com/versioninfo/EvothingsWorkbench.php?param='
-				+ encodeURIComponent(json)
-
-			// TODO: For debugging, remove later on.
-			LOGGER.log('Version request: ' + json)
-
-			// Get version info from server.
-			FILEUTIL.downloadAsString(
-				requestURL,
-				'EvothingsWorkbench', // User agent
-				versionCheckResponseHandler)
-		}
-
-		function versionCheckResponseHandler(status, data)
-		{
-			// Abort if the response is not valid.
-			if (200 != status)
-			{
-				console.log('Version response code: ' + status)
-				return
-			}
-
-			// Parse response.
-			var response
-			try
-			{
-				console.log('Version response: ' + data)
-				response = JSON.parse(data)
-			}
-			catch(e)
-			{
-				LOGGER.log("JSON.parse error: " + e)
-				return
-			}
-
-			// Store GUID.
-			SETTINGS.setEvoGUID(response.guid)
-
-			// Get currently installed version.
-			var installedVersion = versionGetCurrent()
-
-			// Get value of version update user does not want to be reminded of.
-			var doNotShowVersion = SETTINGS.getDoNotShowUpdateDialogForVersion()
-
-			// Show dialog with info about new version.
-			// Check that the available version is greater
-			// than the installed version and that the user
-			// has not marked this version as do-not-show.
-			if (response.version > installedVersion &&
-				response.version != doNotShowVersion)
-			{
-				hyper.newAvailableVersion = response.version
-
-				$('#ModalDialog-NewVersionAvailable-VersionNumber').html(response.version)
-				$('#ModalDialog-NewVersionAvailable').modal('show')
-			}
-		}
-
-		function versionGetCurrent()
-		{
-			// Get installed version from package file.
-			var data = FILEUTIL.readFileSync('package.json')
-			var installedVersion = JSON.parse(data).version
-			return installedVersion
-		}
-
-		// Click handler for download link in the ModalDialog-NewVersionAvailable dialog.
-		$('#ModalDialog-NewVersionAvailable-DownloadLink').click(function()
-		{
-			GUI.Shell.openExternal('http://evothings.com/download/')
-		})
-
-		// Click handler for download link in the ModalDialog-NewVersionAvailable dialog.
-		$('#ModalDialog-NewVersionAvailable-DoNotShowCheckbox').change(function(event)
-		{
-			// Store the version info that we should not show dialog for.
-			var version = event.target.checked ? hyper.newAvailableVersion : null
-			SETTINGS.setDoNotShowUpdateDialogForVersion(version)
-		})
-
-		window.showSettingsDialog = function()
-		{
-			hyper.UI.showSettingsDialog()
-		}
-
-		// Initialize the file server (socket.io client that
-		// handles file requests).
-		hyper.setUpServer()
-		hyper.UI.connect()
-
-		// Display the Connect dialog box.
-		// TODO: Auto get key?
-// 		setTimeout(window.showConnectKeyDialog, 100)
-
-		// Do version check at start up.
-		// VERSION CHECK DISABLED!
-		// TODO: Enable in production.
-		//setTimeout(versionCheck, 1000)
-	})()
-	</script>
 </body>
 </html>

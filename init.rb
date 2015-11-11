@@ -59,8 +59,12 @@ end
 ### Install and flatten node modules.
 
 def installNodeModules
-	if(!File.exist?('node_modules/socket.io'))
-		sh 'npm install socket.io'
+	if(!File.exist?('node_modules/socket.io-client'))
+		sh 'npm install socket.io-client'
+	end
+
+	if(!File.exist?('node_modules/fs-extra'))
+		sh 'npm install fs-extra'
 	end
 
 	if(File.exist?('node_modules/socket.io/node_modules'))

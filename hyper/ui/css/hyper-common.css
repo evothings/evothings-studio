@@ -1,13 +1,39 @@
-@import '../server/ui/fonts/ProximaNova.css';
+@import '../fonts/ProximaNova.css';
 
-body
+html
+{
+  box-sizing: border-box;
+}
+
+*, *:before, *:after
+{
+  box-sizing: inherit;
+}
+
+html, body, p, div
 {
 	font-family: 'Proxima Nova Regular';
+}
+
+h1
+{
+	font-family: 'Proxima Nova Black';
+}
+
+h2, h3, h4, h5, h6
+{
+	font-family: 'Proxima Nova Bold';
+}
+
+strong
+{
+	font-family: 'Proxima Nova Bold';
 }
 
 .btn
 {
 	text-transform: uppercase;
+	font-family: 'Proxima Nova Bold';
 }
 
 .et-btn-red

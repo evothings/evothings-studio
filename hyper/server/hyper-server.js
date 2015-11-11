@@ -157,9 +157,8 @@ function onMessageWorkbenchSetSessionID(socket, message)
 		// Save session id in settings.
 		SETTINGS.setSessionID(mSessionID)
 
-		// Save sessionID in global reference.
-		// TODO: Can we pass session id some other way than a global variable?
-		global.mainHyper.sessionID = mSessionID
+		// Send event width session id.
+		// TODO: Who is listening to this? No one it seems.
         EVENTS.publish(EVENTS.SETSESSIONID, mSessionID)
 
 		// Pass the connect key to the callback function,
