@@ -36,6 +36,11 @@ strong
 	font-family: 'Proxima Nova Bold';
 }
 
+.btn:focus
+{
+  outline: none !important;
+}
+
 .et-btn-red
 {
 	border-color: #e15a64 !important;
@@ -168,6 +173,21 @@ strong
 {
 	border-color: #dddddd !important;
 	background-color: #dddddd !important;
+	color: #111111 !important;
+}
+
+.et-btn-white-only
+{
+	border-color: #ffffff !important;
+	background-color: #ffffff !important;
+	color: #111111 !important;
+}
+.et-btn-white-only:hover,
+.et-btn-white-only:active,
+.btn-group.open .et-btn-white-only
+{
+	border-color: #ffffff !important;
+	background-color: #ffffff !important;
 	color: #111111 !important;
 }
 

@@ -20,6 +20,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+var FILEUTIL = require('../server/fileutil.js')
+
 exports.set = function(key, value)
 {
 	window.localStorage.setItem(key, JSON.stringify(value))
@@ -126,6 +128,11 @@ systemSetting('ServerDiscoveryPort', 4088)
  * Version update info should not be shown for this version.
  */
 systemSetting('DoNotShowUpdateDialogForVersion', null)
+
+/**
+ * Version update info should not be shown for this version.
+ */
+systemSetting('MyAppsPath', FILEUTIL.getEvothingsUserFolderPath())
 
 /**
  * Settings for user GUID are handled specially to preserve existing ids.
