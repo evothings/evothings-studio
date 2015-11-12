@@ -31,7 +31,9 @@ html, body
 
 #button-tool-menu
 {
-	width: 50px;
+	/*width: 50px;*/
+	width: 100px;
+	text-transform: none !important;
 }
 
 #panel-tool-buttons
@@ -39,7 +41,8 @@ html, body
 	position: absolute;
 	right: 0px;
 	top: 0px;
-	left: 50px;
+	/*left: 50px;*/
+	left: 100px;
 }
 
 #panel-tool-buttons .btn
@@ -55,6 +58,7 @@ html, body
 	-webkit-border-radius: 0;
 	-moz-border-radius: 0;
 	border-radius: 0;
+	color: #111111;
 }
 
 #panel-middle
@@ -321,9 +325,20 @@ TODO: Remove, use automatic width for all buttons.
 #button-toogle-help
 {
 	position: absolute;
-	width: 130px;
+	width: 115px;
 	height: auto;
-	top: 15px;
-	right: 145px;
+	top: 0px;
+	right: 0px;
 	font-size: 100% !important;
+}
+
+.framed-box
+{
+	margin: 0px;
+	padding: 10px 10px;
+	background: rgb(255,255,255);
+	border: 1px solid #999999;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
 }

@@ -68,87 +68,44 @@ exports.fileIsHTML = function(path)
 exports.downloadAsString = function(url, userAgent, callbackFun)
 {
 	uri = URL.parse(url);
-	HTTP.get({hostname:uri.hostname, path:uri.path, headers:{'user-agent':userAgent}}, function(response)
-	{
-		response.setEncoding('utf8')
-		var data = ''
-		response.on('data', function (chunk)
+	HTTP.get(
 		{
-			data += chunk
-		})
-		response.on('end', function ()
+			hostname:uri.hostname,
+			path:uri.path,
+			headers:{'user-agent':userAgent}
+		},
+		function(response)
 		{
-			callbackFun(response.statusCode, data)
+			response.setEncoding('utf8')
+			var data = ''
+			response.on('data', function (chunk)
+			{
+				data += chunk
+			})
+			response.on('end', function ()
+			{
+				callbackFun(response.statusCode, data)
+			})
+		}).on('error', function(err)
+		{
+			callbackFun(-1, err.message)
 		})
-	}).on('error', function(err)
-	{
-		callbackFun(-1, err.message)
-	})
 }
 
-/*
-
-https://npmjs.org/package/adm-zip
-https://github.com/cthackers/adm-zip
-http://nodejs.org/api/stream.html
-https://npmjs.org/package/unzip
-
-http://stackoverflow.com/questions/18323152/get-download-progress-in-node-js-with-chunks
-http://stackoverflow.com/questions/4771614/download-large-file-with-node-js-avoiding-high-memory-consumption
-
-var http = require('http');
-var fs = require('fs');
-
-var download = function(url, dest, cb) {
-  var file = fs.createWriteStream(dest);
-  var request = http.get(url, function(response) {
-    response.pipe(file);
-    file.on('finish', function() {
-      file.close();
-      cb();
-    });
-  });
+exports.getEvothingsUserFolderPath = function()
+{
+	try
+	{
+		var userDir =
+			process.env.HOME ||
+			process.env.HOMEPATH ||
+			process.env.USERPROFILE
+		var myAppsDir = PATH.join(
+			userDir, 'EvothingsStudio', 'MyApps')
+		return myAppsDir
+	}
+	catch (error)
+	{
+		return null
+	}
 }
-
-var file_url = 'http://test-jackguy.rhcloud.com/snap.zip';
-var out = fs.createWriteStream('test.zip');
-
-var req = request({
-    method: 'GET',
-    uri: file_url
-});
-req.pipe(out);
-
-req.on('data', function (chunk)
-{
-    console.log(chunk.length);
-});
-
-req.on('end', function()
-{
-    var zip = new AdmZip("test.zip"),
-    zipEntries = zip.getEntries();
-    zip.extractAllTo("temp-download", true);
-});
-
-req.on( 'response', function ( data ) {
-    console.log( data.headers[ 'content-length' ] );
-} );
-
-
-var r = request(downloadURL).pipe(downloadFile);
-
-r.on('data', function(data) {
-  inspect('binary data received');
-});
-downloadFile.on('end', function () {
-  inspect(downloadPath, 'file downloaded to path');
-});
-
-downloadFile.on('error', function (err) {
-  inspect(err, 'error downloading file');
-});
-
-request(downloadurl).pipe(fs.createWriteStream(downloadtohere))
-http://stackoverflow.com/questions/18323152/get-download-progress-in-node-js-with-chunks
-*/

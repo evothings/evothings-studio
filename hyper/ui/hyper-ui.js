@@ -71,6 +71,7 @@ hyper.main = function()
 	hyper.UI.setupUI()
 	hyper.UI.setupUIEvents()
 	hyper.UI.setStartScreenHelpVisibility()
+	hyper.UI.showInitialScreen()
 
 	hyper.setupServer()
 	hyper.UI.connect()
@@ -264,7 +265,7 @@ hyper.UI.defineUIFunctions = function()
 		{
 			e.stopPropagation()
 			e.preventDefault()
-			hyper.showTab('projects')
+			hyper.UI.showTab('projects')
 			$('#drag-overlay').show()
 			enterTarget = event.target
 		})
@@ -344,7 +345,7 @@ hyper.UI.defineUIFunctions = function()
 			html +=
 				'<button '
 				+	'type="button" '
-				+	'class="button-open btn et-btn-blue" '
+				+	'class="button-open btn et-btn-indigo" '
 				+	'onclick="window.hyper.copyExample(\'__PATH1__\')">'
 				+	'Copy'
 				+ '</button>'
@@ -355,7 +356,7 @@ hyper.UI.defineUIFunctions = function()
 			html +=
 				'<button '
 				+	'type="button" '
-				+	'class="button-open btn et-btn-stone" '
+				+	'class="button-open btn et-btn-blue" '
 				+	'onclick="window.hyper.openFileFolder(\'__PATH2__\')">'
 				+	'Code'
 				+ '</button>'
@@ -493,7 +494,7 @@ hyper.UI.defineUIFunctions = function()
 		hyper.setProjectList(projects)
 	}
 
-	hyper.UI.showToolsWorkbenchWindow = function()
+	hyper.UI.openToolsWorkbenchWindow = function()
 	{
 		if (mWorkbenchWindow && !mWorkbenchWindow.closed)
 		{
@@ -564,10 +565,12 @@ hyper.UI.defineUIFunctions = function()
 			// No items in list, show help text.
 			var html =
 				'<div style="padding: 0px 10px 10px 10px;">' +
-				'<h2>Create your projects here</h2>' +
-				'<p>Drag and drop an .html file (typically index.html) here to add a project.</p>' +
-				'<p>Move projects using drag and drop. Delete a project using the close icon (x) (this does not delete your files, only the project list item).</p>' +
+				'<h2>How to create a new app</h2>' +
+				'<p>Create a new app by copying one of the example apps (click "Copy") or by clicking the "New" button.</p>' +
+				'<p>You can also drag and drop an .html file (typically index.html) to this window.</p>' +
+				'<p>Arrange apps in the list using drag and drop. Click the close icon (x) to delete an app entry. This will NOT delete the application files.</p>' +
 				'</div>'
+
 			$('#screen-projects').append(html)
 		}
 	}
@@ -613,13 +616,15 @@ hyper.UI.defineUIFunctions = function()
 		hyper.UI.displayProjectList()
 	}
 
-	hyper.UI.showSettingsDialog = function()
+	hyper.UI.openSettingsDialog = function()
 	{
 		// Populate input fields.
 		$('#input-setting-javascript-workbench-font-size').val(
 			SETTINGS.getWorkbenchFontSize())
 		$('#input-setting-number-of-directory-levels').val(
 			SETTINGS.getNumberOfDirecoryLevelsToTraverse())
+		$('#input-setting-my-apps-path').val(
+			SETTINGS.getMyAppsPath())
 		$('#input-setting-reload-server-address').val(
 			SETTINGS.getReloadServerAddress())
 
@@ -640,6 +645,9 @@ hyper.UI.defineUIFunctions = function()
 		SETTINGS.setNumberOfDirecoryLevelsToTraverse(
 			parseInt($('#input-setting-number-of-directory-levels').val()))
 
+		SETTINGS.setMyAppsPath(
+			$('#input-setting-my-apps-path').val())
+
 		// Check if server address has been changed.
 		var updatedServerAddress = $('#input-setting-reload-server-address').val()
 		if (updatedServerAddress != SETTINGS.getReloadServerAddress())
@@ -651,7 +659,7 @@ hyper.UI.defineUIFunctions = function()
 			hyper.UI.connect()
 
 			// Show connect screen.
-			hyper.showTab('connect')
+			hyper.UI.showTab('connect')
 
 			// Display message.
 			hyper.UI.displayConnectKey(
@@ -659,21 +667,96 @@ hyper.UI.defineUIFunctions = function()
 		}
 	}
 
+	hyper.UI.openNewAppDialog = function()
+	{
+		// Populate input fields.
+		var path = PATH.join(SETTINGS.getMyAppsPath())
+		$('#input-new-app-parent-folder').val(path)
+
+		// Show dialog.
+		$('#dialog-new-app').modal('show')
+	}
+
+	hyper.UI.saveNewApp = function()
+	{
+		window.alert('Sorry, not yet implemented.')
+
+		// Hide dialog.
+		$('#dialog-new-app').modal('hide')
+
+		var parentFolder = $('#input-new-app-parent-folder').val()
+		var appFolder = $('#input-new-app-folder').val()
+
+		/*
+		try
+		{
+			console.log('@@@ saveNewApp')
+
+			var template = 'TODO'
+
+			var indexFile = PATH.basename(fullExamplePath)
+			var exampleDir = PATH.dirname(fullExamplePath)
+			var exampleFolderName = PATH.basename(exampleDir)
+			var myAppsDir = SETTINGS.getMyAppsPath()
+			var targetDir = PATH.join(myAppsDir, exampleFolderName)
+
+			console.log('targetDir: ' + targetDir)
+
+
+			var overwrite = true
+			var exists = FILEUTIL.statSync(userTargetDir)
+			if (exists)
+			{
+				overwrite = window.confirm('App folder exists, do you want to overwrite it?')
+			}
+
+			if (overwrite)
+			{
+				// Copy.
+				FSEXTRA.copySync(exampleDir, userTargetDir)
+
+				// Add path of index.html to my apps.
+				var fullTargetPath = PATH.join(userTargetDir, indexFile)
+				console.log('fullTargetPath: ' + fullTargetPath)
+				hyper.addProject(fullTargetPath)
+
+				// Show my apps.
+				hyper.UI.showTab('projects')
+				hyper.UI.displayProjectList()
+			}
+		}
+		catch (error)
+		{
+			window.alert('Something went wrong, could not create app.')
+			console.log('Error in saveNewApp: ' + error)
+		}
+		*/
+	}
+
+	/*
+	// Unused - documentation is online-only.
 	hyper.UI.openDocumentation = function()
 	{
 		var url = 'file://' + PATH.resolve('./documentation/index.html')
 		hyper.UI.openInBrowser(url)
 	}
 
+	// Unused - documentation is online-only.
 	hyper.UI.openReleaseNotes = function()
 	{
 		var url = 'file://' + PATH.resolve('./documentation/studio/release-notes.html')
 		hyper.UI.openInBrowser(url)
 	}
+	*/
 
 	hyper.UI.openInBrowser = function(url)
 	{
 		GUI.Shell.openExternal(url)
+	}
+
+	hyper.UI.showInitialScreen = function()
+	{
+		hyper.UI.showTab('getting-started')
 	}
 
 	hyper.UI.setStartScreenHelpVisibility = function()
@@ -1062,21 +1145,13 @@ hyper.defineServerFunctions = function()
 		{
 			console.log('@@@ copyExampleToUserApps')
 
-			var userDir =
-				process.env.HOME ||
-				process.env.HOMEPATH ||
-				process.env.USERPROFILE
-
 			var indexFile = PATH.basename(fullExamplePath)
 			var exampleDir = PATH.dirname(fullExamplePath)
 			var exampleFolderName = PATH.basename(exampleDir)
-			var targetDir = PATH.join(
-				userDir, 'EvothingsStudio', 'MyApps', exampleFolderName)
+			var myAppsDir = SETTINGS.getMyAppsPath()
+			var targetDir = PATH.join(myAppsDir, exampleFolderName)
 
-			console.log('userDir: ' + userDir)
-			//console.log('exampleDir: ' + exampleDir)
-			//console.log('exampleFolderName: ' + exampleFolderName)
-			//console.log('targetDir: ' + targetDir)
+			console.log('targetDir: ' + targetDir)
 
 			// Copy example. Ask for target path, present targetDir as default.
 			var userTargetDir = window.prompt('Copy example to folder', targetDir)
@@ -1100,7 +1175,7 @@ hyper.defineServerFunctions = function()
 					hyper.addProject(fullTargetPath)
 
 					// Show my apps.
-					hyper.showTab('projects')
+					hyper.UI.showTab('projects')
 					hyper.UI.displayProjectList()
 				}
 			}
@@ -1129,46 +1204,135 @@ hyper.UI.setupUIEvents = function()
 	var DISCONNECT_DELAY = 30000
 	var mDisconnectTimer = 0
 
-	// ************** Connect Key Button **********************
+	// ************** Connect Key Button **************
 
 	$('#button-get-connect-key').click(function()
 	{
 		hyper.UI.getConnectKeyFromServer()
 	})
 
-	// ************** UI Buttons/Links **********************
+	// ************** Getting Started Screen Button **************
 
-	$('#button-show-settings-dialog').click(function()
+	$('#button-getting-started').click(function()
 	{
-		hyper.UI.showSettingsDialog()
+		hyper.UI.showTab('getting-started')
 	})
 
-	$('#button-show-release-notes').click(function()
+	// ************** Open Settings Button **************
+
+	$('#button-open-settings-dialog').click(function()
 	{
-		hyper.UI.openReleaseNotes()
+		hyper.UI.openSettingsDialog()
 	})
+
+	// ************** Settings Dialog Save Button **************
 
 	$('#button-save-settings').click(function()
 	{
 		hyper.UI.saveSettings()
 	})
 
-	$('#button-open-documentation').click(function()
+	// ************** Documentation Button **************
+
+	$('.button-documentation').click(function()
 	{
-		hyper.UI.openDocumentation()
+		hyper.UI.openInBrowser('https://evothings.com/doc/')
 	})
 
-	// ************** Start Screen Toggle Help Button **********************
+	// ************** Release Notes Button **************
+
+	$('#button-release-notes').click(function()
+	{
+		hyper.UI.openInBrowser('https://evothings.com/doc/studio/release-notes.html')
+	})
+
+	// ************** Examples Documentation Button **************
+
+	$('#button-examples-documentation').click(function()
+	{
+		hyper.UI.openInBrowser('https://evothings.com/doc/examples/examples.html')
+	})
+
+	// ************** Connect Screen Button **************
+
+	$('#button-connect').click(function()
+	{
+		hyper.UI.showTab('connect')
+	})
+
+	// ************** Connect Screen Toggle Help Button **************
 
 	$('#button-toogle-help').click(function()
 	{
 		hyper.UI.toogleStartScreenHelp()
 	})
 
-	// ************** Login Button **********************
+	// ************** Feedback Button **************
 
-	// Set login button action handler. The button
-	// toggles login/logout.
+	$('#button-feedback').click(function()
+	{
+		hyper.UI.openInBrowser('https://evothings.com/feedback/')
+	})
+
+	// ************** Forum Button **************
+
+	$('#button-forum').click(function()
+	{
+		hyper.UI.openInBrowser('https://evothings.com/forum/')
+	})
+
+	// ************** News Button **************
+
+	$('#button-news').click(function()
+	{
+		hyper.UI.openInBrowser('https://evothings.com/news/')
+	})
+
+	// ************** Tell-a-friend Button **************
+
+	$('#button-tell-a-friend').click(function()
+	{
+		hyper.UI.openInBrowser('https://evothings.com/tell-a-friend/')
+	})
+
+	// ************** Examples Tab Button **************
+
+	$('#button-examples').click(function()
+	{
+		hyper.UI.showTab('examples')
+	})
+
+	// ************** My Apps Tab Button **************
+
+	$('#button-projects').click(function()
+	{
+		hyper.UI.showTab('projects')
+	})
+
+	// ************** New App Button **************
+
+	$('#button-new-app').click(function()
+	{
+		hyper.UI.openNewAppDialog()
+	})
+
+	// ************** New App Dialog Save Button **************
+
+	$('#button-save-app').click(function()
+	{
+		hyper.UI.saveNewApp()
+	})
+
+	// ************** Tools Button **************
+
+	$('#button-tools').click(function()
+	{
+		hyper.UI.openToolsWorkbenchWindow()
+	})
+
+	// ************** Login Button **************
+
+	// Set login button action handler. The button toggles login/logout.
 	$('#button-login').click(function()
 	{
 		if (USER_HANDLER.getUser())
@@ -1181,10 +1345,14 @@ hyper.UI.setupUIEvents = function()
 		}
 	})
 
+	// ************** Login Close Button **************
+
 	$('#connect-screen-login-close-button').click(function()
 	{
 		hideLoginScreen()
 	})
+
+	// ************** Login Events **************
 
 	EVENTS.subscribe(EVENTS.LOGINCONNECT, function(obj)
 	{
@@ -1213,6 +1381,8 @@ hyper.UI.setupUIEvents = function()
 
 		displayLoginButton()
 	})
+
+	// ************** Connect Events **************
 
 	EVENTS.subscribe(EVENTS.CONNECT, function(obj)
 	{
@@ -1320,71 +1490,23 @@ hyper.UI.setupUIEvents = function()
 
 	// ************** Tab Button Handling **************
 
-	hyper.showTab = function(tabname)
+	hyper.UI.showTab = function(tabname)
 	{
 		// Hide all screens and set unselected colour for buttons.
+		$('#screen-getting-started').hide()
 		$('#screen-connect').hide()
 		$('#screen-examples').hide()
 		$('#screen-projects').hide()
 		$('#button-connect, #button-examples, #button-projects')
-			.removeClass('et-btn-stone')
-			.addClass('et-btn-stone-light')
+			.removeClass('et-btn-et-btn-white-only')
+			.addClass('et-btn-stone')
 
 		// Show selected tab.
 		var screenId = '#screen-' + tabname
 		var buttonId = '#button-' + tabname
 		$(screenId).show()
-		$(buttonId).removeClass('et-btn-stone-light').addClass('et-btn-stone')
+		$(buttonId).removeClass('et-btn-stone').addClass('et-btn-et-btn-white-only')
 	}
-
-	// ************** Connect Tab Button **************
-
-	$('#button-connect').click(function()
-	{
-		hyper.showTab('connect')
-	})
-
-	// ************** Examples Tab Button **************
-
-
-	$('#button-examples').click(function()
-	{
-		hyper.showTab('examples')
-	})
-
-	// ************** Projects Tab Button **************
-
-	$('#button-projects').click(function()
-	{
-		hyper.showTab('projects')
-	})
-
-	// ************** Show Initial Tab **************
-
-	hyper.showTab('connect')
-
-	// ************** Tools Button **************
-
-	$('#button-tools').click(function()
-	{
-		hyper.UI.showToolsWorkbenchWindow()
-	})
-
-	// ************** Documentation Button **************
-
-	var button = $('#button-documentation')
-	button && button.click(function()
-	{
-		hyper.UI.openDocumentation()
-	})
-
-	// ************** Forum Button **************
-
-	button = $('#button-forum')
-	button && button.click(function()
-	{
-		hyper.UI.openInBrowser('http://forum.evothings.com/')
-	})
 
 	// ************** No Client Connected Event **************
 
@@ -1400,13 +1522,6 @@ hyper.UI.setupUIEvents = function()
 		var url = 'file://' + PATH.resolve('./documentation/studio/mobile-app.html')
 		hyper.UI.openInBrowser(url)
 	})
-
-	// Make settings dialog available in global scope.
-	// TODO: Where is this used? Change to hyper scope.
-	/*window.showSettingsDialog = function()
-	{
-		hyper.UI.showSettingsDialog()
-	}*/
 
     // ************** Additional event handlers **************
 
