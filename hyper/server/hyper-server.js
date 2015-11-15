@@ -34,6 +34,7 @@ var LOGGER = require('./log.js')
 var SETTINGS = require('../settings/settings.js')
 var UUID = require('./uuid.js')
 var EVENTS = require('./events')
+var APP_SETTINGS = require('./app-settings.js')
 
 /*********************************/
 /***     Module variables      ***/
@@ -495,7 +496,7 @@ exports.runApp = function()
 {
 	//serveUsingResponse200()
 	serveUsingResponse304()
-	mAppID = getAppID()
+	mAppID = APP_SETTINGS.getAppID(mBasePath)
 	sendMessageToServer(mSocket, 'workbench.run',
 		{
 			sessionID: mSessionID,
@@ -518,33 +519,6 @@ exports.reloadApp = function()
 			appID: mAppID
 		})
 	mReloadCallback && mReloadCallback()
-}
-
-/**
- * Internal.
- *
- * Get the app ID.
- *
- * This is used by the server to identify apps.
- *
- * File evothings.json contains app settings. It can be used
- * for other settings as well in the future.
- */
-function getAppID()
-{
-	var path = mBasePath + '/' + 'evothings.json'
-	if (FS.existsSync(path))
-	{
-		var json = FILEUTIL.readFileSync(path)
-		var settings = JSON.parse(json)
-	}
-	else
-	{
-		var settings = { 'app-uuid': UUID.generateUUID() }
-		var json = JSON.stringify(settings)
-		FS.writeFileSync(path, json, {encoding: 'utf8'})
-	}
-	return settings['app-uuid']
 }
 
 /**

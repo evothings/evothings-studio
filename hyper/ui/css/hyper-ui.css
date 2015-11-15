@@ -99,7 +99,7 @@ html, body
 	width: 100%;
 }
 
-.project-list div
+.project-list .project-entry
 {
 	position: relative;
 	margin: 5px;
@@ -341,4 +341,35 @@ TODO: Remove, use automatic width for all buttons.
 	-webkit-border-radius: 4px;
 	-moz-border-radius: 4px;
 	border-radius: 4px;
+}
+
+.project-list .project-entry .app-icon
+{
+	height: 50px;
+	width: 50px;
+	float: left;
+	margin-right: 10px;
+	padding: 0 10px;
+	background: #AAAAAA;
+	background-size: cover;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+}
+
+
+@media all max-width: 500px
+{
+.app-icon
+{
+	display: none;
+}
+}
+
+@media all min-width: 501px
+{
+.app-icon
+{
+	display: block;
+}
 }

@@ -45,6 +45,7 @@ var LOGGER = require('../server/log.js')
 var UUID = require('../server/uuid.js')
 var EVENTS = require('../server/events')
 var USER_HANDLER = require('../server/user-handler.js')
+var APP_SETTINGS = require('../server/app-settings.js')
 
 /*** Globals ***/
 
@@ -323,22 +324,24 @@ hyper.UI.defineUIFunctions = function()
 	{
 		options = options || {}
 
-		// Template for project items.
-		var html = '<div class="ui-state-default ui-corner-all">'
+		console.log('@@@ createProjectEntry path: ' + path)
 
-		/*
-		// TODO: Commented out images in examples list.
-		// Images of uniform size are needed for all examples.
-		// Paths to images need to be to a directory within
-		// the application to produce a stand-alone package.
-		// Images can be placed in a shared folder inside examples
-		// or inside each app folder.
-		if(options.imagePath)
+		// Create div tag for app items.
+		var html = '<div class="project-entry ui-state-default ui-corner-all">'
+
+		// Show app image icon
+		var appPath = hyper.makeFullPath(PATH.dirname(path))
+		console.log('@@@ appPath: ' + appPath)
+		var imagePath = APP_SETTINGS.getAppImage(appPath)
+		console.log('@@@ imagePath: ' + imagePath)
+
+		if (imagePath)
 		{
-			// TODO: Set path to point to local folder.
-			html += '<img src="../../../evothings-examples/__IMAGE_PATH__" height="75px" style="float:left; margin-right: 10px;">'
+			var fullImagePath = PATH.join(appPath, imagePath)
+			console.log('@@@ fullImagePath: ' + fullImagePath)
+			html += '<div class="app-icon" style="background-image: url(\'file://' +
+				fullImagePath + '\');"></div>'
 		}
-		*/
 
 		if (options.copyButton)
 		{
@@ -1007,11 +1010,8 @@ hyper.defineServerFunctions = function()
 	// The Run button in the UI has been clicked.
 	hyper.runApp = function(path)
 	{
-		// Prepend base path if this is not an absolute path.
-		if (!FILEUTIL.isPathAbsolute(path))
-		{
-			path = mApplicationBasePath + '/' + path
-		}
+		// Prepend application path if this is not an absolute path.
+		path = hyper.makeFullPath(path)
 
 		LOGGER.log('runApp: ' + path)
 
@@ -1101,6 +1101,22 @@ hyper.defineServerFunctions = function()
 		return mExampleList
 	}
 
+	/**
+	 * If path is not a full path, make it so. This is
+	 * used to make relative example paths full paths.
+	 */
+	hyper.makeFullPath = function(path)
+	{
+		if (!FILEUTIL.isPathAbsolute(path))
+		{
+			return PATH.join(mApplicationBasePath, path)
+		}
+		else
+		{
+			return path
+		}
+	}
+
 	function openFolder(path)
 	{
 		// Convert path separators on Windows.
@@ -1117,11 +1133,8 @@ hyper.defineServerFunctions = function()
 
 	hyper.openFileFolder = function(path)
 	{
-		// Prepend base path if this is not an absolute path.
-		if (!FILEUTIL.isPathAbsolute(path))
-		{
-			path = mApplicationBasePath + '/' + path
-		}
+		// Prepend application path if this is not an absolute path.
+		path = hyper.makeFullPath(path)
 
 		// Show the file in the folder.
 		openFolder(path)
@@ -1129,11 +1142,8 @@ hyper.defineServerFunctions = function()
 
 	hyper.copyExample = function(path)
 	{
-		// Prepend base path if this is not an absolute path.
-		if (!FILEUTIL.isPathAbsolute(path))
-		{
-			path = mApplicationBasePath + '/' + path
-		}
+		// Prepend application path if this is not an absolute path.
+		path = hyper.makeFullPath(path)
 
 		// Show the file in the folder.
 		copyExampleToUserApps(path)
