@@ -80,19 +80,14 @@ exports.getAppImage = function(appPath)
 function readAppSettings(appPath)
 {
 	var path = PATH.join(appPath, 'evothings.json')
-	console.log('*** readAppSettings path: ' + path)
 	if (FS.existsSync(path))
 	{
-	console.log('*** readAppSettings EXISTS')
 		var json = FILEUTIL.readFileSync(path)
-		console.log('*** JSON: ' + json)
 		var settings = JSON.parse(json)
-		console.dir(settings)
 		return settings
 	}
 	else
 	{
-	console.log('*** readAppSettings ERROR')
 		return null
 	}
 }

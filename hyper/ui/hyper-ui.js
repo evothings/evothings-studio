@@ -324,23 +324,27 @@ hyper.UI.defineUIFunctions = function()
 	{
 		options = options || {}
 
-		console.log('@@@ createProjectEntry path: ' + path)
-
 		// Create div tag for app items.
 		var html = '<div class="project-entry ui-state-default ui-corner-all">'
 
 		// Show app image icon
 		var appPath = hyper.makeFullPath(PATH.dirname(path))
-		console.log('@@@ appPath: ' + appPath)
 		var imagePath = APP_SETTINGS.getAppImage(appPath)
-		console.log('@@@ imagePath: ' + imagePath)
 
 		if (imagePath)
 		{
 			var fullImagePath = PATH.join(appPath, imagePath)
-			console.log('@@@ fullImagePath: ' + fullImagePath)
 			html += '<div class="app-icon" style="background-image: url(\'file://' +
 				fullImagePath + '\');"></div>'
+		}
+		else
+		{
+			// Show a color if no icon is provided.
+			var r = 155 + Math.floor(Math.random() * 100)
+			var g = 155 + Math.floor(Math.random() * 100)
+			var b = 155 + Math.floor(Math.random() * 100)
+			var color = 'rgb(' + r + ',' + g + ',' + b + ')'
+			html += '<div class="app-icon" style="background:' + color + ';"></div>'
 		}
 
 		if (options.copyButton)

@@ -345,20 +345,19 @@ TODO: Remove, use automatic width for all buttons.
 
 .project-list .project-entry .app-icon
 {
-	height: 50px;
-	width: 50px;
+	width: 60px;
+	height: 60px;
 	float: left;
-	margin-right: 10px;
-	padding: 0 10px;
+	margin: 5px 10px 5px -5px;
 	background: #AAAAAA;
 	background-size: cover;
+	border: 1px solid #999999;
 	-webkit-border-radius: 4px;
 	-moz-border-radius: 4px;
 	border-radius: 4px;
 }
 
-
-@media all max-width: 500px
+@media (max-width: 500px)
 {
 .app-icon
 {
@@ -366,7 +365,7 @@ TODO: Remove, use automatic width for all buttons.
 }
 }
 
-@media all min-width: 501px
+@media (min-width: 501px)
 {
 .app-icon
 {
