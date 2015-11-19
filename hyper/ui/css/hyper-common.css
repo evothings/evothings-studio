@@ -71,6 +71,21 @@ strong
 	color: #ffffff !important;
 }
 
+.et-btn-yellow-dark
+{
+	border-color: #d9c022 !important;
+	background-color: #d9c022 !important;
+	color: #ffffff !important;
+}
+.et-btn-yellow-dark:hover,
+.et-btn-yellow-dark:active,
+.btn-group.open .et-btn-yellow-dark
+{
+	border-color: #c9b012 !important;
+	background-color: #c9b012 !important;
+	color: #ffffff !important;
+}
+
 .et-btn-green
 {
 	border-color: #54dfb3 !important;
