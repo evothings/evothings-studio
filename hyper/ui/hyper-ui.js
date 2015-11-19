@@ -369,6 +369,15 @@ hyper.UI.defineUIFunctions = function()
 				+ '</button>'
 		}
 
+		// Cache button.
+		html +=
+			'<button '
+			+	'type="button" '
+			+	'class="button-cache btn btn-default" '
+			+	'onclick="hyper.cacheAppGuard(\'__PATH6__\', \'__NAME2__\')">'
+			+	'Cache'
+			+ '</button>'
+
 		// Run button.
 		html +=
 			'<button '
@@ -419,7 +428,9 @@ hyper.UI.defineUIFunctions = function()
 		html = html.replace('__PATH3__', escapedPath)
 		html = html.replace('__PATH4__', getShortPathFromPath(path))
 		html = html.replace('__PATH5__', path)
+		html = html.replace('__PATH6__', escapedPath)
 		html = html.replace('__NAME__', name)
+		html = html.replace('__NAME2__', name)
 		html = html.replace('__IMAGE_PATH__', options.imagePath)
 
 		// Create element.
@@ -1007,17 +1018,30 @@ hyper.defineServerFunctions = function()
 		{
 			mRunAppGuardFlag = true
 			hyper.runApp(path)
-			setTimeout(function() { mRunAppGuardFlag = false }, 500)
+		}
+	}
+
+	hyper.cacheAppGuard = function(path, name)
+	{
+		if (!mRunAppGuardFlag)
+		{
+			mRunAppGuardFlag = true
+			if(!name)
+				throw "no name 2!"
+			SERVER.setAppName(name)
+			hyper.runApp(path, 'cacheApp')
 		}
 	}
 
 	// The Run button in the UI has been clicked.
-	hyper.runApp = function(path)
+	hyper.runApp = function(path, func)
 	{
+		func = func || 'runApp'
+
 		// Prepend application path if this is not an absolute path.
 		path = hyper.makeFullPath(path)
 
-		LOGGER.log('runApp: ' + path)
+		LOGGER.log(func+': ' + path)
 
 		SERVER.setAppPath(path)
 		MONITOR.setBasePath(SERVER.getBasePath())
@@ -1030,7 +1054,7 @@ hyper.defineServerFunctions = function()
 		else
 		{
 			// Otherwise, load the requested file on connected clients.
-			SERVER.runApp()
+			SERVER[func]()
 		}
 
 		//mNumberOfConnectedClients = 0
@@ -1039,6 +1063,8 @@ hyper.defineServerFunctions = function()
 		//mConnectedCounterTimer = setTimeout(function() {
 		//	hyper.UI.setConnectedCounter(mNumberOfConnectedClients) },
 		//	5000)
+
+		setTimeout(function() { mRunAppGuardFlag = false }, 500)
 	}
 
 	function clientInfoCallback(message)

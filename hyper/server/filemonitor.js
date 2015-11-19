@@ -95,9 +95,7 @@ function runFileSystemMonitor()
 	if (!mRunFileSystemMonitor) { return }
 
 	mFileCounter = 0
-	var filesUpdated = fileSystemMonitorWorker(
-		mBasePath,
-		mTraverseNumDirecoryLevels)
+	var filesUpdated = scanAppFiles(fileSystemMonitorCallback)
 	if (filesUpdated)
 	{
 		mFileSystemChangedCallback && mFileSystemChangedCallback()
@@ -109,61 +107,70 @@ function runFileSystemMonitor()
 		setTimeout(runFileSystemMonitor, 500)
 	}
 }
-
-/**
- * Internal.
- * Return true if a file ahs been updated, otherwise false.
- */
-function fileSystemMonitorWorker(path, level)
+// returns true if any callback returned true, false otherwise.
+// if a callback returns true, the scan is aborted.
+// sets mFileCounter.
+function scanAppFiles(callback)
 {
-	if (!path) { return false }
-	try
-	{
-		/*var files = FS.readdirSync(path)
-		for (var i in files)
-		{
-			LOGGER.log(path + files[i])
-		}
-		return false*/
+	mFileCounter = 0
+	return scanAppFilesWorker(callback, mBasePath, mTraverseNumDirecoryLevels)
+}
 
+function shouldIgnoreAppFile(name)
+{
+	// dot files are hidden by UNIX systems, and should not be part of any HTML project.
+	// in Evothings projects, common dot files include ".git" and ".svn".
+	//window.console.log(typeof name, name)
+	return name.substr(0,1) == '.'
+}
+
+function scanAppFilesWorker(callback, path, level)
+{
+	//window.console.log('scanAppFilesWorker path:level: ' + path + ':' + level)
+	if (!path) { return false }
+	{
 		var files = FS.readdirSync(path)
 		for (var i in files)
 		{
-			try
 			{
-				var stat = FS.statSync(path + files[i])
-				var t = stat.mtime.getTime()
+				if(!files[i])
+					continue
+				if(shouldIgnoreAppFile(files[i]))
+					continue
+
+				var name = path + files[i]
+				var stat = FS.statSync(name)
 
 				if (stat.isFile())
 				{
 					++mFileCounter
 				}
 
-				//LOGGER.log('Checking file: ' + files[i] + ': ' + stat.mtime)
-				if (stat.isFile() && t > mLastReloadTime)
-				{
-					//LOGGER.log('***** File has changed ***** ' + files[i])
-					mLastReloadTime = Date.now()
+				if(callback(name, stat))
 					return true
-				}
-				else if (stat.isDirectory() && level > 0)
+
+				if (stat.isDirectory() && level > 0)
 				{
-					//LOGGER.log('Decending into: ' + path + files[i])
-					var changed = fileSystemMonitorWorker(
-						path + files[i] + '/',
-						level - 1)
-					if (changed) { return true }
+					//window.console.log('Decending into: ' + path + files[i])
+					if(scanAppFilesWorker(callback, path + files[i] + '/', level - 1))
+						return true
 				}
-			}
-			catch (err2)
-			{
-				LOGGER.log('ERROR in fileSystemMonitorWorker inner loop: ' + err2)
 			}
 		}
 	}
-	catch(err1)
+	return false
+}
+
+function fileSystemMonitorCallback(name, stat)
+{
+	var t = stat.mtime.getTime()
+
+	//window.console.log('Checking file: ' + name + ': ' + stat.mtime)
+	if (stat.isFile() && t > mLastReloadTime)
 	{
-		LOGGER.log('ERROR in fileSystemMonitorWorker: ' + err1)
+		//window.console.log('***** File has changed ***** ' + name)
+		mLastReloadTime = Date.now()
+		return true
 	}
 	return false
 }
@@ -176,3 +183,4 @@ exports.getNumberOfMonitoredFiles = getNumberOfMonitoredFiles
 exports.setFileSystemChangedCallbackFun = setFileSystemChangedCallbackFun
 exports.startFileSystemMonitor = startFileSystemMonitor
 exports.stopFileSystemMonitor = stopFileSystemMonitor
+exports.scanAppFiles = scanAppFiles

@@ -575,4 +575,5 @@ function getDefaultMimeTypes()
 
 exports.response = response
 exports.createResponse = createResponse
+exports.createResponse200 = createResponse200
 exports.createResponse404 = createResponse404

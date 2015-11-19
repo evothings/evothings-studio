@@ -30,6 +30,7 @@ var PATH = require('path')
 var SOCKETIO_CLIENT = require('socket.io-client')
 var FILEUTIL = require('./fileutil.js')
 var LOADER = require('./fileloader.js')
+var MONITOR = require('./filemonitor.js')
 var LOGGER = require('./log.js')
 var SETTINGS = require('../settings/settings.js')
 var UUID = require('./uuid.js')
@@ -55,6 +56,7 @@ var mSocket = null
 var mAppPath = null
 var mAppFile = null
 var mAppID = null
+var mAppName = null
 var mMessageCallback = null
 var mClientInfoCallback = null
 var mReloadCallback = null
@@ -308,25 +310,53 @@ function serveResource(platform, path, ifModifiedSince)
 	{
 		// TODO: Serve something else? A default page?
 		// Handle this case in the server?
-		LOADER.createResponse404(path)
+		return LOADER.createResponse404(path)
 	}
-	else if (SETTINGS.getServeCordovaJsFiles() &&
+
+	if (SETTINGS.getServeCordovaJsFiles() &&
 		(path == '/cordova.js' ||
 		path == '/cordova_plugins.js' ||
 		path.indexOf('/plugins/') == 0))
 	{
 		return serveCordovaFile(platform, path, ifModifiedSince)
 	}
-	else if (mBasePath)
+
+	if(path == '/evocache-manifest.json')
+	{
+		return serveEvocacheManifestJson()
+	}
+
+	if (mBasePath)
 	{
 		return LOADER.response(
 			mBasePath + path.substr(1),
 			ifModifiedSince)
 	}
-	else
-	{
-		return LOADER.createResponse404(path)
+
+	return LOADER.createResponse404(path)
+}
+
+/**
+ * Internal.
+ *
+ * Serve evocache-manifest.json.
+ */
+function serveEvocacheManifestJson()
+{
+	var manifest = {
+		name: mAppName,
+		files: [],
+		startPage: mAppFile,
 	}
+	window.console.log(JSON.stringify(manifest))
+	MONITOR.scanAppFiles(function(name, stat) {
+		if(!stat.isDirectory())
+			manifest.files.push(name.substr(mBasePath.length))
+	})
+
+	var content = JSON.stringify(manifest)
+
+	return LOADER.createResponse200(content, new Date(), 'text/plain; charset=utf8')
 }
 
 /**
@@ -464,19 +494,19 @@ exports.getBasePath = function()
 }
 
 /**
- * External.
- */
-exports.getAppServerURL = function()
-{
-	return mRemoteServerURL + '/hyper/' + mSessionID + '/' + mAppID + '/' + mAppFile
-}
-
-/**
  * Internal.
  */
 function getAppURL()
 {
 	return '/' + mAppID + '/' + mAppFile
+}
+
+/**
+ * Internal.
+ */
+function getCacheURL()
+{
+	return '/' + mAppID + '/evocache-manifest.json'
 }
 
 /**
@@ -502,6 +532,32 @@ exports.runApp = function()
 			sessionID: mSessionID,
 			appID: mAppID,
 			url: getAppURL()
+		})
+}
+
+/**
+ * External.
+ */
+exports.setAppName = function(name)
+{
+	mAppName = name
+}
+
+/**
+ * External.
+ *
+ * Reloads the main HTML file of the current app.
+ */
+exports.cacheApp = function()
+{
+	serveUsingResponse304()
+	mAppID = APP_SETTINGS.getAppID(mBasePath)
+	sendMessageToServer(mSocket, 'workbench.cache',
+		{
+			sessionID: mSessionID,
+			appID: mAppID,
+			name: mAppName,
+			url: getCacheURL()
 		})
 }
 
