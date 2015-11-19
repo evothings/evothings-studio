@@ -38,7 +38,6 @@ var EVENTS = require('./events')
 
 var mLoginClient = null
 var mUser = null
-var mLoginConnected = false
 
 /*********************************/
 /***		Functions		  ***/
@@ -46,72 +45,29 @@ var mLoginConnected = false
 
 exports.createLoginClient = function()
 {
-	// Create connection to login sever (SAAS server).
-	if (!mLoginClient)
-	{
-		var serverAddress = getLoginServerAddress()
-		LOGGER.log('LOGIN: connecting to login server '+serverAddress);
+	EVENTS.subscribe(EVENTS.LOGIN, exports.setUser)
+	EVENTS.subscribe(EVENTS.LOGOUT, exports.clearUser)
+}
 
-		// Create login client.
-		var serverURL = serverAddress.replace('https', 'wss')
-		mLoginClient = IO(serverURL)
+exports.setUser = function(uobj)
+{
+	LOGGER.log('LOGIN: setting user to "'+uobj.name+'"')
+	LOGGER.log('LOGIN: Listing user object:')
+	LOGGER.log(uobj)
+	mUser = uobj
+}
 
-		mLoginClient.on('connect', function()
-		{
-			LOGGER.log('[user-handler.js] Connected to login server')
-			mLoginConnected = true
-			EVENTS.publish(EVENTS.LOGINCONNECT, {event: 'loginconnect'})
-		})
-
-		mLoginClient.on('error', function(error)
-		{
-			LOGGER.log('[user-handler.js] Login server error: ' + error)
-		})
-
-		mLoginClient.on('disconnect', function()
-		{
-			LOGGER.log('[user-handler.js] Disconnected from login server')
-			mLoginConnected = false
-			EVENTS.publish(EVENTS.LOGINDISCONNECT, {event: 'logindisconnect'})
-		})
-
-		mLoginClient.on('message', function(msg)
-		{
-			LOGGER.log('LOGIN: got auth callback message:')
-			LOGGER.log(msg);
-
-			if (msg.logout)
-			{
-				// User is now logged out.
-				LOGGER.log('LOGIN: loggin out user. Setting mUser to null')
-				mUser = null
-
-				// Notify logged out callback.
-				EVENTS.publish(EVENTS.LOGOUT, {event: 'logout'})
-			}
-			else
-			if (msg.user)
-			{
-				// User is now logged in.
-				mUser = msg.user
-				LOGGER.log('LOGIN: setting user to "'+msg.user.name+'"')
-				LOGGER.log('LOGIN: Listing user object:')
-				LOGGER.log(msg.user)
-
-				// Notify logged in callback.
-				EVENTS.publish(EVENTS.LOGIN, msg.user)
-			}
-		})
-	}
+exports.clearUser = function()
+{
+	LOGGER.log('LOGIN:clearing user')
+	mUser = undefined
 }
 
 exports.startLoginSequence = function()
 {
 	var sessionID = SERVER.getSessionID()
-	console.log('LOGIN: starting Login Sequence')
-	mLoginClient.emit(
-		'message',
-		JSON.stringify({target:'registerAuthCallback', uuid: sessionID }))
+	console.log('LOGIN: starting Login Sequence. Registering authentication callback with proxy. sessionID = '+sessionID)
+	SERVER.sendMessageToServer(undefined, 'workbench.registerauthcallback', { sessionID: sessionID })
 }
 
 exports.getLoginURL = function()
@@ -138,11 +94,6 @@ exports.getLogoutURL = function()
 	return logoutURL
 }
 
-exports.isConnectedToLoginServer = function()
-{
-	return mLoginConnected
-}
-
 exports.getUser = function()
 {
 	return mUser
@@ -156,39 +107,6 @@ exports.clearUser = function()
 function getLoginServerAddress()
 {
 	var serverAddress = SETTINGS.getReloadServerAddress()
-	var serverAddress = serverAddress + ':3003'
+	serverAddress = serverAddress + ':3003'
 	return serverAddress
 }
-
-/* UNUSED
-function openLoginWindow()
-{
-	var sessionID = SERVER.getSessionID()
-	console.log('sessionID = '+sessionID)
-	mLoginClient.emit(
-		'message',
-		JSON.stringify({target:'registerAuthCallback', uuid: sessionID }))
-
-	LOGGER.log('LOGIN: starting login sequence.')
-	var serverAddress = getLoginServerAddress()
-	var loginURL = serverAddress+'/?uuid='+sessionID+'&loginonly=true'
-	console.log('loginURL = '+loginURL)
-
-	// Create login window if it does not exist.
-	if (!mLoginWindow || mLoginWindow.closed)
-	{
-		LOGGER.log('LOGIN: creating login window')
-		mLoginWindow = window.open(
-			loginURL,
-			'Login',
-			{
-				resizable: true
-			})
-		mLoginWindow.resizeTo(550, 700)
-		mLoginWindow.moveTo(50, 50)
-		mLoginWindow.focus()
-	}
-
-	LOGGER.log('LOGIN: sending registerAuthCallback to saas server for uuid '+sessionID)
-}
-*/

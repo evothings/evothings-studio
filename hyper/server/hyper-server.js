@@ -86,7 +86,9 @@ exports.connectToRemoteServer = function()
 		'workbench.get-resource': onMessageWorkbenchGetResource,
 		'workbench.log': onMessageWorkbenchLog,
 		'workbench.javascript-result': onMessageWorkbenchJavaScriptResult,
-		'workbench.user-message': onMessageWorkbenchUserMessage
+		'workbench.user-message': onMessageWorkbenchUserMessage,
+		'workbench.user-login': onMessageWorkbenchUserLogin,
+		'workbench.user-logout': onMessageWorkbenchUserLogout
 	}
 
 	console.log('connecting to server: ' + mRemoteServerURL)
@@ -127,8 +129,6 @@ exports.connectToRemoteServer = function()
 
 	socket.on('hyper-workbench-message', function(message)
 	{
-        //LOGGER.log('hyper workbench message received')
-        //console.dir(message)
         var handler = messageHandlers[message.name]
         if (handler)
         {
@@ -137,8 +137,22 @@ exports.connectToRemoteServer = function()
 	})
 }
 
-function sendMessageToServer(socket, name, data)
+function onMessageWorkbenchUserLogin(socket, message)
 {
+	if(message.data && message.data.user)
+	{
+		EVENTS.publish(EVENTS.LOGIN, message.data.user)
+	}
+}
+
+function onMessageWorkbenchUserLogout(socket, message)
+{
+	EVENTS.publish(EVENTS.LOGOUT, {event: 'logout'})
+}
+
+function sendMessageToServer(_socket, name, data)
+{
+	var socket = _socket || mSocket
 	socket.emit('hyper-workbench-message', {
 		protocolVersion: mProtocolVersion,
 		workbenchVersionCode: mWorkbenchVersionCode,
@@ -598,3 +612,5 @@ exports.getSessionID = function()
 {
     return mSessionID
 }
+
+exports.sendMessageToServer = sendMessageToServer

@@ -47,6 +47,7 @@ var EVENTS = require('../server/events')
 var USER_HANDLER = require('../server/user-handler.js')
 var APP_SETTINGS = require('../server/app-settings.js')
 
+
 /*** Globals ***/
 
 // Global object that holds globally available functions.
@@ -1368,12 +1369,12 @@ hyper.UI.setupUIEvents = function()
 
 	// ************** Login Events **************
 
-	EVENTS.subscribe(EVENTS.LOGINCONNECT, function(obj)
+	EVENTS.subscribe(EVENTS.CONNECT, function(obj)
 	{
 		enableLoginButton()
 	})
 
-	EVENTS.subscribe(EVENTS.LOGINDISCONNECT, function(obj)
+	EVENTS.subscribe(EVENTS.DISCONNECT, function(obj)
 	{
 		displayLoginButton()
 		disableLoginButton()
@@ -1420,6 +1421,7 @@ hyper.UI.setupUIEvents = function()
 	function loginUser()
 	{
 		USER_HANDLER.createLoginClient()
+
 		USER_HANDLER.startLoginSequence()
 		var loginURL = USER_HANDLER.getLoginURL()
 		console.log('loginURL : ' + loginURL)
