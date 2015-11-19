@@ -90,7 +90,7 @@ Copyright (c) 2013-2015 Evothings AB
 						class="btn btn-hyper-toolbar et-btn-stone"
 						href="javascript:void(0)">My Apps</a>
 					<a id="button-new-app" role="button"
-						class="btn btn-hyper-toolbar et-btn-indigo"
+						class="btn btn-hyper-toolbar et-btn-yellow"
 						href="javascript:void(0)">New</a>
 					<a id="button-tools" role="button"
 						class="btn btn-hyper-toolbar btn-toolbar et-btn-blue"
@@ -207,6 +207,7 @@ Copyright (c) 2013-2015 Evothings AB
 								<input type="text"
 									id="input-new-app-folder"
 									class="form-control"
+									value="MyNewApp"
 									placeholder="AppFolderName"/>
 							</div>
 							<div class="form-group">
@@ -219,7 +220,58 @@ Copyright (c) 2013-2015 Evothings AB
 						</div>
 
 						<div class="modal-footer">
-							<button id="button-save-app"
+							<button id="button-save-new-app"
+								type="button"
+								class="btn btn-success">
+								Create
+							</button>
+							<button type="button"
+								class="btn btn-default"
+								data-dismiss="modal">
+								Dismiss
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Modal dialog: dialog-copy-app -->
+			<div class="modal fade"
+				id="dialog-copy-app"
+				tabindex="-1"
+				role="dialog"
+				aria-labelledby="dialog-copy-app-label"
+				aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h4 class="modal-title" id="dialog-copy-app-label">
+								Copy Example App
+							</h4>
+						</div>
+
+						<div class="modal-body">
+							<input id="input-copy-app-source-path" type="hidden" value="">
+							<div class="form-group">
+								<label for="input-copy-app-target-folder">
+									Destination folder name:</label>
+								<input type="text"
+									id="input-copy-app-target-folder"
+									class="form-control"
+									placeholder="AppFolderName"/>
+							</div>
+							<div class="form-group">
+								<label for="input-copy-app-target-parent-folder">
+									Parent folder where app is saved:</label>
+								<input type="text"
+									id="input-copy-app-target-parent-folder"
+									class="form-control"/>
+							</div>
+						</div>
+
+						<div class="modal-footer">
+							<button id="button-save-copy-app"
 								type="button"
 								class="btn btn-success">
 								Create

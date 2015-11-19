@@ -357,7 +357,7 @@ TODO: Remove, use automatic width for all buttons.
 	border-radius: 4px;
 }
 
-@media (max-width: 500px)
+@media (max-width: 599px)
 {
 .app-icon
 {
@@ -365,7 +365,7 @@ TODO: Remove, use automatic width for all buttons.
 }
 }
 
-@media (min-width: 501px)
+@media (min-width: 600px)
 {
 .app-icon
 {

@@ -129,6 +129,9 @@ hyper.UI.defineUIFunctions = function()
 
 	function styleUI()
 	{
+		// Put some content into connect key field to make field visible.
+		// Skip for now. hyper.UI.displayConnectKey('Click "Get Key"')
+
 		// Apply jQuery UI button style.
 		//$('button').button()
 
@@ -341,10 +344,11 @@ hyper.UI.defineUIFunctions = function()
 		else
 		{
 			// Show a color if no icon is provided.
-			var r = 155 + Math.floor(Math.random() * 100)
-			var g = 155 + Math.floor(Math.random() * 100)
-			var b = 155 + Math.floor(Math.random() * 100)
-			var color = 'rgb(' + r + ',' + g + ',' + b + ')'
+			//var r = 155 + Math.floor(Math.random() * 100)
+			//var g = 155 + Math.floor(Math.random() * 100)
+			//var b = 155 + Math.floor(Math.random() * 100)
+			//var color = 'rgb(' + r + ',' + g + ',' + b + ')'
+			var color = 'rgb(200,200,200)'
 			html += '<div class="app-icon" style="background:' + color + ';"></div>'
 		}
 
@@ -353,8 +357,8 @@ hyper.UI.defineUIFunctions = function()
 			html +=
 				'<button '
 				+	'type="button" '
-				+	'class="button-open btn et-btn-indigo" '
-				+	'onclick="window.hyper.copyExample(\'__PATH1__\')">'
+				+	'class="button-open btn et-btn-yellow" '
+				+	'onclick="window.hyper.UI.openCopyAppDialog(\'__PATH1__\')">'
 				+	'Copy'
 				+ '</button>'
 		}
@@ -365,7 +369,7 @@ hyper.UI.defineUIFunctions = function()
 				'<button '
 				+	'type="button" '
 				+	'class="button-open btn et-btn-blue" '
-				+	'onclick="window.hyper.openFileFolder(\'__PATH2__\')">'
+				+	'onclick="window.hyper.UI.openFileFolder(\'__PATH2__\')">'
 				+	'Code'
 				+ '</button>'
 		}
@@ -421,7 +425,6 @@ hyper.UI.defineUIFunctions = function()
 		html = html.replace('__PATH4__', getShortPathFromPath(path))
 		html = html.replace('__PATH5__', path)
 		html = html.replace('__NAME__', name)
-		html = html.replace('__IMAGE_PATH__', options.imagePath)
 
 		// Create element.
 		var element = $(html)
@@ -675,6 +678,96 @@ hyper.UI.defineUIFunctions = function()
 		}
 	}
 
+	hyper.UI.openFileFolder = function(path)
+	{
+		// Prepend application path if this is not an absolute path.
+		path = hyper.makeFullPath(path)
+
+		// Show the file in the folder.
+		hyper.openFolder(path)
+	}
+
+	hyper.UI.openCopyAppDialog = function(path)
+	{
+		// Populate input fields.
+
+		// Prepend application path if this is not an absolute path.
+		path = hyper.makeFullPath(path)
+		$('#input-copy-app-source-path').val(path)
+
+		// Set folder name of app to copy.
+		var sourceDir = PATH.dirname(path)
+		var appFolderName = PATH.basename(sourceDir)
+		$('#input-copy-app-target-folder').val(appFolderName)
+
+		var myAppsDir = SETTINGS.getMyAppsPath()
+		$('#input-copy-app-target-parent-folder').val(myAppsDir)
+
+		// Show dialog.
+		$('#dialog-copy-app').modal('show')
+	}
+
+	hyper.UI.saveCopyApp = function()
+	{
+		// Hide dialog.
+		$('#dialog-copy-app').modal('hide')
+
+		var sourcePath = $('#input-copy-app-source-path').val()
+		var indexFile = PATH.basename(sourcePath)
+		var sourceDir = PATH.dirname(sourcePath)
+		var targetAppFolder = $('#input-copy-app-target-folder').val()
+		var targetParentDir = $('#input-copy-app-target-parent-folder').val()
+		var targetDir = PATH.join(targetParentDir, targetAppFolder)
+
+		copyApp(sourcePath, targetDir)
+		showMyApps()
+	}
+
+	function copyApp(sourcePath, targetDir)
+	{
+		try
+		{
+			var indexFile = PATH.basename(sourcePath)
+			var sourceDir = PATH.dirname(sourcePath)
+
+			console.log('@@@ targetDir: ' + targetDir)
+
+			// Copy app.
+			var overwrite = true
+			var exists = FILEUTIL.statSync(targetDir)
+			if (exists)
+			{
+				overwrite = window.confirm('Folder exists, do you want to overwrite it?')
+			}
+
+			if (overwrite)
+			{
+				// Copy.
+				FSEXTRA.copySync(sourceDir, targetDir)
+
+				// Add path of index.html to my apps.
+				var fullTargetPath = PATH.join(targetDir, indexFile)
+				console.log('@@@ Copy to fullTargetPath: ' + fullTargetPath)
+				hyper.addProject(fullTargetPath)
+
+				// Show my apps.
+				hyper.UI.showTab('projects')
+				hyper.UI.displayProjectList()
+			}
+		}
+		catch (error)
+		{
+			window.alert('Something went wrong, could not save app.')
+			console.log('Error in copyApp: ' + error)
+		}
+	}
+
+	function showMyApps()
+	{
+		hyper.UI.showTab('projects')
+		hyper.UI.displayProjectList()
+	}
+
 	hyper.UI.openNewAppDialog = function()
 	{
 		// Populate input fields.
@@ -687,58 +780,20 @@ hyper.UI.defineUIFunctions = function()
 
 	hyper.UI.saveNewApp = function()
 	{
-		window.alert('Sorry, not yet implemented.')
-
 		// Hide dialog.
 		$('#dialog-new-app').modal('hide')
+
+		var sourcePath = hyper.makeFullPath('examples/template-basic-app/index.html')
 
 		var parentFolder = $('#input-new-app-parent-folder').val()
 		var appFolder = $('#input-new-app-folder').val()
 
-		/*
-		try
-		{
-			console.log('@@@ saveNewApp')
+		var targetDir = PATH.join(parentFolder, appFolder)
 
-			var template = 'TODO'
+		console.log('@@@ save new app target dir: ' + targetDir)
 
-			var indexFile = PATH.basename(fullExamplePath)
-			var exampleDir = PATH.dirname(fullExamplePath)
-			var exampleFolderName = PATH.basename(exampleDir)
-			var myAppsDir = SETTINGS.getMyAppsPath()
-			var targetDir = PATH.join(myAppsDir, exampleFolderName)
-
-			console.log('targetDir: ' + targetDir)
-
-
-			var overwrite = true
-			var exists = FILEUTIL.statSync(userTargetDir)
-			if (exists)
-			{
-				overwrite = window.confirm('App folder exists, do you want to overwrite it?')
-			}
-
-			if (overwrite)
-			{
-				// Copy.
-				FSEXTRA.copySync(exampleDir, userTargetDir)
-
-				// Add path of index.html to my apps.
-				var fullTargetPath = PATH.join(userTargetDir, indexFile)
-				console.log('fullTargetPath: ' + fullTargetPath)
-				hyper.addProject(fullTargetPath)
-
-				// Show my apps.
-				hyper.UI.showTab('projects')
-				hyper.UI.displayProjectList()
-			}
-		}
-		catch (error)
-		{
-			window.alert('Something went wrong, could not create app.')
-			console.log('Error in saveNewApp: ' + error)
-		}
-		*/
+		copyApp(sourcePath, targetDir)
+		showMyApps()
 	}
 
 	/*
@@ -885,7 +940,7 @@ hyper.UI.defineUIFunctions = function()
 	}
 }
 
-/*** Server setup ***/
+/*** Server/IO setup ***/
 
 hyper.defineServerFunctions = function()
 {
@@ -1122,7 +1177,7 @@ hyper.defineServerFunctions = function()
 		}
 	}
 
-	function openFolder(path)
+	hyper.openFolder = function(path)
 	{
 		// Convert path separators on Windows.
 		if (process.platform === 'win32')
@@ -1134,72 +1189,6 @@ hyper.defineServerFunctions = function()
 		LOGGER.log('Open folder: ' + path)
 
 		GUI.Shell.showItemInFolder(path)
-	}
-
-	hyper.openFileFolder = function(path)
-	{
-		// Prepend application path if this is not an absolute path.
-		path = hyper.makeFullPath(path)
-
-		// Show the file in the folder.
-		openFolder(path)
-	}
-
-	hyper.copyExample = function(path)
-	{
-		// Prepend application path if this is not an absolute path.
-		path = hyper.makeFullPath(path)
-
-		// Show the file in the folder.
-		copyExampleToUserApps(path)
-	}
-
-	function copyExampleToUserApps(fullExamplePath)
-	{
-		try
-		{
-			console.log('@@@ copyExampleToUserApps')
-
-			var indexFile = PATH.basename(fullExamplePath)
-			var exampleDir = PATH.dirname(fullExamplePath)
-			var exampleFolderName = PATH.basename(exampleDir)
-			var myAppsDir = SETTINGS.getMyAppsPath()
-			var targetDir = PATH.join(myAppsDir, exampleFolderName)
-
-			console.log('targetDir: ' + targetDir)
-
-			// Copy example. Ask for target path, present targetDir as default.
-			var userTargetDir = window.prompt('Copy example to folder', targetDir)
-			if (userTargetDir)
-			{
-				var overwrite = true
-				var exists = FILEUTIL.statSync(userTargetDir)
-				if (exists)
-				{
-					overwrite = window.confirm('Folder exists, do you want to overwrite it?')
-				}
-
-				if (overwrite)
-				{
-					// Copy.
-					FSEXTRA.copySync(exampleDir, userTargetDir)
-
-					// Add path of index.html to my apps.
-					var fullTargetPath = PATH.join(userTargetDir, indexFile)
-					console.log('fullTargetPath: ' + fullTargetPath)
-					hyper.addProject(fullTargetPath)
-
-					// Show my apps.
-					hyper.UI.showTab('projects')
-					hyper.UI.displayProjectList()
-				}
-			}
-		}
-		catch (error)
-		{
-			window.alert('Something went wrong, could not copy example app.')
-			console.log('Error in copyExampleToUserApps: ' + error)
-		}
 	}
 
 	hyper.setRemoteServerURL = function(url)
@@ -1333,9 +1322,16 @@ hyper.UI.setupUIEvents = function()
 
 	// ************** New App Dialog Save Button **************
 
-	$('#button-save-app').click(function()
+	$('#button-save-new-app').click(function()
 	{
 		hyper.UI.saveNewApp()
+	})
+
+	// ************** Copy App Dialog Save Button **************
+
+	$('#button-save-copy-app').click(function()
+	{
+		hyper.UI.saveCopyApp()
 	})
 
 	// ************** Tools Button **************
