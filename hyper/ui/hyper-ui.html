@@ -146,7 +146,7 @@ Copyright (c) 2013-2015 Evothings AB
 							</div>
 							<div class="form-group">
 								<label for="input-setting-number-of-directory-levels">
-									Number of directory levels to monitor for live reload:</label>
+									Number of app directory levels to monitor for live reload:</label>
 								<input type="text"
 									id="input-setting-number-of-directory-levels"
 									class="form-control"
@@ -294,13 +294,37 @@ Copyright (c) 2013-2015 Evothings AB
 						<img class="screen-start-logotype"
 							src="images/logo.svg" alt="Evothings" />
 
-						<div>
+						<div class="style-big-para">
 							<h1>Getting Started</h1>
-							<p>Evothings Studio consists of two connected parts, Evothings Workbench and the Evothings Viewer app. Install <strong>Evothings Viewer</strong> on your mobile devices from Google Play and Apple App Store.</p>
-							<p>From the Workbench you can run apps in connected Viewers. The currently running app will be reloaded automatically when saving edited code files.</p>
-							<p><strong>To connect to the Workbench from Evothings Viewer, you need Internet access and a connect key.</strong></p>
-							<p><strong>Go to the "Connect" tab and click the "Get Key" button to obtain a connect key.</strong> Use this key when connecting from the Viewer. Click "Get Key" again if the key times out. Once connected, your session has no time limit.</p>
-							<p><strong>Login</strong> on the Connect screen to get a quick-connect button in Evothings Viewer. This button is displayed when you restart the Viewer and allows you to reconnect to the Workbench where you are logged in, without entering a connect code.</p>
+
+							<p>(You can view this screen at any time by selecting "Getting Started" in the "More" dropdown menu.)</p>
+
+							<h2>Run apps you develop directly on mobile devices</h2>
+
+							<p>Evothings Studio consists of two connected parts, Evothings Workbench (the application you are currently running) and the Evothings Viewer app running on your mobile device(s). You need both parts to be able to use Evothings Studio.</p>
+
+							<p>Run apps on connected Viewers by clicking RUN on the apps under "Examples" and "My Apps". The currently running app will be automatically reloaded when saving edited code files.</p>
+
+							<h2>Step 1: Install Evothings Viewer</h2>
+
+							<p>Install the Evothings Viewer application on your mobile device(s), get the app from Google Play or Apple App Store.</p>
+
+							<h2>Step 2: Connect to the Workbench from the Viewer</h2>
+
+							<p>To connect the Evothings Viewer app to the Workbench, you need Internet access and a connect key.</p>
+
+							<p>Go to the <button type="button" class="button-open-connect-screen btn btn-hyper-toolbar et-btn-stone">CONNECT</button> tab and click the <button type="button" class="button-open-connect-screen btn et-btn-green">Get Key</button> button to obtain a connect key code. Use this code when connecting from the Viewer. Once connected, your session has no time limit. Click the "Get Key" button again if the key times out.</p>
+
+							<p>LOGIN on the Connect screen to get a Quick-Connect button in the Evothings Viewer app. This button is displayed when you restart the Viewer and allows you to reconnect to the Workbench where you are logged in, without entering a connect key again. This makes it much quicker to connect to same Workbench.</p>
+
+							<h2>Step 3: How to create a new app</h2>
+
+							<p>To create your own apps you have two options. Copy one of the example apps (click COPY) and modify it for your own purposes, or click the NEW button.</p>
+
+							<p>You can also drag and drop an .html file (typically index.html) to this window to add an existing app under "My Apps".</p>
+
+							<p>Arrange apps using drag and drop (example apps cannot be rearranged). Click the close icon (x) to delete an app entry. This will NOT delete the application files.</p>
+
 							<p>For further details and a Getting Started guide, <a class="button-documentation" href="javascript:void(0)">visit the documentation</a>.</p>
 						</div>
 
@@ -329,7 +353,7 @@ Copyright (c) 2013-2015 Evothings AB
 
 						<h1>Connect and Login</h1>
 
-						<div class="screen-start-help">
+						<div class="screen-start-help style-big-para">
 							<p><strong>To connect to the Workbench from Evothings Viewer, you need Internet access and a connect key.</strong></p>
 						</div>
 
@@ -342,19 +366,19 @@ Copyright (c) 2013-2015 Evothings AB
 							<div id="connect-key" class="well well-sm valign"></div>
 						</div>
 
-						<div class="screen-start-help framed-box">
+						<div class="screen-start-help framed-box style-big-para">
 							<p><strong>Click the "Get Key" button to obtain a connect key.</strong> Use this key when connecting from the Viewer. Click "Get Key" again if the key times out. Once connected, your session has no time limit.</p>
 						</div>
 
 						<div>
 							<button id="button-login"
 								type="button"
-								class="btn et-btn-blue valign">
+								class="btn et-btn-blue style-valign">
 								Login
 							</button>
 						</div>
 
-						<div class="screen-start-help framed-box">
+						<div class="screen-start-help framed-box style-big-para">
 							<p><strong>Login</strong> to get a quick-connect button in Evothings Viewer. This button is displayed when you restart the Viewer and allows you to reconnect to the Workbench where you are logged in, without entering a connect code.</p>
 						</div>
 

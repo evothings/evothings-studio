@@ -196,7 +196,7 @@ TODO: Remove, use automatic width for all buttons.
 	border-radius: 4px;
 }
 
-#screen-connect p
+.style-big-para > p
 {
 	/* Make text a bit bigger than the default. */
 	font-size: 120%;
@@ -211,7 +211,7 @@ TODO: Remove, use automatic width for all buttons.
 	margin-bottom: 10px;
 }
 
-.valign
+.style-valign
 {
     vertical-align: middle;
     display: inline;

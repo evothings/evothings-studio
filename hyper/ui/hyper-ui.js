@@ -575,7 +575,7 @@ hyper.UI.defineUIFunctions = function()
 		{
 			// No items in list, show help text.
 			var html =
-				'<div style="padding: 0px 10px 10px 10px;">' +
+				'<div class="style-big-para" style="padding: 0px 10px 10px 10px;">' +
 				'<h2>How to create a new app</h2>' +
 				'<p>Create a new app by copying one of the example apps (click "Copy") or by clicking the "New" button.</p>' +
 				'<p>You can also drag and drop an .html file (typically index.html) to this window.</p>' +
@@ -1259,7 +1259,7 @@ hyper.UI.setupUIEvents = function()
 
 	// ************** Connect Screen Button **************
 
-	$('#button-connect').click(function()
+	$('#button-connect, .button-open-connect-screen').click(function()
 	{
 		hyper.UI.showTab('connect')
 	})
