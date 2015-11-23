@@ -28,6 +28,9 @@
 {"path":"examples/redbearlab-simplechat/index.html"},
 
 {"path":"examples/mediatek-linkit/app/index.html"},
+{"path":"examples/mediatek-linkit-connect/app/index.html"},
+
+{"path":"examples/esp8266/app/index.html"},
 {"path":"examples/lightblue-bean-basic/app/index.html"},
 {"path":"examples/rfduino-led-onoff/app/index.html"},
 {"path":"examples/bluno-helloworld/app/index.html"}
