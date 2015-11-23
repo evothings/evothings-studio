@@ -357,7 +357,7 @@ hyper.UI.defineUIFunctions = function()
 			html +=
 				'<button '
 				+	'type="button" '
-				+	'class="button-open btn et-btn-yellow" '
+				+	'class="button-open btn et-btn-indigo" '
 				+	'onclick="window.hyper.UI.openCopyAppDialog(\'__PATH1__\')">'
 				+	'Copy'
 				+ '</button>'
