@@ -107,10 +107,10 @@ Copyright (c) 2013-2015 Evothings AB
 					<div class="modal-content">
 						<div class="modal-header">
 							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-							<h4 class="modal-title" id="ModalDialog-NoClientConnected-Label">No client connected</h4>
+							<h4 class="modal-title" id="ModalDialog-NoClientConnected-Label">No Evothings Viewer app connected</h4>
 						</div>
 						<div class="modal-body">
-							Please connect from the <a href="javascript:void(0)" id="ModalDialog-NoClientConnected-ClientAppLink">Evothings Viewer</a> app.
+							Please connect from the Evothings Viewer</a> app on your mobile device(s). Learn more on the <a href="javascript:void(0)" id="ModalDialog-NoClientConnected-HelpLink">Getting Started screen</a>.
 						</div>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -294,7 +294,7 @@ Copyright (c) 2013-2015 Evothings AB
 						<img class="screen-start-logotype"
 							src="images/logo.svg" alt="Evothings" />
 
-						<div class="style-big-para">
+						<div class="style-big-para style-small-h2">
 							<h1>Getting Started</h1>
 
 							<p>(You can view this screen at any time by selecting "Getting Started" in the "More" dropdown menu.)</p>
@@ -313,22 +313,22 @@ Copyright (c) 2013-2015 Evothings AB
 
 							<p>To connect the Evothings Viewer app to the Workbench, you need Internet access and a connect key.</p>
 
-							<p>Go to the <button type="button" class="button-open-connect-screen btn btn-hyper-toolbar et-btn-stone">CONNECT</button> tab and click the <button type="button" class="button-open-connect-screen btn et-btn-green">Get Key</button> button to obtain a connect key code. Use this code when connecting from the Viewer. Once connected, your session has no time limit. Click the "Get Key" button again if the key times out.</p>
+							<p>Go to the <strong>Connect</strong> tab and click the <button type="button" class="btn et-btn-green" style="font-size:80%;">Get Key</button> button to obtain a connect key code. Use this code when connecting from the Viewer. Once connected, your session has no time limit. Click the "Get Key" button again if the key times out.</p>
 
-							<p>LOGIN on the Connect screen to get a Quick-Connect button in the Evothings Viewer app. This button is displayed when you restart the Viewer and allows you to reconnect to the Workbench where you are logged in, without entering a connect key again. This makes it much quicker to connect to same Workbench.</p>
+							<p>Click <button type="button" class="btn et-btn-blue" style="font-size:80%;">Login</button> on the Connect screen to get a Quick-Connect button in the Evothings Viewer app. This button is displayed when you restart the Viewer and allows you to reconnect to the Workbench where you are logged in, without entering a connect key again. This makes it much quicker to connect to same Workbench.</p>
 
 							<h2>Step 3: How to create a new app</h2>
 
 							<p>To create your own apps you have two options. Copy one of the example apps (click COPY) and modify it for your own purposes, or click the NEW button.</p>
 
-							<p>You can also drag and drop an .html file (typically index.html) to this window to add an existing app under "My Apps".</p>
+							<p>You can also drag and drop an .html file (typically index.html) to this window to add an existing app under <strong>My Apps</strong>.</p>
 
 							<p>Arrange apps using drag and drop (example apps cannot be rearranged). Click the close icon (x) to delete an app entry. This will NOT delete the application files.</p>
 
 							<p>For further details and a Getting Started guide, <a class="button-documentation" href="javascript:void(0)">visit the documentation</a>.</p>
 						</div>
 
-						<!-- TODO: Show in iframe  from server -->
+						<!-- TODO: Show in iframe served from web server -->
 						<!--
 						<iframe id="getting-started-screen-iframe"
 							style="display:none;"
@@ -345,25 +345,22 @@ Copyright (c) 2013-2015 Evothings AB
 				<div class="panel">
 					<div class="panel-body">
 
-						<button id="button-toogle-help"
-							type="button"
-							class="btn et-btn-charcoal">
-							Hide Help
-						</button>
-
 						<h1>Connect and Login</h1>
 
 						<div class="screen-start-help style-big-para">
 							<p><strong>To connect to the Workbench from Evothings Viewer, you need Internet access and a connect key.</strong></p>
 						</div>
 
-						<div>
+						<div class="connect-key-table connect-screen-element">
 							<button id="button-get-connect-key"
 								type="button"
-								class="btn et-btn-green valign">
-								Get Key <span id="connect-spinner" class="glyphicon glyphicon-refresh glyphicon-spin"></span>
-							</button>
-							<div id="connect-key" class="well well-sm valign"></div>
+								class="btn et-btn-green connect-key-item">
+								Get Key <span id="connect-spinner" class="glyphicon glyphicon-refresh"></button>
+							<div id="connect-key" class="connect-key-item"></div>
+						</div>
+
+						<div>
+							<p id="connect-screen-message" class="connect-screen-element">Server message goes here</p>
 						</div>
 
 						<div class="screen-start-help framed-box style-big-para">
@@ -373,7 +370,7 @@ Copyright (c) 2013-2015 Evothings AB
 						<div>
 							<button id="button-login"
 								type="button"
-								class="btn et-btn-blue style-valign">
+								class="btn et-btn-blue connect-screen-element">
 								Login
 							</button>
 						</div>
@@ -382,15 +379,11 @@ Copyright (c) 2013-2015 Evothings AB
 							<p><strong>Login</strong> to get a quick-connect button in Evothings Viewer. This button is displayed when you restart the Viewer and allows you to reconnect to the Workbench where you are logged in, without entering a connect code.</p>
 						</div>
 
-						<div>
-							<p id="connect-screen-message"></p>
-						</div>
+						<button id="button-toogle-help" type="button"
+							class="btn et-btn-charcoal connect-screen-element">
+							Hide Help
+						</button>
 
-<!--
-						<div style="padding-top:10px;">
-							<p class="screen-start-ui-help">Login to get a quick connect button in Evothings Viewer. This button is displayed when you restart the Viewer and allows you to reconnect to the Workbench where you are logged in.</p>
-						</div>
--->
 						<!-- Div that holds the login iframe -->
 						<div id="connect-screen-login">
 							<button id="connect-screen-login-close-button" class="btn btn-hyper-toolbar et-btn-stone-light">

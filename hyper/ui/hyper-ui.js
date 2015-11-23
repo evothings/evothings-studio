@@ -895,7 +895,7 @@ hyper.UI.defineUIFunctions = function()
 	hyper.UI.getConnectKeyFromServer = function()
 	{
 		// Show spinner.
-		$('#connect-spinner').css('display', 'inline-block')
+		$('#connect-spinner').addClass('icon-spin-animate')
 
 		if (!hyper.SERVER.isConnected())
 		{
@@ -919,8 +919,9 @@ hyper.UI.defineUIFunctions = function()
 
 		// Set timeout for connect key display.
 		mConnectKeyTimer = setTimeout(function() {
-			hyper.UI.displayConnectKey(
-				'Key has timed out. Click GET KEY to get a new one.') },
+			hyper.UI.displayConnectKey('Key expired')
+			//hyper.UI.displayConnectScreenMessage('Key has timed out. Click GET KEY to get a new one.')
+			},
 			timeout)
 	}
 
@@ -928,35 +929,18 @@ hyper.UI.defineUIFunctions = function()
 	// message from the server.
 	hyper.UI.displayConnectKey = function(key)
 	{
-		// Adjust font size depending on the length of the key.
-		// A connect key currently is 8 characters, a message is
-		// probably longer.
-		if (key.length > 8)
-		{
-			// Message longer than 8 chars.
-			$('#connect-key').css('display', 'block')
-			$('#connect-key').css('font-size', '22px')
-			$('#connect-key').css('color', 'black')
-		}
-		else
-		{
-			// Display connect key with bigger font and after the Get Key button.
-			$('#connect-key').css('display', 'inline')
-			$('#connect-key').css('font-size', '36px')
-			$('#connect-key').css('color', 'black')
-		}
-
 		// Show connect key field text.
 		$('#connect-key').html(key)
 
-		// Hide button spinner.
-		$('#connect-spinner').css('display', 'none')
+		// Stop button spinner.
+		$('#connect-spinner').removeClass('icon-spin-animate')
 	}
 
 	hyper.UI.displayConnectScreenMessage = function(message)
 	{
-		$('#connect-spinner').css('display', 'none')
 		$('#connect-screen-message').html(message)
+		$('#connect-screen-message').show()
+		$('#connect-spinner').removeClass('icon-spin-animate')
 	}
 }
 
@@ -1549,10 +1533,16 @@ hyper.UI.setupUIEvents = function()
 	}
 
 	// Click handler for link in the ModalDialog-NoClientConnected dialog.
-	$('#ModalDialog-NoClientConnected-ClientAppLink').click(function()
+	$('#ModalDialog-NoClientConnected-HelpLink').click(function()
 	{
-		var url = 'file://' + PATH.resolve('./documentation/studio/mobile-app.html')
-		hyper.UI.openInBrowser(url)
+		//var url = 'file://' + PATH.resolve('./documentation/studio/mobile-app.html')
+		//hyper.UI.openInBrowser(url)
+
+		// Hide modal dialog.
+		$('#ModalDialog-NoClientConnected').modal('hide')
+
+		// Show Getting Started screen.
+		hyper.UI.showTab('getting-started')
 	})
 
     // ************** Additional event handlers **************
