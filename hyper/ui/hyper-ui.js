@@ -689,18 +689,27 @@ hyper.UI.defineUIFunctions = function()
 
 	hyper.UI.openCopyAppDialog = function(path)
 	{
-		// Populate input fields.
-
 		// Prepend application path if this is not an absolute path.
 		path = hyper.makeFullPath(path)
-		$('#input-copy-app-source-path').val(path)
 
-		// Set folder name of app to copy.
+		// Set source and folder name of app to copy.
 		var sourceDir = PATH.dirname(path)
 		var appFolderName = PATH.basename(sourceDir)
-		$('#input-copy-app-target-folder').val(appFolderName)
-
 		var myAppsDir = SETTINGS.getMyAppsPath()
+
+		// Now, time to handle a special case. Some of the Evothings example
+		// apps contain a folder named "app" where index.html is found.
+		// If the appFolderName is "app", we go up one level.
+		// It should be noted that this is not a very nice hack,
+		// and there is a corresponding hack in function copyApp().
+		if ('app' ==  appFolderName)
+		{
+			appFolderName = PATH.basename(PATH.dirname(sourceDir))
+		}
+
+		// Set dialog box fields.
+		$('#input-copy-app-source-path').val(path) // Hidden field.
+		$('#input-copy-app-target-folder').val(appFolderName)
 		$('#input-copy-app-target-parent-folder').val(myAppsDir)
 
 		// Show dialog.
@@ -712,15 +721,14 @@ hyper.UI.defineUIFunctions = function()
 		// Hide dialog.
 		$('#dialog-copy-app').modal('hide')
 
+		// Set up source and target paths.
 		var sourcePath = $('#input-copy-app-source-path').val()
-		var indexFile = PATH.basename(sourcePath)
-		var sourceDir = PATH.dirname(sourcePath)
 		var targetAppFolder = $('#input-copy-app-target-folder').val()
 		var targetParentDir = $('#input-copy-app-target-parent-folder').val()
 		var targetDir = PATH.join(targetParentDir, targetAppFolder)
 
+		// Copy the app.
 		copyApp(sourcePath, targetDir)
-		showMyApps()
 	}
 
 	function copyApp(sourcePath, targetDir)
@@ -729,12 +737,27 @@ hyper.UI.defineUIFunctions = function()
 		{
 			var indexFile = PATH.basename(sourcePath)
 			var sourceDir = PATH.dirname(sourcePath)
+			var appFolderName = PATH.basename(sourceDir)
+			var indexFileTargetPath = PATH.join(targetDir, indexFile)
+
+			// Again, we need to handle the special case when index.html of the
+			// example app is contained in a subfolder named "app".
+			// If the appFolderName is "app", we go up one level.
+			// There is a corresponding hack in function hyper.UI.openCopyAppDialog().
+			if ('app' ==  appFolderName)
+			{
+				sourceDir = PATH.dirname(sourceDir)
+				indexFileTargetPath = PATH.join(targetDir, appFolderName, indexFile)
+			}
 
 			console.log('@@@ targetDir: ' + targetDir)
+			console.log('@@@ sourceDir: ' + sourceDir)
+			console.log('@@@ indexFileTargetPath: ' + indexFileTargetPath)
 
 			// Copy app.
 			var overwrite = true
 			var exists = FILEUTIL.statSync(targetDir)
+
 			if (exists)
 			{
 				overwrite = window.confirm('Folder exists, do you want to overwrite it?')
@@ -742,17 +765,14 @@ hyper.UI.defineUIFunctions = function()
 
 			if (overwrite)
 			{
-				// Copy.
+				// Copy files.
 				FSEXTRA.copySync(sourceDir, targetDir)
 
-				// Add path of index.html to my apps.
-				var fullTargetPath = PATH.join(targetDir, indexFile)
-				console.log('@@@ Copy to fullTargetPath: ' + fullTargetPath)
-				hyper.addProject(fullTargetPath)
+				// Add path of index.html to "My Apps".
+				hyper.addProject(indexFileTargetPath)
 
-				// Show my apps.
-				hyper.UI.showTab('projects')
-				hyper.UI.displayProjectList()
+				// Show the "My Apps" screen.
+				showMyApps()
 			}
 		}
 		catch (error)
