@@ -58,7 +58,6 @@ var mAppID = null
 var mMessageCallback = null
 var mClientInfoCallback = null
 var mReloadCallback = null
-var mStatusCallback = null
 var mRequestConnectKeyCallback = null
 var mCheckIfModifiedSince = false
 
@@ -123,8 +122,6 @@ exports.connectToRemoteServer = function()
 	{
 		mIsConnected = false
         EVENTS.publish(EVENTS.DISCONNECT, {event: 'disconnected' })
-		mStatusCallback && mStatusCallback({
-			event: 'disconnected' })
 	})
 
 	socket.on('hyper-workbench-message', function(message)
@@ -163,6 +160,7 @@ function sendMessageToServer(_socket, name, data)
 function onMessageWorkbenchSetSessionID(socket, message)
 {
 	LOGGER.log('onMessageWorkbenchSetSessionID: ' + message.data.sessionID)
+
 	// Set/display session id if we got it.
 	if (message.data.sessionID)
 	{
@@ -175,23 +173,12 @@ function onMessageWorkbenchSetSessionID(socket, message)
 		// Send event width session id.
 		// TODO: Who is listening to this? No one it seems.
         EVENTS.publish(EVENTS.SETSESSIONID, mSessionID)
-
-		// Pass the connect key to the callback function,
-		// this displays the key in the UI.
-        message.data.event = 'connected'
-		mStatusCallback && mStatusCallback(message.data)
 	}
 
-	// Display message if we gone one.
+	// Display user message if we gone one.
 	if (message.userMessage)
 	{
-		// Pass the message to the callback function,
-		// this displays the message in the UI.
 		EVENTS.publish(EVENTS.USERMESSAGE, message.userMessage)
-		mStatusCallback && mStatusCallback({
-			event: 'user-message',
-			userMessage: message.userMessage })
-
 	}
 }
 
@@ -258,9 +245,6 @@ function onMessageWorkbenchUserMessage(socket, message)
 		// Pass the message to the callback function,
 		// this displays the message in the UI.
 		EVENTS.publish(EVENTS.USERMESSAGE, message.userMessage)
-		mStatusCallback && mStatusCallback({
-			event: 'workbench.user-message',
-			userMessage: message.userMessage })
 	}
 }
 
@@ -577,16 +561,6 @@ exports.setClientInfoCallbackFun = function(fun)
 exports.setReloadCallbackFun = function(fun)
 {
 	mReloadCallback = fun
-}
-
-/**
- * External.
- *
- * Callback form: fun(message)
- */
-exports.setStatusCallbackFun = function(fun)
-{
-	mStatusCallback = fun
 }
 
 /**
