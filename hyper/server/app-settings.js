@@ -97,6 +97,7 @@ function readAppSettings(appPath)
  */
 function writeAppSettings(settings, appPath)
 {
+	var path = PATH.join(appPath, 'evothings.json')
 	var data = JSON.stringify(settings)
-	FS.writeFileSync(appPath, data, {encoding: 'utf8'})
+	FS.writeFileSync(path, data, {encoding: 'utf8'})
 }
