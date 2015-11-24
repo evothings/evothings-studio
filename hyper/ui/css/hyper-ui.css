@@ -196,83 +196,85 @@ TODO: Remove, use automatic width for all buttons.
 	border-radius: 4px;
 }
 
-#screen-connect p
+.style-big-para > p
 {
 	/* Make text a bit bigger than the default. */
 	font-size: 120%;
 }
 
-#screen-connect button
+.style-small-h2 > h2
 {
-	/* Make button text bigger than the default. */
 	font-size: 150%;
-	margin-right: 10px;
-	margin-top: 10px;
-	margin-bottom: 10px;
 }
 
-.valign
+.connect-screen-element
 {
-    vertical-align: middle;
-    display: inline;
-}
-
-#connect-key
-{
-	display: none;
-	font-weight: bold;
-	padding: 5px 10px;
-	background: white;
-	/*
-	font-size: 255% !important;
-	padding: 20px;
-	border: 1px solid #888888;
-	background-color: rgb(255,255,255);
-	-webkit-border-radius: 4px;
-	-moz-border-radius: 4px;
-	border-radius: 4px;
-	*/
-}
-
-#connect-spinner
-{
-	display: none;
+	margin-top: 20px;
+	margin-bottom: 20px;
 }
 
 #connect-screen-message
 {
-	padding-top: 20px;
-	font-size: 125%;
+	display: none;
+	font-size: 200%;
 	font-weight: bold;
 }
 
-/* For spinning icon on the Get Key button */
-.glyphicon-spin
+#screen-connect button
 {
-	-webkit-animation: spin 1000ms infinite linear;
-	animation: spin 1000ms infinite linear;
+	/* Make button text bigger than the default. */
+	font-size: 140%;
+	margin-right: 10px;
 }
-@-webkit-keyframes spin
+
+.connect-key-table
 {
-	0% {
-		-webkit-transform: rotate(0deg);
-		transform: rotate(0deg);
-	}
-	100% {
-		-webkit-transform: rotate(359deg);
-		transform: rotate(359deg);
-	}
+	display: table;
 }
-@keyframes spin
+
+.connect-key-item
 {
-	0% {
-		-webkit-transform: rotate(0deg);
-		transform: rotate(0deg);
-	}
-	100% {
-		-webkit-transform: rotate(359deg);
-		transform: rotate(359deg);
-	}
+	display: table-cell;
+	vertical-align: middle;
+}
+
+#connect-key
+{
+	font-weight: bold;
+	font-size: 28px;
+	color: black;
+	background: rgb(245,245,245);
+	padding: 0px 15px;
+	margin-left: 10px;
+	margin-top: 0px;
+	margin-bottom: 0px;
+	min-width: 230px;
+	border: 1px solid #888888;
+	-webkit-border-radius: 4px;
+}
+
+#connect-spinner
+{
+	/*display: none;*/
+	/*vertical-align: middle;*/
+	vertical-align: -3px;
+    display: inline-block;
+}
+
+/* Spinning icon on the Get Key button */
+
+.icon-spin-animate
+{
+	/*-webkit-transform-origin: 50% 58%;*/
+	-webkit-animation-name: spinanimation;
+	-webkit-animation-duration: 1.0s;
+	-webkit-animation-iteration-count: infinite;
+	-webkit-animation-timing-function: linear;
+}
+
+@-webkit-keyframes "spinanimation" {
+	from { transform: scale( 1 ) rotate( 0deg );   }
+	to   { transform: scale( 1 ) rotate( 360deg ); }
 }
 
 #connect-screen-login
@@ -324,11 +326,13 @@ TODO: Remove, use automatic width for all buttons.
 
 #button-toogle-help
 {
+	/*
 	position: absolute;
 	width: 115px;
 	height: auto;
 	top: 0px;
 	right: 0px;
+	*/
 	font-size: 100% !important;
 }
 

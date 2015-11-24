@@ -42,11 +42,11 @@ var APP_SETTINGS = require('./app-settings.js')
 
 // Workbench version code should be incremented on each new release.
 // The version code can be used by the server to display info.
-var mWorkbenchVersionCode = 4
+var mWorkbenchVersionCode = 5
 
 // Version of the server message protocol implemented on top of socket.io.
 // Increment when the protocol has changed.
-var mProtocolVersion = 3
+var mProtocolVersion = 4
 
 var mIsConnected = false
 var mSessionID = null

@@ -357,7 +357,7 @@ hyper.UI.defineUIFunctions = function()
 			html +=
 				'<button '
 				+	'type="button" '
-				+	'class="button-open btn et-btn-yellow" '
+				+	'class="button-open btn et-btn-indigo" '
 				+	'onclick="window.hyper.UI.openCopyAppDialog(\'__PATH1__\')">'
 				+	'Copy'
 				+ '</button>'
@@ -575,7 +575,7 @@ hyper.UI.defineUIFunctions = function()
 		{
 			// No items in list, show help text.
 			var html =
-				'<div style="padding: 0px 10px 10px 10px;">' +
+				'<div class="style-big-para" style="padding: 0px 10px 10px 10px;">' +
 				'<h2>How to create a new app</h2>' +
 				'<p>Create a new app by copying one of the example apps (click "Copy") or by clicking the "New" button.</p>' +
 				'<p>You can also drag and drop an .html file (typically index.html) to this window.</p>' +
@@ -689,18 +689,27 @@ hyper.UI.defineUIFunctions = function()
 
 	hyper.UI.openCopyAppDialog = function(path)
 	{
-		// Populate input fields.
-
 		// Prepend application path if this is not an absolute path.
 		path = hyper.makeFullPath(path)
-		$('#input-copy-app-source-path').val(path)
 
-		// Set folder name of app to copy.
+		// Set source and folder name of app to copy.
 		var sourceDir = PATH.dirname(path)
 		var appFolderName = PATH.basename(sourceDir)
-		$('#input-copy-app-target-folder').val(appFolderName)
-
 		var myAppsDir = SETTINGS.getMyAppsPath()
+
+		// Now, time to handle a special case. Some of the Evothings example
+		// apps contain a folder named "app" where index.html is found.
+		// If the appFolderName is "app", we go up one level.
+		// It should be noted that this is not a very nice hack,
+		// and there is a corresponding hack in function copyApp().
+		if ('app' ==  appFolderName)
+		{
+			appFolderName = PATH.basename(PATH.dirname(sourceDir))
+		}
+
+		// Set dialog box fields.
+		$('#input-copy-app-source-path').val(path) // Hidden field.
+		$('#input-copy-app-target-folder').val(appFolderName)
 		$('#input-copy-app-target-parent-folder').val(myAppsDir)
 
 		// Show dialog.
@@ -712,15 +721,14 @@ hyper.UI.defineUIFunctions = function()
 		// Hide dialog.
 		$('#dialog-copy-app').modal('hide')
 
+		// Set up source and target paths.
 		var sourcePath = $('#input-copy-app-source-path').val()
-		var indexFile = PATH.basename(sourcePath)
-		var sourceDir = PATH.dirname(sourcePath)
 		var targetAppFolder = $('#input-copy-app-target-folder').val()
 		var targetParentDir = $('#input-copy-app-target-parent-folder').val()
 		var targetDir = PATH.join(targetParentDir, targetAppFolder)
 
+		// Copy the app.
 		copyApp(sourcePath, targetDir)
-		showMyApps()
 	}
 
 	function copyApp(sourcePath, targetDir)
@@ -729,12 +737,27 @@ hyper.UI.defineUIFunctions = function()
 		{
 			var indexFile = PATH.basename(sourcePath)
 			var sourceDir = PATH.dirname(sourcePath)
+			var appFolderName = PATH.basename(sourceDir)
+			var indexFileTargetPath = PATH.join(targetDir, indexFile)
+
+			// Again, we need to handle the special case when index.html of the
+			// example app is contained in a subfolder named "app".
+			// If the appFolderName is "app", we go up one level.
+			// There is a corresponding hack in function hyper.UI.openCopyAppDialog().
+			if ('app' ==  appFolderName)
+			{
+				sourceDir = PATH.dirname(sourceDir)
+				indexFileTargetPath = PATH.join(targetDir, appFolderName, indexFile)
+			}
 
 			console.log('@@@ targetDir: ' + targetDir)
+			console.log('@@@ sourceDir: ' + sourceDir)
+			console.log('@@@ indexFileTargetPath: ' + indexFileTargetPath)
 
 			// Copy app.
 			var overwrite = true
 			var exists = FILEUTIL.statSync(targetDir)
+
 			if (exists)
 			{
 				overwrite = window.confirm('Folder exists, do you want to overwrite it?')
@@ -742,17 +765,14 @@ hyper.UI.defineUIFunctions = function()
 
 			if (overwrite)
 			{
-				// Copy.
+				// Copy files.
 				FSEXTRA.copySync(sourceDir, targetDir)
 
-				// Add path of index.html to my apps.
-				var fullTargetPath = PATH.join(targetDir, indexFile)
-				console.log('@@@ Copy to fullTargetPath: ' + fullTargetPath)
-				hyper.addProject(fullTargetPath)
+				// Add path of index.html to "My Apps".
+				hyper.addProject(indexFileTargetPath)
 
-				// Show my apps.
-				hyper.UI.showTab('projects')
-				hyper.UI.displayProjectList()
+				// Show the "My Apps" screen.
+				showMyApps()
 			}
 		}
 		catch (error)
@@ -875,7 +895,7 @@ hyper.UI.defineUIFunctions = function()
 	hyper.UI.getConnectKeyFromServer = function()
 	{
 		// Show spinner.
-		$('#connect-spinner').css('display', 'inline-block')
+		$('#connect-spinner').addClass('icon-spin-animate')
 
 		if (!hyper.SERVER.isConnected())
 		{
@@ -899,8 +919,9 @@ hyper.UI.defineUIFunctions = function()
 
 		// Set timeout for connect key display.
 		mConnectKeyTimer = setTimeout(function() {
-			hyper.UI.displayConnectKey(
-				'Key has timed out. Click GET KEY to get a new one.') },
+			hyper.UI.displayConnectKey('Key expired')
+			//hyper.UI.displayConnectScreenMessage('Key has timed out. Click GET KEY to get a new one.')
+			},
 			timeout)
 	}
 
@@ -908,35 +929,18 @@ hyper.UI.defineUIFunctions = function()
 	// message from the server.
 	hyper.UI.displayConnectKey = function(key)
 	{
-		// Adjust font size depending on the length of the key.
-		// A connect key currently is 8 characters, a message is
-		// probably longer.
-		if (key.length > 8)
-		{
-			// Message longer than 8 chars.
-			$('#connect-key').css('display', 'block')
-			$('#connect-key').css('font-size', '22px')
-			$('#connect-key').css('color', 'black')
-		}
-		else
-		{
-			// Display connect key with bigger font and after the Get Key button.
-			$('#connect-key').css('display', 'inline')
-			$('#connect-key').css('font-size', '36px')
-			$('#connect-key').css('color', 'black')
-		}
-
 		// Show connect key field text.
 		$('#connect-key').html(key)
 
-		// Hide button spinner.
-		$('#connect-spinner').css('display', 'none')
+		// Stop button spinner.
+		$('#connect-spinner').removeClass('icon-spin-animate')
 	}
 
 	hyper.UI.displayConnectScreenMessage = function(message)
 	{
-		$('#connect-spinner').css('display', 'none')
 		$('#connect-screen-message').html(message)
+		$('#connect-screen-message').show()
+		$('#connect-spinner').removeClass('icon-spin-animate')
 	}
 }
 
@@ -1259,7 +1263,7 @@ hyper.UI.setupUIEvents = function()
 
 	// ************** Connect Screen Button **************
 
-	$('#button-connect').click(function()
+	$('#button-connect, .button-open-connect-screen').click(function()
 	{
 		hyper.UI.showTab('connect')
 	})
@@ -1529,10 +1533,16 @@ hyper.UI.setupUIEvents = function()
 	}
 
 	// Click handler for link in the ModalDialog-NoClientConnected dialog.
-	$('#ModalDialog-NoClientConnected-ClientAppLink').click(function()
+	$('#ModalDialog-NoClientConnected-HelpLink').click(function()
 	{
-		var url = 'file://' + PATH.resolve('./documentation/studio/mobile-app.html')
-		hyper.UI.openInBrowser(url)
+		//var url = 'file://' + PATH.resolve('./documentation/studio/mobile-app.html')
+		//hyper.UI.openInBrowser(url)
+
+		// Hide modal dialog.
+		$('#ModalDialog-NoClientConnected').modal('hide')
+
+		// Show Getting Started screen.
+		hyper.UI.showTab('getting-started')
 	})
 
     // ************** Additional event handlers **************
