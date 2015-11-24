@@ -955,7 +955,7 @@ hyper.UI.defineUIFunctions = function()
 	hyper.UI.displayConnectKey = function(key)
 	{
 		// Show connect key field text.
-		$('#connect-key').html(key)  // TODO: .text()
+		$('#connect-key').text(key)
 
 		// Stop button spinner.
 		$('#connect-spinner').removeClass('icon-spin-animate')
@@ -963,7 +963,7 @@ hyper.UI.defineUIFunctions = function()
 
 	hyper.UI.displayConnectScreenMessage = function(message)
 	{
-		$('#connect-screen-message').text(message)   // TODO: .text()
+		$('#connect-screen-message').text(message)
 		$('#connect-screen-message').show()
 		$('#connect-spinner').removeClass('icon-spin-animate')
 	}
