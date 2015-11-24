@@ -973,7 +973,7 @@ hyper.UI.defineUIFunctions = function()
 
 	hyper.UI.testSystemMessage = function(message)
 	{
-		EVENTS.publish(EVENTS.USERMESSAGE, 'This is a test')
+		EVENTS.publish(EVENTS.USERMESSAGE, 'This is a test.')
 	}
 }
 
@@ -1342,8 +1342,40 @@ hyper.UI.setupUIEvents = function()
 
 	$('#button-tell-a-friend').click(function()
 	{
-		hyper.UI.openInBrowser('https://evothings.com/tell-a-friend/')
+		// hyper.UI.openInBrowser('https://evothings.com/tell-a-friend/')
+		$('#dialog-tell-a-friend').modal('show')
 	})
+
+	$('#button-copy-tell-a-friend-1').click(function()
+	{
+		copyElementTextToClipboard('#tell-a-friend-1')
+	})
+
+	$('#button-copy-tell-a-friend-2').click(function()
+	{
+		copyElementTextToClipboard('#tell-a-friend-2')
+	})
+
+	$('#button-copy-tell-a-friend-3').click(function()
+	{
+		copyElementTextToClipboard('#tell-a-friend-3')
+	})
+
+	$('#button-copy-tell-a-friend-4').click(function()
+	{
+		copyElementTextToClipboard('#tell-a-friend-4')
+	})
+
+	function copyElementTextToClipboard(elementID)
+	{
+		copyToClipboard($(elementID).text())
+	}
+
+	function copyToClipboard(text)
+	{
+		var clipboard = GUI.Clipboard.get()
+		clipboard.set(text, 'text')
+	}
 
 	// ************** Test-system-message Button **************
 
