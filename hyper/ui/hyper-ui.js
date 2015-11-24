@@ -343,13 +343,8 @@ hyper.UI.defineUIFunctions = function()
 		}
 		else
 		{
-			// Show a color if no icon is provided.
-			//var r = 155 + Math.floor(Math.random() * 100)
-			//var g = 155 + Math.floor(Math.random() * 100)
-			//var b = 155 + Math.floor(Math.random() * 100)
-			//var color = 'rgb(' + r + ',' + g + ',' + b + ')'
-			var color = 'rgb(200,200,200)'
-			html += '<div class="app-icon" style="background:' + color + ';"></div>'
+			// Show a default icon if no image file is provided.
+			html += '<div class="app-icon" style="background-image: url(\'images/app-icon.png\');"></div>'
 		}
 
 		if (options.copyButton)
