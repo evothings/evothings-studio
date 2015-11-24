@@ -943,9 +943,10 @@ hyper.UI.defineUIFunctions = function()
 		}
 
 		// Set timeout for connect key display.
-		mConnectKeyTimer = setTimeout(function() {
-			hyper.UI.displayConnectKey('Key expired')
-			//hyper.UI.displayConnectScreenMessage('Key has timed out. Click GET KEY to get a new one.')
+		mConnectKeyTimer = setTimeout(
+			function()
+			{
+				hyper.UI.displayConnectKey('Key expired')
 			},
 			timeout)
 	}
@@ -961,11 +962,18 @@ hyper.UI.defineUIFunctions = function()
 		$('#connect-spinner').removeClass('icon-spin-animate')
 	}
 
-	hyper.UI.displayConnectScreenMessage = function(message)
+	hyper.UI.displaySystemMessage = function(message)
 	{
-		$('#connect-screen-message').text(message)
-		$('#connect-screen-message').show()
-		$('#connect-spinner').removeClass('icon-spin-animate')
+		if (!$('#dialog-system-message').is(':visible'))
+		{
+			$('#system-message').text(message)
+			$('#dialog-system-message').modal('show')
+		}
+	}
+
+	hyper.UI.testSystemMessage = function(message)
+	{
+		EVENTS.publish(EVENTS.USERMESSAGE, 'This is a test')
 	}
 }
 
@@ -1337,6 +1345,13 @@ hyper.UI.setupUIEvents = function()
 		hyper.UI.openInBrowser('https://evothings.com/tell-a-friend/')
 	})
 
+	// ************** Test-system-message Button **************
+
+	$('#button-test-system-message').click(function()
+	{
+		hyper.UI.testSystemMessage()
+	})
+
 	// ************** Examples Tab Button **************
 
 	$('#button-examples').click(function()
@@ -1594,8 +1609,7 @@ hyper.UI.setupUIEvents = function()
     EVENTS.subscribe(EVENTS.USERMESSAGE, function(message)
     {
         // Display a message for the user.
-        hyper.UI.displayConnectScreenMessage(message)
-	    hyper.UI.showTab('connect')
+        hyper.UI.displaySystemMessage(message)
     })
 }
 

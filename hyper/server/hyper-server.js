@@ -175,7 +175,7 @@ function onMessageWorkbenchSetSessionID(socket, message)
         EVENTS.publish(EVENTS.SETSESSIONID, mSessionID)
 	}
 
-	// Display user message if we gone one.
+	// Display user message if we got one.
 	if (message.userMessage)
 	{
 		EVENTS.publish(EVENTS.USERMESSAGE, message.userMessage)

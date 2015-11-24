@@ -74,6 +74,9 @@ Copyright (c) 2013-2015 Evothings AB
 						<li><a id="button-open-settings-dialog"
 							role="button" href="javascript:void(0)">
 							Settings</a></li>
+						<li><a id="button-test-system-message"
+							role="button" href="javascript:void(0)">
+							Test system message</a></li>
 					</ul>
 				</div>
 			</div>
@@ -294,6 +297,39 @@ Copyright (c) 2013-2015 Evothings AB
 				</div>
 			</div>
 
+			<!-- ModalDialog: dialog-system-message --->
+			<div class="modal fade"
+				id="dialog-system-message"
+				tabindex="-1"
+				role="dialog"
+				aria-labelledby="dialog-system-message-label"
+				aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h4 class="modal-title" id="dialog-system-message-label">
+								System message
+							</h4>
+						</div>
+
+						<div class="modal-body">
+							<div class="form-group style-big-para">
+								<p id="system-message">Hello World</p>
+							</div>
+						</div>
+
+						<div class="modal-footer">
+							<button type="button"
+								class="btn btn-default"
+								data-dismiss="modal">
+								Close
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
 			<!-- ModalDialog: dialog-remove-app --->
 			<div class="modal fade"
 				id="dialog-remove-app"
@@ -410,10 +446,6 @@ Copyright (c) 2013-2015 Evothings AB
 								class="btn et-btn-green connect-key-item">
 								Get Key <span id="connect-spinner" class="glyphicon glyphicon-refresh"></button>
 							<div id="connect-key" class="connect-key-item"></div>
-						</div>
-
-						<div>
-							<p id="connect-screen-message" class="connect-screen-element">Server message goes here</p>
 						</div>
 
 						<div class="screen-start-help framed-box style-big-para">
