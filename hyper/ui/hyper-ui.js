@@ -987,8 +987,14 @@ hyper.defineServerFunctions = function()
 		// TODO: Remove.
 		// SERVER.setReloadCallbackFun(reloadCallback)
 
-		MONITOR.setFileSystemChangedCallbackFun(
-			function() { SERVER.reloadApp() })
+		MONITOR.setFileSystemChangedCallbackFun(function()
+		{
+			// Refresh list of my apps.
+			hyper.UI.displayProjectList()
+
+			// Reload app.
+			SERVER.reloadApp()
+		})
 	}
 
 	hyper.startServer = function()
@@ -1095,6 +1101,9 @@ hyper.defineServerFunctions = function()
 		}
 		else
 		{
+			// Refresh list of my apps.
+			hyper.UI.displayProjectList()
+
 			// Otherwise, load the requested file on connected clients.
 			SERVER.runApp()
 		}
