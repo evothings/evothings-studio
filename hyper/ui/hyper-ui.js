@@ -1557,10 +1557,11 @@ hyper.UI.setupUIEvents = function()
         hyper.UI.displayConnectStatus('Disconnected')
     })
 
-    EVENTS.subscribe(EVENTS.USERMESSAGE, function(obj)
+    EVENTS.subscribe(EVENTS.USERMESSAGE, function(message)
     {
         // Display a message for the user.
-        hyper.UI.displayConnectScreenMessage(message.userMessage)
+        hyper.UI.displayConnectScreenMessage(message)
+	    hyper.UI.showTab('connect')
     })
 }
 

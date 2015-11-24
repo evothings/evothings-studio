@@ -42,7 +42,7 @@ var APP_SETTINGS = require('./app-settings.js')
 
 // Workbench version code should be incremented on each new release.
 // The version code can be used by the server to display info.
-var mWorkbenchVersionCode = 5
+var mWorkbenchVersionCode = 1
 
 // Version of the server message protocol implemented on top of socket.io.
 // Increment when the protocol has changed.
@@ -187,10 +187,11 @@ function onMessageWorkbenchSetSessionID(socket, message)
 	{
 		// Pass the message to the callback function,
 		// this displays the message in the UI.
+		EVENTS.publish(EVENTS.USERMESSAGE, message.userMessage)
 		mStatusCallback && mStatusCallback({
 			event: 'user-message',
 			userMessage: message.userMessage })
-        EVENTS.publish(EVENTS.USERMESSAGE, message.userMessage)
+
 	}
 }
 
@@ -256,8 +257,9 @@ function onMessageWorkbenchUserMessage(socket, message)
 	{
 		// Pass the message to the callback function,
 		// this displays the message in the UI.
+		EVENTS.publish(EVENTS.USERMESSAGE, message.userMessage)
 		mStatusCallback && mStatusCallback({
-			event: 'user-message',
+			event: 'workbench.user-message',
 			userMessage: message.userMessage })
 	}
 }
