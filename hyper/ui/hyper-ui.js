@@ -616,10 +616,8 @@ hyper.UI.defineUIFunctions = function()
 
 	hyper.UI.deleteEntry = function(obj)
 	{
-		LOGGER.log($(obj).parent())
-		$(obj).parent().remove()
-		updateProjectList()
-		hyper.UI.displayProjectList()
+		//LOGGER.log($(obj).parent())
+		hyper.UI.openRemoveAppDialog(obj)
 	}
 
 	hyper.UI.openSettingsDialog = function()
@@ -817,6 +815,32 @@ hyper.UI.defineUIFunctions = function()
 		showMyApps()
 	}
 
+	hyper.UI.openRemoveAppDialog = function(obj)
+	{
+		// Show dialog.
+		$('#dialog-remove-app').modal('show')
+
+		// Replace click handler.
+		$('#button-remove-app').off('click')
+		$('#button-remove-app').on('click', function()
+		{
+			hyper.UI.removeApp(obj)
+		})
+	}
+
+	hyper.UI.removeApp = function(obj)
+	{
+		// Remote the list item.
+		$(obj).parent().remove()
+
+		// Display updated list.
+		updateProjectList()
+		hyper.UI.displayProjectList()
+
+		// Hide dialog.
+		$('#dialog-remove-app').modal('hide')
+	}
+
 	/*
 	// Unused - documentation is online-only.
 	hyper.UI.openDocumentation = function()
@@ -931,7 +955,7 @@ hyper.UI.defineUIFunctions = function()
 	hyper.UI.displayConnectKey = function(key)
 	{
 		// Show connect key field text.
-		$('#connect-key').html(key)
+		$('#connect-key').html(key)  // TODO: .text()
 
 		// Stop button spinner.
 		$('#connect-spinner').removeClass('icon-spin-animate')
@@ -939,7 +963,7 @@ hyper.UI.defineUIFunctions = function()
 
 	hyper.UI.displayConnectScreenMessage = function(message)
 	{
-		$('#connect-screen-message').html(message)
+		$('#connect-screen-message').text(message)   // TODO: .text()
 		$('#connect-screen-message').show()
 		$('#connect-spinner').removeClass('icon-spin-animate')
 	}

@@ -292,6 +292,45 @@ Copyright (c) 2013-2015 Evothings AB
 				</div>
 			</div>
 
+			<!-- ModalDialog: dialog-remove-app --->
+			<div class="modal fade"
+				id="dialog-remove-app"
+				tabindex="-1"
+				role="dialog"
+				aria-labelledby="dialog-remove-app-label"
+				aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h4 class="modal-title" id="dialog-remove-app-label">
+								Remove app entry
+							</h4>
+						</div>
+
+						<div class="modal-body">
+							<div class="form-group">
+								<p><strong>Do you want to remove the app from the list?</strong></p>
+								<p>Note that this will not remove the application files. You can add back the app to the list at any time by dragging and dropping index.html onto this window.</p>
+							</div>
+						</div>
+
+						<div class="modal-footer">
+							<button id="button-remove-app"
+								type="button"
+								class="btn btn-danger">
+								Remove
+							</button>
+							<button type="button"
+								class="btn btn-default"
+								data-dismiss="modal">
+								Cancel
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
 			<!-- Getting Started screen -->
 			<div id="screen-getting-started">
 				<div class="panel">
