@@ -219,6 +219,7 @@ Copyright (c) 2013-2015 Evothings AB
 							</div>
 							<div class="form-group">
 								<p><strong>Hint:</strong> To change the app name displayed on the My Apps screen, edit the title tag in index.html. The name will refresh when you run or reload the app.</p>
+								<p>To change the icon for an app entry, replace the file app-icon.png or edit the app-icon entry in evothings.json</p>
 							</div>
 						</div>
 
@@ -273,6 +274,7 @@ Copyright (c) 2013-2015 Evothings AB
 							</div>
 							<div class="form-group">
 								<p><strong>Hint:</strong> To change the app name displayed on the My Apps screen, edit the title tag in index.html. The name will refresh when you run or reload the app.</p>
+								<p>To change the icon for an app entry, replace the file app-icon.png or edit the app-icon entry in evothings.json</p>
 							</div>
 						</div>
 
@@ -348,7 +350,7 @@ Copyright (c) 2013-2015 Evothings AB
 
 							<img src="images/getting-started-mobile-app.jpg" style="float:right;width:300px;height:auto;margin-left:20px;margin:bottom:20px;"/><p>Evothings Studio consists of two connected parts, Evothings Workbench (the application you are currently running) and the Evothings Viewer app running on your mobile device(s). You need both parts to be able to use Evothings Studio.</p>
 
-							<p>Run apps on connected Viewers by clicking RUN on the apps under "Examples" and "My Apps". The currently running app will be automatically reloaded when saving edited code files.</p>
+							<p>Run apps on connected Viewers by clicking <button type="button" class="btn et-btn-green style-small-button">Run</button> on the apps listed under <strong>Examples</strong> and <strong>My Apps</strong>. The currently running app will be automatically reloaded when saving edited code files.</p>
 
 							<h2>Step 1: Install Evothings Viewer</h2>
 
@@ -358,19 +360,25 @@ Copyright (c) 2013-2015 Evothings AB
 
 							<p>To connect the Evothings Viewer app to the Workbench, you need Internet access and a connect key.</p>
 
-							<p>Go to the <strong>Connect</strong> tab and click the <button type="button" class="btn et-btn-green" style="font-size:70%;padding:3px;">Get Key</button> button to obtain a connect key code. Use this code when connecting from the Viewer. Once connected, your session has no time limit. Click the "Get Key" button again if the key times out.</p>
+							<p>Go to the <strong>Connect</strong> tab and click the <button type="button" class="btn et-btn-green style-small-button">Get Key</button> button to obtain a connect key code. Use this code when connecting from the Viewer. Once connected, your session has no time limit. Click the "Get Key" button again if the key times out.</p>
 
-							<p>Click <button type="button" class="btn et-btn-blue" style="font-size:70%;padding:3px;">Login</button> on the Connect screen to get a Quick-Connect button in the Evothings Viewer app. This button is displayed when you restart the Viewer and allows you to reconnect to the Workbench where you are logged in, without entering a connect key again. This makes it much quicker to connect to same Workbench.</p>
+							<p>Click <button type="button" class="btn et-btn-blue style-small-button">Login</button> on the Connect screen to get a Quick-Connect button in the Evothings Viewer app. This button is displayed when you restart the Viewer and allows you to reconnect to the Workbench where you are logged in, without entering a connect key again. This makes it much quicker to connect to same Workbench.</p>
 
 							<h2>Step 3: How to create a new app</h2>
 
-							<p>To create your own apps you have two options. Copy one of the example apps (click COPY) and modify it for your own purposes, or click the NEW button.</p>
+							<p>To create your own apps you have two options. Copy one of the example apps bly clicking the <button type="button" class="btn et-btn-indigo style-small-button">Copy</button>) button, and modify it for your own purposes, or click the <button type="button" class="btn et-btn-indigo style-small-button">New</button> button to create a basic app template.</p>
 
 							<p>You can also drag and drop an .html file (typically index.html) to this window to add an existing app under <strong>My Apps</strong>.</p>
 
 							<p>Arrange apps using drag and drop (example apps cannot be rearranged). Click the close icon (x) to delete an app entry. This will NOT delete the application files.</p>
 
-							<p>For further details and a Getting Started guide, <a class="button-documentation" href="javascript:void(0)">visit the documentation</a>.</p>
+							<p>For further details and a Getting Started guide, <a class="button-documentation" href="javascript:void(0)">visit the online documentation</a>.</p>
+
+							<h2>Step 4: Code in your favourite editor end enjoy live reload</h2>
+							<p>Click the <button type="button" class="btn et-btn-blue style-small-button">Open</button> button on the app under <strong>My Apps</strong> you wish to edit. This will display a file browser for your app. (You cannot edit example apps directly, you need to make a copy first.)</p>
+
+							<p>Open the files you wish to edit in your editor of choice. Launch the app on connected Viewers using the <button type="button" class="btn et-btn-green style-small-button">Run</button> button. This selects the currently active app. When you save any code file in the active app, it will automatically get reloaded on all mobile devices.</p>
+							<p><strong>Happy coding!</strong></p>
 						</div>
 
 						<!-- TODO: Show in iframe served from web server -->
