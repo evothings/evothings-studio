@@ -718,17 +718,28 @@ hyper.UI.defineUIFunctions = function()
 
 	hyper.UI.saveCopyApp = function()
 	{
-		// Hide dialog.
-		$('#dialog-copy-app').modal('hide')
-
 		// Set up source and target paths.
 		var sourcePath = $('#input-copy-app-source-path').val()
 		var targetAppFolder = $('#input-copy-app-target-folder').val()
 		var targetParentDir = $('#input-copy-app-target-parent-folder').val()
 		var targetDir = PATH.join(targetParentDir, targetAppFolder)
 
+		// If target folder exists, display an alert dialog and abort.
+		var exists = FILEUTIL.statSync(targetDir)
+		if (exists)
+		{
+			window.alert('An app with this folder name already exists, please type a new folder name.')
+			return // Abort (dialog is still visible)
+		}
+
 		// Copy the app.
 		copyApp(sourcePath, targetDir)
+
+		// Hide dialog.
+		$('#dialog-copy-app').modal('hide')
+
+		// Show the "My Apps" screen.
+		showMyApps()
 	}
 
 	function copyApp(sourcePath, targetDir)
@@ -750,35 +761,19 @@ hyper.UI.defineUIFunctions = function()
 				indexFileTargetPath = PATH.join(targetDir, appFolderName, indexFile)
 			}
 
-			console.log('@@@ targetDir: ' + targetDir)
-			console.log('@@@ sourceDir: ' + sourceDir)
-			console.log('@@@ indexFileTargetPath: ' + indexFileTargetPath)
+			//console.log('@@@ targetDir: ' + targetDir)
+			//console.log('@@@ sourceDir: ' + sourceDir)
+			//console.log('@@@ indexFileTargetPath: ' + indexFileTargetPath)
 
-			// Copy app.
-			var overwrite = true
-			var exists = FILEUTIL.statSync(targetDir)
+			// Copy files.
+			FSEXTRA.copySync(sourceDir, targetDir)
 
-			if (exists)
-			{
-				overwrite = window.confirm('Folder exists, do you want to overwrite it?')
-			}
+			// Remove any app-uuid entry from evothings.json in the copied app.
+			// This is done to prevent duplicated app uuids.
+			APP_SETTINGS.generateNewAppUUID(PATH.dirname(indexFileTargetPath))
 
-			if (overwrite)
-			{
-				// Copy files.
-				FSEXTRA.copySync(sourceDir, targetDir)
-
-				// Remove any app-uuid entry from evothings.json in the copied app.
-				// This is done to prevent duplicated app uuids.
-				console.log('@@@ basename for evothings.json: ' + PATH.dirname(indexFileTargetPath))
-				APP_SETTINGS.generateNewAppUUID(PATH.dirname(indexFileTargetPath))
-
-				// Add path of index.html to "My Apps".
-				hyper.addProject(indexFileTargetPath)
-
-				// Show the "My Apps" screen.
-				showMyApps()
-			}
+			// Add path of index.html to "My Apps".
+			hyper.addProject(indexFileTargetPath)
 		}
 		catch (error)
 		{
@@ -805,19 +800,24 @@ hyper.UI.defineUIFunctions = function()
 
 	hyper.UI.saveNewApp = function()
 	{
-		// Hide dialog.
-		$('#dialog-new-app').modal('hide')
-
 		var sourcePath = hyper.makeFullPath('examples/template-basic-app/index.html')
-
 		var parentFolder = $('#input-new-app-parent-folder').val()
 		var appFolder = $('#input-new-app-folder').val()
-
 		var targetDir = PATH.join(parentFolder, appFolder)
 
-		console.log('@@@ save new app target dir: ' + targetDir)
+		// If target folder exists, display an alert dialog and abort.
+		var exists = FILEUTIL.statSync(targetDir)
+		if (exists)
+		{
+			window.alert('An app with this folder name already exists, please type a new folder name.')
+			return // Abort (dialog is still visible)
+		}
 
+		// Copy files.
 		copyApp(sourcePath, targetDir)
+
+		// Hide dialog.
+		$('#dialog-new-app').modal('hide')
 
 		showMyApps()
 	}
