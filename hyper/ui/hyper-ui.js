@@ -768,6 +768,11 @@ hyper.UI.defineUIFunctions = function()
 				// Copy files.
 				FSEXTRA.copySync(sourceDir, targetDir)
 
+				// Remove any app-uuid entry from evothings.json in the copied app.
+				// This is done to prevent duplicated app uuids.
+				console.log('@@@ basename for evothings.json: ' + PATH.dirname(indexFileTargetPath))
+				APP_SETTINGS.generateNewAppUUID(PATH.dirname(indexFileTargetPath))
+
 				// Add path of index.html to "My Apps".
 				hyper.addProject(indexFileTargetPath)
 
@@ -813,6 +818,7 @@ hyper.UI.defineUIFunctions = function()
 		console.log('@@@ save new app target dir: ' + targetDir)
 
 		copyApp(sourcePath, targetDir)
+
 		showMyApps()
 	}
 
