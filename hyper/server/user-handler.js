@@ -88,8 +88,14 @@ exports.getLogoutURL = function()
 
 	var serverAddress = getLoginServerAddress()
 	var logoutURL = serverAddress+'/?uuid='+sessionID+'&loginonly=true&logout=true'
+	var checked = SETTINGS.getRememberMe()
+	console.log('checked remember me = '+checked)
+	if(!checked)
+	{
+		logoutURL += '&federated'
+	}
 
-	console.log('LOGOUT: loginURL = '+logoutURL)
+	console.log('LOGOUT: logoutURL = '+logoutURL)
 
 	return logoutURL
 }
