@@ -10,6 +10,12 @@ html
   box-sizing: inherit;
 }
 
+html, body
+{
+	height: 100%;
+	overflow: hidden;
+}
+
 html, body, p, div
 {
 	font-family: 'Proxima Nova Regular';

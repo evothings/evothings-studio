@@ -75,6 +75,24 @@ exports.getAppImage = function(appPath)
 }
 
 /**
+ * Generate and save a new App UUID.
+ */
+exports.generateNewAppUUID = function(appPath)
+{
+	var settings = readAppSettings(appPath)
+
+	if (settings)
+	{
+		settings['app-uuid'] = UUID.generateUUID()
+		writeAppSettings(settings, appPath)
+	}
+	else
+	{
+		return null
+	}
+}
+
+/**
  * Read settings file and return data object, or null if settings file is missing.
  */
 function readAppSettings(appPath)

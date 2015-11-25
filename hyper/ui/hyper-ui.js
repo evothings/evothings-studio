@@ -343,13 +343,8 @@ hyper.UI.defineUIFunctions = function()
 		}
 		else
 		{
-			// Show a color if no icon is provided.
-			//var r = 155 + Math.floor(Math.random() * 100)
-			//var g = 155 + Math.floor(Math.random() * 100)
-			//var b = 155 + Math.floor(Math.random() * 100)
-			//var color = 'rgb(' + r + ',' + g + ',' + b + ')'
-			var color = 'rgb(200,200,200)'
-			html += '<div class="app-icon" style="background:' + color + ';"></div>'
+			// Show a default icon if no image file is provided.
+			html += '<div class="app-icon" style="background-image: url(\'images/app-icon.png\');"></div>'
 		}
 
 		if (options.copyButton)
@@ -621,10 +616,8 @@ hyper.UI.defineUIFunctions = function()
 
 	hyper.UI.deleteEntry = function(obj)
 	{
-		LOGGER.log($(obj).parent())
-		$(obj).parent().remove()
-		updateProjectList()
-		hyper.UI.displayProjectList()
+		//LOGGER.log($(obj).parent())
+		hyper.UI.openRemoveAppDialog(obj)
 	}
 
 	hyper.UI.openSettingsDialog = function()
@@ -718,17 +711,28 @@ hyper.UI.defineUIFunctions = function()
 
 	hyper.UI.saveCopyApp = function()
 	{
-		// Hide dialog.
-		$('#dialog-copy-app').modal('hide')
-
 		// Set up source and target paths.
 		var sourcePath = $('#input-copy-app-source-path').val()
 		var targetAppFolder = $('#input-copy-app-target-folder').val()
 		var targetParentDir = $('#input-copy-app-target-parent-folder').val()
 		var targetDir = PATH.join(targetParentDir, targetAppFolder)
 
+		// If target folder exists, display an alert dialog and abort.
+		var exists = FILEUTIL.statSync(targetDir)
+		if (exists)
+		{
+			window.alert('An app with this folder name already exists, please type a new folder name.')
+			return // Abort (dialog is still visible)
+		}
+
 		// Copy the app.
 		copyApp(sourcePath, targetDir)
+
+		// Hide dialog.
+		$('#dialog-copy-app').modal('hide')
+
+		// Show the "My Apps" screen.
+		showMyApps()
 	}
 
 	function copyApp(sourcePath, targetDir)
@@ -750,30 +754,19 @@ hyper.UI.defineUIFunctions = function()
 				indexFileTargetPath = PATH.join(targetDir, appFolderName, indexFile)
 			}
 
-			console.log('@@@ targetDir: ' + targetDir)
-			console.log('@@@ sourceDir: ' + sourceDir)
-			console.log('@@@ indexFileTargetPath: ' + indexFileTargetPath)
+			//console.log('@@@ targetDir: ' + targetDir)
+			//console.log('@@@ sourceDir: ' + sourceDir)
+			//console.log('@@@ indexFileTargetPath: ' + indexFileTargetPath)
 
-			// Copy app.
-			var overwrite = true
-			var exists = FILEUTIL.statSync(targetDir)
+			// Copy files.
+			FSEXTRA.copySync(sourceDir, targetDir)
 
-			if (exists)
-			{
-				overwrite = window.confirm('Folder exists, do you want to overwrite it?')
-			}
+			// Remove any app-uuid entry from evothings.json in the copied app.
+			// This is done to prevent duplicated app uuids.
+			APP_SETTINGS.generateNewAppUUID(PATH.dirname(indexFileTargetPath))
 
-			if (overwrite)
-			{
-				// Copy files.
-				FSEXTRA.copySync(sourceDir, targetDir)
-
-				// Add path of index.html to "My Apps".
-				hyper.addProject(indexFileTargetPath)
-
-				// Show the "My Apps" screen.
-				showMyApps()
-			}
+			// Add path of index.html to "My Apps".
+			hyper.addProject(indexFileTargetPath)
 		}
 		catch (error)
 		{
@@ -800,20 +793,52 @@ hyper.UI.defineUIFunctions = function()
 
 	hyper.UI.saveNewApp = function()
 	{
+		var sourcePath = hyper.makeFullPath('examples/template-basic-app/index.html')
+		var parentFolder = $('#input-new-app-parent-folder').val()
+		var appFolder = $('#input-new-app-folder').val()
+		var targetDir = PATH.join(parentFolder, appFolder)
+
+		// If target folder exists, display an alert dialog and abort.
+		var exists = FILEUTIL.statSync(targetDir)
+		if (exists)
+		{
+			window.alert('An app with this folder name already exists, please type a new folder name.')
+			return // Abort (dialog is still visible)
+		}
+
+		// Copy files.
+		copyApp(sourcePath, targetDir)
+
 		// Hide dialog.
 		$('#dialog-new-app').modal('hide')
 
-		var sourcePath = hyper.makeFullPath('examples/template-basic-app/index.html')
-
-		var parentFolder = $('#input-new-app-parent-folder').val()
-		var appFolder = $('#input-new-app-folder').val()
-
-		var targetDir = PATH.join(parentFolder, appFolder)
-
-		console.log('@@@ save new app target dir: ' + targetDir)
-
-		copyApp(sourcePath, targetDir)
 		showMyApps()
+	}
+
+	hyper.UI.openRemoveAppDialog = function(obj)
+	{
+		// Show dialog.
+		$('#dialog-remove-app').modal('show')
+
+		// Replace click handler.
+		$('#button-remove-app').off('click')
+		$('#button-remove-app').on('click', function()
+		{
+			hyper.UI.removeApp(obj)
+		})
+	}
+
+	hyper.UI.removeApp = function(obj)
+	{
+		// Remote the list item.
+		$(obj).parent().remove()
+
+		// Display updated list.
+		updateProjectList()
+		hyper.UI.displayProjectList()
+
+		// Hide dialog.
+		$('#dialog-remove-app').modal('hide')
 	}
 
 	/*
@@ -918,9 +943,10 @@ hyper.UI.defineUIFunctions = function()
 		}
 
 		// Set timeout for connect key display.
-		mConnectKeyTimer = setTimeout(function() {
-			hyper.UI.displayConnectKey('Key expired')
-			//hyper.UI.displayConnectScreenMessage('Key has timed out. Click GET KEY to get a new one.')
+		mConnectKeyTimer = setTimeout(
+			function()
+			{
+				hyper.UI.displayConnectKey('Key expired')
 			},
 			timeout)
 	}
@@ -930,17 +956,24 @@ hyper.UI.defineUIFunctions = function()
 	hyper.UI.displayConnectKey = function(key)
 	{
 		// Show connect key field text.
-		$('#connect-key').html(key)
+		$('#connect-key').text(key)
 
 		// Stop button spinner.
 		$('#connect-spinner').removeClass('icon-spin-animate')
 	}
 
-	hyper.UI.displayConnectScreenMessage = function(message)
+	hyper.UI.displaySystemMessage = function(message)
 	{
-		$('#connect-screen-message').html(message)
-		$('#connect-screen-message').show()
-		$('#connect-spinner').removeClass('icon-spin-animate')
+		if (!$('#dialog-system-message').is(':visible'))
+		{
+			$('#system-message').text(message)
+			$('#dialog-system-message').modal('show')
+		}
+	}
+
+	hyper.UI.testSystemMessage = function(message)
+	{
+		EVENTS.publish(EVENTS.USERMESSAGE, 'This is a test.')
 	}
 }
 
@@ -981,8 +1014,14 @@ hyper.defineServerFunctions = function()
 		// TODO: Remove.
 		// SERVER.setReloadCallbackFun(reloadCallback)
 
-		MONITOR.setFileSystemChangedCallbackFun(
-			function() { SERVER.reloadApp() })
+		MONITOR.setFileSystemChangedCallbackFun(function()
+		{
+			// Refresh list of my apps.
+			hyper.UI.displayProjectList()
+
+			// Reload app.
+			SERVER.reloadApp()
+		})
 	}
 
 	hyper.startServer = function()
@@ -1089,6 +1128,9 @@ hyper.defineServerFunctions = function()
 		}
 		else
 		{
+			// Refresh list of my apps.
+			hyper.UI.displayProjectList()
+
 			// Otherwise, load the requested file on connected clients.
 			SERVER.runApp()
 		}
@@ -1300,7 +1342,46 @@ hyper.UI.setupUIEvents = function()
 
 	$('#button-tell-a-friend').click(function()
 	{
-		hyper.UI.openInBrowser('https://evothings.com/tell-a-friend/')
+		// hyper.UI.openInBrowser('https://evothings.com/tell-a-friend/')
+		$('#dialog-tell-a-friend').modal('show')
+	})
+
+	$('#button-copy-tell-a-friend-1').click(function()
+	{
+		copyElementTextToClipboard('#tell-a-friend-1')
+	})
+
+	$('#button-copy-tell-a-friend-2').click(function()
+	{
+		copyElementTextToClipboard('#tell-a-friend-2')
+	})
+
+	$('#button-copy-tell-a-friend-3').click(function()
+	{
+		copyElementTextToClipboard('#tell-a-friend-3')
+	})
+
+	$('#button-copy-tell-a-friend-4').click(function()
+	{
+		copyElementTextToClipboard('#tell-a-friend-4')
+	})
+
+	function copyElementTextToClipboard(elementID)
+	{
+		copyToClipboard($(elementID).text())
+	}
+
+	function copyToClipboard(text)
+	{
+		var clipboard = GUI.Clipboard.get()
+		clipboard.set(text, 'text')
+	}
+
+	// ************** Test-system-message Button **************
+
+	$('#button-test-system-message').click(function()
+	{
+		hyper.UI.testSystemMessage()
 	})
 
 	// ************** Examples Tab Button **************
@@ -1560,8 +1641,7 @@ hyper.UI.setupUIEvents = function()
     EVENTS.subscribe(EVENTS.USERMESSAGE, function(message)
     {
         // Display a message for the user.
-        hyper.UI.displayConnectScreenMessage(message)
-	    hyper.UI.showTab('connect')
+        hyper.UI.displaySystemMessage(message)
     })
 }
 

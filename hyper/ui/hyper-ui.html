@@ -62,9 +62,9 @@ Copyright (c) 2013-2015 Evothings AB
 						<li><a id="button-forum"
 							role="button" href="javascript:void(0)">
 							Forum</a></li>
-						<li><a id="button-news"
+						<!--<li><a id="button-news"
 							role="button" href="javascript:void(0)">
-							News</a></li>
+							News</a></li>-->
 						<li><a id="button-feedback"
 							role="button" href="javascript:void(0)">
 							Feedback</a></li>
@@ -74,6 +74,9 @@ Copyright (c) 2013-2015 Evothings AB
 						<li><a id="button-open-settings-dialog"
 							role="button" href="javascript:void(0)">
 							Settings</a></li>
+						<li><a id="button-test-system-message"
+							role="button" href="javascript:void(0)">
+							Test system message</a></li>
 					</ul>
 				</div>
 			</div>
@@ -217,6 +220,10 @@ Copyright (c) 2013-2015 Evothings AB
 									id="input-new-app-parent-folder"
 									class="form-control"/>
 							</div>
+							<div class="form-group">
+								<p><strong>Hint:</strong> To change the app name displayed on the My Apps screen, edit the title tag in index.html. The name will refresh when you run or reload the app.</p>
+								<p>To change the icon for an app entry, replace the file app-icon.png or edit the app-icon entry in evothings.json</p>
+							</div>
 						</div>
 
 						<div class="modal-footer">
@@ -268,6 +275,10 @@ Copyright (c) 2013-2015 Evothings AB
 									id="input-copy-app-target-parent-folder"
 									class="form-control"/>
 							</div>
+							<div class="form-group">
+								<p><strong>Hint:</strong> To change the app name displayed on the My Apps screen, edit the title tag in index.html. The name will refresh when you run or reload the app.</p>
+								<p>To change the icon for an app entry, replace the file app-icon.png or edit the app-icon entry in evothings.json</p>
+							</div>
 						</div>
 
 						<div class="modal-footer">
@@ -280,6 +291,113 @@ Copyright (c) 2013-2015 Evothings AB
 								class="btn btn-default"
 								data-dismiss="modal">
 								Dismiss
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- ModalDialog: dialog-remove-app --->
+			<div class="modal fade"
+				id="dialog-remove-app"
+				tabindex="-1"
+				role="dialog"
+				aria-labelledby="dialog-remove-app-label"
+				aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h4 class="modal-title" id="dialog-remove-app-label">
+								Remove app entry
+							</h4>
+						</div>
+
+						<div class="modal-body">
+							<div class="form-group">
+								<p><strong>Do you want to remove the app from the list?</strong></p>
+								<p>Note that this will not remove the application files. You can add back the app to the list at any time by dragging and dropping index.html onto this window.</p>
+							</div>
+						</div>
+
+						<div class="modal-footer">
+							<button id="button-remove-app"
+								type="button"
+								class="btn btn-danger">
+								Remove
+							</button>
+							<button type="button"
+								class="btn btn-default"
+								data-dismiss="modal">
+								Cancel
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- ModalDialog: dialog-system-message --->
+			<div class="modal fade"
+				id="dialog-system-message"
+				tabindex="-1"
+				role="dialog"
+				aria-labelledby="dialog-system-message-label"
+				aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h4 class="modal-title" id="dialog-system-message-label">
+								System message
+							</h4>
+						</div>
+
+						<div class="modal-body">
+							<div class="form-group style-big-para">
+								<p id="system-message">Hello World</p>
+							</div>
+						</div>
+
+						<div class="modal-footer">
+							<button type="button"
+								class="btn btn-default"
+								data-dismiss="modal">
+								Close
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- ModalDialog: dialog-tell-a-friend --->
+			<div class="modal fade"
+				id="dialog-tell-a-friend"
+				tabindex="-1"
+				role="dialog"
+				aria-labelledby="dialog-tell-a-friend-label"
+				aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h4 class="modal-title" id="dialog-tell-a-friend-label">
+								Tell a friend about Evothings Studio
+							</h4>
+						</div>
+
+						<div class="modal-body style-big-para">
+							<p><strong>Here are some messages you can send to a friend or share on Twitter or Facebook. Just click COPY and paste in an email or wherever you like. If this sounds too trivial, write a great message of your own.</strong></p>
+							<p><span id="tell-a-friend-1">Try out a quick way to develop apps for Eddystone and iBeacon using Evothings Studio. Download from http://evothings.com</span> <button id="button-copy-tell-a-friend-1" type="button" class="btn et-btn-blue style-small-button">Copy</button></p>
+							<p><span id="tell-a-friend-2">With Evothings Studio you can develop apps on as many mobile phones and tablets as you like, and see the result instantly on all of them. Download from http://evothings.com</span> <button id="button-copy-tell-a-friend-2" type="button" class="btn et-btn-blue style-small-button">Copy</button></p>
+							<p><span id="tell-a-friend-3">Use Evothings Studio to develop apps for BLE in JavaScript and HTML. Download from http://evothings.com</span> <button id="button-copy-tell-a-friend-3" type="button" class="btn et-btn-blue style-small-button">Copy</button></p>
+							<p><span id="tell-a-friend-4">Develop mobile apps for Arduino using JavaScript and HTML. Download Evothings Studio from http://evothings.com</span> <button id="button-copy-tell-a-friend-4" type="button" class="btn et-btn-blue style-small-button">Copy</button></p>
+						</div>
+
+						<div class="modal-footer">
+							<button type="button"
+								class="btn btn-default"
+								data-dismiss="modal">
+								OK
 							</button>
 						</div>
 					</div>
@@ -301,9 +419,9 @@ Copyright (c) 2013-2015 Evothings AB
 
 							<h2>Run apps you develop directly on mobile devices</h2>
 
-							<p>Evothings Studio consists of two connected parts, Evothings Workbench (the application you are currently running) and the Evothings Viewer app running on your mobile device(s). You need both parts to be able to use Evothings Studio.</p>
+							<img src="images/getting-started-mobile-app.jpg" style="float:right;width:300px;height:auto;margin-left:20px;margin:bottom:20px;"/><p>Evothings Studio consists of two connected parts, Evothings Workbench (the application you are currently running) and the Evothings Viewer app running on your mobile device(s). You need both parts to be able to use Evothings Studio.</p>
 
-							<p>Run apps on connected Viewers by clicking RUN on the apps under "Examples" and "My Apps". The currently running app will be automatically reloaded when saving edited code files.</p>
+							<p>Run apps on connected Viewers by clicking <button type="button" class="btn et-btn-green style-small-button">Run</button> on the apps listed under <strong>Examples</strong> and <strong>My Apps</strong>. The currently running app will be automatically reloaded when saving edited code files.</p>
 
 							<h2>Step 1: Install Evothings Viewer</h2>
 
@@ -313,19 +431,25 @@ Copyright (c) 2013-2015 Evothings AB
 
 							<p>To connect the Evothings Viewer app to the Workbench, you need Internet access and a connect key.</p>
 
-							<p>Go to the <strong>Connect</strong> tab and click the <button type="button" class="btn et-btn-green" style="font-size:80%;">Get Key</button> button to obtain a connect key code. Use this code when connecting from the Viewer. Once connected, your session has no time limit. Click the "Get Key" button again if the key times out.</p>
+							<p>Go to the <strong>Connect</strong> tab and click the <button type="button" class="btn et-btn-green style-small-button">Get Key</button> button to obtain a connect key code. Use this code when connecting from the Viewer. Once connected, your session has no time limit. Click the "Get Key" button again if the key times out.</p>
 
-							<p>Click <button type="button" class="btn et-btn-blue" style="font-size:80%;">Login</button> on the Connect screen to get a Quick-Connect button in the Evothings Viewer app. This button is displayed when you restart the Viewer and allows you to reconnect to the Workbench where you are logged in, without entering a connect key again. This makes it much quicker to connect to same Workbench.</p>
+							<p>Click <button type="button" class="btn et-btn-blue style-small-button">Login</button> on the Connect screen to get a Quick-Connect button in the Evothings Viewer app. This button is displayed when you restart the Viewer and allows you to reconnect to the Workbench where you are logged in, without entering a connect key again. This makes it much quicker to connect to same Workbench.</p>
 
 							<h2>Step 3: How to create a new app</h2>
 
-							<p>To create your own apps you have two options. Copy one of the example apps (click COPY) and modify it for your own purposes, or click the NEW button.</p>
+							<p>To create your own apps you have two options. Copy one of the example apps bly clicking the <button type="button" class="btn et-btn-indigo style-small-button">Copy</button> button, and modify it for your own purposes, or click the <button type="button" class="btn et-btn-indigo style-small-button">New</button> button to create a basic app template.</p>
 
 							<p>You can also drag and drop an .html file (typically index.html) to this window to add an existing app under <strong>My Apps</strong>.</p>
 
 							<p>Arrange apps using drag and drop (example apps cannot be rearranged). Click the close icon (x) to delete an app entry. This will NOT delete the application files.</p>
 
-							<p>For further details and a Getting Started guide, <a class="button-documentation" href="javascript:void(0)">visit the documentation</a>.</p>
+							<p>For further details and a Getting Started guide, <a class="button-documentation" href="javascript:void(0)">visit the online documentation</a>.</p>
+
+							<h2>Step 4: Code in your favourite editor end enjoy live reload</h2>
+							<p>Click the <button type="button" class="btn et-btn-blue style-small-button">Open</button> button on the app under <strong>My Apps</strong> you wish to edit. This will display a file browser for your app. (You cannot edit example apps directly, you need to make a copy first.)</p>
+
+							<p>Open the files you wish to edit in your editor of choice. Launch the app on connected Viewers using the <button type="button" class="btn et-btn-green style-small-button">Run</button> button. This selects the currently active app. When you save any code file in the active app, it will automatically get reloaded on all mobile devices.</p>
+							<p><strong>Happy coding!</strong></p>
 						</div>
 
 						<!-- TODO: Show in iframe served from web server -->
@@ -357,10 +481,6 @@ Copyright (c) 2013-2015 Evothings AB
 								class="btn et-btn-green connect-key-item">
 								Get Key <span id="connect-spinner" class="glyphicon glyphicon-refresh"></button>
 							<div id="connect-key" class="connect-key-item"></div>
-						</div>
-
-						<div>
-							<p id="connect-screen-message" class="connect-screen-element">Server message goes here</p>
 						</div>
 
 						<div class="screen-start-help framed-box style-big-para">

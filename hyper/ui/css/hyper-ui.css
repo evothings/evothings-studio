@@ -347,6 +347,12 @@ TODO: Remove, use automatic width for all buttons.
 	border-radius: 4px;
 }
 
+.style-small-button
+{
+	font-size: 70%;
+	padding: 3px;
+}
+
 .project-list .project-entry .app-icon
 {
 	width: 60px;

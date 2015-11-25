@@ -28,6 +28,9 @@ $(function()
 	// Flag for toggling autoscroll of log view.
 	var mAutoScroll = true
 
+	// Buffer for log when autoscroll is off.
+	var mScrollBuffer = null
+
 	$('#button-eval').click(function()
 	{
 		if (!mMainWindow)
@@ -97,6 +100,15 @@ $(function()
 	$('#button-toggle-autoscroll').click(function()
 	{
 		mAutoScroll = !mAutoScroll
+		if (mAutoScroll)
+		{
+			$('#button-toggle-autoscroll').text('AutoScroll On')
+			showScrollBuffer()
+		}
+		else
+		{
+			$('#button-toggle-autoscroll').text('AutoScroll Off')
+		}
 	})
 
 	$('#button-restore').click(function()
@@ -120,12 +132,37 @@ $(function()
 	});
 	*/
 
+	function showScrollBuffer()
+	{
+		// If we have scroll buffer, show it.
+		if (mScrollBuffer)
+		{
+			mResult.setValue(mResult.getValue() + '\n' + mScrollBuffer)
+			mScrollBuffer = null
+			mResult.scrollIntoView({ line: mResult.lastLine(), ch: 0 })
+		}
+	}
+
 	function showResult(res)
 	{
-		mResult.setValue(mResult.getValue() + '\n' + res)
 		if (mAutoScroll)
 		{
+			showScrollBuffer()
+
+			// Show the result and scroll.
+			mResult.setValue(mResult.getValue() + '\n' + res)
 			mResult.scrollIntoView({ line: mResult.lastLine(), ch: 0 })
+		}
+		else
+		{
+			// Initialise scroll buffer.
+			if (!mScrollBuffer)
+			{
+				mScrollBuffer = ''
+			}
+
+			// Add log data to scroll buffer.
+			mScrollBuffer += '\n' + res
 		}
 	}
 
