@@ -46,7 +46,7 @@ var UUID = require('../server/uuid.js')
 var EVENTS = require('../server/events')
 var USER_HANDLER = require('../server/user-handler.js')
 var APP_SETTINGS = require('../server/app-settings.js')
-
+var NODE_RED = require('../server/nreditor')
 
 /*** Globals ***/
 
@@ -84,6 +84,7 @@ hyper.main = function()
 hyper.UI.defineUIFunctions = function()
 {
 	var mWorkbenchWindow = null
+	var mNodeRedWindow = null
 	var mConnectKeyTimer
 
 	hyper.UI.setupUI = function()
@@ -498,6 +499,28 @@ hyper.UI.defineUIFunctions = function()
 			}
 		})
 		hyper.setProjectList(projects)
+	}
+
+	hyper.UI.openNodeRedWindow = function(path)
+	{
+		if (mNodeRedWindow && !mNodeRedWindow.closed)
+		{
+			// Bring existing window to front.
+			mNodeRedWindow.focus()
+		}
+		else
+		{
+
+			NODE_RED.startForPath(path)
+			mNodeRedWindow = window.open(
+				'localhost:8008',
+				'workbench',
+				'resizable=1,width=800,height=600')
+			mNodeRedWindow.moveTo(50, 150)
+			mNodeRedWindow.focus()
+			// Establish contact. Not really needed.
+			mNodeRedWindow.postMessage({ message: 'hyper.hello' }, '*')
+		}
 	}
 
 	hyper.UI.openToolsWorkbenchWindow = function()
