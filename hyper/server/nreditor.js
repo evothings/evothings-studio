@@ -9,7 +9,7 @@ var nreditor =
 {
 	startForPath: function(path)
 	{
-		console.log('setting node-red porject path to '+path);
+		console.log('setting node-red project path to '+path);
 		// Create an Express app
 		app = express();
 		// Add a simple route for static content served from 'public'
@@ -18,8 +18,12 @@ var nreditor =
 		var server = http.createServer(app);
 		// Create the settings object - see default settings.js file for other options
 		var settings = {
+			verbose: true,
+			disableEditor: false,
 			httpAdminRoot:"/red",
 			httpNodeRoot: "/api",
+			flowFile: path+"/flows.json",
+			nodesDir: '/home/peter/projects/nrmodules',
 			userDir:path,
 			functionGlobalContext: { }    // enables global context
 		};
@@ -30,7 +34,7 @@ var nreditor =
 		app.use(settings.httpAdminRoot,RED.httpAdmin);
 		// Serve the http nodes UI from /api
 		app.use(settings.httpNodeRoot,RED.httpNode);
-		server.listen(8008);
+		server.listen(8000);
 
 		// Start the runtime
 		RED.start();
@@ -50,4 +54,4 @@ var nreditor =
 };
 
 
-module.exports.nreditor = nreditor
+module.exports = nreditor

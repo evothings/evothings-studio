@@ -370,6 +370,18 @@ hyper.UI.defineUIFunctions = function()
 				+ '</button>'
 		}
 
+		if (options.nredit)
+		{
+			html +=
+				'<button '
+				+	'type="button" '
+				+	'class="button-open btn et-btn-red" '
+				+   'style="padding:0" '
+				+	'onclick="window.hyper.UI.openNodeRedWindow(\''+appPath+'\')">'
+				+	'Node-Red'
+				+ '</button>'
+		}
+
 		// Run button.
 		html +=
 			'<button '
@@ -510,12 +522,11 @@ hyper.UI.defineUIFunctions = function()
 		}
 		else
 		{
-
 			NODE_RED.startForPath(path)
 			mNodeRedWindow = window.open(
-				'localhost:8008',
-				'workbench',
-				'resizable=1,width=800,height=600')
+				'http://localhost:8000/red',
+				'nodered',
+				'resizable=1,width=1000,height=800')
 			mNodeRedWindow.moveTo(50, 150)
 			mNodeRedWindow.focus()
 			// Establish contact. Not really needed.
@@ -585,7 +596,8 @@ hyper.UI.defineUIFunctions = function()
 					{
 						screen: '#screen-projects',
 						openButton: true,
-						deleteButton: true
+						deleteButton: true,
+						nredit:true
 					})
 			}
 		}
