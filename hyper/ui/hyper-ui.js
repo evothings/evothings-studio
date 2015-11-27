@@ -1341,32 +1341,55 @@ hyper.UI.setupUIEvents = function()
 		hyper.UI.openInBrowser('https://evothings.com/news/')
 	})
 
-	// ************** Tell-a-friend Button **************
+	// ************** Share in Social Media Button **************
 
-	$('#button-tell-a-friend').click(function()
+	$('#button-share-social').click(function()
 	{
-		// hyper.UI.openInBrowser('https://evothings.com/tell-a-friend/')
-		$('#dialog-tell-a-friend').modal('show')
+		// hyper.UI.openInBrowser('https://evothings.com/share-social/')
+		$('#dialog-share-social').modal('show')
 	})
 
-	$('#button-copy-tell-a-friend-1').click(function()
+	$('#button-share-facebook').click(function()
 	{
-		copyElementTextToClipboard('#tell-a-friend-1')
+		hyper.UI.openInBrowser("http://www.facebook.com/sharer.php?u=http%3A%2F%2Fwww.evothings.com")
+	})
+	
+	$('#button-share-google').click(function()
+	{
+		hyper.UI.openInBrowser("https://plus.google.com/share?url=http%3A%2F%2Fwww.evothings.com")
+	})
+	
+	$('#button-share-linkedin').click(function()
+	{
+		hyper.UI.openInBrowser("https://www.linkedin.com/shareArticle?mini=true&url=http%3A%2F%2Fwww.evothings.com&title=Evothings")
 	})
 
-	$('#button-copy-tell-a-friend-2').click(function()
+	$('#button-share-digg').click(function()
 	{
-		copyElementTextToClipboard('#tell-a-friend-2')
+		hyper.UI.openInBrowser("http://www.digg.com/submit?url=http%3A%2F%2Fwww.evothings.com")
+	})
+	
+  $('#button-share-twitter-1').click(function()
+	{
+		hyper.UI.openInBrowser("https://twitter.com/share?url=http%3A%2F%2Fwww.evothings.com&text=" + $('#share-social-1').text())
+	})
+	$('#button-share-twitter-2').click(function()
+	{
+		hyper.UI.openInBrowser("https://twitter.com/share?url=http%3A%2F%2Fwww.evothings.com&text=" + $('#share-social-2').text())
+	})
+	$('#button-share-twitter-3').click(function()
+	{
+		hyper.UI.openInBrowser("https://twitter.com/share?url=http%3A%2F%2Fwww.evothings.com&text=" + $('#share-social-3').text())
+	})
+	$('#button-share-twitter-4').click(function()
+	{
+		hyper.UI.openInBrowser("https://twitter.com/share?url=http%3A%2F%2Fwww.evothings.com&text=" + $('#share-social-4').text())
 	})
 
-	$('#button-copy-tell-a-friend-3').click(function()
+	// Not used anymore
+	$('#button-copy-share-social-1').click(function()
 	{
-		copyElementTextToClipboard('#tell-a-friend-3')
-	})
-
-	$('#button-copy-tell-a-friend-4').click(function()
-	{
-		copyElementTextToClipboard('#tell-a-friend-4')
+		copyElementTextToClipboard('#share-social-1')
 	})
 
 	function copyElementTextToClipboard(elementID)

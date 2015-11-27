@@ -68,9 +68,9 @@ Copyright (c) 2013-2015 Evothings AB
 						<li><a id="button-feedback"
 							role="button" href="javascript:void(0)">
 							Feedback</a></li>
-						<li><a id="button-tell-a-friend"
+						<li><a id="button-share-social"
 							role="button" href="javascript:void(0)">
-							Tell a friend</a></li>
+							Share in Social Media</a></li>
 						<li><a id="button-open-settings-dialog"
 							role="button" href="javascript:void(0)">
 							Settings</a></li>
@@ -369,30 +369,65 @@ Copyright (c) 2013-2015 Evothings AB
 				</div>
 			</div>
 
-			<!-- ModalDialog: dialog-tell-a-friend --->
+			<!-- ModalDialog: dialog-share-social --->
 			<div class="modal fade"
-				id="dialog-tell-a-friend"
+				id="dialog-share-social"
 				tabindex="-1"
 				role="dialog"
-				aria-labelledby="dialog-tell-a-friend-label"
+				aria-labelledby="dialog-share-social-label"
 				aria-hidden="true">
 				<div class="modal-dialog">
 					<div class="modal-content">
 						<div class="modal-header">
 							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-							<h4 class="modal-title" id="dialog-tell-a-friend-label">
-								Tell a friend about Evothings Studio
+							<h4 class="modal-title" id="dialog-share-social-label">
+								Share Evothings Studio In Social Media
 							</h4>
 						</div>
 
-						<div class="modal-body style-big-para">
-							<p><strong>Here are some messages you can send to a friend or share on Twitter or Facebook. Just click COPY and paste in an email or wherever you like. If this sounds too trivial, write a great message of your own.</strong></p>
-							<p><span id="tell-a-friend-1">Try out a quick way to develop apps for Eddystone and iBeacon using Evothings Studio. Download from http://evothings.com</span> <button id="button-copy-tell-a-friend-1" type="button" class="btn et-btn-blue style-small-button">Copy</button></p>
-							<p><span id="tell-a-friend-2">With Evothings Studio you can develop apps on as many mobile phones and tablets as you like, and see the result instantly on all of them. Download from http://evothings.com</span> <button id="button-copy-tell-a-friend-2" type="button" class="btn et-btn-blue style-small-button">Copy</button></p>
-							<p><span id="tell-a-friend-3">Use Evothings Studio to develop apps for BLE in JavaScript and HTML. Download from http://evothings.com</span> <button id="button-copy-tell-a-friend-3" type="button" class="btn et-btn-blue style-small-button">Copy</button></p>
-							<p><span id="tell-a-friend-4">Develop mobile apps for Arduino using JavaScript and HTML. Download Evothings Studio from http://evothings.com</span> <button id="button-copy-tell-a-friend-4" type="button" class="btn et-btn-blue style-small-button">Copy</button></p>
-						</div>
+						<!-- Style for sharing buttons below -->
+						<style type="text/css">
+							.share-buttons img { float: right; width: 40px; padding: 5px; border: 1; box-shadow: 0; display: inline;}
+							div.share-buttons { margin-bottom: 30px; }
+						</style>
 
+						<div class="modal-body style-big-para">
+							<p><strong>Here are some messages you can tweet! And you get a chance to edit the message to make it more personal :)</strong></p>
+
+						  <div class="share-buttons">
+						  	<span id="share-social-1">
+								<em>Try out a quick way to develop apps for Eddystone and iBeacon using Evothings Studio.</em></span>
+								<a href="#"><img id="button-share-twitter-1"  src="images/twitter.png" alt="Twitter" /></a>
+    					</div>
+							<hr/>
+						  <div class="share-buttons">
+								<span id="share-social-2">
+								<em>With Evothings Studio you develop apps on as many mobile devices as you like, and see the result instantly on all.</em></span>
+								<a href="#"><img id="button-share-twitter-2" src="images/twitter.png" alt="Twitter" /></a>
+    					</div>
+ 							<hr/>
+    					<div class="share-buttons">
+								<span id="share-social-3">
+								<em>Use Evothings Studio to develop apps for BLE in JavaScript and HTML.</em></span>
+								<a href="#"><img id="button-share-twitter-3" src="images/twitter.png" alt="Twitter" /></a>
+    					</div>
+ 							<hr/>
+    					<div class="share-buttons">
+								<span id="share-social-4">
+								<em>Develop mobile apps for Arduino using JavaScript and HTML.</em></span>
+								<a href="#"><img id="button-share-twitter-4" src="images/twitter.png" alt="Twitter" /></a>
+    					</div>
+    					<hr/>
+						<p><strong>...or you can just share us by clicking these :)</strong>
+						<div class="share-buttons">
+							<div id="button-share-linkedin"><a href="#"><img src="images/linkedin.png" alt="LinkedIn" /></a></div>
+							<div id="button-share-digg"><a href="#"><img src="images/diggit.png" alt="Digg" /></a></div>
+							<div id="button-share-facebook"><a href="#"><img src="images/facebook.png" alt="Facebook" /></a></div>
+							<div id="button-share-google"><a href="#"><img src="images/google.png" alt="Google" /></a></div>
+    					</div>
+						</div>
+						</p>
+						<br />
 						<div class="modal-footer">
 							<button type="button"
 								class="btn btn-default"
