@@ -240,6 +240,9 @@ hyper.UI.defineUIFunctions = function()
 			win.width = geometry.width
 			win.height = geometry.height
 		}
+		// Restore remember me state for logout action
+		var checked = SETTINGS.getRememberMe()
+		$('#remember-checkbox').attr('checked', checked)
 	}
 
 	function receiveMessage(event)
@@ -1482,6 +1485,16 @@ hyper.UI.setupUIEvents = function()
 	{
 		hideLoginScreen()
 	})
+
+	// ************** Remember me checkbox **************
+
+	$('#remember-checkbox').change(function(e)
+	{
+		var remember = e.target.checked;
+		console.log('remmember me changed value to '+remember);
+		SETTINGS.setRememberMe(remember)
+	})
+
 
 	// ************** Login Events **************
 

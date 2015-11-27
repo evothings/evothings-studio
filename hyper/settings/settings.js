@@ -97,6 +97,12 @@ systemSetting('ServeCordovaJsFiles', true)
 systemSetting('ProjectWindowGeometry')
 
 /**
+ * Remeber user account setting for login and logout.
+ */
+systemSetting('RememberMe')
+
+
+/**
  * Welcome screen setting.
  */
 systemSetting('ShowStartScreenHelp', true)
