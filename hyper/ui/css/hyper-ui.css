@@ -333,6 +333,7 @@ TODO: Remove, use automatic width for all buttons.
 	top: 0px;
 	right: 0px;
 	*/
+	display: block;
 	font-size: 100% !important;
 }
 
