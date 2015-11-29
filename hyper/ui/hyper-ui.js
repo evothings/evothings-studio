@@ -1292,6 +1292,21 @@ hyper.UI.setupUIEvents = function()
 		hyper.UI.openInBrowser('https://evothings.com/doc/')
 	})
 
+	// ************** Links to App Stores **************
+
+	$('.button-evothings-viewer-on-google-play').click(function()
+	{
+		hyper.UI.openInBrowser(
+			'https://play.google.com/store/apps/details?id=' +
+			'com.evothings.evothingsviewer&hl=en')
+	})
+
+	$('.button-evothings-viewer-on-itunes').click(function()
+	{
+		hyper.UI.openInBrowser(
+			'https://itunes.apple.com/nz/app/evothings-viewer/id1029452707?mt=8')
+	})
+
 	// ************** Release Notes Button **************
 
 	$('#button-release-notes').click(function()
@@ -1353,12 +1368,12 @@ hyper.UI.setupUIEvents = function()
 	{
 		hyper.UI.openInBrowser("http://www.facebook.com/sharer.php?u=http%3A%2F%2Fwww.evothings.com")
 	})
-	
+
 	$('#button-share-google').click(function()
 	{
 		hyper.UI.openInBrowser("https://plus.google.com/share?url=http%3A%2F%2Fwww.evothings.com")
 	})
-	
+
 	$('#button-share-linkedin').click(function()
 	{
 		hyper.UI.openInBrowser("https://www.linkedin.com/shareArticle?mini=true&url=http%3A%2F%2Fwww.evothings.com&title=Evothings")
@@ -1368,7 +1383,7 @@ hyper.UI.setupUIEvents = function()
 	{
 		hyper.UI.openInBrowser("http://www.digg.com/submit?url=http%3A%2F%2Fwww.evothings.com")
 	})
-	
+
   $('#button-share-twitter-1').click(function()
 	{
 		hyper.UI.openInBrowser("https://twitter.com/share?url=http%3A%2F%2Fwww.evothings.com&text=" + $('#share-social-1').text())
