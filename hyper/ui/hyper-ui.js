@@ -341,6 +341,7 @@ hyper.UI.defineUIFunctions = function()
 		if (imagePath)
 		{
 			var fullImagePath = PATH.join(appPath, imagePath)
+			fullImagePath = fullImagePath.replace(/\\/g, '/')
 			html += '<div class="app-icon" style="background-image: url(\'file://' +
 				fullImagePath + '\');"></div>'
 		}
