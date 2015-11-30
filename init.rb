@@ -102,7 +102,7 @@ end
 ### Make links required for running Evothings Studio without building a package.
 
 def makeLinksForDevelopment
-	mklink('documentation', '../evothings-doc')
+#	mklink('documentation', '../evothings-doc')
 	mklink('examples', '../evothings-examples/examples')
 	mklink('hyper/server/ui', '../evothings-examples/resources/ui')
 end

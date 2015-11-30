@@ -57,9 +57,9 @@ def buildCopyHyperToDistDir
 	FileUtils.copy_entry(
 		pathSourceHyper + "hyper/",
 		pathDistSource + "hyper/")
-	FileUtils.copy_entry(
-		pathSourceDoc,
-		pathDistSource + "documentation/")
+#	FileUtils.copy_entry(
+#		pathSourceDoc,
+#		pathDistSource + "documentation/")
 	FileUtils.copy_entry(
 		pathSourceHyper + "node_modules/",
 		pathDistSource + "node_modules/")
