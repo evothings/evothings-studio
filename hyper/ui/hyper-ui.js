@@ -1366,39 +1366,39 @@ hyper.UI.setupUIEvents = function()
 
 	$('#button-share-facebook').click(function()
 	{
-		hyper.UI.openInBrowser("http://www.facebook.com/sharer.php?u=http%3A%2F%2Fwww.evothings.com")
+		hyper.UI.openInBrowser("http://www.facebook.com/sharer.php?u=https%3A%2F%2Fevothings.com")
 	})
 
 	$('#button-share-google').click(function()
 	{
-		hyper.UI.openInBrowser("https://plus.google.com/share?url=http%3A%2F%2Fwww.evothings.com")
+		hyper.UI.openInBrowser("https://plus.google.com/share?url=https%3A%2F%2Fevothings.com")
 	})
 
 	$('#button-share-linkedin').click(function()
 	{
-		hyper.UI.openInBrowser("https://www.linkedin.com/shareArticle?mini=true&url=http%3A%2F%2Fwww.evothings.com&title=Evothings")
+		hyper.UI.openInBrowser("https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fevothings.com&title=Evothings")
 	})
 
 	$('#button-share-digg').click(function()
 	{
-		hyper.UI.openInBrowser("http://www.digg.com/submit?url=http%3A%2F%2Fwww.evothings.com")
+		hyper.UI.openInBrowser("http://www.digg.com/submit?url=https%3A%2F%2Fevothings.com")
 	})
 
   $('#button-share-twitter-1').click(function()
 	{
-		hyper.UI.openInBrowser("https://twitter.com/share?url=http%3A%2F%2Fwww.evothings.com&text=" + $('#share-social-1').text())
+		hyper.UI.openInBrowser("https://twitter.com/share?url=https%3A%2F%2Fevothings.com&text=" + $('#share-social-1').text().replace("#", "%23"))
 	})
 	$('#button-share-twitter-2').click(function()
 	{
-		hyper.UI.openInBrowser("https://twitter.com/share?url=http%3A%2F%2Fwww.evothings.com&text=" + $('#share-social-2').text())
+		hyper.UI.openInBrowser("https://twitter.com/share?url=https%3A%2F%2Fevothings.com&text=" + $('#share-social-2').text().replace("#", "%23"))
 	})
 	$('#button-share-twitter-3').click(function()
 	{
-		hyper.UI.openInBrowser("https://twitter.com/share?url=http%3A%2F%2Fwww.evothings.com&text=" + $('#share-social-3').text())
+		hyper.UI.openInBrowser("https://twitter.com/share?url=https%3A%2F%2Fevothings.com&text=" + $('#share-social-3').text().replace("#", "%23"))
 	})
 	$('#button-share-twitter-4').click(function()
 	{
-		hyper.UI.openInBrowser("https://twitter.com/share?url=http%3A%2F%2Fwww.evothings.com&text=" + $('#share-social-4').text())
+		hyper.UI.openInBrowser("https://twitter.com/share?url=https%3A%2F%2Fevothings.com&text=" + $('#share-social-4').text().replace("#", "%23"))
 	})
 
 	// Not used anymore
