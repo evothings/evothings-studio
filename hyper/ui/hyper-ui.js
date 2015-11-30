@@ -1384,21 +1384,24 @@ hyper.UI.setupUIEvents = function()
 		hyper.UI.openInBrowser("http://www.digg.com/submit?url=https%3A%2F%2Fevothings.com")
 	})
 
-  $('#button-share-twitter-1').click(function()
+	$('#button-share-twitter-1').click(function()
 	{
-		hyper.UI.openInBrowser("https://twitter.com/share?url=https%3A%2F%2Fevothings.com&text=" + $('#share-social-1').text().replace("#", "%23"))
+		openTwitter('#share-social-1')
 	})
+
 	$('#button-share-twitter-2').click(function()
 	{
-		hyper.UI.openInBrowser("https://twitter.com/share?url=https%3A%2F%2Fevothings.com&text=" + $('#share-social-2').text().replace("#", "%23"))
+		openTwitter('#share-social-2')
 	})
+
 	$('#button-share-twitter-3').click(function()
 	{
-		hyper.UI.openInBrowser("https://twitter.com/share?url=https%3A%2F%2Fevothings.com&text=" + $('#share-social-3').text().replace("#", "%23"))
+		openTwitter('#share-social-3')
 	})
+
 	$('#button-share-twitter-4').click(function()
 	{
-		hyper.UI.openInBrowser("https://twitter.com/share?url=https%3A%2F%2Fevothings.com&text=" + $('#share-social-4').text().replace("#", "%23"))
+		openTwitter('#share-social-4')
 	})
 
 	// Not used anymore
@@ -1406,6 +1409,13 @@ hyper.UI.setupUIEvents = function()
 	{
 		copyElementTextToClipboard('#share-social-1')
 	})
+
+	function openTwitter(elementID)
+	{
+		var url = 'https://twitter.com/share?url=https%3A%2F%2Fevothings.com&text='
+			+ $(elementID).text().replace(/#/g, '%23')
+		hyper.UI.openInBrowser(url)
+	}
 
 	function copyElementTextToClipboard(elementID)
 	{
