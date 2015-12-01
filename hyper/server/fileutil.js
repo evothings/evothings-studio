@@ -98,8 +98,8 @@ exports.getEvothingsUserFolderPath = function()
 	{
 		var userDir =
 			process.env.HOME ||
-			process.env.HOMEPATH ||
-			process.env.USERPROFILE
+			process.env.USERPROFILE ||
+			(process.env.HOMEDRIVE && process.env.HOMEPATH) ? (process.env.HOMEDRIVE + process.env.HOMEPATH) : false
 		var myAppsDir = PATH.join(
 			userDir, 'EvothingsStudio', 'MyApps')
 		return myAppsDir
