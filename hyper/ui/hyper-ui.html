@@ -68,15 +68,15 @@ Copyright (c) 2013-2015 Evothings AB
 						<li><a id="button-feedback"
 							role="button" href="javascript:void(0)">
 							Feedback</a></li>
-						<li><a id="button-tell-a-friend"
+						<li><a id="button-share-social"
 							role="button" href="javascript:void(0)">
-							Tell a friend</a></li>
+							Share in Social Media</a></li>
 						<li><a id="button-open-settings-dialog"
 							role="button" href="javascript:void(0)">
 							Settings</a></li>
-						<li><a id="button-test-system-message"
+						<!--<li><a id="button-test-system-message"
 							role="button" href="javascript:void(0)">
-							Test system message</a></li>
+							Test system message</a></li>-->
 					</ul>
 				</div>
 			</div>
@@ -369,30 +369,65 @@ Copyright (c) 2013-2015 Evothings AB
 				</div>
 			</div>
 
-			<!-- ModalDialog: dialog-tell-a-friend --->
+			<!-- ModalDialog: dialog-share-social --->
 			<div class="modal fade"
-				id="dialog-tell-a-friend"
+				id="dialog-share-social"
 				tabindex="-1"
 				role="dialog"
-				aria-labelledby="dialog-tell-a-friend-label"
+				aria-labelledby="dialog-share-social-label"
 				aria-hidden="true">
 				<div class="modal-dialog">
 					<div class="modal-content">
 						<div class="modal-header">
 							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-							<h4 class="modal-title" id="dialog-tell-a-friend-label">
-								Tell a friend about Evothings Studio
+							<h4 class="modal-title" id="dialog-share-social-label">
+								Share Evothings Studio In Social Media
 							</h4>
 						</div>
 
-						<div class="modal-body style-big-para">
-							<p><strong>Here are some messages you can send to a friend or share on Twitter or Facebook. Just click COPY and paste in an email or wherever you like. If this sounds too trivial, write a great message of your own.</strong></p>
-							<p><span id="tell-a-friend-1">Try out a quick way to develop apps for Eddystone and iBeacon using Evothings Studio. Download from http://evothings.com</span> <button id="button-copy-tell-a-friend-1" type="button" class="btn et-btn-blue style-small-button">Copy</button></p>
-							<p><span id="tell-a-friend-2">With Evothings Studio you can develop apps on as many mobile phones and tablets as you like, and see the result instantly on all of them. Download from http://evothings.com</span> <button id="button-copy-tell-a-friend-2" type="button" class="btn et-btn-blue style-small-button">Copy</button></p>
-							<p><span id="tell-a-friend-3">Use Evothings Studio to develop apps for BLE in JavaScript and HTML. Download from http://evothings.com</span> <button id="button-copy-tell-a-friend-3" type="button" class="btn et-btn-blue style-small-button">Copy</button></p>
-							<p><span id="tell-a-friend-4">Develop mobile apps for Arduino using JavaScript and HTML. Download Evothings Studio from http://evothings.com</span> <button id="button-copy-tell-a-friend-4" type="button" class="btn et-btn-blue style-small-button">Copy</button></p>
-						</div>
+						<!-- Style for sharing buttons below -->
+						<style type="text/css">
+							.share-buttons img { float: right; width: 40px; padding: 5px; border: 1; box-shadow: 0; display: inline;}
+							div.share-buttons { margin-bottom: 30px; }
+						</style>
 
+						<div class="modal-body style-big-para">
+							<p><strong>We would love if you would like to help us spread the word! <br/><br/>Here are some sample tweets, don't worry, you will get a chance to edit the message (or write your own) to make it more personal :)</strong></p>
+
+						  <div class="share-buttons">
+						  	<span id="share-social-1">
+								<em>Try out a quick way to develop apps for #Eddystone and #iBeacon using #Evothings Studio.</em></span>
+								<a href="#"><img id="button-share-twitter-1"  src="images/twitter.png" alt="Twitter" /></a>
+    					</div>
+							<hr/>
+						  <div class="share-buttons">
+								<span id="share-social-2">
+								<em>With #Evothings Studio you develop apps on as many mobile devices as you like, and see changes instantly on all.</em></span>
+								<a href="#"><img id="button-share-twitter-2" src="images/twitter.png" alt="Twitter" /></a>
+    					</div>
+ 							<hr/>
+    					<div class="share-buttons">
+								<span id="share-social-3">
+								<em>Use #Evothings Studio to develop apps for #BLE in #JavaScript and HTML.</em></span>
+								<a href="#"><img id="button-share-twitter-3" src="images/twitter.png" alt="Twitter" /></a>
+    					</div>
+ 							<hr/>
+    					<div class="share-buttons">
+								<span id="share-social-4">
+								<em>Develop mobile apps in #Evothings for #Arduino using #JavaScript and HTML.</em></span>
+								<a href="#"><img id="button-share-twitter-4" src="images/twitter.png" alt="Twitter" /></a>
+    					</div>
+    					<hr/>
+						<p><strong>...or you can just share us by clicking these :)</strong>
+						<div class="share-buttons">
+							<div id="button-share-linkedin"><a href="#"><img src="images/linkedin.png" alt="LinkedIn" /></a></div>
+							<div id="button-share-digg"><a href="#"><img src="images/diggit.png" alt="Digg" /></a></div>
+							<div id="button-share-facebook"><a href="#"><img src="images/facebook.png" alt="Facebook" /></a></div>
+							<div id="button-share-google"><a href="#"><img src="images/google.png" alt="Google" /></a></div>
+    					</div>
+						</div>
+						</p>
+						<br />
 						<div class="modal-footer">
 							<button type="button"
 								class="btn btn-default"
@@ -415,7 +450,7 @@ Copyright (c) 2013-2015 Evothings AB
 						<div class="style-big-para style-small-h2">
 							<h1>Getting Started</h1>
 
-							<p>(You can view this screen at any time by selecting "Getting Started" in the "More" dropdown menu.)</p>
+							<p>You can view this screen at any time by selecting "Getting Started" in the "More" dropdown menu.</p>
 
 							<h2>Introduction</h2>
 
@@ -425,7 +460,7 @@ Copyright (c) 2013-2015 Evothings AB
 
 							<h2>Step 1: Install Evothings Viewer</h2>
 
-							<p>Install the Evothings Viewer application on your mobile device(s), get the app from <a href="">Google Play</a> or <a href="">Apple App Store</a>.</p>
+							<p>Install the Evothings Viewer application on your mobile device(s), get the app from <a class="button-evothings-viewer-on-google-play" href="javascript:void(0)">Google Play Store</a> or <a class="button-evothings-viewer-on-itunes" href="javascript:void(0)">Apple App Store</a>.
 
 							<h2>Step 2: Connect to the Workbench from the Viewer</h2>
 
@@ -433,16 +468,16 @@ Copyright (c) 2013-2015 Evothings AB
 
 							<p>Go to the <strong>Connect</strong> screen and click the <button type="button" class="btn et-btn-green style-small-button">Get Key</button> button to obtain a connect key. Use this key when connecting from the Viewer. Once connected, your session has no time limit. Click the "Get Key" button again if the connect key times out.</p>
 
-							<p>Click <button type="button" class="btn et-btn-blue style-small-button">Login</button> on the Connect screen to get a Quick-Connect button in the Evothings Viewer app. This button is displayed when you restart the Viewer and allows you to reconnect to the Workbench where you are logged in, without entering a connect key again. This makes it much quicker to connect to same Workbench.</p>
+							<p>Click <button type="button" class="btn et-btn-blue style-small-button">Login</button> on the Connect screen to get a Quick-Connect button in the Evothings Viewer app. This button is displayed when you restart the Viewer and allows you to reconnect to the Workbench where you are logged in, without entering a connect key again. This makes it much quicker to connect to the same Workbench.</p>
 
 							<h2>Step 3: How to create a new app</h2>
 
 							<p>To create your own apps you have three options. Copy one of the example apps by clicking the <button type="button" class="btn et-btn-indigo style-small-button">Copy</button> button, and modify it for your own purposes, or click the <button type="button" class="btn et-btn-indigo style-small-button">New</button> button to create a basic app template. You can also drag and drop any .html file (typically index.html) to the Workbench window to add an existing app under <strong>My Apps</strong>.</p>
 
-							<p>Arrange apps using drag and drop (example apps cannot be rearranged). Click the close icon (x) to delete an app entry. This will NOT delete the application files.</p>
+							<p>Arrange apps using drag and drop, example apps cannot be rearranged though. Click the close icon (x) to delete an app entry. This will NOT delete the application files.</p>
 
 							<h2>Step 4: Code in your favourite editor end enjoy live reload</h2>
-							<p>To edit the code of an app, click the <button type="button" class="btn et-btn-blue style-small-button">Code</button> button on the app under <strong>My Apps</strong>. This will open a system file browser for your app. (You cannot edit example apps directly, you need to make a copy first.)</p>
+							<p>To edit the code of an app, click the <button type="button" class="btn et-btn-blue style-small-button">Code</button> button on the app under <strong>My Apps</strong>. This will open a system file browser for your app. You cannot edit example apps directly, you need to make a copy first.</p>
 							<p>From the system file browser, open the files you wish to edit in your editor of choice. Launch the app on connected Viewers using the <button type="button" class="btn et-btn-green style-small-button">Run</button> button. This selects the currently active app. When you save any code file for the active app, it will automatically get reloaded on all connected mobile devices.</p>
 							<p>For further details, please <a class="button-documentation" href="javascript:void(0)">visit the online documentation</a>.</p>
 							<p><strong>Happy coding!</strong></p>
@@ -490,7 +525,7 @@ Copyright (c) 2013-2015 Evothings AB
 								Login
 							</button>
 							<input id="remember-checkbox" type="checkbox">
-							<label for="remember-checkbox">Remember my account at Google or Github at next login</label>
+							<label for="remember-checkbox">Remember my account at Google on next login</label>
 						</span>
 
 						<div class="screen-start-help framed-box style-big-para">

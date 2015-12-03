@@ -342,6 +342,7 @@ hyper.UI.defineUIFunctions = function()
 		if (imagePath)
 		{
 			var fullImagePath = PATH.join(appPath, imagePath)
+			fullImagePath = fullImagePath.replace(/\\/g, '/')
 			html += '<div class="app-icon" style="background-image: url(\'file://' +
 				fullImagePath + '\');"></div>'
 		}
@@ -1327,6 +1328,21 @@ hyper.UI.setupUIEvents = function()
 		hyper.UI.openInBrowser('https://evothings.com/doc/')
 	})
 
+	// ************** Links to App Stores **************
+
+	$('.button-evothings-viewer-on-google-play').click(function()
+	{
+		hyper.UI.openInBrowser(
+			'https://play.google.com/store/apps/details?id=' +
+			'com.evothings.evothingsviewer&hl=en')
+	})
+
+	$('.button-evothings-viewer-on-itunes').click(function()
+	{
+		hyper.UI.openInBrowser(
+			'https://itunes.apple.com/nz/app/evothings-viewer/id1029452707?mt=8')
+	})
+
 	// ************** Release Notes Button **************
 
 	$('#button-release-notes').click(function()
@@ -1376,33 +1392,66 @@ hyper.UI.setupUIEvents = function()
 		hyper.UI.openInBrowser('https://evothings.com/news/')
 	})
 
-	// ************** Tell-a-friend Button **************
+	// ************** Share in Social Media Button **************
 
-	$('#button-tell-a-friend').click(function()
+	$('#button-share-social').click(function()
 	{
-		// hyper.UI.openInBrowser('https://evothings.com/tell-a-friend/')
-		$('#dialog-tell-a-friend').modal('show')
+		// hyper.UI.openInBrowser('https://evothings.com/share-social/')
+		$('#dialog-share-social').modal('show')
 	})
 
-	$('#button-copy-tell-a-friend-1').click(function()
+	$('#button-share-facebook').click(function()
 	{
-		copyElementTextToClipboard('#tell-a-friend-1')
+		hyper.UI.openInBrowser("http://www.facebook.com/sharer.php?u=https%3A%2F%2Fevothings.com")
 	})
 
-	$('#button-copy-tell-a-friend-2').click(function()
+	$('#button-share-google').click(function()
 	{
-		copyElementTextToClipboard('#tell-a-friend-2')
+		hyper.UI.openInBrowser("https://plus.google.com/share?url=https%3A%2F%2Fevothings.com")
 	})
 
-	$('#button-copy-tell-a-friend-3').click(function()
+	$('#button-share-linkedin').click(function()
 	{
-		copyElementTextToClipboard('#tell-a-friend-3')
+		hyper.UI.openInBrowser("https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fevothings.com&title=Evothings")
 	})
 
-	$('#button-copy-tell-a-friend-4').click(function()
+	$('#button-share-digg').click(function()
 	{
-		copyElementTextToClipboard('#tell-a-friend-4')
+		hyper.UI.openInBrowser("http://www.digg.com/submit?url=https%3A%2F%2Fevothings.com")
 	})
+
+	$('#button-share-twitter-1').click(function()
+	{
+		openTwitter('#share-social-1')
+	})
+
+	$('#button-share-twitter-2').click(function()
+	{
+		openTwitter('#share-social-2')
+	})
+
+	$('#button-share-twitter-3').click(function()
+	{
+		openTwitter('#share-social-3')
+	})
+
+	$('#button-share-twitter-4').click(function()
+	{
+		openTwitter('#share-social-4')
+	})
+
+	// Not used anymore
+	$('#button-copy-share-social-1').click(function()
+	{
+		copyElementTextToClipboard('#share-social-1')
+	})
+
+	function openTwitter(elementID)
+	{
+		var url = 'https://twitter.com/share?url=https%3A%2F%2Fevothings.com&text='
+			+ $(elementID).text().replace(/#/g, '%23')
+		hyper.UI.openInBrowser(url)
+	}
 
 	function copyElementTextToClipboard(elementID)
 	{
