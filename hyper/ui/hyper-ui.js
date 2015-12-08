@@ -379,7 +379,7 @@ hyper.UI.defineUIFunctions = function()
 			html +=
 				'<button '
 				+	'type="button" '
-				+	'class="button-open btn et-btn-red" '
+				+	'class="button-red btn et-btn-red" '
 				+   'style="padding:0" '
 				+	'onclick="window.hyper.UI.openNodeRedWindow(\''+appPath+'\')">'
 				+	'Node-Red'
