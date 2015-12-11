@@ -1,7 +1,7 @@
 var http = require('http');
 var express = require("express");
 var RED = require("node-red");
-
+var NRMODULES = require("nrmodules")
 
 var app = undefined;
 
@@ -10,6 +10,8 @@ var nreditor =
 	startForPath: function(path)
 	{
 		console.log('setting node-red project path to '+path);
+		var modpath = __dirname+'/../../node_modules/nrmodules';
+		console.log('modules path is = '+modpath);
 		// Create an Express app
 		app = express();
 		// Add a simple route for static content served from 'public'
@@ -23,7 +25,7 @@ var nreditor =
 			httpAdminRoot:"/red",
 			httpNodeRoot: "/api",
 			flowFile: path+"/flows.json",
-			nodesDir: '/home/peter/projects/nrmodules',
+			nodesDir: modpath,
 			userDir:path,
 			functionGlobalContext: { }    // enables global context
 		};

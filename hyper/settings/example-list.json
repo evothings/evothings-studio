@@ -1,5 +1,6 @@
 [
 {"path":"examples/hello-world/index.html"},
+  {"path":"examples/nrfe-hello-world/index.html"},
 {"path":"examples/cordova-accelerometer/index.html"},
 {"path":"examples/hue-lights/index.html"},
 
