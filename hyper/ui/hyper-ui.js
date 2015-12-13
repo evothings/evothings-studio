@@ -38,6 +38,7 @@ var PATH = require('path')
 var OS = require('os')
 var GUI = require('nw.gui')
 var PATH = require('path')
+var REQUEST = require("request");
 var FSEXTRA = require('fs-extra')
 var FILEUTIL = require('../server/fileutil.js')
 var SETTINGS = require('../settings/settings.js')
@@ -519,23 +520,39 @@ hyper.UI.defineUIFunctions = function()
 
 	hyper.UI.openNodeRedWindow = function(path)
 	{
+		console.log('opening node-red window')
 		if (mNodeRedWindow && !mNodeRedWindow.closed)
 		{
-			// Bring existing window to front.
 			mNodeRedWindow.focus()
 		}
-		else
+
+		NODE_RED.stop()
+		NODE_RED.startForPath(path)
+
+		var poll = function()
 		{
-			NODE_RED.startForPath(path)
-			mNodeRedWindow = window.open(
-				'http://localhost:8000/red',
-				'nodered',
-				'resizable=1,width=1000,height=800')
-			mNodeRedWindow.moveTo(50, 150)
-			mNodeRedWindow.focus()
-			// Establish contact. Not really needed.
-			mNodeRedWindow.postMessage({ message: 'hyper.hello' }, '*')
+			REQUEST("http://localhost:8000/red", function(error, response, body)
+			{
+				console.log(arguments);
+				if(body.toLowerCase().indexOf('cannot') > -1)
+				{
+					setTimeout(poll, 1000);
+				}
+				else
+				{
+					if (!mNodeRedWindow)
+					{
+						mNodeRedWindow = window.open(
+							'http://localhost:8000/red',
+							'nodered',
+							'resizable=1,width=1000,height=800')
+						mNodeRedWindow.moveTo(50, 150)
+						mNodeRedWindow.focus()
+					}
+				}
+			});
 		}
+		poll();
 	}
 
 	hyper.UI.openToolsWorkbenchWindow = function()
