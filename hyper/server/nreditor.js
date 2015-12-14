@@ -3,7 +3,8 @@ var express = require("express");
 var RED = require("node-red");
 var NRMODULES = require("nrmodules")
 
-var app = undefined;
+var app = undefined
+var server = undefined;
 
 var nreditor =
 {
@@ -17,7 +18,7 @@ var nreditor =
 		// Add a simple route for static content served from 'public'
 		app.use("/",express.static("public"));
 		// Create a server
-		var server = http.createServer(app);
+		server = http.createServer(app);
 		// Create the settings object - see default settings.js file for other options
 		var settings = {
 			verbose: true,
@@ -39,6 +40,7 @@ var nreditor =
 		server.listen(8000);
 
 		// Start the runtime
+		console.log('starting node-red .....');
 		RED.start();
 	},
 
@@ -48,9 +50,14 @@ var nreditor =
 		{
 			// stop red
 			RED.stop();
-			// stop express
-			app.close();
-			app = undefined;
+			if(app && server)
+			{
+				console.log('stopping app '+app)
+				// stop express
+				server.close();
+				app = undefined;
+				server = undefined;
+			}
 		}
 	}
 };
