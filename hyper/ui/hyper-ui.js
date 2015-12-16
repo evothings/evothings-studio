@@ -549,15 +549,14 @@ hyper.UI.defineUIFunctions = function()
 							'nodered',
 							'resizable=1,width=1000,height=800')
 						mNodeRedWindow.moveTo(50, 150)
-						console.dir(mNodeRedWindow)
+						mNodeRedWindow.focus()
 					}
 					else
 					{
 						console.log('reusing old node-red window')
-						console.dir(mNodeRedWindow)
-						mNodeRedWindow.show()
-						mNodeRedWindow.focus()
 					}
+
+					mNodeRedWindow.focus()
 				}
 			});
 		}
