@@ -38,6 +38,7 @@ var PATH = require('path')
 var OS = require('os')
 var GUI = require('nw.gui')
 var PATH = require('path')
+var REQUEST = require("request");
 var FSEXTRA = require('fs-extra')
 var FILEUTIL = require('../server/fileutil.js')
 var SETTINGS = require('../settings/settings.js')
@@ -537,6 +538,7 @@ hyper.UI.defineUIFunctions = function()
 				if(body.toLowerCase().indexOf('cannot') > -1)
 				{
 					console.log('waiting for node-red to start')
+
 					setTimeout(poll, 1000);
 				}
 				else
