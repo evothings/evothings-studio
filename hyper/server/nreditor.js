@@ -1,17 +1,18 @@
 var http = require('http');
 var express = require("express");
 var RED = require("node-red");
+var PATH = require('path')
 var NRMODULES = require("nrmodules")
 
 var app = undefined
-var server = undefined;
+var server = undefined
 
 var nreditor =
 {
 	startForPath: function(path)
 	{
 		console.log('setting node-red project path to '+path);
-		var modpath = __dirname+'/../../node_modules/nrmodules';
+		var modpath = PATH.join(__dirname,'..','..','node_modules','nrmodules');
 		console.log('modules path is = '+modpath);
 		// Create an Express app
 		app = express();

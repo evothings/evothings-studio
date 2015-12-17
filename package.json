@@ -17,6 +17,7 @@
   "dependencies": {
     "fs-extra": "^0.26.2",
     "nrmodules": "^1.0.0",
+    "path": "^0.12.7",
     "request": "^2.67.0",
     "socket.io-client": "^1.3.7"
   },
