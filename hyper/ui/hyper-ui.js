@@ -339,6 +339,10 @@ hyper.UI.defineUIFunctions = function()
 
 		// Show app image icon
 		var appPath = hyper.makeFullPath(PATH.dirname(path))
+		if(appPath.indexOf('\\') > -1)
+		{
+			appPath = appPath.split('\\').join('\\\\')
+		}
 		var imagePath = APP_SETTINGS.getAppImage(appPath)
 
 		if (imagePath)
