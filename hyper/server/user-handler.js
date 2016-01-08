@@ -43,10 +43,10 @@ var mUser = null
 /***		Functions		  ***/
 /*********************************/
 
+
 exports.createLoginClient = function()
 {
-	EVENTS.subscribe(EVENTS.LOGIN, exports.setUser)
-	EVENTS.subscribe(EVENTS.LOGOUT, exports.clearUser)
+
 }
 
 exports.setUser = function(uobj)
@@ -68,6 +68,13 @@ exports.startLoginSequence = function()
 	var sessionID = SERVER.getSessionID()
 	console.log('LOGIN: starting Login Sequence. Registering authentication callback with proxy. sessionID = '+sessionID)
 	SERVER.sendMessageToServer(undefined, 'workbench.registerauthcallback', { sessionID: sessionID })
+}
+
+exports.startLogoutSequence = function()
+{
+	var sessionID = SERVER.getSessionID()
+	console.log('LOGOUT: starting Login Sequence. Registering logout callback with proxy. sessionID = '+sessionID)
+	SERVER.sendMessageToServer(undefined, 'workbench.registerlogoutcallback', { sessionID: sessionID })
 }
 
 exports.getLoginURL = function()
@@ -102,6 +109,8 @@ exports.getLogoutURL = function()
 
 exports.getUser = function()
 {
+	console.log('user-handler getUser returns ')
+	console.dir(mUser)
 	return mUser
 }
 
@@ -116,3 +125,6 @@ function getLoginServerAddress()
 	serverAddress = serverAddress + ':3003'
 	return serverAddress
 }
+
+EVENTS.subscribe(EVENTS.LOGIN, exports.setUser)
+EVENTS.subscribe(EVENTS.LOGOUT, exports.clearUser)

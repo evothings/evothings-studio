@@ -126,6 +126,7 @@ exports.connectToRemoteServer = function()
 
 	socket.on('hyper-workbench-message', function(message)
 	{
+		console.log('---- got message '+message.name)
         var handler = messageHandlers[message.name]
         if (handler)
         {
@@ -136,8 +137,11 @@ exports.connectToRemoteServer = function()
 
 function onMessageWorkbenchUserLogin(socket, message)
 {
+	console.log('login message is')
+	console.dir(message)
 	if(message.data && message.data.user)
 	{
+		console.log('*** publishing LOGIN')
 		EVENTS.publish(EVENTS.LOGIN, message.data.user)
 	}
 }
