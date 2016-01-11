@@ -45,8 +45,7 @@ var mUser = null
 
 exports.createLoginClient = function()
 {
-	EVENTS.subscribe(EVENTS.LOGIN, exports.setUser)
-	EVENTS.subscribe(EVENTS.LOGOUT, exports.clearUser)
+
 }
 
 exports.setUser = function(uobj)
@@ -116,3 +115,6 @@ function getLoginServerAddress()
 	serverAddress = serverAddress + ':3003'
 	return serverAddress
 }
+
+EVENTS.subscribe(EVENTS.LOGIN, exports.setUser)
+EVENTS.subscribe(EVENTS.LOGOUT, exports.clearUser)
