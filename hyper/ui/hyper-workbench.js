@@ -214,7 +214,7 @@ $(function()
 
 	function receiveMessage(event)
 	{
-		//LOGGER.log('Workbench got : ' + event.data.message)
+		//LOGGER.log('[user-workbench.js] Workbench got : ' + event.data.message)
 		if ('hyper.hello' == event.data.message)
 		{
 			mMainWindow = event.source

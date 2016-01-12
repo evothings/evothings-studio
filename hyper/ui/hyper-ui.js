@@ -113,7 +113,7 @@ hyper.UI.defineUIFunctions = function()
 			}
 			catch (ex)
 			{
-				LOGGER.log('Error creating OS X menubar: ' + ex.message);
+				LOGGER.log('[hyper-ui.js] Error creating OS X menubar: ' + ex.message);
 			}
 		}
 	}
@@ -187,7 +187,7 @@ hyper.UI.defineUIFunctions = function()
 			catch(e)
 			{
 				// app is closing; no way to handle errors beyond logging them.
-				LOGGER.log('Error on window close: ' + e);
+				LOGGER.log('[hyper-ui.js] Error on window close: ' + e);
 			}
 
 			GUI.App.quit()
@@ -246,14 +246,14 @@ hyper.UI.defineUIFunctions = function()
 
 	function receiveMessage(event)
 	{
-		//LOGGER.log('Main got : ' + event.data.message)
+		//LOGGER.log('[hyper-ui.js] Main got : ' + event.data.message)
 		if ('eval' == event.data.message)
 		{
 			hyper.SERVER.evalJS(event.data.code)
 		}
         else if ('setSession' == event.data.message)
         {
-            console.log('==== session set to '+event.data.sid)
+            LOGGER.log('[hyper-ui.js] ==== session set to '+event.data.sid)
         }
 	}
 
@@ -773,9 +773,9 @@ hyper.UI.defineUIFunctions = function()
 				indexFileTargetPath = PATH.join(targetDir, appFolderName, indexFile)
 			}
 
-			//console.log('@@@ targetDir: ' + targetDir)
-			//console.log('@@@ sourceDir: ' + sourceDir)
-			//console.log('@@@ indexFileTargetPath: ' + indexFileTargetPath)
+			//LOGGER.log('[hyper-ui.js] @@@ targetDir: ' + targetDir)
+			//LOGGER.log('[hyper-ui.js] @@@ sourceDir: ' + sourceDir)
+			//LOGGER.log('[hyper-ui.js] @@@ indexFileTargetPath: ' + indexFileTargetPath)
 
 			// Copy files.
 			FSEXTRA.copySync(sourceDir, targetDir)
@@ -790,7 +790,7 @@ hyper.UI.defineUIFunctions = function()
 		catch (error)
 		{
 			window.alert('Something went wrong, could not save app.')
-			console.log('Error in copyApp: ' + error)
+			LOGGER.log('[hyper-ui.js] Error in copyApp: ' + error)
 		}
 	}
 
@@ -1135,7 +1135,7 @@ hyper.defineServerFunctions = function()
 		// Prepend application path if this is not an absolute path.
 		path = hyper.makeFullPath(path)
 
-		LOGGER.log('runApp: ' + path)
+		LOGGER.log('[hyper-ui.js] runApp: ' + path)
 
 		SERVER.setAppPath(path)
 		MONITOR.setBasePath(SERVER.getBasePath())
@@ -1171,7 +1171,7 @@ hyper.defineServerFunctions = function()
 	// Called when a connect key is sent from the server.
     function requestConnectKeyCallback(message)
     {
-        //LOGGER.log('requestConnectKeyCallback called for message')
+        //LOGGER.log('[hyper-ui.js] requestConnectKeyCallback called for message')
         //console.dir(message)
         hyper.UI.setConnectKeyTimeout(message.data.timeout)
         hyper.UI.displayConnectKey(message.data.connectKey)
@@ -1251,7 +1251,7 @@ hyper.defineServerFunctions = function()
 		}
 
 		// Debug logging.
-		LOGGER.log('Open folder: ' + path)
+		LOGGER.log('[hyper-ui.js] Open folder: ' + path)
 
 		GUI.Shell.showItemInFolder(path)
 	}
@@ -1520,7 +1520,7 @@ hyper.UI.setupUIEvents = function()
 	$('#remember-checkbox').change(function(e)
 	{
 		var remember = e.target.checked;
-		console.log('remmember me changed value to '+remember);
+		LOGGER.log('[hyper-ui.js] remmember me changed value to '+remember);
 		SETTINGS.setRememberMe(remember)
 	})
 
@@ -1540,7 +1540,7 @@ hyper.UI.setupUIEvents = function()
 
 	EVENTS.subscribe(EVENTS.LOGIN, function(user)
 	{
-		console.log('*** User has logged in: ' + user)
+		LOGGER.log('[hyper-ui.js] *** User has logged in: ' + user)
 		console.dir(user)
 
 		hideLoginScreen()
@@ -1550,7 +1550,7 @@ hyper.UI.setupUIEvents = function()
 	EVENTS.subscribe(EVENTS.LOGOUT, function()
 	{
 		// TODO: Pass user id to the Run/Reload messaging code (hyper-server.js).
-		LOGGER.log('*** User has logged out ***')
+		LOGGER.log('[hyper-ui.js] *** User has logged out ***')
 
 		displayLoginButton()
 	})
@@ -1559,7 +1559,7 @@ hyper.UI.setupUIEvents = function()
 
 	EVENTS.subscribe(EVENTS.CONNECT, function(obj)
 	{
-		LOGGER.log('socket.io connect')
+		LOGGER.log('[hyper-ui.js] socket.io connect')
 		if(mDisconnectTimer)
 		{
 			clearTimeout(mDisconnectTimer)
@@ -1569,7 +1569,7 @@ hyper.UI.setupUIEvents = function()
 
 	EVENTS.subscribe(EVENTS.DISCONNECT, function(obj)
 	{
-		LOGGER.log('socket.io disconnect')
+		LOGGER.log('[hyper-ui.js] socket.io disconnect')
 		mDisconnectTimer = setTimeout(function()
 		{
 			logoutUser()
@@ -1582,7 +1582,7 @@ hyper.UI.setupUIEvents = function()
 
 		USER_HANDLER.startLoginSequence()
 		var loginURL = USER_HANDLER.getLoginURL()
-		console.log('loginURL : ' + loginURL)
+		LOGGER.log('[hyper-ui.js] loginURL : ' + loginURL)
 		showLoginScreen(loginURL)
 	}
 

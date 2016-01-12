@@ -73,7 +73,7 @@ var mBasePath = ''
  */
 exports.connectToRemoteServer = function()
 {
-	LOGGER.log('Connecting to remote server')
+	LOGGER.log('[hyper-server.js] Connecting to remote server')
 
 	// Message handler table.
 	var messageHandlers =
@@ -90,7 +90,7 @@ exports.connectToRemoteServer = function()
 		'workbench.user-logout': onMessageWorkbenchUserLogout
 	}
 
-	console.log('connecting to server: ' + mRemoteServerURL)
+	LOGGER.log('[hyper-server.js] connecting to server: ' + mRemoteServerURL)
 
 	// Create socket.io instance.
 	var socket = SOCKETIO_CLIENT(
@@ -103,13 +103,13 @@ exports.connectToRemoteServer = function()
 	// Connect function.
 	socket.on('connect', function()
 	{
-		LOGGER.log('Connected to server')
+		LOGGER.log('[hyper-server.js] Connected to server')
 		mIsConnected = true
         EVENTS.publish(EVENTS.CONNECT, { event: 'connected' })
 		//exports.requestConnectKey()
 		mSessionID = SETTINGS.getSessionID()
 
-		console.log('workbench.connected session: ' + mSessionID)
+		LOGGER.log('[hyper-server.js] workbench.connected session: ' + mSessionID)
         sendMessageToServer(mSocket, 'workbench.connected', { sessionID: mSessionID })
 	})
 
@@ -159,7 +159,7 @@ function sendMessageToServer(_socket, name, data)
 
 function onMessageWorkbenchSetSessionID(socket, message)
 {
-	LOGGER.log('onMessageWorkbenchSetSessionID: ' + message.data.sessionID)
+	LOGGER.log('[hyper-server.js] onMessageWorkbenchSetSessionID: ' + message.data.sessionID)
 
 	// Set/display session id if we got it.
 	if (message.data.sessionID)
@@ -264,7 +264,7 @@ exports.requestConnectKey = function()
 	// On first call mSessionID will be null, if server goes down
 	// and we connect again we will pass our session id so the server
 	// can restore our session.
-    LOGGER.log('requesting connect key from server')
+    LOGGER.log('[hyper-server.js] requesting connect key from server')
 	sendMessageToServer(mSocket, 'workbench.request-connect-key', { sessionID: mSessionID })
 }
 
@@ -273,7 +273,7 @@ exports.requestConnectKey = function()
  */
 exports.disconnectFromRemoteServer = function()
 {
-	LOGGER.log('Disconnecting from remote server')
+	LOGGER.log('[hyper-server.js] Disconnecting from remote server')
 
 	if (mSocket)
 	{
@@ -302,7 +302,7 @@ function serveUsingResponse304()
  */
 function serveResource(platform, path, ifModifiedSince)
 {
-	//LOGGER.log('serveResource: ' + path)
+	//LOGGER.log('[hyper-server.js] serveResource: ' + path)
 
 	if (!path || path == '/')
 	{
