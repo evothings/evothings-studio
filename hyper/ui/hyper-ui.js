@@ -401,6 +401,13 @@ hyper.UI.defineUIFunctions = function()
 
 		// Get name of project, use title tag as first choise.
 		var name = hyper.UI.getProjectNameFromFile(path)
+		if (null === name)
+		{
+			LOGGER.log('[hyper-ui.js] getProjectNameFromFile failed: ' + path)
+
+			// Could not open the app main file, skip this app.
+			return
+		}
 
 		// Escape any backslashes in the path (needed on Windows).
 		var escapedPath = path.replace(/[\\]/g,'\\\\')
@@ -494,19 +501,21 @@ hyper.UI.defineUIFunctions = function()
 
 	hyper.UI.getProjectNameFromFile = function(path)
 	{
+		// Read app main file.
 		var data = FILEUTIL.readFileSync(path)
 		if (!data)
 		{
-			// Return on error, skipping rest of the code.
-			LOGGER.log('getProjectNameFromFile failed: ' + path)
-			return
+			// Return null on error.
+			return null
 		}
 
 		var name = getTagContent(data, 'title')
 		if (!name)
 		{
+			// If title tag is missing, use short form of path as app name.
 			name = getNameFromPath(path)
 		}
+
 		return name
 	}
 
