@@ -505,6 +505,7 @@ exports.runApp = function()
 		{
 			sessionID: mSessionID,
 			appID: mAppID,
+			appName: hyper.UI.getProjectNameFromFile(mAppPath),
 			url: getAppURL()
 		})
 }
@@ -520,7 +521,8 @@ exports.reloadApp = function()
 	sendMessageToServer(mSocket, 'workbench.reload',
 		{
 			sessionID: mSessionID,
-			appID: mAppID
+			appID: mAppID,
+			appName: hyper.UI.getProjectNameFromFile(mAppPath)
 		})
 	mReloadCallback && mReloadCallback()
 }

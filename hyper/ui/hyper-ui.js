@@ -400,19 +400,7 @@ hyper.UI.defineUIFunctions = function()
 			+ '</div>'
 
 		// Get name of project, use title tag as first choise.
-		var data = FILEUTIL.readFileSync(path)
-		if (!data)
-		{
-			// Return on error, skipping rest of the code.
-			LOGGER.log('createProjectEntry failed: ' + path)
-			return
-		}
-
-		var name = getTagContent(data, 'title')
-		if (!name)
-		{
-			name = getNameFromPath(path)
-		}
+		var name = hyper.UI.getProjectNameFromFile(path)
 
 		// Escape any backslashes in the path (needed on Windows).
 		var escapedPath = path.replace(/[\\]/g,'\\\\')
@@ -502,6 +490,24 @@ hyper.UI.defineUIFunctions = function()
 			}
 		})
 		hyper.setProjectList(projects)
+	}
+
+	hyper.UI.getProjectNameFromFile = function(path)
+	{
+		var data = FILEUTIL.readFileSync(path)
+		if (!data)
+		{
+			// Return on error, skipping rest of the code.
+			LOGGER.log('getProjectNameFromFile failed: ' + path)
+			return
+		}
+
+		var name = getTagContent(data, 'title')
+		if (!name)
+		{
+			name = getNameFromPath(path)
+		}
+		return name
 	}
 
 	hyper.UI.openToolsWorkbenchWindow = function()
