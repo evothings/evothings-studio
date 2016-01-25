@@ -21,6 +21,7 @@ limitations under the License.
 */
 
 var FILEUTIL = require('../server/fileutil.js')
+var UUID = require('../server/uuid.js')
 
 exports.set = function(key, value)
 {
@@ -145,7 +146,13 @@ systemSetting('MyAppsPath', FILEUTIL.getEvothingsUserFolderPath())
  */
 exports.getEvoGUID = function()
 {
-	return window.localStorage.getItem('evo-guid')
+	var uuid = window.localStorage.getItem('evo-guid')
+	if (!uuid)
+	{
+		uuid = UUID.generateUUID()
+		exports.setEvoGUID(uuid)
+	}
+	return uuid
 }
 
 exports.setEvoGUID = function(value)
