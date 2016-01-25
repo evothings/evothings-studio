@@ -60,6 +60,9 @@ var mClientInfoCallback = null
 var mReloadCallback = null
 var mRequestConnectKeyCallback = null
 var mCheckIfModifiedSince = false
+var mHeartbeatTimer = undefined
+var mDeviceInfo = {}
+var mHeartbeatInterval = 20000
 
 // The current base directory. Must NOT end with a slash.
 var mBasePath = ''
@@ -110,7 +113,21 @@ exports.connectToRemoteServer = function()
 		mSessionID = SETTINGS.getSessionID()
 
 		console.log('workbench.connected session: ' + mSessionID)
-        sendMessageToServer(mSocket, 'workbench.connected', { sessionID: mSessionID })
+
+		var info =
+		{
+			arch: OS.arch(),
+			platform: OS.platform(),
+			osrelease: OS.release(),
+			ostype: OS.type()
+		}
+		var uuid = SETTINGS.getEvoGUID()
+		console.log('------ uuid = '+uuid)
+		mDeviceInfo = info
+		//
+        sendMessageToServer(mSocket, 'workbench.connected', { sessionID: mSessionID, uuid: uuid, info: info })
+		mHeartbeatTimer = setInterval(heartbeat, mHeartbeatInterval)
+		heartbeat()
 	})
 
 	socket.on('error', function(error)
@@ -122,6 +139,7 @@ exports.connectToRemoteServer = function()
 	{
 		mIsConnected = false
         EVENTS.publish(EVENTS.DISCONNECT, {event: 'disconnected' })
+		clearInterval(mHeartbeatTimer)
 	})
 
 	socket.on('hyper-workbench-message', function(message)
@@ -132,6 +150,12 @@ exports.connectToRemoteServer = function()
         	handler(socket, message)
         }
 	})
+}
+
+function heartbeat()
+{
+	var uuid = SETTINGS.getEvoGUID()
+	sendMessageToServer(mSocket, 'workbench.heartbeat', { sessionID: mSessionID, uuid: uuid, info: mDeviceInfo })
 }
 
 function onMessageWorkbenchUserLogin(socket, message)
@@ -150,10 +174,14 @@ function onMessageWorkbenchUserLogout(socket, message)
 function sendMessageToServer(_socket, name, data)
 {
 	var socket = _socket || mSocket
+	var uuid = SETTINGS.getEvoGUID()
+	console.log('-- uuid = '+uuid)
 	socket.emit('hyper-workbench-message', {
 		protocolVersion: mProtocolVersion,
 		workbenchVersionCode: mWorkbenchVersionCode,
 		name: name,
+		sessionID: mSessionID,
+		UUID: uuid,
 		data: data })
 }
 
@@ -191,6 +219,8 @@ function onMessageWorkbenchSetConnectKey(socket, message)
 function onMessageWorkbenchClientInfo(socket, message)
 {
 	// Notify UI about clients.
+	console.log('got client info')
+	console.dir(message)
 	mClientInfoCallback && mClientInfoCallback(message)
 }
 
