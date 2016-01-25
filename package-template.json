@@ -30,7 +30,7 @@
 		"toolbar": false,
 		"frame": true,
 		"width": 700,
-		"height": 600,
+		"height": 680,
 		"position": "mouse",
 		"icon": "hyper/ui/images/evothings-icon.png"
 	}

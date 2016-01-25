@@ -883,7 +883,8 @@ hyper.UI.defineUIFunctions = function()
 
 	hyper.UI.showInitialScreen = function()
 	{
-		hyper.UI.showTab('getting-started')
+		//hyper.UI.showTab('getting-started')
+		hyper.UI.showTab('connect')
 	}
 
 	hyper.UI.setStartScreenHelpVisibility = function()
@@ -1282,7 +1283,7 @@ hyper.UI.setupUIEvents = function()
 
 	// ************** Getting Started Screen Button **************
 
-	$('#button-getting-started').click(function()
+	$('.button-getting-started').click(function()
 	{
 		hyper.UI.showTab('getting-started')
 	})
