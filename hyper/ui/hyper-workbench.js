@@ -102,12 +102,12 @@ $(function()
 		mAutoScroll = !mAutoScroll
 		if (mAutoScroll)
 		{
-			$('#button-toggle-autoscroll').text('AutoScroll On')
+			$('#button-toggle-autoscroll').text('Pause Log')
 			showScrollBuffer()
 		}
 		else
 		{
-			$('#button-toggle-autoscroll').text('AutoScroll Off')
+			$('#button-toggle-autoscroll').text('Resume Log')
 		}
 	})
 
@@ -137,7 +137,7 @@ $(function()
 		// If we have scroll buffer, show it.
 		if (mScrollBuffer)
 		{
-			mResult.setValue(mResult.getValue() + '\n' + mScrollBuffer)
+			mResult.setValue(mResult.getValue() + mScrollBuffer)
 			mScrollBuffer = null
 			mResult.scrollIntoView({ line: mResult.lastLine(), ch: 0 })
 		}
