@@ -325,9 +325,9 @@ TODO: Remove, use automatic width for all buttons.
 .screen-start-logotype
 {
 	position: absolute;
-	width: 100px;
-	height: auto;
-	top: 15px;
+	width: auto;
+	height: 55px;
+	top: 10px;
 	right: 15px;
 }
 
