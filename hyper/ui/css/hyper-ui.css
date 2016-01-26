@@ -6,6 +6,11 @@ html, body
 	font-family: sans-serif;
 }
 
+.hyper-screen
+{
+	display: none;
+}
+
 #panel-page
 {
 	margin: 0;
@@ -221,7 +226,6 @@ TODO: Remove, use automatic width for all buttons.
 
 #connect-screen-message
 {
-	display: none;
 	font-size: 200%;
 	font-weight: bold;
 }
