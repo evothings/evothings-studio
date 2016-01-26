@@ -62,6 +62,10 @@ window.hyper = hyper
 // UI-related functions.
 hyper.UI = {}
 
+// Currently active app path (set when clicking RUN,
+// used to highlight list item).
+hyper.UI.activeAppPath = ''
+
 /*** Main setup function ***/
 
 // This function is called at the end of this file.
@@ -332,7 +336,16 @@ hyper.UI.defineUIFunctions = function()
 		options = options || {}
 
 		// Create div tag for app items.
-		var html = '<div class="project-entry ui-state-default ui-corner-all">'
+		var html = '<div class="project-entry ui-state-default ui-corner-all"'
+
+		// Set background color of active app entry.
+		if (path == hyper.UI.activeAppPath)
+		{
+			html += ' style="background-color:#EAFFEA;"'
+		}
+
+		// Close opening div tag.
+		html += '>'
 
 		// Show app image icon
 		var appPath = hyper.makeFullPath(PATH.dirname(path))
@@ -561,6 +574,12 @@ hyper.UI.defineUIFunctions = function()
 	{
 		document.querySelector('#files-counter').innerHTML =
 			hyper.MONITOR.getNumberOfMonitoredFiles()
+	}
+
+	hyper.UI.displayAppLists = function()
+	{
+		hyper.UI.displayExampleList()
+		hyper.UI.displayProjectList()
 	}
 
 	hyper.UI.displayProjectList = function()
@@ -1022,8 +1041,7 @@ hyper.defineServerFunctions = function()
 		// TODO: Consider moving these calls to a function in hyper.UI.
 		mExampleList = parseProjectList(FILEUTIL.readFileSync(mExampleListFile))
 		readProjectList()
-		hyper.UI.displayProjectList()
-		hyper.UI.displayExampleList()
+		hyper.UI.displayAppLists()
 		hyper.UI.setServerMessageFun()
 
 		//displayServerIpAddress()
@@ -1134,11 +1152,12 @@ hyper.defineServerFunctions = function()
 	hyper.runApp = function(path)
 	{
 		// Prepend application path if this is not an absolute path.
-		path = hyper.makeFullPath(path)
+		var fullPath = hyper.makeFullPath(path)
 
-		LOGGER.log('[hyper-ui.js] runApp: ' + path)
+		LOGGER.log('[hyper-ui.js] runApp: ' + fullPath)
 
-		SERVER.setAppPath(path)
+		// TODO: Move these 2 lines inside else-clause below?
+		SERVER.setAppPath(fullPath)
 		MONITOR.setBasePath(SERVER.getBasePath())
 
 		if (mNumberOfConnectedClients <= 0)
@@ -1148,8 +1167,11 @@ hyper.defineServerFunctions = function()
 		}
 		else
 		{
+			// Set active app path (note that this is path, not fullPath).
+			hyper.UI.activeAppPath = path
+
 			// Refresh list of my apps.
-			hyper.UI.displayProjectList()
+			hyper.UI.displayAppLists()
 
 			// Otherwise, load the requested file on connected clients.
 			SERVER.runApp()
