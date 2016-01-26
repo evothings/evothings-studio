@@ -94,18 +94,26 @@ exports.downloadAsString = function(url, userAgent, callbackFun)
 
 exports.getEvothingsUserFolderPath = function()
 {
+	var myAppsDir = 'EnterPathToMyAppsFolder'
 	try
 	{
+		// TODO: Consider using this module:
+		// https://github.com/sindresorhus/os-homedir
 		var userDir =
 			process.env.HOME ||
 			process.env.USERPROFILE ||
-			(process.env.HOMEDRIVE && process.env.HOMEPATH) ? (process.env.HOMEDRIVE + process.env.HOMEPATH) : false
-		var myAppsDir = PATH.join(
-			userDir, 'EvothingsStudio', 'MyApps')
-		return myAppsDir
+			((process.env.HOMEDRIVE && process.env.HOMEPATH) ?
+				process.env.HOMEDRIVE + process.env.HOMEPATH :
+				null)
+		if (userDir)
+		{
+			myAppsDir =  PATH.join(userDir, 'EvothingsStudio', 'MyApps')
+		}
 	}
 	catch (error)
 	{
-		return null
+		HYPER.log('[fileutil.js] Failed to get user home path')
 	}
+
+	return myAppsDir
 }

@@ -71,6 +71,12 @@ html, body
 	overflow: auto;
 }
 
+.panel-body h1
+{
+	margin-top: 10px;
+	margin-bottom: 15px;
+}
+
 #panel-bottom
 {
 	position: absolute;
@@ -209,8 +215,8 @@ TODO: Remove, use automatic width for all buttons.
 
 .connect-screen-element
 {
-	margin-top: 20px;
-	margin-bottom: 20px;
+	margin-top: 10px;
+	margin-bottom: 10px;
 }
 
 #connect-screen-message
@@ -242,6 +248,8 @@ TODO: Remove, use automatic width for all buttons.
 {
 	font-weight: bold;
 	font-size: 28px;
+	letter-spacing: 1px;
+	font-kerning: none;
 	color: black;
 	background: rgb(245,245,245);
 	padding: 0px 15px;
@@ -322,6 +330,7 @@ TODO: Remove, use automatic width for all buttons.
 .screen-start-help
 {
 	display: none;
+	padding-bottom: 0px !important;
 }
 
 #button-toogle-help

@@ -26,11 +26,11 @@
 	"private": true,
 	"window":
 	{
-		"title": "Evothings Workbench __VERSION__ Beta 2",
+		"title": "Evothings Workbench __VERSION__ Beta 3",
 		"toolbar": false,
 		"frame": true,
 		"width": 700,
-		"height": 600,
+		"height": 680,
 		"position": "mouse",
 		"icon": "hyper/ui/images/evothings-icon.png"
 	}

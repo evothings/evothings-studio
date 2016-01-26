@@ -30,7 +30,7 @@ var mMimeTypes = getDefaultMimeTypes()
 // Returns a response object.
 function response(path, ifModifiedSince)
 {
-	//LOGGER.log('response path: ' + path)
+	//LOGGER.log('[fileloader.js] response path: ' + path)
 	var file = getFileStatus(path)
 	if (!file)
 	{
@@ -77,9 +77,9 @@ function createResponse(data, mtime, contentType, ifModifiedSince)
 		var ifModifiedSinceTime = new Date(ifModifiedSince).getTime()
 		var modifiedTime = mtime.getTime()
 
-		//LOGGER.log('ifModifiedSince: ' + ifModifiedSince)
-		//LOGGER.log('ifModifiedSinceTime: ' + ifModifiedSinceTime)
-		//LOGGER.log('modifiedTime: ' + modifiedTime)
+		//LOGGER.log('[fileloader.js] ifModifiedSince: ' + ifModifiedSince)
+		//LOGGER.log('[fileloader.js] ifModifiedSinceTime: ' + ifModifiedSinceTime)
+		//LOGGER.log('[fileloader.js] modifiedTime: ' + modifiedTime)
 
 		if (modifiedTime <= ifModifiedSinceTime)
 		{
@@ -130,7 +130,7 @@ function getFileStatus(fullPath)
 	}
 	catch (ex)
 	{
-		LOGGER.log('resource-loader.js: getFileStatus exception: ' + ex)
+		LOGGER.log('[fileloader.js] resource-loader.js: getFileStatus exception: ' + ex)
 		return null
 	}
 }

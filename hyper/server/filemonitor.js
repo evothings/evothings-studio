@@ -139,16 +139,16 @@ function fileSystemMonitorWorker(path, level)
 					++mFileCounter
 				}
 
-				//LOGGER.log('Checking file: ' + files[i] + ': ' + stat.mtime)
+				//LOGGER.log('[filemonitor.js] Checking file: ' + files[i] + ': ' + stat.mtime)
 				if (stat.isFile() && t > mLastReloadTime)
 				{
-					//LOGGER.log('***** File has changed ***** ' + files[i])
+					//LOGGER.log('[filemonitor.js] ***** File has changed ***** ' + files[i])
 					mLastReloadTime = Date.now()
 					return true
 				}
 				else if (stat.isDirectory() && level > 0)
 				{
-					//LOGGER.log('Decending into: ' + path + files[i])
+					//LOGGER.log('[filemonitor.js] Decending into: ' + path + files[i])
 					var changed = fileSystemMonitorWorker(
 						path + files[i] + '/',
 						level - 1)
@@ -157,13 +157,13 @@ function fileSystemMonitorWorker(path, level)
 			}
 			catch (err2)
 			{
-				LOGGER.log('ERROR in fileSystemMonitorWorker inner loop: ' + err2)
+				LOGGER.log('[filemonitor.js] ERROR in fileSystemMonitorWorker inner loop: ' + err2)
 			}
 		}
 	}
 	catch(err1)
 	{
-		LOGGER.log('ERROR in fileSystemMonitorWorker: ' + err1)
+		LOGGER.log('[filemonitor.js] ERROR in fileSystemMonitorWorker: ' + err1)
 	}
 	return false
 }
