@@ -15,8 +15,31 @@ def distCopyright
 	"Copyright (c) 2015 Evothings AB"
 end
 
+# TODO: Update on new release.
 def distVersion
 	"2.0.0"
+end
+
+# TODO: Update on new release.
+def distVersionLabel
+	# TODO: Remove " Beta 3" for final release.
+	distVersion + " Beta 3"
+end
+
+# TODO: Update on new release.
+def distPackageVersion
+	time = Time.new
+
+	timestamp =
+		time.year.to_s[-2..-1] +
+		time.month.to_s.rjust(2, '0') +
+		time.day.to_s.rjust(2, '0') +
+		"_" +
+		time.hour.to_s.rjust(2, '0') +
+		time.min.to_s.rjust(2, '0')
+
+	# TODO: Remove "_Beta3" for final release.
+	distVersion + "_Beta3_" + timestamp
 end
 
 def root
@@ -25,7 +48,8 @@ end
 
 # Destination folder for distribution packages.
 def pathDist
-	root + distPackageName + "_" + version + "/"
+
+	root + distPackageName + "_" + distPackageVersion + "/"
 end
 
 # Destination temporary folder for application code.

@@ -36,11 +36,7 @@ require "pathname"
 #                 GLOBAL VARIABLES                    #
 #######################################################
 
-$VersionString = 'UndefinedVersion'
-
-def version
-	$VersionString
-end
+# None
 
 #######################################################
 #                  BUILD FUNCTIONS                    #
@@ -71,7 +67,8 @@ def buildCopyHyperToDistDir
 
 	# Create package.json for this version.
 	content = fileReadContent(pathSourcePackageJson)
-	content = content.gsub("__VERSION__", version)
+	content = content.gsub("__VERSION__", distVersion)
+	content = content.gsub("__VERSION_LABEL__", distVersionLabel)
 	fileSaveContent(pathDistSource + "package.json", content)
 
 	# Delete hidden OS X files.
@@ -95,8 +92,8 @@ def buildDistBinaries
 	puts "Building Win32"
 	buildDistBinaryWin32
 
-	#puts "Building Win64"
-	#buildDistBinaryWin64
+	puts "Building Win64"
+	buildDistBinaryWin64
 
 	# Delete hidden OS X files.
 	fileDeleteAll(pathDist + "**/.DS_Store")
@@ -181,7 +178,7 @@ def buildDistBinaryMac64
 	info = fileReadContent(infoPlistPath)
 	#puts(info)
 	info = macPatchValue(info, "CFBundleName", applicationName)
-	info = macPatchValue(info, "CFBundleShortVersionString", version)
+	info = macPatchValue(info, "CFBundleShortVersionString", distVersion)
 	info = macPatchValue(info, "CFBundleVersion", distCopyright)
 	#puts(info)
 	fileSaveContent(infoPlistPath, info)
@@ -249,12 +246,12 @@ def buildZippedBinaries
 		zipPackage(distPackageMac64)
 	end
 	zipPackage(distPackageWin32)
-	#zipPackage(distPackageWin64)
+	zipPackage(distPackageWin64)
 end
 
 # Build distribution package.
 def buildDist zipFlag
-	puts "Building " + distPackageName + " version " + version + " with node-webkit version " + nodeWebKitVersion
+	puts "Building " + distPackageName + " version " + distVersion + " with node-webkit version " + nodeWebKitVersion
 	buildCreateDistDir
 	buildPreProcess
 	buildCopyHyperToDistDir
@@ -345,23 +342,23 @@ end
 #######################################################
 
 def distPackageLinux32
-	pathDist + distPackageName + "_Linux_32_" + version + "/"
+	pathDist + distPackageName + "_Linux_32_" + distPackageVersion + "/"
 end
 
 def distPackageLinux64
-	pathDist + distPackageName + "_Linux_64_" + version + "/"
+	pathDist + distPackageName + "_Linux_64_" + distPackageVersion + "/"
 end
 
 def distPackageMac64
-	pathDist + distPackageName + "_Mac_64_" + version + "/"
+	pathDist + distPackageName + "_Mac_64_" + distPackageVersion + "/"
 end
 
 def distPackageWin32
-	pathDist + distPackageName + "_Win_32_" + version + "/"
+	pathDist + distPackageName + "_Win_32_" + distPackageVersion + "/"
 end
 
 def distPackageWin64
-	pathDist + distPackageName + "_Win_64_" + version + "/"
+	pathDist + distPackageName + "_Win_64_" + distPackageVersion + "/"
 end
 
 
@@ -374,7 +371,6 @@ load "buildPlugin.rb"
 #######################################################
 #                 START BUILD PROCESS                 #
 #######################################################
-$VersionString = distVersion
 
 if (ARGV.size == 0)
 	buildDist "nozip"
