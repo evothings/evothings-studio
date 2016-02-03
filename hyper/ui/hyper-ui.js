@@ -88,6 +88,7 @@ hyper.main = function()
 hyper.UI.defineUIFunctions = function()
 {
 	var mWorkbenchWindow = null
+	var mViewersWindow = null
 	var mConnectKeyTimer
 
 	hyper.UI.setupUI = function()
@@ -557,6 +558,27 @@ hyper.UI.defineUIFunctions = function()
 			mWorkbenchWindow.focus()
 			// Establish contact. Not really needed.
 			mWorkbenchWindow.postMessage({ message: 'hyper.hello' }, '*')
+		}
+	}
+
+	hyper.UI.openViewersWindow = function()
+	{
+		if (mViewersWindow && !mViewersWindow.closed)
+		{
+			// Bring existing window to front.
+			mViewersWindow.focus()
+		}
+		else
+		{
+			// Create new window.
+			mViewersWindow = window.open(
+				'hyper-viewers.html',
+				'Viewers',
+				'resizable=1,width=800,height=600')
+			mViewersWindow.moveTo(150, 150)
+			mViewersWindow.focus()
+			// Establish contact. Not really needed.
+			mViewersWindow.postMessage({ message: 'hyper.hello' }, '*')
 		}
 	}
 
@@ -1514,6 +1536,13 @@ hyper.UI.setupUIEvents = function()
 	$('#button-tools').click(function()
 	{
 		hyper.UI.openToolsWorkbenchWindow()
+	})
+
+	// ************** Viewers Button **************
+
+	$('#button-viewers').click(function()
+	{
+		hyper.UI.openViewersWindow()
 	})
 
 	// ************** Login Button **************

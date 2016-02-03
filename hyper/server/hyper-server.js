@@ -63,6 +63,7 @@ var mCheckIfModifiedSince = false
 var mHeartbeatTimer = undefined
 var mDeviceInfo = {}
 var mHeartbeatInterval = 20000
+var mCLientInfo = undefined
 
 // The current base directory. Must NOT end with a slash.
 var mBasePath = ''
@@ -175,7 +176,7 @@ function sendMessageToServer(_socket, name, data)
 {
 	var socket = _socket || mSocket
 	var uuid = SETTINGS.getEvoGUID()
-	LOGGER.log('[hyper-server.js] sendMessageToServer -- uuid = '+uuid)
+	//LOGGER.log('[hyper-server.js] sendMessageToServer -- uuid = '+uuid)
 	socket.emit('hyper-workbench-message', {
 		protocolVersion: mProtocolVersion,
 		workbenchVersionCode: mWorkbenchVersionCode,
@@ -221,6 +222,8 @@ function onMessageWorkbenchClientInfo(socket, message)
 	// Notify UI about clients.
 	LOGGER.log('[hyper-server.js] got client info')
 	console.dir(message)
+	EVENTS.publish(EVENTS.VIEWERSUPDATED, message.data)
+	mCLientInfo = message.data
 	mClientInfoCallback && mClientInfoCallback(message)
 }
 
@@ -515,6 +518,11 @@ function getAppURL()
 exports.getUserKey = function()
 {
 	return mUserKey
+}
+
+exports.getCLinetInfo = function()
+{
+	return mCLientInfo
 }
 
 /**

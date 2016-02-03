@@ -10,6 +10,7 @@ var Events =
     USERMESSAGE:    'usermessage',
 	LOGINCONNECT:   'loginconnect',
 	LOGINDISCONNECT:'logindisconnect',
+	VIEWERSUPDATED: 'viewersupdated',
 
     listeners:  [],
 
