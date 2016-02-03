@@ -15,7 +15,6 @@ Software needed:
 * Node.js
 * Ruby
 * Git
-* Apache Cordova
 * TODO: Add additional prerequisites
 
 Install node module "flatten-packages" if not installed. On Windows:
@@ -26,6 +25,10 @@ On Linux or OS X:
 
     sudo npm install -g flatten-packages
 
+Clone this repository:
+
+    git clone git@github.com:evothings/evothings-studio.git
+
 Run init.rb before first build, this will download required repositories:
 
     ruby init.rb
@@ -33,6 +36,10 @@ Run init.rb before first build, this will download required repositories:
 Build with:
 
     ruby build.rb
+
+Update dependent repos, build and zip packages in one step:
+
+    ruby build-latest.rb
 
 Built packages are created in a folder named "EvothingsStudio_VERSIONNUMBER", where VERSIONNUMBER is the version number given in file buildPlugin.rb.
 
