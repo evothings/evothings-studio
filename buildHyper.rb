@@ -246,7 +246,7 @@ def buildZippedBinaries
 		zipPackage(distPackageMac64)
 	end
 	zipPackage(distPackageWin32)
-	zipPackage(distPackageWin64)
+	##zipPackage(distPackageWin64)
 end
 
 # Build distribution package.
