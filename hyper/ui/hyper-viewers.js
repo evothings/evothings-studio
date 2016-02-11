@@ -165,9 +165,12 @@ $(function()
 				var div = document.createElement('div')
 				div.style.display = 'flex';
 				div.style.flexDirection = 'column'
+				div.style.justifyContent = 'space-around'
+				div.style.width = '100%'
 				var span = document.createElement('span')
 				span.innerHTML = viewer.name + ' ('+viewer.info.model+')'
 				var img = document.createElement('img')
+				img.style.width='30px'
 				img.src = 'images/PNG/Nexus7.png'
 				domlist.appendChild(div)
 				div.appendChild(img)
