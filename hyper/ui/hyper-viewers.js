@@ -10,12 +10,7 @@ $(function()
 	// Main application window
 	var mMainWindow = window.opener
 
-	// Flag for toggling autoscroll of log view.
-	var mAutoScroll = true
-
-	// Buffer for log when autoscroll is off.
-	var mScrollBuffer = null
-
+	var currentClients = []
 
 
 	window.hyper = {}
@@ -159,6 +154,7 @@ $(function()
 
 	function addViewersToList(list)
 	{
+		currentClients = list
 		console.log('showing '+list.length+' clients')
 		console.dir(list)
 		if(list)
@@ -167,7 +163,8 @@ $(function()
 			list.forEach(function(viewer)
 			{
 				var div = document.createElement('div')
-				div.style = {display: 'flex', flexDirection: 'column'}
+				div.style.display = 'flex';
+				div.style.flexDirection = 'column'
 				var span = document.createElement('span')
 				span.innerHTML = viewer.name + ' ('+viewer.info.model+')'
 				var img = document.createElement('img')
@@ -175,26 +172,52 @@ $(function()
 				domlist.appendChild(div)
 				div.appendChild(img)
 				div.appendChild(span)
+				div.addEventListener('mouseup', function(e)
+				{
+					onClientSelected(viewer)
+				})
 				console.log('adding client')
 				console.dir(viewer)
 			})
 		}
 	}
 
+	function onClientSelected(viewer)
+	{
+		console.log('user selected client '+viewer.name)
+		injectInstrumentationToClient(viewer)
+	}
+
+	function onViewersUpdated(viewerlist)
+	{
+		LOGGER.log('[hyper-viewers.js] got viewers updated event');
+		console.dir(viewerlist)
+		domlist = document.getElementById('viewer-list')
+		domlist.html = ""
+		if(viewerlist.data && viewerlist.data.clients)
+		{
+			var list = viewerlist.data.clients
+			addViewersToList(list)
+		}
+	}
+
+	function injectInstrumentationToClient(client)
+	{
+		console.log('injectin instrumetnation into client '+client.name)
+
+	}
+
+	function onViewersInstrumentation(message)
+	{
+		console.log('------------------ instrumentation received!!')
+		console.dir(message)
+
+	}
+
 	function setupEventListeners()
 	{
-		EVENTS.subscribe(EVENTS.VIEWERSUPDATED, function(viewerlist)
-		{
-			LOGGER.log('[hyper-viewers.js] got viewers updated event');
-			console.dir(viewerlist)
-			domlist = document.getElementById('viewer-list')
-			domlist.html = ""
-			if(viewerlist.data && viewerlist.data.clients)
-			{
-				var list = viewerlist.data.clients
-				addViewersToList(list)
-			}
-		})
+		EVENTS.subscribe(EVENTS.VIEWERSUPDATED, onViewersUpdated)
+		EVENTS.subscribe(EVENTS.VIEWERSINSTRUMENTATION, onViewersInstrumentation)
 
 		console.log('getting initial list of clients...')
 		var info = SERVER.getCLinetInfo()

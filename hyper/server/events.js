@@ -2,15 +2,16 @@ UUID = require('./uuid')
 
 var Events =
 {
-    CONNECT:        'connect',
-    DISCONNECT:     'disconnect',
-    LOGIN:          'login',
-    LOGOUT:         'logout',
-    SETSESSIONID:   'setsessionid',
-    USERMESSAGE:    'usermessage',
-	LOGINCONNECT:   'loginconnect',
-	LOGINDISCONNECT:'logindisconnect',
-	VIEWERSUPDATED: 'viewersupdated',
+    CONNECT:                'connect',
+    DISCONNECT:             'disconnect',
+    LOGIN:                  'login',
+    LOGOUT:                 'logout',
+    SETSESSIONID:           'setsessionid',
+    USERMESSAGE:            'usermessage',
+	LOGINCONNECT:           'loginconnect',
+	LOGINDISCONNECT:        'logindisconnect',
+	VIEWERSUPDATED:         'viewersupdated',
+	VIEWERSINSTRUMENTATION: 'viewersinstrumentation',
 
     listeners:  [],
 

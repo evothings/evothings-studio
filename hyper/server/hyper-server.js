@@ -86,6 +86,7 @@ exports.connectToRemoteServer = function()
 		'workbench.set-session-id': onMessageWorkbenchSetSessionID,
         'workbench.set-connect-key': onMessageWorkbenchSetConnectKey,
 		'workbench.client-info': onMessageWorkbenchClientInfo,
+		'workbench.client-instrumentation': onMessageWorkbenchClientInstrumentation,
 		'workbench.get-resource': onMessageWorkbenchGetResource,
 		'workbench.log': onMessageWorkbenchLog,
 		'workbench.javascript-result': onMessageWorkbenchJavaScriptResult,
@@ -225,6 +226,14 @@ function onMessageWorkbenchClientInfo(socket, message)
 	EVENTS.publish(EVENTS.VIEWERSUPDATED, message.data)
 	mCLientInfo = message.data
 	mClientInfoCallback && mClientInfoCallback(message)
+}
+
+function onMessageWorkbenchClientInstrumentation(socket, message)
+{
+	// Notify UI about clients.
+	LOGGER.log('[hyper-server.js] got client instrumentation')
+	console.dir(message)
+	EVENTS.publish(EVENTS.VIEWERINSTRUMENTATION, message.data)
 }
 
 function onMessageWorkbenchGetResource(socket, message)
