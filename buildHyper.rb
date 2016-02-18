@@ -92,8 +92,8 @@ def buildDistBinaries
 	puts "Building Win32"
 	buildDistBinaryWin32
 
-	puts "Building Win64"
-	buildDistBinaryWin64
+	#puts "Building Win64"
+	#buildDistBinaryWin64
 
 	# Delete hidden OS X files.
 	fileDeleteAll(pathDist + "**/.DS_Store")
@@ -246,7 +246,7 @@ def buildZippedBinaries
 		zipPackage(distPackageMac64)
 	end
 	zipPackage(distPackageWin32)
-	zipPackage(distPackageWin64)
+	##zipPackage(distPackageWin64)
 end
 
 # Build distribution package.
@@ -350,11 +350,13 @@ def distPackageLinux64
 end
 
 def distPackageMac64
-	pathDist + distPackageName + "_Mac_64_" + distPackageVersion + "/"
+	#pathDist + distPackageName + "_Mac_64_" + distPackageVersion + "/"
+	pathDist + distPackageName + "_Mac_" + distPackageVersion + "/"
 end
 
 def distPackageWin32
-	pathDist + distPackageName + "_Win_32_" + distPackageVersion + "/"
+	#pathDist + distPackageName + "_Win_32_" + distPackageVersion + "/"
+	pathDist + distPackageName + "_Win_" + distPackageVersion + "/"
 end
 
 def distPackageWin64

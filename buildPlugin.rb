@@ -168,44 +168,46 @@ def buildPreProcess
 	buildOSXIcons
 end
 
-def buildDocumentation
-	include FileUtils::Verbose
-	cwd = pwd
+# Not used
+#def buildDocumentation
+#	include FileUtils::Verbose
+#	cwd = pwd
+#
+#	mkdir_p pathDistSource + 'documentation'
+#
+#	# plugins
+#	cd "#{root}evothings-client"
+#	sh 'ruby workfile.rb doc'
+#	cd cwd
+#	dst = pathDistSource + 'documentation/plugins'
+#	mv("#{root}evothings-client/gen-doc", dst)
+#
+#	# libraries
+#	src = "#{root}evothings-examples/resources/libs/evothings"
+#	cd src
+#	sh 'jsdoc -r .'
+#	cd cwd
+#	dst = pathDistSource + 'documentation/lib-doc'
+#	mv(src + '/out', dst)
+#
+#	# insert plugin list into API overview.
+#	apiOverview = File.read(pathDistSource + 'documentation/studio/api-overview.html')
+#	list = File.read(pathDistSource + 'documentation/plugins/index.html.embed')
+#	list.gsub!('<a href="', '<a href="../plugins/')
+#	apiOverview.gsub!('INSERT_PLUGIN_LIST_HERE', list)
+#	File.write(pathDistSource + 'documentation/studio/api-overview.html', apiOverview)
+#end
 
-	mkdir_p pathDistSource + 'documentation'
-
-	# plugins
-	cd "#{root}evothings-client"
-	sh 'ruby workfile.rb doc'
-	cd cwd
-	dst = pathDistSource + 'documentation/plugins'
-	mv("#{root}evothings-client/gen-doc", dst)
-
-	# libraries
-	src = "#{root}evothings-examples/resources/libs/evothings"
-	cd src
-	sh 'jsdoc -r .'
-	cd cwd
-	dst = pathDistSource + 'documentation/lib-doc'
-	mv(src + '/out', dst)
-
-	# insert plugin list into API overview.
-	apiOverview = File.read(pathDistSource + 'documentation/studio/api-overview.html')
-	list = File.read(pathDistSource + 'documentation/plugins/index.html.embed')
-	list.gsub!('<a href="', '<a href="../plugins/')
-	apiOverview.gsub!('INSERT_PLUGIN_LIST_HERE', list)
-	File.write(pathDistSource + 'documentation/studio/api-overview.html', apiOverview)
-end
-
-def buildEvoThingsClient
-	cwd = FileUtils.pwd
-	FileUtils.chdir(root + 'evothings-client')
-	sh 'ruby workfile.rb'
-	FileUtils.chdir(cwd)
-	FileUtils.copy_entry(root + 'evothings-client',
-		pathDistSource + 'evothings-client')
-	FileUtils.remove_dir(pathDistSource + 'evothings-client/.git', true)
-end
+# Not used
+#def buildEvoThingsClient
+#	cwd = FileUtils.pwd
+#	FileUtils.chdir(root + 'evothings-client')
+#	sh 'ruby workfile.rb'
+#	FileUtils.chdir(cwd)
+#	FileUtils.copy_entry(root + 'evothings-client',
+#		pathDistSource + 'evothings-client')
+#	FileUtils.remove_dir(pathDistSource + 'evothings-client/.git', true)
+#end
 
 def buildPostProcess
 	#buildDocumentation
@@ -218,7 +220,7 @@ def buildPostProcess
 
 	# Copy Evothings Examples to dist.
 	FileUtils.copy_entry(
-		root + "evothings-examples/examples",
+		root + "evothings-examples/generated/examples",
 		pathDistSource + "examples")
 
 	# Copy Evothings Studio license file.

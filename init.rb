@@ -103,8 +103,8 @@ end
 
 def makeLinksForDevelopment
 #	mklink('documentation', '../evothings-doc')
-	mklink('examples', '../evothings-examples/examples')
-	mklink('hyper/server/ui', '../evothings-examples/resources/ui')
+	mklink('examples', '../evothings-examples/generated/examples')
+#	mklink('hyper/server/ui', '../evothings-examples/resources/ui')
 end
 
 ### Load custom settings from localConfig.rb
