@@ -254,7 +254,7 @@ hyper.UI.defineUIFunctions = function()
 		//LOGGER.log('[hyper-ui.js] Main got : ' + event.data.message)
 		if ('eval' == event.data.message)
 		{
-			hyper.SERVER.evalJS(event.data.code)
+			hyper.SERVER.evalJS(event.data.code, event.data.client)
 		}
         else if ('setSession' == event.data.message)
         {
@@ -574,7 +574,7 @@ hyper.UI.defineUIFunctions = function()
 			mViewersWindow = window.open(
 				'hyper-viewers.html',
 				'Viewers',
-				'resizable=1,width=800,height=600')
+				'resizable=1,width=400,height=300')
 			mViewersWindow.moveTo(150, 150)
 			mViewersWindow.focus()
 			// Establish contact. Not really needed.

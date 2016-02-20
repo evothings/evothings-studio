@@ -1,17 +1,23 @@
+hyper.log('instrumentation-starter loading...')
 if (window.evo && window.evo.instrumentation)
 {
 	var mgr = window.evo.instrumentation
 	//
 	//
-	if(window.evo.instrumentation.cordova)
+	if(window.evo.cordova)
 	{
-		mgr.addServiceProvider(window.evo.instrumentation.cordova)
+		mgr.addServiceProvider(window.evo.cordova)
+	}
+	else
+	{
+		hyper.log('* did not find cordova instrumentation *')
 	}
 	//
 	//
 	mgr.discoverServices()
+	hyper.log("INJECTION ACTIVATED")
 }
 else
 {
-	console.log('ERROR: Could not find any evo instrumentation to start!!')
+	hyper.log('ERROR: Could not find any evo instrumentation to start!!')
 }

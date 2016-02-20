@@ -1,6 +1,7 @@
 $(function()
 {
 	var OS = require('os')
+	var FS = require('fs')
 	var SETTINGS = require('../settings/settings.js')
 	var LOGGER = require('../server/log.js')
 	var GUI = require('nw.gui')
@@ -10,8 +11,11 @@ $(function()
 	// Main application window
 	var mMainWindow = window.opener
 
-	var currentClients = []
-
+	var mCurrentClients = []
+	var mCurrentClientServices = []
+	var mCurrentServiceData = []
+	var mCurrentClientList = undefined
+	var mInstrumentationReceivedFrom = []
 
 	window.hyper = {}
 
@@ -152,43 +156,126 @@ $(function()
 			})
 	}
 
-	function addViewersToList(list)
+	function renderViewersFromList(list)
 	{
-		currentClients = list
-		console.log('showing '+list.length+' clients')
+		mCurrentClientList = list
+		console.log('renderViewersFromList showing '+list.length+' clients')
 		console.dir(list)
-		if(list)
+		if(list && list.length)
 		{
 			domlist = document.getElementById('viewer-list')
+			domlist.innerHTML = ""
+			console.dir(list)
 			list.forEach(function(viewer)
 			{
+				var rowdiv = document.createElement('div')
+				rowdiv.style.display = 'flex';
+				rowdiv.style.flexDirection = 'row'
+				//
 				var div = document.createElement('div')
 				div.style.display = 'flex';
 				div.style.flexDirection = 'column'
 				div.style.justifyContent = 'space-around'
-				div.style.width = '100%'
+				div.style.width = '200px'
 				var span = document.createElement('span')
 				span.innerHTML = viewer.name + ' ('+viewer.info.model+')'
 				var img = document.createElement('img')
 				img.style.width='30px'
+				//
+				// TODO: switch to other icons depending on viewer hardware
+				//
 				img.src = 'images/PNG/Nexus7.png'
-				domlist.appendChild(div)
+				//
+				rowdiv.appendChild(div)
 				div.appendChild(img)
 				div.appendChild(span)
 				div.addEventListener('mouseup', function(e)
 				{
 					onClientSelected(viewer)
 				})
+				//
+				var sdiv = document.createElement('div')
+				sdiv.style.display = 'flex';
+				sdiv.style.flexDirection = 'column'
+				sdiv.innerHTML = ""
+				rowdiv.appendChild(sdiv)
+				renderServicesForClient(viewer, sdiv)
+				//
+
+				domlist.appendChild(rowdiv)
 				console.log('adding client')
 				console.dir(viewer)
 			})
 		}
 	}
 
+	function renderServicesForClient(viewer, div)
+	{
+		console.log('renderServicesForClient for '+viewer.clientID)
+		var allservices = mCurrentClientServices[viewer.clientID] || []
+		console.log('allservices for viewer are')
+		console.dir(allservices)
+		providers = []
+		allservices.forEach(function(service)
+		{
+			providerName = service.providerName
+			var services = providers[providerName] || []
+			services.push(service)
+			providers[providerName] = services
+		})
+		for(var pname in providers)
+		{
+			var img = getImageForProvider(pname)
+			var pnamediv = document.createElement('div')
+			pnamediv.innerHTML = '<b>'+pname+'</b>>'
+			pnamediv.appendChild(img)
+			div.appendChild(pnamediv)
+			//
+			var sdiv = document.createElement('div')
+			sdiv.innerHTML = ""
+			div.appendChild(sdiv)
+			console.log('adding provider '+pname)
+			pnamediv.addEventListener('mouseup', function(e)
+			{
+				var pservices = providers[pname]
+				console.log('pservices are')
+				console.dir(pservices)
+				pservices.forEach(function(service)
+				{
+					var ssdiv = document.createElement('div')
+					ssdiv.innerHTML = service.name
+					console.log('adding service '+service.name)
+					div.appendChild(ssdiv)
+					ssdiv.addEventListener('mouseup', function(e)
+					{
+						console.log('service '+service.name+' selected on provider '+pname)
+
+					})
+				})
+			})
+		}
+	}
+
+	function getImageForProvider(pname)
+	{
+		var img = document.createElement('img')
+		img.style.width='30px'
+		switch(pname)
+		{
+			case 'cordova':
+				img.src = 'images/cordova_256.png'
+		}
+
+		return img
+	}
+
 	function onClientSelected(viewer)
 	{
 		console.log('user selected client '+viewer.name)
-		injectInstrumentationToClient(viewer)
+		if(!mInstrumentationReceivedFrom[viewer.clientID])
+		{
+			injectInstrumentationToClient(viewer)
+		}
 	}
 
 	function onViewersUpdated(viewerlist)
@@ -200,32 +287,74 @@ $(function()
 		if(viewerlist.data && viewerlist.data.clients)
 		{
 			var list = viewerlist.data.clients
-			addViewersToList(list)
+			renderViewersFromList(list)
 		}
 	}
 
 	function injectInstrumentationToClient(client)
 	{
-		console.log('injectin instrumetnation into client '+client.name)
-
+		var wd = global.require.main.filename+'../'
+		wd = wd.replace('hyper-ui.html','')
+		console.log('injecting instrumentation into client '+client.name+' from directory '+wd+', to client '+client.UUID)
+		FS.readFile( wd+'../injectables/cordova-instrumentation.js', "utf-8", function (err, f1) {
+			if (err) {
+				throw err;
+			}
+			FS.readFile( wd+'../injectables/instrumentation-manager.js', "utf-8", function (err, f2) {
+				if (err) {
+					throw err;
+				}
+				FS.readFile( wd+'../injectables/instrumentation-starter.js', "utf-8", function (err, f3) {
+					if (err) {
+						throw err;
+					}
+					console.log('loaded all three injectables')
+					mMainWindow.postMessage({ message: 'eval', code: f1+'; '+f2+'; '+f3, clientUUID: client.UUID }, '*')
+					console.log('all three injectables injected into client. Evaluating listServices()')
+					mMainWindow.postMessage({ message: 'eval', code: 'window.evo.instrumentation.listServices()', clientUUID: client.UUID }, '*')
+				});
+			});
+		});
 	}
 
 	function onViewersInstrumentation(message)
 	{
 		console.log('------------------ instrumentation received!!')
 		console.dir(message)
+		mInstrumentationReceivedFrom[message.clientID] = true
+		if(message.services)
+		{
+			addServiceProvidersToViewer(message.clientID, message.services)
+		}
+		else if (message.serviceData)
+		{
+			addServiceDataToViewer(message.clientID, message.serviceDatas)
+		}
+	}
+
+	function addServiceProvidersToViewer(clientID, services)
+	{
+		 mCurrentClientServices[clientID] = services
+		console.log('setting client services for clientID '+clientID+' to ')
+		console.dir(services)
+		console.log('list of viewers is now')
+		console.dir(mCurrentClientList)
+		renderViewersFromList(mCurrentClientList)
+	}
+
+	function addServiceDataToViewer(clientID, servicedata)
+	{
 
 	}
 
 	function setupEventListeners()
 	{
-		EVENTS.subscribe(EVENTS.VIEWERSUPDATED, onViewersUpdated)
-		EVENTS.subscribe(EVENTS.VIEWERSINSTRUMENTATION, onViewersInstrumentation)
-
-		console.log('getting initial list of clients...')
-		var info = SERVER.getCLinetInfo()
+		EVENTS.subscribe(EVENTS.VIEWERSUPDATED, onViewersUpdated.bind(this))
+		EVENTS.subscribe(EVENTS.VIEWERSINSTRUMENTATION, onViewersInstrumentation.bind(this))
+		console.log('getting initial list of clients from server '+SERVER)
+		var info = SERVER.getClientInfo()
 		if(info && info.clients)
-		addViewersToList(info.clients)
+		renderViewersFromList(info.clients)
 	}
 
 	// Set up event listeners.

@@ -86,7 +86,7 @@ exports.connectToRemoteServer = function()
 		'workbench.set-session-id': onMessageWorkbenchSetSessionID,
         'workbench.set-connect-key': onMessageWorkbenchSetConnectKey,
 		'workbench.client-info': onMessageWorkbenchClientInfo,
-		'workbench.client-instrumentation': onMessageWorkbenchClientInstrumentation,
+		'client.instrumentation': onMessageWorkbenchClientInstrumentation,
 		'workbench.get-resource': onMessageWorkbenchGetResource,
 		'workbench.log': onMessageWorkbenchLog,
 		'workbench.javascript-result': onMessageWorkbenchJavaScriptResult,
@@ -146,6 +146,7 @@ exports.connectToRemoteServer = function()
 
 	socket.on('hyper-workbench-message', function(message)
 	{
+		console.log('message = '+message.name)
         var handler = messageHandlers[message.name]
         if (handler)
         {
@@ -221,8 +222,8 @@ function onMessageWorkbenchSetConnectKey(socket, message)
 function onMessageWorkbenchClientInfo(socket, message)
 {
 	// Notify UI about clients.
-	LOGGER.log('[hyper-server.js] got client info')
-	console.dir(message)
+	//LOGGER.log('[hyper-server.js] got client info')
+	//console.dir(message)
 	EVENTS.publish(EVENTS.VIEWERSUPDATED, message.data)
 	mCLientInfo = message.data
 	mClientInfoCallback && mClientInfoCallback(message)
@@ -231,9 +232,9 @@ function onMessageWorkbenchClientInfo(socket, message)
 function onMessageWorkbenchClientInstrumentation(socket, message)
 {
 	// Notify UI about clients.
-	LOGGER.log('[hyper-server.js] got client instrumentation')
+	LOGGER.log('[hyper-server.js] ******** got client instrumentation')
 	console.dir(message)
-	EVENTS.publish(EVENTS.VIEWERINSTRUMENTATION, message.data)
+	EVENTS.publish(EVENTS.VIEWERSINSTRUMENTATION, message.data)
 }
 
 function onMessageWorkbenchGetResource(socket, message)
@@ -529,7 +530,7 @@ exports.getUserKey = function()
 	return mUserKey
 }
 
-exports.getCLinetInfo = function()
+exports.getClientInfo = function()
 {
 	return mCLientInfo
 }
@@ -573,12 +574,13 @@ exports.reloadApp = function()
 /**
  * External.
  */
-exports.evalJS = function(code)
+exports.evalJS = function(code, client)
 {
 	sendMessageToServer(mSocket, 'workbench.eval',
 		{
 			sessionID: mSessionID,
-			code: code
+			code: code,
+			client: client
 		})
 }
 

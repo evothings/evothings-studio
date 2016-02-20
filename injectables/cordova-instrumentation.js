@@ -1,6 +1,10 @@
-var evo = window.evo || {}
-evo.instrumentation = evo.instrumentation || {}
-console.log ('cordova intrumentation provider loading...')
+if(!window.evo)
+{
+	window.evo = {}
+}
+
+
+hyper.log ('cordova intrumentation provider loading....')
 
 function generateUUID() {
 	var d = new Date().getTime();
@@ -12,13 +16,16 @@ function generateUUID() {
 	return uuid;
 }
 
-var me = evo.instrumentation.cordova =
+var me = window.evo.cordova =
 {
+
 	services: [],
 	subscriptions: [],
+	name: 'cordova',
 
-	discover: function()
+	discover: function(cb)
 	{
+		hyper.log('cordova.discover called')
 		var accelerometer =
 		{
 			name: 'accelerometer',
@@ -54,7 +61,7 @@ var me = evo.instrumentation.cordova =
 		//
 		//------------------------------------------
 		//
-		return me.services
+		cb(me.services)
 	},
 	subscribeTo: function(serviceName, params, interval, callback)
 	{
