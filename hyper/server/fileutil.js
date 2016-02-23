@@ -37,6 +37,19 @@ exports.readFileSync = function(path, options)
 	}
 }
 
+exports.writeFileSync = function(path, data, options)
+{
+	try
+	{
+		return FS.writeFileSync(path, data, options || {encoding: 'utf8'})
+	}
+	catch (err)
+	{
+		return null
+	}
+}
+
+
 exports.statSync = function(path)
 {
 	try

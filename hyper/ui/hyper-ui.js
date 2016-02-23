@@ -11,7 +11,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -255,10 +255,10 @@ hyper.UI.defineUIFunctions = function()
 		{
 			hyper.SERVER.evalJS(event.data.code)
 		}
-        else if ('setSession' == event.data.message)
-        {
-            LOGGER.log('[hyper-ui.js] ==== session set to '+event.data.sid)
-        }
+		else if ('setSession' == event.data.message)
+		{
+			LOGGER.log('[hyper-ui.js] ==== session set to '+event.data.sid)
+		}
 	}
 
 	function setUpFileDrop()
@@ -326,10 +326,10 @@ hyper.UI.defineUIFunctions = function()
 
 	/**
 	 * Possible options include:
-	 *   options.screen
-	 *   options.copyButton
-	 *   options.openButton
-	 *   options.deleteButton
+	 *	 options.screen
+	 *	 options.copyButton
+	 *	 options.openButton
+	 *	 options.deleteButton
 	 */
 	function createProjectEntry(path, options)
 	{
@@ -947,13 +947,13 @@ hyper.UI.defineUIFunctions = function()
 		$('.screen-start-help').hide()
 	}
 
-    hyper.UI.connect = function()
-    {
-        var serverURL = SETTINGS.getReloadServerAddress()
-        hyper.stopServer()
-        hyper.setRemoteServerURL(serverURL)
-        hyper.startServer()
-    }
+	hyper.UI.connect = function()
+	{
+		var serverURL = SETTINGS.getReloadServerAddress()
+		hyper.stopServer()
+		hyper.setRemoteServerURL(serverURL)
+		hyper.startServer()
+	}
 
 	// Called when the Connect button in the Connect dialog is clicked.
 	hyper.UI.getConnectKeyFromServer = function()
@@ -1022,6 +1022,8 @@ hyper.defineServerFunctions = function()
 {
 	var SERVER = require('../server/hyper-server.js')
 	var MONITOR = require('../server/filemonitor.js')
+	var BABEL = require('babel-core')
+	var GLOB = require('glob')
 
 	hyper.SERVER = SERVER
 	hyper.MONITOR = MONITOR
@@ -1048,17 +1050,19 @@ hyper.defineServerFunctions = function()
 		//setInterval(checkServerIpAddressForRestart, 10000)
 
 		SERVER.setClientInfoCallbackFun(clientInfoCallback)
-        SERVER.setRequestConnectKeyCallbackFun(requestConnectKeyCallback)
+		SERVER.setRequestConnectKeyCallbackFun(requestConnectKeyCallback)
 		// TODO: Remove.
 		// SERVER.setReloadCallbackFun(reloadCallback)
 
-		MONITOR.setFileSystemChangedCallbackFun(function()
+		MONITOR.setFileSystemChangedCallbackFun(function(changedFiles)
 		{
+		    console.log('FileSystemChangedCallback: ' + changedFiles[0])
+			// TODO: Possibly move into build callback.
 			// Refresh list of my apps.
 			hyper.UI.displayProjectList()
 
-			// Reload app.
-			SERVER.reloadApp()
+			// Process build.
+			hyper.buildAppFiles(changedFiles)
 		})
 	}
 
@@ -1076,6 +1080,144 @@ hyper.defineServerFunctions = function()
 		// Stop server tasks.
 		SERVER.disconnectFromRemoteServer()
 		MONITOR.stopFileSystemMonitor()
+	}
+
+	// Hard-coded for Babel.
+	hyper.buildApp = function(rootPath, sourcePath, destPath, successFun, errorFun)
+	{
+		console.log('buildApp: ' + rootPath)
+
+        var options =
+        {
+            follow: false,
+            nomount: true,
+            nodir: true,
+            root: PATH.join(rootPath, sourcePath)
+        }
+        var sourceFiles = GLOB.sync('/**/*', options)
+
+        console.log('globbed files:')
+        for (var i = 0; i < sourceFiles.length; ++i)
+        {
+            console.log('  ' + sourceFiles[i])
+        }
+
+        hyper.buildAppFiles(rootPath, sourcePath, sourceFiles, destPath, successFun, errorFun)
+	}
+
+	hyper.buildAppFiles = function(rootPath, sourcePath, sourceFiles, destPath, successFun, errorFun)
+	{
+		console.log('buildAppFiles')
+
+		function buildNextFile()
+		{
+			// Is build done?
+			if (0 == sourceFiles.length)
+			{
+		        console.log('build done')
+				successFun()
+				return
+			}
+
+			// Build next file.
+			var filePath = sourceFiles.pop()
+			var fullSourcePath = PATH.join(rootPath, sourcePath, filePath)
+			var fullDestPath = PATH.join(rootPath, destPath, filePath)
+
+		    console.log('@@@@@ buildNextFile: ' + fullSourcePath)
+
+		    hyper.buildAppFile(
+		        fullSourcePath,
+		        fullDestPath,
+		        buildFileComplete)
+		}
+
+		function buildFileComplete(error, result, fullDestPath)
+		{
+			if (error)
+			{
+			    console.log('##### Build error: ' + error.message)
+
+			    // Build terminates here.
+			    errorFun(error)
+			}
+			else if (result)
+			{
+			    console.log('Build result write')
+			    //console.log(result)
+
+                // Save result.
+                var encoding = ('string' == typeof result) ? 'utf8' : null
+                FSEXTRA.outputFileSync(fullDestPath, result, { encoding: encoding })
+
+			    // Build next file.
+			    buildNextFile()
+			}
+		}
+
+        // TODO: Move.
+		function reloadApp()
+		{
+			// Reload app.
+			SERVER.reloadApp()
+
+			// Start monitoring again.
+			MONITOR.startFileSystemMonitor()
+		}
+
+        // Start building files.
+		buildNextFile()
+	}
+
+	hyper.buildAppFile = function(fullSourcePath, fullDestPath, resultCallback)
+	{
+        function buildFile()
+        {
+        console.log('BuildFile: ' + fullSourcePath)
+            // JavaScript.
+		    if ('js' == fullSourcePath.substr(-2))
+		    {
+			    buildJsFile()
+		    }
+		    else
+		    {
+		        // Default if to return file data unprocessed.
+		        buildFileDefault()
+		    }
+
+		    // TODO: Add SASS, add plugin mechanism.
+		}
+
+	    function buildJsFile()
+	    {
+        console.log('buildJsFile')
+		    //http://babeljs.io/docs/usage/options/
+		    var presetsPath = PATH.join(mApplicationBasePath, 'node_modules', 'babel-preset-es2015')
+		    var options =
+		    {
+		    	"ast": false,
+		    	"babelrc": false,
+		    	"presets": [presetsPath]
+		    }
+		    BABEL.transformFile(fullSourcePath, options, buildJsComplete)
+		}
+
+		function buildJsComplete(error, result)
+		{
+        console.log('buildJsComplete')
+		    var data = !!result ? result.code : null
+        console.log('buildJsComplete: ' + data)
+		    resultCallback(error, data, fullDestPath)
+		}
+
+	    function buildFileDefault()
+	    {
+		    var data = FS.readFileSync(fullSourcePath, { encoding: null })
+		    resultCallback(null, data, fullDestPath)
+		}
+
+        // Build the file.
+        buildFile()
 	}
 
 /*
@@ -1151,38 +1293,87 @@ hyper.defineServerFunctions = function()
 	// The Run button in the UI has been clicked.
 	hyper.runApp = function(path)
 	{
+		LOGGER.log('[hyper-ui.js] runApp: ' + path)
+
+        MONITOR.stopFileSystemMonitor()
+
 		// Prepend application path if this is not an absolute path.
 		var fullPath = hyper.makeFullPath(path)
 
-		LOGGER.log('[hyper-ui.js] runApp: ' + fullPath)
+		// Path where files are served.
+		var wwwPath = PATH.dirname(fullPath)
 
-		// TODO: Move these 2 lines inside else-clause below?
+		// Path for app root.
+		var rootPath = PATH.normalize(PATH.join(wwwPath, '../'))
+
+		// Path for monitoring files.
+		var monitorPath = rootPath
+
+        // Set www server path.
 		SERVER.setAppPath(fullPath)
-		MONITOR.setBasePath(SERVER.getBasePath())
 
-		if (mNumberOfConnectedClients <= 0)
+		// Set files to monitor.
+		MONITOR.setBasePath(monitorPath)
+
+		// Build project (optionally)
+		// TODO: Check settings in evothings.json
+		hyper.buildApp(
+		    rootPath,
+		    'src',
+		    'www',
+		    buildAppSuccess,
+		    buildAppError)
+
+		function buildAppSuccess()
+        {
+            console.log('Build app success')
+
+            runApp()
+
+			// Start monitoring.
+			MONITOR.startFileSystemMonitor()
+        }
+
+		function buildAppError(error)
+        {
+            console.log('Build app error: ' + error.message)
+
+            // TODO: Display build error window.
+
+			// Start monitoring so that live reload will
+			// work when fixing errors.
+			MONITOR.startFileSystemMonitor()
+        }
+
+        // TODO: Move to file monitor callback.
+		function reloadApp()
 		{
-			// This function is defined in hyper-ui.html.
-			hyper.noClientConnectedHander()
-		}
-		else
-		{
-			// Set active app path (note that this is path, not fullPath).
-			hyper.UI.activeAppPath = path
+			// Reload app.
+			SERVER.reloadApp()
 
-			// Refresh list of my apps.
-			hyper.UI.displayAppLists()
-
-			// Otherwise, load the requested file on connected clients.
-			SERVER.runApp()
+			// Start monitoring again.
+			MONITOR.startFileSystemMonitor()
 		}
 
-		//mNumberOfConnectedClients = 0
+        function runApp()
+        {
+            if (mNumberOfConnectedClients <= 0)
+            {
+                // This function is defined in hyper-ui.html.
+                hyper.noClientConnectedHander()
+            }
+            else
+            {
+                // Set active app path (note that this is path, not fullPath).
+                hyper.UI.activeAppPath = path
 
-		//clearTimeout(mConnectedCounterTimer)
-		//mConnectedCounterTimer = setTimeout(function() {
-		//	hyper.UI.setConnectedCounter(mNumberOfConnectedClients) },
-		//	5000)
+                // Refresh list of my apps.
+                hyper.UI.displayAppLists()
+
+                // Otherwise, load the requested file on connected clients.
+                SERVER.runApp()
+            }
+		}
 	}
 
 	function clientInfoCallback(message)
@@ -1192,13 +1383,13 @@ hyper.defineServerFunctions = function()
 	}
 
 	// Called when a connect key is sent from the server.
-    function requestConnectKeyCallback(message)
-    {
-        //LOGGER.log('[hyper-ui.js] requestConnectKeyCallback called for message')
-        //console.dir(message)
-        hyper.UI.setConnectKeyTimeout(message.data.timeout)
-        hyper.UI.displayConnectKey(message.data.connectKey)
-    }
+	function requestConnectKeyCallback(message)
+	{
+		//LOGGER.log('[hyper-ui.js] requestConnectKeyCallback called for message')
+		//console.dir(message)
+		hyper.UI.setConnectKeyTimeout(message.data.timeout)
+		hyper.UI.displayConnectKey(message.data.connectKey)
+	}
 
 	function parseProjectList(json)
 	{
@@ -1726,23 +1917,23 @@ hyper.UI.setupUIEvents = function()
 		hyper.UI.showTab('getting-started')
 	})
 
-    // ************** Additional event handlers **************
+	// ************** Additional event handlers **************
 
-    EVENTS.subscribe(EVENTS.CONNECT, function(obj)
-    {
-        hyper.UI.displayConnectStatus('Connected')
-    })
+	EVENTS.subscribe(EVENTS.CONNECT, function(obj)
+	{
+		hyper.UI.displayConnectStatus('Connected')
+	})
 
-    EVENTS.subscribe(EVENTS.DISCONNECT, function(obj)
-    {
-        hyper.UI.displayConnectStatus('Disconnected')
-    })
+	EVENTS.subscribe(EVENTS.DISCONNECT, function(obj)
+	{
+		hyper.UI.displayConnectStatus('Disconnected')
+	})
 
-    EVENTS.subscribe(EVENTS.USERMESSAGE, function(message)
-    {
-        // Display a message for the user.
-        hyper.UI.displaySystemMessage(message)
-    })
+	EVENTS.subscribe(EVENTS.USERMESSAGE, function(message)
+	{
+		// Display a message for the user.
+		hyper.UI.displaySystemMessage(message)
+	})
 }
 
 // Call main function to setup UI and server.

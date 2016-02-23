@@ -11,7 +11,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,13 +27,14 @@ var LOGGER = require('./log.js')
 
 /*** File traversal variables ***/
 
-var mLastReloadTime = Date.now()
+var mLastTraverseTime = Date.now()
 var mTraverseNumDirecoryLevels = 0
 var mFileCounter = 0
 var mNumberOfMonitoredFiles = 0
 var mBasePath = null
 var mFileSystemChangedCallback
 var mRunFileSystemMonitor = true
+var mIncludeFilter = '((i?)(([\w\\(-_ )]{1,255})+(\.)+(htm|html|css|js|png|jpg|jpeg|gif)))'
 
 /*** File traversal functions ***/
 
@@ -63,6 +64,8 @@ function getNumberOfMonitoredFiles()
 
 /**
  * External.
+ * Circular file structures are not supported and will cause
+ * an infinite loop.
  */
 function startFileSystemMonitor()
 {
@@ -80,8 +83,14 @@ function stopFileSystemMonitor()
 
 /**
  * External.
+ * The callback function will be called when one or more files
+ * are modified. File monitoring will stop until started again.
+ * This allows the callback to run build scripts without
+ * interruption by the file monitor.
+ * @param fun Function called when file system has changed.
+ * Callback format fun(array), where array is an array of
+ * paths for changed files.
  */
-
 function setFileSystemChangedCallbackFun(fun)
 {
 	mFileSystemChangedCallback = fun
@@ -95,16 +104,21 @@ function runFileSystemMonitor()
 	if (!mRunFileSystemMonitor) { return }
 
 	mFileCounter = 0
+
+	var changedFiles = []
+
 	var filesUpdated = fileSystemMonitorWorker(
 		mBasePath,
-		mTraverseNumDirecoryLevels)
+		mTraverseNumDirecoryLevels,
+		changedFiles)
 	if (filesUpdated)
 	{
-		mFileSystemChangedCallback && mFileSystemChangedCallback()
-		setTimeout(runFileSystemMonitor, 1000)
+		// File(s) changed, call the changed function and stop monitoring.
+		mFileSystemChangedCallback && mFileSystemChangedCallback(changedFiles)
 	}
 	else
 	{
+		// No modifie files detected, monitor file again.
 		mNumberOfMonitoredFiles = mFileCounter
 		setTimeout(runFileSystemMonitor, 500)
 	}
@@ -112,11 +126,16 @@ function runFileSystemMonitor()
 
 /**
  * Internal.
- * Return true if a file ahs been updated, otherwise false.
+ * Return true if any file has been updated, otherwise false.
  */
-function fileSystemMonitorWorker(path, level)
+function fileSystemMonitorWorker(path, level, changedFiles)
 {
 	if (!path) { return false }
+
+	var filesChanged = false
+
+	var regexp = new RegExp(mIncludeFilter, 'i')
+
 	try
 	{
 		/*var files = FS.readdirSync(path)
@@ -131,7 +150,9 @@ function fileSystemMonitorWorker(path, level)
 		{
 			try
 			{
-				var stat = FS.statSync(path + files[i])
+				var fileName = files[i]
+				var fullFilePath = path + fileName
+				var stat = FS.statSync(fullFilePath)
 				var t = stat.mtime.getTime()
 
 				if (stat.isFile())
@@ -140,19 +161,20 @@ function fileSystemMonitorWorker(path, level)
 				}
 
 				//LOGGER.log('[filemonitor.js] Checking file: ' + files[i] + ': ' + stat.mtime)
-				if (stat.isFile() && t > mLastReloadTime)
+				if (stat.isFile() && regexp.test(fileName) && t > mLastTraverseTime)
 				{
 					//LOGGER.log('[filemonitor.js] ***** File has changed ***** ' + files[i])
-					mLastReloadTime = Date.now()
-					return true
+					mLastTraverseTime = Date.now()
+					filesChanged = true
+					changedFiles.push(fullFilePath)
 				}
 				else if (stat.isDirectory() && level > 0)
 				{
 					//LOGGER.log('[filemonitor.js] Decending into: ' + path + files[i])
-					var changed = fileSystemMonitorWorker(
-						path + files[i] + '/',
-						level - 1)
-					if (changed) { return true }
+					filesChanged = fileSystemMonitorWorker(
+						fullFilePath + '/',
+						level - 1,
+						changedFiles)
 				}
 			}
 			catch (err2)
@@ -165,7 +187,8 @@ function fileSystemMonitorWorker(path, level)
 	{
 		LOGGER.log('[filemonitor.js] ERROR in fileSystemMonitorWorker: ' + err1)
 	}
-	return false
+
+	return filesChanged
 }
 
 /*** Module exports ***/
