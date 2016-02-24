@@ -27,7 +27,7 @@ limitations under the License.
 
 var FS = require('fs')
 var PATH = require('path')
-var FILEUTIL = require('./fileutil.js')
+var FILEUTIL = require('./file-util.js')
 var UUID = require('./uuid.js')
 
 /*********************************/

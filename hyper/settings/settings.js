@@ -20,7 +20,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-var FILEUTIL = require('../server/fileutil.js')
+var FILEUTIL = require('../server/file-util.js')
 var UUID = require('../server/uuid.js')
 
 exports.set = function(key, value)

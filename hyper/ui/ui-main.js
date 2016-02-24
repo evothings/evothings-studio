@@ -39,11 +39,11 @@ var OS = require('os')
 var GUI = require('nw.gui')
 var PATH = require('path')
 var FSEXTRA = require('fs-extra')
-var FILEUTIL = require('../server/fileutil.js')
+var FILEUTIL = require('../server/file-util.js')
 var SETTINGS = require('../settings/settings.js')
 var LOGGER = require('../server/log.js')
 var UUID = require('../server/uuid.js')
-var EVENTS = require('../server/events')
+var EVENTS = require('../server/system-events')
 var USER_HANDLER = require('../server/user-handler.js')
 var APP_SETTINGS = require('../server/app-settings.js')
 
@@ -117,7 +117,7 @@ hyper.UI.defineUIFunctions = function()
 			}
 			catch (ex)
 			{
-				LOGGER.log('[hyper-ui.js] Error creating OS X menubar: ' + ex.message);
+				LOGGER.log('[ui-main.js] Error creating OS X menubar: ' + ex.message);
 			}
 		}
 	}
@@ -191,7 +191,7 @@ hyper.UI.defineUIFunctions = function()
 			catch(e)
 			{
 				// app is closing; no way to handle errors beyond logging them.
-				LOGGER.log('[hyper-ui.js] Error on window close: ' + e);
+				LOGGER.log('[ui-main.js] Error on window close: ' + e);
 			}
 
 			GUI.App.quit()
@@ -250,14 +250,14 @@ hyper.UI.defineUIFunctions = function()
 
 	function receiveMessage(event)
 	{
-		//LOGGER.log('[hyper-ui.js] Main got : ' + event.data.message)
+		//LOGGER.log('[ui-main.js] Main got : ' + event.data.message)
 		if ('eval' == event.data.message)
 		{
 			hyper.SERVER.evalJS(event.data.code)
 		}
 		else if ('setSession' == event.data.message)
 		{
-			LOGGER.log('[hyper-ui.js] ==== session set to '+event.data.sid)
+			LOGGER.log('[ui-main.js] ==== session set to '+event.data.sid)
 		}
 	}
 
@@ -416,7 +416,7 @@ hyper.UI.defineUIFunctions = function()
 		var name = hyper.UI.getProjectNameFromFile(path)
 		if (null === name)
 		{
-			LOGGER.log('[hyper-ui.js] getProjectNameFromFile failed: ' + path)
+			LOGGER.log('[ui-main.js] getProjectNameFromFile failed: ' + path)
 
 			// Could not open the app main file, skip this app.
 			return
@@ -543,14 +543,14 @@ hyper.UI.defineUIFunctions = function()
 		{
 			// Create new window.
 			/* This does not work:
-			mWorkbenchWindow = GUI.Window.open('hyper-workbench.html', {
+			mWorkbenchWindow = GUI.Window.open('tools-window.html', {
 				//position: 'mouse',
 				width: 901,
 				height: 600,
 				focus: true
 			})*/
 			mWorkbenchWindow = window.open(
-				'hyper-workbench.html',
+				'tools-window.html',
 				'workbench',
 				'resizable=1,width=800,height=600')
 			mWorkbenchWindow.moveTo(50, 50)
@@ -792,9 +792,9 @@ hyper.UI.defineUIFunctions = function()
 				indexFileTargetPath = PATH.join(targetDir, appFolderName, indexFile)
 			}
 
-			//LOGGER.log('[hyper-ui.js] @@@ targetDir: ' + targetDir)
-			//LOGGER.log('[hyper-ui.js] @@@ sourceDir: ' + sourceDir)
-			//LOGGER.log('[hyper-ui.js] @@@ indexFileTargetPath: ' + indexFileTargetPath)
+			//LOGGER.log('[ui-main.js] @@@ targetDir: ' + targetDir)
+			//LOGGER.log('[ui-main.js] @@@ sourceDir: ' + sourceDir)
+			//LOGGER.log('[ui-main.js] @@@ indexFileTargetPath: ' + indexFileTargetPath)
 
 			// Copy files.
 			FSEXTRA.copySync(sourceDir, targetDir)
@@ -809,7 +809,7 @@ hyper.UI.defineUIFunctions = function()
 		catch (error)
 		{
 			window.alert('Something went wrong, could not save app.')
-			LOGGER.log('[hyper-ui.js] Error in copyApp: ' + error)
+			LOGGER.log('[ui-main.js] Error in copyApp: ' + error)
 		}
 	}
 
@@ -1020,8 +1020,8 @@ hyper.UI.defineUIFunctions = function()
 
 hyper.defineServerFunctions = function()
 {
-	var SERVER = require('../server/hyper-server.js')
-	var MONITOR = require('../server/filemonitor.js')
+	var SERVER = require('../server/file-server.js')
+	var MONITOR = require('../server/file-monitor.js')
 	var BABEL = require('babel-core')
 	var GLOB = require('glob')
 
@@ -1046,23 +1046,13 @@ hyper.defineServerFunctions = function()
 		hyper.UI.displayAppLists()
 		hyper.UI.setServerMessageFun()
 
-		//displayServerIpAddress()
-		//setInterval(checkServerIpAddressForRestart, 10000)
-
 		SERVER.setClientInfoCallbackFun(clientInfoCallback)
 		SERVER.setRequestConnectKeyCallbackFun(requestConnectKeyCallback)
-		// TODO: Remove.
-		// SERVER.setReloadCallbackFun(reloadCallback)
 
 		MONITOR.setFileSystemChangedCallbackFun(function(changedFiles)
 		{
-		    console.log('FileSystemChangedCallback: ' + changedFiles[0])
-			// TODO: Possibly move into build callback.
-			// Refresh list of my apps.
-			hyper.UI.displayProjectList()
-
-			// Process build.
-			hyper.buildAppFiles(changedFiles)
+			// Build changed files and reload.
+			hyper.reloadApp(changedFiles)
 		})
 	}
 
@@ -1290,10 +1280,67 @@ hyper.defineServerFunctions = function()
 		}
 	}
 
+
+
+	// Live reload.
+	hyper.reloadApp = function(changedFiles)
+	{
+		console.log('@@@reloadApp: ' + changedFiles[0])
+		LOGGER.log('[ui-main.js] reloadApp')
+
+		// Build project (optionally)
+		// TODO: Check settings in evothings.json
+		hyper.buildAppFiles(
+		rootPath, sourcePath, sourceFiles, destPath, successFun, errorFun)
+		hyper.buildAppFiles(
+		    rootPath,
+		    'src',
+		    'www',
+		    buildAppSuccess,
+		    buildAppError)
+
+		function buildAppSuccess()
+        {
+            console.log('Build app success')
+
+            runApp()
+
+			// Start monitoring.
+			MONITOR.startFileSystemMonitor()
+        }
+
+		function buildAppError(error)
+        {
+            console.log('Build app error: ' + error.message)
+
+            // TODO: Display build error window.
+
+			// Start monitoring so that live reload will
+			// work when fixing errors.
+			MONITOR.startFileSystemMonitor()
+        }
+
+        // TODO: Move to file monitor callback.
+		function reloadApp()
+		{
+			// Reload app.
+			SERVER.reloadApp()
+
+			// Start monitoring again.
+			MONITOR.startFileSystemMonitor()
+		}
+
+		hyper.UI.displayProjectList()
+
+    }
+
+
+
+
 	// The Run button in the UI has been clicked.
 	hyper.runApp = function(path)
 	{
-		LOGGER.log('[hyper-ui.js] runApp: ' + path)
+		LOGGER.log('[ui-main.js] runApp: ' + path)
 
         MONITOR.stopFileSystemMonitor()
 
@@ -1345,16 +1392,6 @@ hyper.defineServerFunctions = function()
 			MONITOR.startFileSystemMonitor()
         }
 
-        // TODO: Move to file monitor callback.
-		function reloadApp()
-		{
-			// Reload app.
-			SERVER.reloadApp()
-
-			// Start monitoring again.
-			MONITOR.startFileSystemMonitor()
-		}
-
         function runApp()
         {
             if (mNumberOfConnectedClients <= 0)
@@ -1385,7 +1422,7 @@ hyper.defineServerFunctions = function()
 	// Called when a connect key is sent from the server.
 	function requestConnectKeyCallback(message)
 	{
-		//LOGGER.log('[hyper-ui.js] requestConnectKeyCallback called for message')
+		//LOGGER.log('[ui-main.js] requestConnectKeyCallback called for message')
 		//console.dir(message)
 		hyper.UI.setConnectKeyTimeout(message.data.timeout)
 		hyper.UI.displayConnectKey(message.data.connectKey)
@@ -1465,7 +1502,7 @@ hyper.defineServerFunctions = function()
 		}
 
 		// Debug logging.
-		LOGGER.log('[hyper-ui.js] Open folder: ' + path)
+		LOGGER.log('[ui-main.js] Open folder: ' + path)
 
 		GUI.Shell.showItemInFolder(path)
 	}
@@ -1734,7 +1771,7 @@ hyper.UI.setupUIEvents = function()
 	$('#remember-checkbox').change(function(e)
 	{
 		var remember = e.target.checked;
-		LOGGER.log('[hyper-ui.js] remmember me changed value to '+remember);
+		LOGGER.log('[ui-main.js] remmember me changed value to '+remember);
 		SETTINGS.setRememberMe(remember)
 	})
 
@@ -1754,7 +1791,7 @@ hyper.UI.setupUIEvents = function()
 
 	EVENTS.subscribe(EVENTS.LOGIN, function(user)
 	{
-		LOGGER.log('[hyper-ui.js] *** User has logged in: ' + user)
+		LOGGER.log('[ui-main.js] *** User has logged in: ' + user)
 		console.dir(user)
 
 		hideLoginScreen()
@@ -1763,8 +1800,8 @@ hyper.UI.setupUIEvents = function()
 
 	EVENTS.subscribe(EVENTS.LOGOUT, function()
 	{
-		// TODO: Pass user id to the Run/Reload messaging code (hyper-server.js).
-		LOGGER.log('[hyper-ui.js] *** User has logged out ***')
+		// TODO: Pass user id to the Run/Reload messaging code (file-server.js).
+		LOGGER.log('[ui-main.js] *** User has logged out ***')
 
 		displayLoginButton()
 	})
@@ -1773,7 +1810,7 @@ hyper.UI.setupUIEvents = function()
 
 	EVENTS.subscribe(EVENTS.CONNECT, function(obj)
 	{
-		LOGGER.log('[hyper-ui.js] socket.io connect')
+		LOGGER.log('[ui-main.js] socket.io connect')
 		if(mDisconnectTimer)
 		{
 			clearTimeout(mDisconnectTimer)
@@ -1783,7 +1820,7 @@ hyper.UI.setupUIEvents = function()
 
 	EVENTS.subscribe(EVENTS.DISCONNECT, function(obj)
 	{
-		LOGGER.log('[hyper-ui.js] socket.io disconnect')
+		LOGGER.log('[ui-main.js] socket.io disconnect')
 		mDisconnectTimer = setTimeout(function()
 		{
 			logoutUser()
@@ -1796,7 +1833,7 @@ hyper.UI.setupUIEvents = function()
 
 		USER_HANDLER.startLoginSequence()
 		var loginURL = USER_HANDLER.getLoginURL()
-		LOGGER.log('[hyper-ui.js] loginURL : ' + loginURL)
+		LOGGER.log('[ui-main.js] loginURL : ' + loginURL)
 		showLoginScreen(loginURL)
 	}
 

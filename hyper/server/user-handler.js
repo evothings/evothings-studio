@@ -29,8 +29,8 @@ var PATH = require('path')
 var IO = require('socket.io-client')
 var LOGGER = require('./log.js')
 var SETTINGS = require('../settings/settings.js')
-var SERVER = require('./hyper-server.js')
-var EVENTS = require('./events')
+var SERVER = require('./file-server.js')
+var EVENTS = require('./system-events.js')
 
 /*********************************/
 /***	 Module variables	  ***/

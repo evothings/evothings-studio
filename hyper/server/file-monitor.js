@@ -1,5 +1,5 @@
 /*
-File: filemonitor.js
+File: file-monitor.js
 Description: File monitoring functionality
 Author: Mikael Kindborg
 
@@ -160,17 +160,17 @@ function fileSystemMonitorWorker(path, level, changedFiles)
 					++mFileCounter
 				}
 
-				//LOGGER.log('[filemonitor.js] Checking file: ' + files[i] + ': ' + stat.mtime)
+				//LOGGER.log('[file-monitor.js] Checking file: ' + files[i] + ': ' + stat.mtime)
 				if (stat.isFile() && regexp.test(fileName) && t > mLastTraverseTime)
 				{
-					//LOGGER.log('[filemonitor.js] ***** File has changed ***** ' + files[i])
+					//LOGGER.log('[file-monitor.js] ***** File has changed ***** ' + files[i])
 					mLastTraverseTime = Date.now()
 					filesChanged = true
 					changedFiles.push(fullFilePath)
 				}
 				else if (stat.isDirectory() && level > 0)
 				{
-					//LOGGER.log('[filemonitor.js] Decending into: ' + path + files[i])
+					//LOGGER.log('[file-monitor.js] Decending into: ' + path + files[i])
 					filesChanged = fileSystemMonitorWorker(
 						fullFilePath + '/',
 						level - 1,
@@ -179,13 +179,13 @@ function fileSystemMonitorWorker(path, level, changedFiles)
 			}
 			catch (err2)
 			{
-				LOGGER.log('[filemonitor.js] ERROR in fileSystemMonitorWorker inner loop: ' + err2)
+				LOGGER.log('[file-monitor.js] ERROR in fileSystemMonitorWorker inner loop: ' + err2)
 			}
 		}
 	}
 	catch(err1)
 	{
-		LOGGER.log('[filemonitor.js] ERROR in fileSystemMonitorWorker: ' + err1)
+		LOGGER.log('[file-monitor.js] ERROR in fileSystemMonitorWorker: ' + err1)
 	}
 
 	return filesChanged

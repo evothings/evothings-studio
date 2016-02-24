@@ -1,5 +1,5 @@
 /*
-File: hyper-server.js
+File: file-server.js
 Description: HyperReload file server.
 Author: Mikael Kindborg
 
@@ -28,12 +28,12 @@ var OS = require('os')
 var FS = require('fs')
 var PATH = require('path')
 var SOCKETIO_CLIENT = require('socket.io-client')
-var FILEUTIL = require('./fileutil.js')
-var LOADER = require('./fileloader.js')
+var FILEUTIL = require('./file-util.js')
+var LOADER = require('./file-loader.js')
 var LOGGER = require('./log.js')
 var SETTINGS = require('../settings/settings.js')
 var UUID = require('./uuid.js')
-var EVENTS = require('./events')
+var EVENTS = require('./system-events.js')
 var APP_SETTINGS = require('./app-settings.js')
 
 /*********************************/
@@ -76,7 +76,7 @@ var mBasePath = ''
  */
 exports.connectToRemoteServer = function()
 {
-	LOGGER.log('[hyper-server.js] Connecting to remote server')
+	LOGGER.log('[file-server.js] Connecting to remote server')
 
 	// Message handler table.
 	var messageHandlers =
@@ -93,7 +93,7 @@ exports.connectToRemoteServer = function()
 		'workbench.user-logout': onMessageWorkbenchUserLogout
 	}
 
-	LOGGER.log('[hyper-server.js] connecting to server: ' + mRemoteServerURL)
+	LOGGER.log('[file-server.js] connecting to server: ' + mRemoteServerURL)
 
 	// Create socket.io instance.
 	var socket = SOCKETIO_CLIENT(
@@ -106,13 +106,13 @@ exports.connectToRemoteServer = function()
 	// Connect function.
 	socket.on('connect', function()
 	{
-		LOGGER.log('[hyper-server.js] Connected to server')
+		LOGGER.log('[file-server.js] Connected to server')
 		mIsConnected = true
         EVENTS.publish(EVENTS.CONNECT, { event: 'connected' })
 		//exports.requestConnectKey()
 		mSessionID = SETTINGS.getSessionID()
 
-		LOGGER.log('[hyper-server.js] workbench.connected session: ' + mSessionID)
+		LOGGER.log('[file-server.js] workbench.connected session: ' + mSessionID)
 
 		var info =
 		{
@@ -122,7 +122,7 @@ exports.connectToRemoteServer = function()
 			ostype: OS.type()
 		}
 		var uuid = SETTINGS.getEvoGUID()
-		LOGGER.log('[hyper-server.js] ------ uuid = '+uuid)
+		LOGGER.log('[file-server.js] ------ uuid = '+uuid)
 		mDeviceInfo = info
 		//
         sendMessageToServer(mSocket, 'workbench.connected', { sessionID: mSessionID, uuid: uuid, info: info })
@@ -132,7 +132,7 @@ exports.connectToRemoteServer = function()
 
 	socket.on('error', function(error)
 	{
-		LOGGER.log('[hyper-server.js] socket error: ' + error)
+		LOGGER.log('[file-server.js] socket error: ' + error)
 	})
 
 	socket.on('disconnect', function()
@@ -175,7 +175,7 @@ function sendMessageToServer(_socket, name, data)
 {
 	var socket = _socket || mSocket
 	var uuid = SETTINGS.getEvoGUID()
-	LOGGER.log('[hyper-server.js] sendMessageToServer -- uuid = '+uuid)
+	LOGGER.log('[file-server.js] sendMessageToServer -- uuid = '+uuid)
 	socket.emit('hyper-workbench-message', {
 		protocolVersion: mProtocolVersion,
 		workbenchVersionCode: mWorkbenchVersionCode,
@@ -187,7 +187,7 @@ function sendMessageToServer(_socket, name, data)
 
 function onMessageWorkbenchSetSessionID(socket, message)
 {
-	LOGGER.log('[hyper-server.js] onMessageWorkbenchSetSessionID: ' + message.data.sessionID)
+	LOGGER.log('[file-server.js] onMessageWorkbenchSetSessionID: ' + message.data.sessionID)
 
 	// Set/display session id if we got it.
 	if (message.data.sessionID)
@@ -219,7 +219,7 @@ function onMessageWorkbenchSetConnectKey(socket, message)
 function onMessageWorkbenchClientInfo(socket, message)
 {
 	// Notify UI about clients.
-	LOGGER.log('[hyper-server.js] got client info')
+	LOGGER.log('[file-server.js] got client info')
 	console.dir(message)
 	mClientInfoCallback && mClientInfoCallback(message)
 }
@@ -294,7 +294,7 @@ exports.requestConnectKey = function()
 	// On first call mSessionID will be null, if server goes down
 	// and we connect again we will pass our session id so the server
 	// can restore our session.
-    LOGGER.log('[hyper-server.js] requesting connect key from server')
+    LOGGER.log('[file-server.js] requesting connect key from server')
 	sendMessageToServer(mSocket, 'workbench.request-connect-key', { sessionID: mSessionID })
 }
 
@@ -303,7 +303,7 @@ exports.requestConnectKey = function()
  */
 exports.disconnectFromRemoteServer = function()
 {
-	LOGGER.log('[hyper-server.js] Disconnecting from remote server')
+	LOGGER.log('[file-server.js] Disconnecting from remote server')
 
 	if (mSocket)
 	{
@@ -332,7 +332,7 @@ function serveUsingResponse304()
  */
 function serveResource(platform, path, ifModifiedSince)
 {
-	//LOGGER.log('[hyper-server.js] serveResource: ' + path)
+	//LOGGER.log('[file-server.js] serveResource: ' + path)
 
 	if (!path || path == '/')
 	{
