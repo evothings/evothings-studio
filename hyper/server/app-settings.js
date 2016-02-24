@@ -63,7 +63,6 @@ exports.getAppID = function(appPath)
 exports.getAppImage = function(appPath)
 {
 	var settings = readAppSettings(appPath)
-
 	if (settings && settings['app-icon'])
 	{
 		return settings['app-icon']
@@ -80,11 +79,59 @@ exports.getAppImage = function(appPath)
 exports.generateNewAppUUID = function(appPath)
 {
 	var settings = readAppSettings(appPath)
-
 	if (settings)
 	{
 		settings['app-uuid'] = UUID.generateUUID()
 		writeAppSettings(settings, appPath)
+	}
+	else
+	{
+		return null
+	}
+}
+
+/**
+ * Set the app HTML file path.
+ */
+exports.setIndexFilePath = function(appPath, indexPath)
+{
+	var settings = readAppSettings(appPath)
+	if (settings)
+	{
+		settings['index-file'] = indexPath
+		writeAppSettings(settings, appPath)
+	}
+	else
+	{
+		return null
+	}
+}
+
+/**
+ * Set the app HTML file path.
+ */
+exports.getIndexFilePath = function(appPath)
+{
+	var settings = readAppSettings(appPath)
+	if (settings)
+	{
+		return settings['index-file']
+	}
+	else
+	{
+		return null
+	}
+}
+
+/**
+ * Set the full HTML file path for the app.
+ */
+exports.getIndexFileFullPath = function(appPath)
+{
+	var indexPath = exports.getIndexFilePath(appPath)
+	if (indexPath)
+	{
+		return PATH.join(path, indexPath)
 	}
 	else
 	{
@@ -116,6 +163,6 @@ function readAppSettings(appPath)
 function writeAppSettings(settings, appPath)
 {
 	var path = PATH.join(appPath, 'evothings.json')
-	var data = JSON.stringify(settings)
+	var data = JSON.stringify(settings, null, 2)
 	FS.writeFileSync(path, data, {encoding: 'utf8'})
 }

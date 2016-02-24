@@ -39,10 +39,6 @@ exports.defineServerFunctions = function(hyper)
 	hyper.SERVER = SERVER
 	hyper.MONITOR = MONITOR
 
-	var mProjectList = []
-	var mExampleListFile = './hyper/settings/example-list.json'
-	var mExampleList = []
-	var mApplicationBasePath = process.cwd()
 	var mRunAppGuardFlag = false
 	var mNumberOfConnectedClients = 0
 
@@ -50,18 +46,12 @@ exports.defineServerFunctions = function(hyper)
 	// that handles file requests).
 	hyper.UI.setupServer = function()
 	{
-		// Populate the UI.
-		// TODO: Consider moving these calls to a function in hyper.UI.
-		mExampleList = parseProjectList(FILEUTIL.readFileSync(mExampleListFile))
-		readProjectList()
-		hyper.UI.displayAppLists()
-		hyper.UI.setServerMessageFun()
-
 		SERVER.setClientInfoCallbackFun(clientInfoCallback)
 		SERVER.setRequestConnectKeyCallbackFun(requestConnectKeyCallback)
 
 		MONITOR.setFileSystemChangedCallbackFun(function(changedFiles)
 		{
+		    // TODO: Update.
 			// Build changed files and reload.
 			hyper.UI.reloadApp(changedFiles)
 		})
@@ -81,6 +71,21 @@ exports.defineServerFunctions = function(hyper)
 		// Stop server tasks.
 		SERVER.disconnectFromRemoteServer()
 		MONITOR.stopFileSystemMonitor()
+	}
+
+	function clientInfoCallback(message)
+	{
+		mNumberOfConnectedClients = parseInt(message.data.numberOfConnectedClients, 10)
+		hyper.UI.setConnectedCounter(mNumberOfConnectedClients)
+	}
+
+	// Called when a connect key is sent from the server.
+	function requestConnectKeyCallback(message)
+	{
+		//LOGGER.log('[ui-server.js] requestConnectKeyCallback called for message')
+		//console.dir(message)
+		hyper.UI.setConnectKeyTimeout(message.data.timeout)
+		hyper.UI.displayConnectKey(message.data.connectKey)
 	}
 
 	// Hard-coded for Babel.
@@ -191,9 +196,14 @@ exports.defineServerFunctions = function(hyper)
 
 	    function buildJsFile()
 	    {
+
         console.log('buildJsFile')
+
 		    //http://babeljs.io/docs/usage/options/
-		    var presetsPath = PATH.join(mApplicationBasePath, 'node_modules', 'babel-preset-es2015')
+		    var presetsPath = PATH.join(
+		        hyper.UI.getWorkbenchPath(),
+		        'node_modules',
+		        'babel-preset-es2015')
 		    var options =
 		    {
 		    	"ast": false,
@@ -242,7 +252,7 @@ exports.defineServerFunctions = function(hyper)
         MONITOR.stopFileSystemMonitor()
 
 		// Prepend application path if this is not an absolute path.
-		var fullPath = hyper.UI.makeFullPath(path)
+		var fullPath = hyper.UI.getAppFullPath(path)
 
 		// Path where files are served.
 		var wwwPath = PATH.dirname(fullPath)
@@ -360,103 +370,5 @@ exports.defineServerFunctions = function(hyper)
 
 		hyper.UI.displayProjectList()
     }
-
-	function clientInfoCallback(message)
-	{
-		mNumberOfConnectedClients = parseInt(message.data.numberOfConnectedClients, 10)
-		hyper.UI.setConnectedCounter(mNumberOfConnectedClients)
-	}
-
-	// Called when a connect key is sent from the server.
-	function requestConnectKeyCallback(message)
-	{
-		//LOGGER.log('[ui-server.js] requestConnectKeyCallback called for message')
-		//console.dir(message)
-		hyper.UI.setConnectKeyTimeout(message.data.timeout)
-		hyper.UI.displayConnectKey(message.data.connectKey)
-	}
-
-	function parseProjectList(json)
-	{
-		// Replace slashes with backslashes on Windows.
-		if (process.platform === 'win32')
-		{
-			json = json.replace(/[\/]/g,'\\\\')
-		}
-
-		return JSON.parse(json)
-	}
-
-	function readProjectList()
-	{
-		var list = SETTINGS.getProjectList()
-		if (list)
-		{
-			mProjectList = list
-		}
-	}
-
-	function saveProjectList()
-	{
-	    SETTINGS.setProjectList(mProjectList)
-	}
-
-	// TODO: Simplify, use updateProjectList instead.
-	hyper.UI.addProject = function(path)
-	{
-		mProjectList.unshift(path)
-		saveProjectList()
-	}
-
-	hyper.UI.setProjectList = function(list)
-	{
-		mProjectList = list
-		saveProjectList()
-	}
-
-	hyper.UI.getProjectList = function()
-	{
-		return mProjectList
-	}
-
-	hyper.UI.getExampleList = function()
-	{
-		return mExampleList
-	}
-
-	/**
-	 * If path is not a full path, make it so. This is
-	 * used to make relative example paths full paths.
-	 */
-	hyper.UI.makeFullPath = function(path)
-	{
-		if (!FILEUTIL.isPathAbsolute(path))
-		{
-			return PATH.join(mApplicationBasePath, path)
-		}
-		else
-		{
-			return path
-		}
-	}
-
-	hyper.UI.openFolder = function(path)
-	{
-		// Convert path separators on Windows.
-		if (process.platform === 'win32')
-		{
-			path = path.replace(/[\/]/g,'\\')
-		}
-
-		// Debug logging.
-		LOGGER.log('[ui-server.js] Open folder: ' + path)
-
-		GUI.Shell.showItemInFolder(path)
-	}
-
-	hyper.UI.setRemoteServerURL = function(url)
-	{
-		SERVER.setRemoteServerURL(url)
-	}
 }
 

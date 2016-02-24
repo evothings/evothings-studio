@@ -64,15 +64,36 @@ exports.statSync = function(path)
 
 exports.isPathAbsolute = function(path)
 {
-	// Check for Linux/OS X and Windows.
+	// Check for Linux, OS X, and Windows.
 	return (path[0] === '/') || (path[0] === PATH.sep) || (path[1] === ':')
+}
+
+exports.stringEndsWith = function(aString, subString)
+{
+	return subString.toLowerCase() == aString.toLowerCase().substr(-(subString.length))
 }
 
 exports.fileIsHTML = function(path)
 {
-	var pos = path.lastIndexOf('.')
-	var extension = path.substring(pos).toLowerCase()
-	return (extension === '.html' || extension === '.htm')
+	return exports.stringEndsWith(path, '.html') || exports.stringEndsWith(path, '.htm')
+}
+
+exports.fileIsDirectory = function(path)
+{
+    var stat = FS.statSync(path)
+	return stat.isDirectory()
+}
+
+exports.fileIsEvothingsSettings = function(path)
+{
+	return exports.stringEndsWith(path, 'evothings.json')
+}
+
+// If path is an HTML file return the directory, else return path,
+// assuming it is a directory.
+exports.getAppDirectory = function(path)
+{
+	return exports.fileIsHTML(path) ? PATH.dirname(path) : path
 }
 
 // Download a document as a text string.

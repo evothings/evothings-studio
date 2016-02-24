@@ -43,6 +43,9 @@ exports.defineUIFunctions = function(hyper)
 {
 	var mWorkbenchWindow = null
 	var mConnectKeyTimer
+	var mProjectList = []
+	var mExampleList = []
+	var mWorkbenchPath = process.cwd()
 
 	hyper.UI.setupUI = function()
 	{
@@ -52,6 +55,15 @@ exports.defineUIFunctions = function(hyper)
 		setWindowActions()
 		setUpFileDrop()
 		restoreSavedUIState()
+		initAppLists()
+	}
+
+	function initAppLists()
+	{
+		readExampleList()
+		readProjectList()
+		hyper.UI.displayAppLists()
+		hyper.UI.setServerMessageFun()
 	}
 
 	// System menus must be explicitly created on OS X,
@@ -233,11 +245,11 @@ exports.defineUIFunctions = function(hyper)
 			e.preventDefault()
 			hyper.UI.showTab('projects')
 			hyper.UI.$('#drag-overlay').show()
-			enterTarget = event.target
+			enterTarget = e.target
 		})
 		dropTarget.on('dragleave', function(e)
 		{
-			if (enterTarget == event.target) {
+			if (enterTarget == e.target) {
 				e.stopPropagation()
 				e.preventDefault()
 				hyper.UI.$('#drag-overlay').hide()
@@ -255,15 +267,17 @@ exports.defineUIFunctions = function(hyper)
 	function handleFileDrop(files)
 	{
 		// Debug print.
-		/*for (var i = 0; i < files.length; ++i)
+		/*
+		for (var i = 0; i < files.length; ++i)
 		{
 			LOGGER.log(files[i].path);
-		}*/
+		}
+		*/
 
 		for (var i = 0; i < files.length; ++i)
 		{
 			var path = files[i].path
-			if (FILEUTIL.fileIsHTML(path))
+			if (pathIsValidAppPath(path))
 			{
 				//hyper.SERVER.setAppPath(path)
 				hyper.UI.addProject(path)
@@ -277,6 +291,13 @@ exports.defineUIFunctions = function(hyper)
 
 		hyper.UI.displayProjectList()
 	}
+
+    function pathIsValidAppPath(path)
+    {
+        return FILEUTIL.fileIsHTML(path) ||
+            FILEUTIL.fileIsEvothingsSettings(path) ||
+            FILEUTIL.fileIsDirectory(path)
+    }
 
 	/**
 	 * Possible options include:
@@ -302,7 +323,7 @@ exports.defineUIFunctions = function(hyper)
 		html += '>'
 
 		// Show app image icon
-		var appPath = hyper.UI.makeFullPath(PATH.dirname(path))
+		var appPath = hyper.UI.getAppFullPath(PATH.dirname(path))
 		var imagePath = APP_SETTINGS.getAppImage(appPath)
 
 		if (imagePath)
@@ -468,10 +489,30 @@ exports.defineUIFunctions = function(hyper)
 
 	hyper.UI.getProjectNameFromFile = function(path)
 	{
+	    // Is it an HTML file?
+	    if (FILEUTIL.fileIsHTML(path))
+	    {
+	        var indexPath = path
+	    }
+	    // Is it a directory?
+	    else if (FILEUTIL.fileIsDirectory(path))
+	    {
+	        // Read index file from evothings.json
+	        var indexPath = APP_SETTINGS.getIndexFileFullPath(path)
+	    }
+	    // Is it unknown?
+	    else if (FILEUTIL.fileIsDirectory(path))
+	    {
+			// Return null on unknown file type.
+	        return null
+	    }
+
+	console.log('read path: ' + indexPath)
 		// Read app main file.
-		var data = FILEUTIL.readFileSync(path)
+		var data = FILEUTIL.readFileSync(indexPath)
 		if (!data)
 		{
+	console.log('read path was null')
 			// Return null on error.
 			return null
 		}
@@ -480,10 +521,126 @@ exports.defineUIFunctions = function(hyper)
 		if (!name)
 		{
 			// If title tag is missing, use short form of path as app name.
-			name = getNameFromPath(path)
+			name = getNameFromPath(indexPath)
 		}
 
 		return name
+	}
+
+	function parseProjectList(json)
+	{
+		// Replace slashes with backslashes on Windows.
+		if (process.platform === 'win32')
+		{
+			json = json.replace(/[\/]/g,'\\\\')
+		}
+
+		return JSON.parse(json)
+	}
+
+	function readExampleList()
+	{
+		var list = SETTINGS.getExampleList()
+		if (list)
+		{
+			mExampleList = list
+		}
+	}
+
+	function readProjectList()
+	{
+		var list = SETTINGS.getProjectList()
+		if (list)
+		{
+			mProjectList = list
+		}
+	}
+
+	function saveProjectList()
+	{
+	    SETTINGS.setProjectList(mProjectList)
+	}
+
+	// TODO: Simplify, use updateProjectList instead.
+	hyper.UI.addProject = function(path)
+	{
+	    if (FILEUTIL.fileIsHTML(path))
+	    {
+	    console.log('Adding project: ' + path)
+	        // Add the path, including HTML file, to the project list.
+		    mProjectList.unshift(path)
+		    saveProjectList()
+	    }
+	    else if (FILEUTIL.fileIsEvothingsSettings(path))
+	    {
+	        // Add the folder path to the project list.
+		    mProjectList.unshift(PATH.dirname(path))
+		    saveProjectList()
+	    }
+	    else if (FILEUTIL.fileIsDirectory(path))
+	    {
+	        // Add the path to the project list.
+		    mProjectList.unshift(path)
+		    saveProjectList()
+	    }
+	}
+
+	hyper.UI.setProjectList = function(list)
+	{
+		mProjectList = list
+		saveProjectList()
+	}
+
+	hyper.UI.getProjectList = function()
+	{
+		return mProjectList
+	}
+
+	hyper.UI.getExampleList = function()
+	{
+		return mExampleList
+	}
+	/**
+	 * If path is not a full path, make it so. This is
+	 * used to make relative example paths full paths.
+	 */
+	hyper.UI.getAppFullPath = function(path)
+	{
+		if (!FILEUTIL.isPathAbsolute(path))
+		{
+			return PATH.join(hyper.UI.getWorkbenchPath(), path)
+		}
+		else
+		{
+			return path
+		}
+	}
+
+	/**
+	 * Get path to the Workbench application directory.
+	 */
+	hyper.UI.getWorkbenchPath = function(path)
+	{
+		return mWorkbenchPath
+	}
+
+	hyper.UI.openFolder = function(path)
+	{
+		// Convert path separators on Windows.
+		if (process.platform === 'win32')
+		{
+			path = path.replace(/[\/]/g,'\\')
+		}
+
+		// Debug logging.
+		LOGGER.log('[ui-server.js] Open folder: ' + path)
+
+		GUI.Shell.showItemInFolder(path)
+	}
+
+	hyper.UI.setRemoteServerURL = function(url)
+	{
+		SERVER.setRemoteServerURL(url)
 	}
 
 	hyper.UI.openToolsWorkbenchWindow = function()
@@ -666,7 +823,7 @@ exports.defineUIFunctions = function(hyper)
 	hyper.UI.openFileFolder = function(path)
 	{
 		// Prepend application path if this is not an absolute path.
-		path = hyper.UI.makeFullPath(path)
+		path = hyper.UI.getAppFullPath(path)
 
 		// Show the file in the folder.
 		hyper.UI.openFolder(path)
@@ -675,7 +832,7 @@ exports.defineUIFunctions = function(hyper)
 	hyper.UI.openCopyAppDialog = function(path)
 	{
 		// Prepend application path if this is not an absolute path.
-		path = hyper.UI.makeFullPath(path)
+		path = hyper.UI.getAppFullPath(path)
 
 		// Set source and folder name of app to copy.
 		var sourceDir = PATH.dirname(path)
@@ -785,7 +942,7 @@ exports.defineUIFunctions = function(hyper)
 
 	hyper.UI.saveNewApp = function()
 	{
-		var sourcePath = hyper.UI.makeFullPath('examples/template-basic-app/index.html')
+		var sourcePath = hyper.UI.getAppFullPath('examples/template-basic-app/index.html')
 		var parentFolder = hyper.UI.$('#input-new-app-parent-folder').val()
 		var appFolder = hyper.UI.$('#input-new-app-folder').val()
 		var targetDir = PATH.join(parentFolder, appFolder)

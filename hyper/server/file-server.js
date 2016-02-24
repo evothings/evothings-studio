@@ -218,9 +218,10 @@ function onMessageWorkbenchSetConnectKey(socket, message)
 
 function onMessageWorkbenchClientInfo(socket, message)
 {
+	//LOGGER.log('[file-server.js] got client info')
+	//console.dir(message)
+
 	// Notify UI about clients.
-	LOGGER.log('[file-server.js] got client info')
-	console.dir(message)
 	mClientInfoCallback && mClientInfoCallback(message)
 }
 

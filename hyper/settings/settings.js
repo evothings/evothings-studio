@@ -197,16 +197,38 @@ exports.getProjectList = function(list)
 	var json = window.localStorage.getItem('project-list')
 	if (json)
 	{
-	    // Replace slashes with backslashes on Windows.
-		if (process.platform === 'win32')
-		{
-			json = json.replace(/[\/]/g,'\\\\')
-		}
-
-		return JSON.parse(json)
+		return JSON.parse(fixWin32PathDelimiters(json))
 	}
 	else
 	{
 	    return null
+	}
+}
+
+exports.getExampleList = function(list)
+{
+	var json = FILEUTIL.readFileSync('./hyper/settings/example-list.json')
+	if (json)
+	{
+		return JSON.parse(fixWin32PathDelimiters(json))
+	}
+	else
+	{
+	    return null
+	}
+}
+
+// What a hack. Replaces forward slashes with two
+// backslashes, globally in all json data. '/' --> '\\'
+function fixWin32PathDelimiters(aString)
+{
+	// Replace slashes with backslashes on Windows.
+	if (process.platform === 'win32')
+	{
+		return aString.replace(/[\/]/g,'\\\\')
+	}
+	else
+	{
+		return aString
 	}
 }
