@@ -142,6 +142,11 @@ systemSetting('DoNotShowUpdateDialogForVersion', null)
 systemSetting('MyAppsPath', FILEUTIL.getEvothingsUserFolderPath())
 
 /**
+ * Session ID for the Workbench.
+ */
+systemSetting('SessionID', null)
+
+/**
  * Settings for user GUID are handled specially to preserve existing ids.
  */
 exports.getEvoGUID = function()
@@ -182,7 +187,26 @@ exports.setReloadServerAddress = function(value) {
 	exports.set('ReloadServerAddressVersion', currentVersion)
 }
 
-/**
- * Session ID.
- */
-systemSetting('SessionID', null)
+exports.setProjectList = function(list)
+{
+	window.localStorage.setItem('project-list', JSON.stringify(list))
+}
+
+exports.getProjectList = function(list)
+{
+	var json = window.localStorage.getItem('project-list')
+	if (json)
+	{
+	    // Replace slashes with backslashes on Windows.
+		if (process.platform === 'win32')
+		{
+			json = json.replace(/[\/]/g,'\\\\')
+		}
+
+		return JSON.parse(json)
+	}
+	else
+	{
+	    return null
+	}
+}
