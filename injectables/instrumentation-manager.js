@@ -13,72 +13,93 @@ function generateUUID() {
 	});
 	return uuid;
 }
+
 var me = window.evo.instrumentation =
 {
-
-	services: [],
 	serviceProviders: [],
-
-	listServices: function()
-	{
-		hyper.log('inst.listServices called. socket is '+window.hyper.IoSocket+', sendMessageToServer is '+window.hyper.sendMessageToServer)
-		var services = []
-		for(var spname in me.services)
-		{
-			var slist = me.services[spname] || []
-			if(!slist.length)
-			{
-				slist = [slist]
-			}
-			console.log('listServices finding services for '+spname+' -> '+slist)
-			hyper.log(JSON.stringify(slist))
-			slist.forEach(function(service)
-			{
-				service.providerName = spname
-				services.push(service)
-			})
-		}
-		window.hyper.sendMessageToServer(window.hyper.IoSocket, 'client.instrumentation', {clientID: window.hyper.clientID, services: services})
-	},
 
 	addServiceProvider: function(serviceProvider)
 	{
 		hyper.log('inst.addServiceProvider called for '+serviceProvider.name)
+		var me = window.evo.instrumentation
 		me.serviceProviders[serviceProvider.name] = serviceProvider
 	},
 
-	discoverServices: function()
+	/*
+	This lets the workbench user drill down into providers with variable depth hierarchies. A level is a dot-delimited string with the root level first.
+	Examples could 'cordova', 'cordova.accalerometer', 'ble.alldevices', 'ble.devices.xxxxxxxxxxxxxx', 'ble.devices.xxxxxxxxxxxx.characteristic_yyyyyyy'
+
+	When calling with a path 'xxx' the result is an array of what is directly under that path (and can be either called selectHierarchy on again or called subscribeToService on (if it is a service).
+	 */
+	selectHierarchy: function(path)
 	{
-		hyper.log('inst.discoverServices called')
-		for(var p in me.serviceProviders)
+		hyper.log('inst.selectHierarchy called for path '+path)
+		var me = window.evo.instrumentation
+		if(!path || path == 'undefined')
 		{
-			var sp = me.serviceProviders[p]
-			hyper.log('discovering services on provider '+sp.name)
-			sp.discover(function(services)
+			var rv = []
+			for(var pname in me.serviceProviders)
 			{
-				hyper.log('discovered '+services.length+' services on '+sp.name)
-				hyper.log(JSON.stringify(services))
-				var slist = me.services[sp.name] || []
-				slist = slist.concat(services)
-				me.services[sp.name] = slist
-				hyper.log('services are now')
-				hyper.log(JSON.stringify(me.services))
+				var provider = me.serviceProviders[pname]
+				rv.push({name: provider.name, icon: provider.icon, selectable: true})
+			}
+			window.hyper.sendMessageToServer(window.hyper.IoSocket, 'client.instrumentation', {clientID: window.hyper.clientID, hierarchySelection:  rv })
+		}
+		else
+		{
+			var levels = path.split('.')
+			var serviceProviderName = levels[0]
+			if(path.indexOf('.') == -1)
+			{
+				serviceProviderName = path
+			}
+			console.log('looking up serviceprovider '+serviceProviderName)
+			var serviceProvider = me.serviceProviders[serviceProviderName]
+			serviceProvider.selectHierarchy(path, function(result)
+			{
+				window.hyper.sendMessageToServer(window.hyper.IoSocket, 'client.instrumentation', {clientID: window.hyper.clientID, hierarchySelection: result })
 			})
 		}
 	},
 
-	subscribeToService: function(serviceProviderName, serviceName, params, interval)
+	subscribeToService: function(path, params, interval)
 	{
-		var serviceProvider = me.serviceProviders[serviceProviderName]
-		return serviceProvider.subscribeTo(serviceName, params, interval, function(data)
+		var me = window.evo.instrumentation
+		hyper.log('inst.subscribeToService called for path '+path)
+		if(path && path != 'undefined')
 		{
-			window.hyper.sendMessageToServer(window.hyper.IoSocket, 'client.instrumentation', {clientID: window.hyper.clientID, serviceData: {provider: providerName, service: servicename, data: data} })
-		})
+			var levels = path.split('.')
+			hyper.log('levels are '+JSON.stringify(levels))
+			var serviceProviderName = levels[0]
+			hyper.log('looking up serviceprovider '+serviceProviderName)
+			var serviceProvider = me.serviceProviders[serviceProviderName]
+			var subscriptionID = serviceProvider.subscribeTo(path, params, interval, function(data)
+			{
+				// data is an object with key, value pairs (obivously), where the kay is the name of the data channel and the value is, well.. the value. Most channels will only have one pair, but the cordova accelerometer have three (x,y,z)
+				window.hyper.sendMessageToServer(window.hyper.IoSocket, 'client.instrumentation', {clientID: window.hyper.clientID, time: Date.now(), serviceData: {path: path, data: data} })
+			})
+			hyper.log('got sid '+subscriptionID+' back for subscription on path '+path)
+			window.hyper.sendMessageToServer(window.hyper.IoSocket, 'client.instrumentation', {clientID: window.hyper.clientID, serviceSubscription: {path: path, subscriptionID: subscriptionID} })
+		}
+		else
+		{
+			hyper.log('* skipping subscribeToService call for bad path "'+path+'"')
+		}
 	},
 
-	unSubscribeToService: function(subscriptionId)
+	unSubscribeToService: function(path, subscriptionId)
 	{
-		var serviceProvider = me.serviceProviders[serviceProviderName]
-		serviceProvider.unSubscribeTo(subscriptionId)
+		var me = window.evo.instrumentation
+		if(path && path != 'undefined')
+		{
+			var levels = path.split('.')
+			var serviceProviderName = levels[0]
+			var serviceProvider = me.serviceProviders[serviceProviderName]
+			serviceProvider.unSubscribeTo(subscriptionId, function()
+			{
+				hyper.log('sending unsubscribe successful to client')
+				window.hyper.sendMessageToServer(window.hyper.IoSocket, 'client.instrumentation', {clientID: window.hyper.clientID, serviceUnsubscribe: {path: path, subscriptionID: subscriptionID} })
+			})
+		}
 	}
 }

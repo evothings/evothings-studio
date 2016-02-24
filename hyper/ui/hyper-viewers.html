@@ -19,17 +19,26 @@ jQuery Layout: http://layout.jquery-dev.net/
 	<script src="../libs/jquery/jquery-2.1.4.min.js"></script>
 	<script src="../libs/jquery/jquery-ui.min.js"></script>
 	<script src="../libs/jquery/jquery.layout-latest.js"></script>
+	<script src="../libs/smoothie.js"></script>
+	<link rel="stylesheet" href="../../node_modules/material-design-lite/material.min.css">
+	<script src="../../node_modules/material-design-lite/material.min.js"></script>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
 	<link rel="stylesheet" href="css/hyper-workbench.css" />
 
 </head>
 
 <body style="margin:10px;border:0">
+<div id="p2" class="mdl-progress mdl-js-progress mdl-progress__indeterminate" style="display:none"></div>
+<div id="snackbar" class="mdl-js-snackbar mdl-snackbar">
+	<div class="mdl-snackbar__text" id="snackbartext"></div>
+	<button class="mdl-snackbar__action" type="button">:/</button>
+</div>
 
 <div class="ui-layout-center" style="padding:10px">
 	<div id="code-area" class="xui-layout-content">
 		<h4>Viewers</h4>
-		<div style="padding:10px;display: flex; flex-direction: row" id="viewer-list">
+		<div style="padding:10px;display: flex; flex-direction: row; font-size:15px" id="viewer-list">
 
 		</div>
 	</div>

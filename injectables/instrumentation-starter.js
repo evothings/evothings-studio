@@ -8,13 +8,11 @@ if (window.evo && window.evo.instrumentation)
 	{
 		mgr.addServiceProvider(window.evo.cordova)
 	}
-	else
+	if(window.evo.bluetooth)
 	{
-		hyper.log('* did not find cordova instrumentation *')
+		mgr.addServiceProvider(window.evo.bluetooth)
 	}
 	//
-	//
-	mgr.discoverServices()
 	hyper.log("INJECTION ACTIVATED")
 }
 else

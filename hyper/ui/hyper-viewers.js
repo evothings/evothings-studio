@@ -12,10 +12,16 @@ $(function()
 	var mMainWindow = window.opener
 
 	var mCurrentClients = []
-	var mCurrentClientServices = []
-	var mCurrentServiceData = []
+	var mChartsVisible = []
+	var mTimeSeriesForChart = []
 	var mCurrentClientList = undefined
 	var mInstrumentationReceivedFrom = []
+	var mServiceSubscriptions = []
+	var mTimeoutHandle = undefined
+
+	var SUBSCRIPTION_INTERVAL = 250
+	var NETWORK_TIMEOUT = 6000
+
 
 	window.hyper = {}
 
@@ -65,7 +71,7 @@ $(function()
 
 	function receiveMessage(event)
 	{
-		//LOGGER.log('[user-workbench.js] Workbench got : ' + event.data.message)
+		//LOGGER.log('[user-Viewers.js] Viewers got : ' + event.data.message)
 		if ('hyper.hello' == event.data.message)
 		{
 			mMainWindow = event.source
@@ -99,7 +105,7 @@ $(function()
 			return;
 		}
 
-		SETTINGS.setWorkbenchWindowGeometry({
+		SETTINGS.setViewersWindowGeometry({
 			x: win.x,
 			y: win.y,
 			width: win.width,
@@ -107,7 +113,7 @@ $(function()
 		})
 
 		var layout = $('body').layout()
-		SETTINGS.setWorkbenchWindowDividerPosition(layout.state.south.size)
+
 	}
 
 	// Save global reference to function.
@@ -115,7 +121,7 @@ $(function()
 
 	function restoreSavedUIState()
 	{
-		var geometry = SETTINGS.getWorkbenchWindowGeometry()
+		var geometry = SETTINGS.getViewersWindowGeometry()
 		if (geometry)
 		{
 			var win = GUI.Window.get()
@@ -138,12 +144,6 @@ $(function()
 			win.height = geometry.height
 		}
 
-		var size = SETTINGS.getWorkbenchWindowDividerPosition()
-		if (size)
-		{
-			var layout = $('body').layout()
-			layout.sizePane('south', size)
-		}
 	}
 
 	function setLayoutProperties()
@@ -168,92 +168,76 @@ $(function()
 			console.dir(list)
 			list.forEach(function(viewer)
 			{
-				var rowdiv = document.createElement('div')
-				rowdiv.style.display = 'flex';
-				rowdiv.style.flexDirection = 'row'
-				//
-				var div = document.createElement('div')
-				div.style.display = 'flex';
-				div.style.flexDirection = 'column'
-				div.style.justifyContent = 'space-around'
-				div.style.width = '200px'
-				var span = document.createElement('span')
-				span.innerHTML = viewer.name + ' ('+viewer.info.model+')'
-				var img = document.createElement('img')
-				img.style.width='30px'
-				//
-				// TODO: switch to other icons depending on viewer hardware
-				//
-				img.src = 'images/PNG/Nexus7.png'
-				//
-				rowdiv.appendChild(div)
-				div.appendChild(img)
-				div.appendChild(span)
-				div.addEventListener('mouseup', function(e)
+				var exist = document.getElementById(viewer.clientID)
+				if(!exist)
 				{
-					onClientSelected(viewer)
-				})
-				//
-				var sdiv = document.createElement('div')
-				sdiv.style.display = 'flex';
-				sdiv.style.flexDirection = 'column'
-				sdiv.innerHTML = ""
-				rowdiv.appendChild(sdiv)
-				renderServicesForClient(viewer, sdiv)
-				//
-
-				domlist.appendChild(rowdiv)
-				console.log('adding client')
-				console.dir(viewer)
+					renderViewer(domlist, viewer)
+				}
 			})
 		}
 	}
 
-	function renderServicesForClient(viewer, div)
+	function renderViewer(domlist, viewer)
 	{
-		console.log('renderServicesForClient for '+viewer.clientID)
-		var allservices = mCurrentClientServices[viewer.clientID] || []
-		console.log('allservices for viewer are')
-		console.dir(allservices)
-		providers = []
-		allservices.forEach(function(service)
+		mCurrentClients[viewer.clientID] = viewer
+		var rowdiv = document.createElement('div')
+		rowdiv.id = viewer.clientID
+		rowdiv.style.display = 'flex';
+		rowdiv.style.flexDirection = 'row'
+		//
+		var div = document.createElement('div')
+		div.style.display = 'flex';
+		div.style.flexDirection = 'column'
+		div.style.justifyContent = 'space-around'
+		div.style.width = '200px'
+		var span = document.createElement('span')
+		span.innerHTML = viewer.name + ' ('+viewer.info.model+')'
+		var img = document.createElement('img')
+		img.style.width='30px'
+		img.src = getImageForModel(viewer.info)
+		//
+		rowdiv.appendChild(div)
+		div.appendChild(img)
+		div.appendChild(span)
+		//div.style.backgroundColor = "blue"
+		div.addEventListener('mouseup', function(e)
 		{
-			providerName = service.providerName
-			var services = providers[providerName] || []
-			services.push(service)
-			providers[providerName] = services
+			onClientSelected(viewer)
 		})
-		for(var pname in providers)
-		{
-			var img = getImageForProvider(pname)
-			var pnamediv = document.createElement('div')
-			pnamediv.innerHTML = '<b>'+pname+'</b>>'
-			pnamediv.appendChild(img)
-			div.appendChild(pnamediv)
-			//
-			var sdiv = document.createElement('div')
-			sdiv.innerHTML = ""
-			div.appendChild(sdiv)
-			console.log('adding provider '+pname)
-			pnamediv.addEventListener('mouseup', function(e)
-			{
-				var pservices = providers[pname]
-				console.log('pservices are')
-				console.dir(pservices)
-				pservices.forEach(function(service)
-				{
-					var ssdiv = document.createElement('div')
-					ssdiv.innerHTML = service.name
-					console.log('adding service '+service.name)
-					div.appendChild(ssdiv)
-					ssdiv.addEventListener('mouseup', function(e)
-					{
-						console.log('service '+service.name+' selected on provider '+pname)
+		var cdiv = document.createElement('ul')
+		cdiv.className = "mdl-list"
+		cdiv.id = viewer.clientID + '.serviceroot'
+		rowdiv.appendChild(cdiv)
+		domlist.appendChild(rowdiv)
+		console.log('adding client')
+		console.dir(viewer)
+	}
 
-					})
-				})
-			})
+	function getImageForModel(info)
+	{
+		var rv = undefined
+		var model = info.model.toLowerCase()
+		if(info.platform == "Android")
+		{
+			rv = 'images/PNG/Nexus7.png'
+			if(model.indexOf('galaxy') > -1)
+			{
+				rv = 'images/PNG/Galaxy3.png'
+			}
 		}
+		else
+		{
+			rv = 'images/PNG/iPhone5.png'
+			if(model.indexOf('ipad') > -1)
+			{
+				rv = 'images/PNG/iPad.png'
+				if(model.indexOf('mini') > -1)
+				{
+					rv = 'images/PNG/iPadMini.png'
+				}
+			}
+		}
+		return rv
 	}
 
 	function getImageForProvider(pname)
@@ -276,6 +260,10 @@ $(function()
 		{
 			injectInstrumentationToClient(viewer)
 		}
+		else
+		{
+			selectHierarchy(undefined, viewer)
+		}
 	}
 
 	function onViewersUpdated(viewerlist)
@@ -295,23 +283,34 @@ $(function()
 	{
 		var wd = global.require.main.filename+'../'
 		wd = wd.replace('hyper-ui.html','')
+		document.getElementById('p2').style.display="block"
 		console.log('injecting instrumentation into client '+client.name+' from directory '+wd+', to client '+client.UUID)
-		FS.readFile( wd+'../injectables/cordova-instrumentation.js', "utf-8", function (err, f1) {
+		FS.readFile( wd+'../injectables/instrumentation-manager.js', "utf-8", function (err, f1) {
 			if (err) {
 				throw err;
 			}
-			FS.readFile( wd+'../injectables/instrumentation-manager.js', "utf-8", function (err, f2) {
+			FS.readFile( wd+'../injectables/bluetooth-instrumentation.js', "utf-8", function (err, f2) {
 				if (err) {
 					throw err;
 				}
-				FS.readFile( wd+'../injectables/instrumentation-starter.js', "utf-8", function (err, f3) {
+				FS.readFile(wd + '../injectables/cordova-instrumentation.js', "utf-8", function (err, f3) {
 					if (err) {
 						throw err;
 					}
-					console.log('loaded all three injectables')
-					mMainWindow.postMessage({ message: 'eval', code: f1+'; '+f2+'; '+f3, clientUUID: client.UUID }, '*')
-					console.log('all three injectables injected into client. Evaluating listServices()')
-					mMainWindow.postMessage({ message: 'eval', code: 'window.evo.instrumentation.listServices()', clientUUID: client.UUID }, '*')
+					FS.readFile(wd + '../injectables/instrumentation-starter.js', "utf-8", function (err, f4) {
+						if (err) {
+							throw err;
+						}
+						console.log('loaded all three injectables')
+						mMainWindow.postMessage({
+							message: 'eval',
+							code: f1 + '; ' + f2 + '; ' + f3 + '; '+f4,
+							clientUUID: client.UUID
+						}, '*')
+						console.log('all three injectables injected into client. Evaluating listServices()')
+						//mMainWindow.postMessage({ message: 'eval', code: 'window.evo.instrumentation.listServices()', clientUUID: client.UUID }, '*')
+						selectHierarchy(undefined, client)
+					});
 				});
 			});
 		});
@@ -319,31 +318,295 @@ $(function()
 
 	function onViewersInstrumentation(message)
 	{
-		console.log('------------------ instrumentation received!!')
-		console.dir(message)
+		//console.log('------------------ instrumentation received!!')
+		cancelNetworkTimeout()
+		//console.dir(message)
 		mInstrumentationReceivedFrom[message.clientID] = true
-		if(message.services)
+		if(message.hierarchySelection)
 		{
-			addServiceProvidersToViewer(message.clientID, message.services)
+			addHierarchySelection(message.clientID, message.hierarchySelection)
 		}
 		else if (message.serviceData)
 		{
-			addServiceDataToViewer(message.clientID, message.serviceDatas)
+			addServiceDataToViewer(message.clientID, message.time, message.serviceData)
+		}
+		else if (message.serviceSubscription)
+		{
+			saveServiceSubscription(message.clientID, message.serviceSubscription)
+		}
+		else if (message.serviceUnsubscribe)
+		{
+			serviceUnsubscribe(message.clientID, message.serviceUnsubscribe)
 		}
 	}
 
-	function addServiceProvidersToViewer(clientID, services)
+	function saveServiceSubscription(clientID, serviceSubscription)
 	{
-		 mCurrentClientServices[clientID] = services
-		console.log('setting client services for clientID '+clientID+' to ')
-		console.dir(services)
-		console.log('list of viewers is now')
-		console.dir(mCurrentClientList)
-		renderViewersFromList(mCurrentClientList)
+		var subscriptions = mServiceSubscriptions[clientID] || []
+		var sid = serviceSubscription.subscriptionID
+		var path = serviceSubscription.path
+		subscriptions[path] = sid
+		console.log('saving service subscription for '+path+' -> '+sid+' under clientID '+clientID)
+		mServiceSubscriptions[clientID] = subscriptions
 	}
 
-	function addServiceDataToViewer(clientID, servicedata)
+	function serviceUnsubscribe(clientID, serviceSubscription)
 	{
+		var subscriptions = mServiceSubscriptions[clientID] || []
+		var path = serviceSubscription.path
+		var sid = subscriptions[path]
+		if(sid)
+		{
+			removeChartFor(clientID, path)
+		}
+	}
+
+	function releaseSubscriptions()
+	{
+		console.log('releaseSUbscriptions called (unimplemented')
+	}
+
+	function releaseEventHandlers()
+	{
+		console.log('releaseSUbscriptions called (unimplemented')
+	}
+
+	function isClientAlreadySubscribedToService(clientID, provider, service)
+	{
+		var rv = false
+		var subscriptions = mServiceSubscriptions[clientID] || []
+		for(var key in subscriptions)
+		{
+			if(key.indexOf(provider) > -1 && key.indexOf(service) > -1)
+			{
+				rv =true
+			}
+		}
+		return rv
+	}
+
+	function addHierarchySelection(clientID, paths)
+	{
+		var client = mCurrentClients[clientID]
+		paths.forEach(function(pathlevel)
+		{
+			var parentnode = document.getElementById(getIdForParentPath(clientID, pathlevel.name))
+			if(parentnode)
+			{
+				var sdiv = document.createElement('li')
+				var name = getNameFromPath(pathlevel.name)
+				//sdiv.style.display = 'flex';
+				//sdiv.style.flexDirection = 'row'
+				sdiv.className = "mdl-list__item"
+				sdiv.style.padding = "3px"
+				parentnode.appendChild(sdiv)
+				// create name, image and potential list of children. The latter to have the 'parent' id
+				var ndiv = document.createElement('button')
+				ndiv.className = "mdl-button mdl-js-button mdl-button--raised"
+				ndiv.innerHTML = name
+				ndiv.style.width = "150px"
+				var img = document.createElement('img')
+				if(pathlevel.icon)
+				{
+					img.src = pathlevel.icon
+					img.style.width='20px'
+					img.style.height='20px'
+					img.style.paddingLeft = "5px"
+				}
+				var cdiv = document.createElement('ul')
+				cdiv.className = "mdl-list"
+				cdiv.style.paddingLeft = "20px"
+				cdiv.id = parentnode.id + '.' + name
+				sdiv.appendChild(ndiv)
+				ndiv.appendChild(img)
+				parentnode.appendChild(cdiv)
+				sdiv.addEventListener('mouseup', function(e)
+				{
+					if(pathlevel.selectable)
+					{
+						selectHierarchy(pathlevel.name, client)
+					}
+					else
+					{
+						var provider = pathlevel.name.split('.')[0]
+						if(!isClientAlreadySubscribedToService(clientID, provider, name))
+						{
+							subscribeToService(pathlevel.name, client)
+						}
+						else
+						{
+							console.log('--- skipping subscription since we are already subscribed to '+pathlevel.name)
+						}
+					}
+				})
+			}
+		})
+	}
+
+	function getNameFromPath(path)
+	{
+		var rv = path
+		if(path.indexOf('.') > -1)
+		{
+			rv = path.substring(path.indexOf('.')+1, path.length)
+		}
+		return rv
+	}
+
+	function getIdForParentPath(clientID, path)
+	{
+		var rv = clientID + '.serviceroot'
+		if(path.indexOf('.') > -1)
+		{
+			var parentpath = path.substring(0, path.indexOf('.'))
+			console.log('parent path = '+parentpath)
+			rv += '.' + parentpath
+		}
+		console.log('getIdForParentPath returns '+rv+' for path '+path)
+		return rv
+	}
+
+	function selectHierarchy(path, client)
+	{
+		console.log('selectHierarchy called for path '+path)
+		waitForTimeout()
+		mMainWindow.postMessage({ message: 'eval', code: 'window.evo.instrumentation.selectHierarchy("'+path+'")', clientUUID: client.UUID }, '*')
+	}
+
+	function subscribeToService(path, client)
+	{
+		console.log('subscribeToService called for path '+path)
+		waitForTimeout()
+		mMainWindow.postMessage({ message: 'eval', code: 'window.evo.instrumentation.subscribeToService("'+path+'",{}, '+SUBSCRIPTION_INTERVAL+')', clientUUID: client.UUID }, '*')
+	}
+
+	function unsubscribeToService(path, clientID)
+	{
+		console.log('cancel subscription called')
+		var client = mCurrentClients[clientID]
+		var subscriptions = mServiceSubscriptions[clientID] || []
+		var sid = subscriptions[path]
+		console.log('unsubscribing to path '+path+' -> '+sid+' for clientID '+clientID)
+		waitForTimeout()
+		mMainWindow.postMessage({ message: 'eval', code: 'window.evo.instrumentation.unSubscribeToService("'+path+'","'+sid+'")', clientUUID: client.UUID }, '*')
+	}
+
+	function waitForTimeout()
+	{
+		document.getElementById('p2').style.display="block"
+		if(!mTimeoutHandle)
+		{
+			mTimeoutHandle = setTimeout(function()
+			{
+				document.getElementById('p2').style.display="none"
+				var snackbarContainer = document.querySelector('#snackbar');
+				var data =
+				{
+					message: 'Temporarily unable to reach viewer.',
+					timeout: 2000
+				};
+				snackbarContainer.MaterialSnackbar.showSnackbar(data);
+			}, NETWORK_TIMEOUT)
+		}
+	}
+
+	function cancelNetworkTimeout()
+	{
+		document.getElementById('p2').style.display="none"
+		if(!mTimeoutHandle)
+		{
+			clearTimeout(mTimeoutHandle)
+		}
+	}
+
+	function addServiceDataToViewer(clientID, time, servicedata)
+	{
+		var path = servicedata.path
+
+		//console.log('adding service data for path ' + path)
+		//console.dir(servicedata.data)
+
+		var channels = 0
+		for(var k in servicedata.data)
+		{
+			channels++
+		}
+		var chart = getChartForPath(clientID, path, channels)
+		if(chart)
+		{
+			var count = 0
+			for(var key in servicedata.data)
+			{
+				if(key != 'timestamp')
+				{
+					var value = servicedata.data[key]
+					var color = '#00ff00'
+					switch(count)
+					{
+						case 0:
+							color = '#f0f000'
+						case 1:
+							color = '#f0f0f0'
+						case 2:
+							color = '#bb0af0'
+						case 3:
+							color = '#aabbcc'
+						default:
+							color = '#f0f0ff'
+					}
+					var ts = getTimeSeriesFor(path+'_'+key, chart, color)
+					//console.log('  -- appending value '+value+' for key '+key+' and timestamp '+time)
+					ts.append(time, value)
+				}
+			}
+		}
+	}
+
+	function getTimeSeriesFor(key, chart, color)
+	{
+		var ts = mTimeSeriesForChart[key]
+		if(!ts)
+		{
+			ts = new TimeSeries()
+			mTimeSeriesForChart[key] = ts
+			console.log('  -- adding new timeseries for key '+key+' and color '+color)
+			chart.addTimeSeries(ts, {lineWidth: 1, strokeStyle: color});
+		}
+		return ts
+	}
+
+	function getChartForPath(clientID, path)
+	{
+		var id = clientID+'.serviceroot.'+path+'.chart'
+		var chart = mChartsVisible[id]
+		var chartnode = document.getElementById(id)
+		//console.log('chart at '+id+' is '+chart)
+		if(!chartnode)
+		{
+			console.log('creating new chart')
+			chartnode = document.createElement('canvas')
+			chartnode.width = "500"
+			chartnode.height = "100"
+			chartnode.id = id
+			var parent = document.getElementById(clientID+'.serviceroot.'+path)
+			if(parent)
+			{
+				parent.appendChild(chartnode)
+				chart = new SmoothieChart({grid: {verticalSections: 3}, timestampFormatter: SmoothieChart.timeFormatter})
+				mChartsVisible[id] = chart
+				chart.streamTo(chartnode, 500);
+			}
+			chartnode.addEventListener('mouseup', function(e)
+			{
+				unsubscribeToService(path, clientID)
+			})
+		}
+		return chart
+	}
+
+	function removeChartFor(clientID, path)
+	{
+		console.log('removeChartFor called')
 
 	}
 
@@ -363,7 +626,8 @@ $(function()
 	var win = GUI.Window.get()
 	win.on('close', function()
 	{
-		saveUIState()
+		releaseSubscriptions()
+		releaseEventHandlers()
 		this.close(true)
 	})
 

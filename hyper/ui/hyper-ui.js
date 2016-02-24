@@ -574,7 +574,7 @@ hyper.UI.defineUIFunctions = function()
 			mViewersWindow = window.open(
 				'hyper-viewers.html',
 				'Viewers',
-				'resizable=1,width=400,height=300')
+				'resizable=1,width=800,height=500')
 			mViewersWindow.moveTo(150, 150)
 			mViewersWindow.focus()
 			// Establish contact. Not really needed.
