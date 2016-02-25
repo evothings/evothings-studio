@@ -68,6 +68,7 @@ exports.isPathAbsolute = function(path)
 	return (path[0] === '/') || (path[0] === PATH.sep) || (path[1] === ':')
 }
 
+// Note: Case insensitive.
 exports.stringEndsWith = function(aString, subString)
 {
 	return subString.toLowerCase() == aString.toLowerCase().substr(-(subString.length))

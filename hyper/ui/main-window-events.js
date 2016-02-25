@@ -1,5 +1,5 @@
 /*
-File: ui-events.js
+File: main-window-events.js
 Description: HyperReload UI events.
 Author: Mikael Kindborg
 
@@ -282,7 +282,7 @@ exports.defineUIEvents = function(hyper)
 	hyper.UI.$('#remember-checkbox').change(function(e)
 	{
 		var remember = e.target.checked;
-		LOGGER.log('[ui-main.js] remmember me changed value to '+remember);
+		LOGGER.log('[main-window-events.js] remmember me changed value to '+remember);
 		SETTINGS.setRememberMe(remember)
 	})
 
@@ -302,7 +302,7 @@ exports.defineUIEvents = function(hyper)
 
 	EVENTS.subscribe(EVENTS.LOGIN, function(user)
 	{
-		LOGGER.log('[ui-main.js] *** User has logged in: ' + user)
+		LOGGER.log('[main-window-events.js] *** User has logged in: ' + user)
 		console.dir(user)
 
 		hideLoginScreen()
@@ -312,7 +312,7 @@ exports.defineUIEvents = function(hyper)
 	EVENTS.subscribe(EVENTS.LOGOUT, function()
 	{
 		// TODO: Pass user id to the Run/Reload messaging code (hyper-server.js).
-		LOGGER.log('[ui-main.js] *** User has logged out ***')
+		LOGGER.log('[main-window-events.js] *** User has logged out ***')
 
 		displayLoginButton()
 	})
@@ -321,7 +321,7 @@ exports.defineUIEvents = function(hyper)
 
 	EVENTS.subscribe(EVENTS.CONNECT, function(obj)
 	{
-		LOGGER.log('[ui-main.js] socket.io connect')
+		LOGGER.log('[main-window-events.js] socket.io connect')
 		if(mDisconnectTimer)
 		{
 			clearTimeout(mDisconnectTimer)
@@ -331,7 +331,7 @@ exports.defineUIEvents = function(hyper)
 
 	EVENTS.subscribe(EVENTS.DISCONNECT, function(obj)
 	{
-		LOGGER.log('[ui-main.js] socket.io disconnect')
+		LOGGER.log('[main-window-events.js] socket.io disconnect')
 		mDisconnectTimer = setTimeout(function()
 		{
 			logoutUser()
@@ -344,7 +344,7 @@ exports.defineUIEvents = function(hyper)
 
 		USER_HANDLER.startLoginSequence()
 		var loginURL = USER_HANDLER.getLoginURL()
-		LOGGER.log('[ui-main.js] loginURL : ' + loginURL)
+		LOGGER.log('[main-window-events.js] loginURL : ' + loginURL)
 		showLoginScreen(loginURL)
 	}
 
@@ -447,7 +447,7 @@ exports.defineUIEvents = function(hyper)
 	// ************** No Client Connected Event **************
 
 	// Called when you press Run and no client is connected.
-	hyper.noClientConnectedHander = function()
+	hyper.UI.noClientConnectedHander = function()
 	{
 		hyper.UI.$('#ModalDialog-NoClientConnected').modal('show')
 	}

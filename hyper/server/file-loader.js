@@ -30,7 +30,7 @@ var mMimeTypes = getDefaultMimeTypes()
 // Returns a response object.
 function response(path, ifModifiedSince)
 {
-	//LOGGER.log('[file-loader.js] response path: ' + path)
+	console.log('[file-loader.js] response path: ' + path)
 	var file = getFileStatus(path)
 	if (!file)
 	{
@@ -40,12 +40,7 @@ function response(path, ifModifiedSince)
 	if (file.isDirectory())
 	{
 		// Get default page 'index.html'.
-		// Add ending slash separator if not present.
-		if ('/' != path.charAt(path.length - 1))
-		{
-			path = path + '/'
-		}
-		path = path + 'index.html'
+		path = PATH.join(path, 'index.html')
 		var indexFile = getFileStatus(path)
 		if (!indexFile)
 		{

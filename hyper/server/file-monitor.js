@@ -23,6 +23,8 @@ limitations under the License.
 /*** Modules used ***/
 
 var FS = require('fs')
+var PATH = require('path')
+var FILEUTIL = require('./file-util.js')
 var LOGGER = require('./log.js')
 
 /*** File traversal variables ***/
@@ -34,7 +36,8 @@ var mNumberOfMonitoredFiles = 0
 var mBasePath = null
 var mFileSystemChangedCallback
 var mRunFileSystemMonitor = true
-var mIncludeFilter = '((i?)(([\w\\(-_ )]{1,255})+(\.)+(htm|html|css|js|png|jpg|jpeg|gif)))'
+// TODO: Add to UI settings.
+var mIncludeFilter = ['htm','html','css','js','png','jpg','jpeg','gif']
 
 /*** File traversal functions ***/
 
@@ -99,6 +102,21 @@ function setFileSystemChangedCallbackFun(fun)
 /**
  * Internal.
  */
+function shouldMonitorFile(path)
+{
+	for (var i = 0; i < mIncludeFilter.length; ++i)
+	{
+	    if (FILEUTIL.stringEndsWith(path, mIncludeFilter[i]))
+	    {
+	        return true
+	    }
+	}
+	return false
+}
+
+/**
+ * Internal.
+ */
 function runFileSystemMonitor()
 {
 	if (!mRunFileSystemMonitor) { return }
@@ -138,20 +156,22 @@ function fileSystemMonitorWorker(path, level, changedFiles)
 
 	try
 	{
-		/*var files = FS.readdirSync(path)
+/*
+        // For debugging.
+		var files = FS.readdirSync(path)
 		for (var i in files)
 		{
-			LOGGER.log(path + files[i])
+			LOGGER.log(PATH.join(path,files[i]))
 		}
-		return false*/
-
+		return false
+*/
 		var files = FS.readdirSync(path)
 		for (var i in files)
 		{
 			try
 			{
 				var fileName = files[i]
-				var fullFilePath = path + fileName
+				var fullFilePath = PATH.join(path, fileName)
 				var stat = FS.statSync(fullFilePath)
 				var t = stat.mtime.getTime()
 
@@ -161,20 +181,21 @@ function fileSystemMonitorWorker(path, level, changedFiles)
 				}
 
 				//LOGGER.log('[file-monitor.js] Checking file: ' + files[i] + ': ' + stat.mtime)
-				if (stat.isFile() && regexp.test(fileName) && t > mLastTraverseTime)
-				{
-					//LOGGER.log('[file-monitor.js] ***** File has changed ***** ' + files[i])
-					mLastTraverseTime = Date.now()
-					filesChanged = true
-					changedFiles.push(fullFilePath)
-				}
-				else if (stat.isDirectory() && level > 0)
+				if (stat.isDirectory() && level > 0)
 				{
 					//LOGGER.log('[file-monitor.js] Decending into: ' + path + files[i])
 					filesChanged = fileSystemMonitorWorker(
-						fullFilePath + '/',
+						fullFilePath,
 						level - 1,
 						changedFiles)
+				}
+				//else if (stat.isFile() && regexp.test(fileName) && t > mLastTraverseTime)
+				else if (stat.isFile() && shouldMonitorFile(fileName) && t > mLastTraverseTime)
+				{
+					console.log('[file-monitor.js] ***** File has changed ***** ' + files[i])
+					mLastTraverseTime = Date.now()
+					filesChanged = true
+					changedFiles.push(fullFilePath)
 				}
 			}
 			catch (err2)

@@ -1,5 +1,5 @@
 /*
-File: ui-server.js
+File: main-window-func.js
 Description: HyperReload server-related UI functions.
 Author: Mikael Kindborg
 
@@ -83,7 +83,7 @@ exports.defineUIFunctions = function(hyper)
 			}
 			catch (ex)
 			{
-				LOGGER.log('[ui-main.js] Error creating OS X menubar: ' + ex.message);
+				LOGGER.log('[main-window-func.js] Error creating OS X menubar: ' + ex.message);
 			}
 		}
 	}
@@ -157,7 +157,7 @@ exports.defineUIFunctions = function(hyper)
 			catch(e)
 			{
 				// app is closing; no way to handle errors beyond logging them.
-				LOGGER.log('[ui-main.js] Error on window close: ' + e);
+				LOGGER.log('[main-window-func.js] Error on window close: ' + e);
 			}
 
 			hyper.UI.GUI.App.quit()
@@ -216,14 +216,14 @@ exports.defineUIFunctions = function(hyper)
 
 	function receiveMessage(event)
 	{
-		//LOGGER.log('[ui-main.js] Main got : ' + event.data.message)
+		//LOGGER.log('[main-window-func.js] Main got : ' + event.data.message)
 		if ('eval' == event.data.message)
 		{
 			hyper.SERVER.evalJS(event.data.code)
 		}
 		else if ('setSession' == event.data.message)
 		{
-			LOGGER.log('[ui-main.js] ==== session set to '+event.data.sid)
+			LOGGER.log('[main-window-func.js] ==== session set to '+event.data.sid)
 		}
 	}
 
@@ -389,9 +389,9 @@ exports.defineUIFunctions = function(hyper)
 
 		// Get name of project, use title tag as first choise.
 		var name = hyper.UI.getProjectNameFromFile(path)
-		if (null === name)
+		if (!name)
 		{
-			LOGGER.log('[ui-main.js] getProjectNameFromFile failed: ' + path)
+			LOGGER.log('[main-window-func.js] getProjectNameFromFile failed: ' + path)
 
 			// Could not open the app main file, skip this app.
 			return
@@ -432,7 +432,7 @@ exports.defineUIFunctions = function(hyper)
 	// Use full path as fallback.
 	function getNameFromPath(path)
 	{
-		path = path.replace(new RegExp("\\"+PATH.sep, 'g'), '/')
+		path = path.replace(new RegExp('\\' + PATH.sep, 'g'), '/')
 		var pos = path.lastIndexOf('/')
 		if (-1 === pos) { return path }
 		pos = path.lastIndexOf('/', pos - 1)
@@ -489,6 +489,8 @@ exports.defineUIFunctions = function(hyper)
 
 	hyper.UI.getProjectNameFromFile = function(path)
 	{
+	    //console.log('@@@ getProjectNameFromFile: '  + path)
+
 	    // Is it an HTML file?
 	    if (FILEUTIL.fileIsHTML(path))
 	    {
@@ -497,22 +499,24 @@ exports.defineUIFunctions = function(hyper)
 	    // Is it a directory?
 	    else if (FILEUTIL.fileIsDirectory(path))
 	    {
+	console.log('@@@ get project name from evotings.json: ' + path)
 	        // Read index file from evothings.json
 	        var indexPath = APP_SETTINGS.getIndexFileFullPath(path)
 	    }
 	    // Is it unknown?
-	    else if (FILEUTIL.fileIsDirectory(path))
+	    else
 	    {
 			// Return null on unknown file type.
 	        return null
 	    }
 
-	console.log('read path: ' + indexPath)
+	console.log('@@@ get project name from indexPath: ' + indexPath)
+
 		// Read app main file.
 		var data = FILEUTIL.readFileSync(indexPath)
 		if (!data)
 		{
-	console.log('read path was null')
+	console.log('@@@ readFileSync retruned null for: ' + indexPath)
 			// Return null on error.
 			return null
 		}
@@ -564,21 +568,25 @@ exports.defineUIFunctions = function(hyper)
 	// TODO: Simplify, use updateProjectList instead.
 	hyper.UI.addProject = function(path)
 	{
+	    console.log('@@@ Adding project: ' + path)
+
 	    if (FILEUTIL.fileIsHTML(path))
 	    {
-	    console.log('Adding project: ' + path)
 	        // Add the path, including HTML file, to the project list.
 		    mProjectList.unshift(path)
 		    saveProjectList()
 	    }
 	    else if (FILEUTIL.fileIsEvothingsSettings(path))
 	    {
+	     console.log('@@@ Adding evothings.json project: ' + PATH.dirname(path))
+
 	        // Add the folder path to the project list.
 		    mProjectList.unshift(PATH.dirname(path))
 		    saveProjectList()
 	    }
 	    else if (FILEUTIL.fileIsDirectory(path))
 	    {
+	     console.log('@@@ Adding dir project: ' + path)
 	        // Add the path to the project list.
 		    mProjectList.unshift(path)
 		    saveProjectList()
@@ -633,7 +641,7 @@ exports.defineUIFunctions = function(hyper)
 		}
 
 		// Debug logging.
-		LOGGER.log('[ui-server.js] Open folder: ' + path)
+		LOGGER.log('[main-window-func.js] Open folder: ' + path)
 
 		GUI.Shell.showItemInFolder(path)
 	}
@@ -903,9 +911,9 @@ exports.defineUIFunctions = function(hyper)
 				indexFileTargetPath = PATH.join(targetDir, appFolderName, indexFile)
 			}
 
-			//LOGGER.log('[ui-main.js] @@@ targetDir: ' + targetDir)
-			//LOGGER.log('[ui-main.js] @@@ sourceDir: ' + sourceDir)
-			//LOGGER.log('[ui-main.js] @@@ indexFileTargetPath: ' + indexFileTargetPath)
+			//LOGGER.log('[main-window-func.js] @@@ targetDir: ' + targetDir)
+			//LOGGER.log('[main-window-func.js] @@@ sourceDir: ' + sourceDir)
+			//LOGGER.log('[main-window-func.js] @@@ indexFileTargetPath: ' + indexFileTargetPath)
 
 			// Copy files.
 			FSEXTRA.copySync(sourceDir, targetDir)
@@ -920,7 +928,7 @@ exports.defineUIFunctions = function(hyper)
 		catch (error)
 		{
 			window.alert('Something went wrong, could not save app.')
-			LOGGER.log('[ui-main.js] Error in copyApp: ' + error)
+			LOGGER.log('[main-window-func.js] Error in copyApp: ' + error)
 		}
 	}
 
@@ -1116,9 +1124,18 @@ exports.defineUIFunctions = function(hyper)
 	{
 		if (!hyper.UI.$('#dialog-system-message').is(':visible'))
 		{
-			hyper.UI.$('#system-message').text(message)
 			hyper.UI.$('#dialog-system-message').modal('show')
 		}
+		hyper.UI.$('#system-message').text(message)
+	}
+
+	hyper.UI.displayBuildMessage = function(message)
+	{
+		if (!hyper.UI.$('#dialog-build-message').is(':visible'))
+		{
+			hyper.UI.$('#dialog-build-message').modal('show')
+		}
+		hyper.UI.$('#build-message').html(message)
 	}
 
 	hyper.UI.testSystemMessage = function(message)

@@ -34,7 +34,6 @@ var LOGGER = require('./log.js')
 var SETTINGS = require('../settings/settings.js')
 var UUID = require('./uuid.js')
 var EVENTS = require('./system-events.js')
-var APP_SETTINGS = require('./app-settings.js')
 
 /*********************************/
 /***     Module variables      ***/
@@ -52,7 +51,6 @@ var mIsConnected = false
 var mSessionID = null
 var mRemoteServerURL = ''
 var mSocket = null
-var mAppPath = null
 var mAppFile = null
 var mAppID = null
 var mMessageCallback = null
@@ -122,9 +120,8 @@ exports.connectToRemoteServer = function()
 			ostype: OS.type()
 		}
 		var uuid = SETTINGS.getEvoGUID()
-		LOGGER.log('[file-server.js] ------ uuid = '+uuid)
+		//LOGGER.log('[file-server.js] ------ uuid = '+uuid)
 		mDeviceInfo = info
-		//
         sendMessageToServer(mSocket, 'workbench.connected', { sessionID: mSessionID, uuid: uuid, info: info })
 		mHeartbeatTimer = setInterval(heartbeat, mHeartbeatInterval)
 		heartbeat()
@@ -175,7 +172,9 @@ function sendMessageToServer(_socket, name, data)
 {
 	var socket = _socket || mSocket
 	var uuid = SETTINGS.getEvoGUID()
-	LOGGER.log('[file-server.js] sendMessageToServer -- uuid = '+uuid)
+	//console.log('[file-server.js] --------------')
+	//console.log('[file-server.js] sendMessageToServer: ' + JSON.stringify(data))
+	//console.log('[file-server.js] --------------')
 	socket.emit('hyper-workbench-message', {
 		protocolVersion: mProtocolVersion,
 		workbenchVersionCode: mWorkbenchVersionCode,
@@ -333,7 +332,7 @@ function serveUsingResponse304()
  */
 function serveResource(platform, path, ifModifiedSince)
 {
-	//LOGGER.log('[file-server.js] serveResource: ' + path)
+	console.log('[file-server.js] serveResource: ' + path)
 
 	if (!path || path == '/')
 	{
@@ -351,7 +350,7 @@ function serveResource(platform, path, ifModifiedSince)
 	else if (mBasePath)
 	{
 		return LOADER.response(
-			mBasePath + path.substr(1),
+			PATH.join(mBasePath, path),
 			ifModifiedSince)
 	}
 	else
@@ -459,13 +458,23 @@ function serveCordovaFile(platform, path)
  */
 exports.setAppPath = function(appPath)
 {
-	if (appPath != mAppPath)
-	{
-		mAppPath = appPath.replace(new RegExp('\\' + PATH.sep, 'g'), '/')
-		var pos = mAppPath.lastIndexOf('/') + 1
-		mBasePath = mAppPath.substr(0, pos)
-		mAppFile = mAppPath.substr(pos)
-	}
+	mBasePath = PATH.normalize(appPath.replace(new RegExp('\\' + PATH.sep, 'g'), '/'))
+}
+
+/**
+ * External.
+ */
+exports.setAppFileName = function(fileName)
+{
+	mAppFile = PATH.normalize(fileName.replace(new RegExp('\\' + PATH.sep, 'g'), '/'))
+}
+
+/**
+ * External.
+ */
+exports.setAppID = function(id)
+{
+	mAppID = id
 }
 
 /**
@@ -483,7 +492,7 @@ exports.getAppFileName = function()
  */
 exports.getAppPath = function()
 {
-	return mAppPath
+	return PATH.join(mBasePath, mAppFile)
 }
 
 /**
@@ -499,7 +508,7 @@ exports.getBasePath = function()
  */
 exports.getAppServerURL = function()
 {
-	return mRemoteServerURL + '/hyper/' + mSessionID + '/' + mAppID + '/' + mAppFile
+	return mRemoteServerURL + '/hyper/' + mSessionID + getAppURL()
 }
 
 /**
@@ -527,12 +536,12 @@ exports.runApp = function()
 {
 	//serveUsingResponse200()
 	serveUsingResponse304()
-	mAppID = APP_SETTINGS.getAppID(mBasePath)
+    console.log('@@@ [file-server.js] run app: ' + getAppURL())
 	sendMessageToServer(mSocket, 'workbench.run',
 		{
 			sessionID: mSessionID,
 			appID: mAppID,
-			appName: hyper.UI.getProjectNameFromFile(mAppPath),
+			appName: hyper.UI.getProjectNameFromFile(exports.getAppPath()),
 			url: getAppURL()
 		})
 }
@@ -549,7 +558,7 @@ exports.reloadApp = function()
 		{
 			sessionID: mSessionID,
 			appID: mAppID,
-			appName: hyper.UI.getProjectNameFromFile(mAppPath)
+			appName: hyper.UI.getProjectNameFromFile(exports.getAppPath())
 		})
 	mReloadCallback && mReloadCallback()
 }

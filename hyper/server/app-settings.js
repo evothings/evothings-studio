@@ -93,7 +93,7 @@ exports.generateNewAppUUID = function(appPath)
 /**
  * Set the app HTML file path.
  */
-exports.setIndexFilePath = function(appPath, indexPath)
+exports.setIndexFile = function(appPath, indexPath)
 {
 	var settings = readAppSettings(appPath)
 	if (settings)
@@ -108,9 +108,9 @@ exports.setIndexFilePath = function(appPath, indexPath)
 }
 
 /**
- * Set the app HTML file path.
+ * Get the app HTML file name.
  */
-exports.getIndexFilePath = function(appPath)
+exports.getIndexFile = function(appPath)
 {
 	var settings = readAppSettings(appPath)
 	if (settings)
@@ -124,14 +124,63 @@ exports.getIndexFilePath = function(appPath)
 }
 
 /**
- * Set the full HTML file path for the app.
+ * Directory for app source files.
+ */
+exports.getAppDir = function(appPath)
+{
+	var settings = readAppSettings(appPath)
+	if (settings)
+	{
+		return settings['app-dir']
+	}
+	else
+	{
+		return null
+	}
+}
+
+/**
+ * Directory for built files.
+ */
+exports.getWwwDir = function(appPath)
+{
+	var settings = readAppSettings(appPath)
+	if (settings)
+	{
+		return settings['www-dir']
+	}
+	else
+	{
+		return null
+	}
+}
+
+/**
+ * Get the app HTML file short path (relative to project root).
+ */
+exports.getIndexFileShortPath = function(appPath)
+{
+	var appDirPath = exports.getAppDir(appPath)
+	var indexPath = exports.getIndexFile(appPath)
+	if (appDirPath && indexPath)
+	{
+		return PATH.join(appDirPath, indexPath)
+	}
+	else
+	{
+		return null
+	}
+}
+
+/**
+ * Get the full HTML file path for the app.
  */
 exports.getIndexFileFullPath = function(appPath)
 {
-	var indexPath = exports.getIndexFilePath(appPath)
-	if (indexPath)
+	var indexShortPath = exports.getIndexFileShortPath(appPath)
+	if (indexShortPath)
 	{
-		return PATH.join(path, indexPath)
+		return PATH.join(appPath, indexShortPath)
 	}
 	else
 	{

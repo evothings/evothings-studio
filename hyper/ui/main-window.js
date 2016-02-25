@@ -1,5 +1,5 @@
 /*
-File: ui-main.js
+File: main-window.js
 Description: HyperReload UI functionality.
 Author: Mikael Kindborg
 
@@ -29,9 +29,10 @@ limitations under the License.
 /*** Imported modules ***/
 
 var GUI = require('nw.gui')
-var UI_FUNC = require('./ui-func.js')
-var UI_EVENTS = require('./ui-events.js')
-var UI_SERVER = require('./ui-server.js')
+var UI_FUNC = require('./main-window-func.js')
+var UI_EVENTS = require('./main-window-events.js')
+var UI_SERVER = require('./main-window-server.js')
+var UI_BUILD = require('./main-window-build.js')
 
 /*** Globals ***/
 
@@ -75,14 +76,18 @@ hyper.UI.activeAppPath = ''
 // This function is called at the end of this file.
 hyper.UI.main = function()
 {
+    // Define functions on the hyper.UI object.
     UI_FUNC.defineUIFunctions(hyper)
     UI_SERVER.defineServerFunctions(hyper)
     UI_EVENTS.defineUIEvents(hyper)
+    UI_BUILD.defineBuildFunctions(hyper)
 
+    // Setup UI.
 	hyper.UI.setupUI()
 	hyper.UI.setStartScreenHelpVisibility()
 	hyper.UI.showInitialScreen()
 
+    //Connect to server.
 	hyper.UI.setupServer()
 	hyper.UI.connect()
 }
