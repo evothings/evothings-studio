@@ -76,7 +76,7 @@ var me = window.evo.instrumentation =
 			var subscriptionID = serviceProvider.subscribeTo(path, params, interval, function(data)
 			{
 				// data is an object with key, value pairs (obivously), where the kay is the name of the data channel and the value is, well.. the value. Most channels will only have one pair, but the cordova accelerometer have three (x,y,z)
-				window.hyper.sendMessageToServer(window.hyper.IoSocket, 'client.instrumentation', {clientID: window.hyper.clientID, time: Date.now(), serviceData: {path: path, data: data} })
+				window.hyper.sendMessageToServer(window.hyper.IoSocket, 'client.instrumentation', {clientID: window.hyper.clientID, time: Date.now(), serviceData: {path: path, data: data, subscriptionID: subscriptionID} })
 			})
 			hyper.log('got sid '+subscriptionID+' back for subscription on path '+path)
 			window.hyper.sendMessageToServer(window.hyper.IoSocket, 'client.instrumentation', {clientID: window.hyper.clientID, serviceSubscription: {path: path, subscriptionID: subscriptionID} })
@@ -98,7 +98,7 @@ var me = window.evo.instrumentation =
 			serviceProvider.unSubscribeTo(subscriptionId, function()
 			{
 				hyper.log('sending unsubscribe successful to client')
-				window.hyper.sendMessageToServer(window.hyper.IoSocket, 'client.instrumentation', {clientID: window.hyper.clientID, serviceUnsubscribe: {path: path, subscriptionID: subscriptionID} })
+				window.hyper.sendMessageToServer(window.hyper.IoSocket, 'client.instrumentation', {clientID: window.hyper.clientID, serviceUnsubscribe: {path: path, subscriptionID: subscriptionId} })
 			})
 		}
 	}

@@ -47,6 +47,7 @@ var me = window.evo.cordova =
 					cb()
 				}, {frequency: interval})
 				me.subscriptions[sid] = accelerometer
+				return sid
 			},
 			unSubscribeTo: function(sid)
 			{
@@ -79,11 +80,12 @@ var me = window.evo.cordova =
 					cb()
 				}, {frequency: interval})
 				me.subscriptions[sid] = accelerometer
+				return sid
 			},
 			unSubscribeTo: function(sid)
 			{
 				hyper.log('cordova.accelerometer.unsubscribeto called')
-				navigator.accelerometer.clearWatch(sid)
+				navigator.compass.clearWatch(sid)
 			}
 		}
 
@@ -106,10 +108,8 @@ var me = window.evo.cordova =
 		hyper.log('* cordova.selectHierarchy called for path '+path+' typeof path = '+(typeof path))
 		var me = window.evo.cordova
 		var levels = path.split('.')
-		hyper.log('** levels[0] == '+levels[0])
 		if(levels[0] == 'cordova')
 		{
-			hyper.log('yep definitely doing that')
 			hyper.log(JSON.stringify(me.services))
 			var rv = []
 			for(var pname in me.services)
@@ -132,12 +132,11 @@ var me = window.evo.cordova =
 		hyper.log('cordova.subscribeTo called for path '+path+' and interval '+interval)
 		var me = window.evo.cordova
 		var serviceName = path.split('.')[1]
-		console.log('serviceName = '+serviceName)
 		var service = me.services[serviceName]
 		if(service)
 		{
 			var sid = service.subscribeTo(params, interval, callback)
-			console.log('saving subscription '+sid+' in '+me.subscriptions)
+			hyper.log('saving subscription '+sid+' in '+me.subscriptions)
 			me.subscriptions[sid] = service
 			return sid
 		}

@@ -160,12 +160,12 @@ $(function()
 	{
 		mCurrentClientList = list
 		console.log('renderViewersFromList showing '+list.length+' clients')
-		console.dir(list)
+		//console.dir(list)
 		if(list && list.length)
 		{
 			domlist = document.getElementById('viewer-list')
 			domlist.innerHTML = ""
-			console.dir(list)
+			//console.dir(list)
 			list.forEach(function(viewer)
 			{
 				var exist = document.getElementById(viewer.clientID)
@@ -206,6 +206,8 @@ $(function()
 		})
 		var cdiv = document.createElement('ul')
 		cdiv.className = "mdl-list"
+		cdiv.style.paddingTop = "0"
+		cdiv.style.paddingBottom = "0"
 		cdiv.id = viewer.clientID + '.serviceroot'
 		rowdiv.appendChild(cdiv)
 		domlist.appendChild(rowdiv)
@@ -268,8 +270,8 @@ $(function()
 
 	function onViewersUpdated(viewerlist)
 	{
-		LOGGER.log('[hyper-viewers.js] got viewers updated event');
-		console.dir(viewerlist)
+		//LOGGER.log('[hyper-viewers.js] got viewers updated event');
+		//console.dir(viewerlist)
 		domlist = document.getElementById('viewer-list')
 		domlist.html = ""
 		if(viewerlist.data && viewerlist.data.clients)
@@ -307,7 +309,7 @@ $(function()
 							code: f1 + '; ' + f2 + '; ' + f3 + '; '+f4,
 							clientUUID: client.UUID
 						}, '*')
-						console.log('all three injectables injected into client. Evaluating listServices()')
+						console.log('all injectables injected into client. Evaluating listServices()')
 						//mMainWindow.postMessage({ message: 'eval', code: 'window.evo.instrumentation.listServices()', clientUUID: client.UUID }, '*')
 						selectHierarchy(undefined, client)
 					});
@@ -318,7 +320,7 @@ $(function()
 
 	function onViewersInstrumentation(message)
 	{
-		//console.log('------------------ instrumentation received!!')
+		console.log('------------------ instrumentation received!!')
 		cancelNetworkTimeout()
 		//console.dir(message)
 		mInstrumentationReceivedFrom[message.clientID] = true
@@ -357,13 +359,14 @@ $(function()
 		var sid = subscriptions[path]
 		if(sid)
 		{
+			delete subscriptions[path]
 			removeChartFor(clientID, path)
 		}
 	}
 
 	function releaseSubscriptions()
 	{
-		console.log('releaseSUbscriptions called (unimplemented')
+		console.log('releaseSubscriptions called (unimplemented')
 	}
 
 	function releaseEventHandlers()
@@ -371,13 +374,13 @@ $(function()
 		console.log('releaseSUbscriptions called (unimplemented')
 	}
 
-	function isClientAlreadySubscribedToService(clientID, provider, service)
+	function isClientAlreadySubscribedToService(clientID, path)
 	{
 		var rv = false
 		var subscriptions = mServiceSubscriptions[clientID] || []
 		for(var key in subscriptions)
 		{
-			if(key.indexOf(provider) > -1 && key.indexOf(service) > -1)
+			if(key.indexOf(path) > -1)
 			{
 				rv =true
 			}
@@ -390,6 +393,7 @@ $(function()
 		var client = mCurrentClients[clientID]
 		paths.forEach(function(pathlevel)
 		{
+			console.log('addHierarchySelection called for '+pathlevel.name)
 			var parentnode = document.getElementById(getIdForParentPath(clientID, pathlevel.name))
 			if(parentnode)
 			{
@@ -398,28 +402,43 @@ $(function()
 				//sdiv.style.display = 'flex';
 				//sdiv.style.flexDirection = 'row'
 				sdiv.className = "mdl-list__item"
+
 				sdiv.style.padding = "3px"
 				parentnode.appendChild(sdiv)
 				// create name, image and potential list of children. The latter to have the 'parent' id
 				var ndiv = document.createElement('button')
 				ndiv.className = "mdl-button mdl-js-button mdl-button--raised"
-				ndiv.innerHTML = name
+				var ttid = parentnode.id + '.' + name + '_button'
+
+				ndiv.innerHTML = '<div id="'+ttid+'">'+name+'</div>'
+
 				ndiv.style.width = "150px"
+
+				var tdiv = document.createElement('div')
+				tdiv.className = "mdl-tooltip mdl-tooltip--large"
+				tdiv.for = ndiv.id
+				tdiv.innerHTML = name
+				//tdiv.innerHTML = '<div class="mdl-tooltip mdl-tooltip--large" for="'+ndiv.id+'">'+name+'</div>'
+				parentnode.appendChild(tdiv)
+
 				var img = document.createElement('img')
 				if(pathlevel.icon)
 				{
 					img.src = pathlevel.icon
-					img.style.width='20px'
-					img.style.height='20px'
+					img.style.width='25px'
+					//img.style.height='20px'
 					img.style.paddingLeft = "5px"
 				}
 				var cdiv = document.createElement('ul')
 				cdiv.className = "mdl-list"
 				cdiv.style.paddingLeft = "20px"
+				cdiv.style.paddingTop = "0"
+				cdiv.style.paddingBottom = "0"
 				cdiv.id = parentnode.id + '.' + name
 				sdiv.appendChild(ndiv)
 				ndiv.appendChild(img)
 				parentnode.appendChild(cdiv)
+				console.log('   adding childnode '+cdiv.id+' under parent node '+parentnode.id)
 				sdiv.addEventListener('mouseup', function(e)
 				{
 					if(pathlevel.selectable)
@@ -429,7 +448,7 @@ $(function()
 					else
 					{
 						var provider = pathlevel.name.split('.')[0]
-						if(!isClientAlreadySubscribedToService(clientID, provider, name))
+						if(!isClientAlreadySubscribedToService(clientID, pathlevel.name))
 						{
 							subscribeToService(pathlevel.name, client)
 						}
@@ -440,6 +459,10 @@ $(function()
 					}
 				})
 			}
+			else
+			{
+				console.log('addHierarchySelection could not find parent node for '+pathlevel.name+' !!!')
+			}
 		})
 	}
 
@@ -448,7 +471,7 @@ $(function()
 		var rv = path
 		if(path.indexOf('.') > -1)
 		{
-			rv = path.substring(path.indexOf('.')+1, path.length)
+			rv = path.substring(path.lastIndexOf('.')+1, path.length)
 		}
 		return rv
 	}
@@ -458,11 +481,11 @@ $(function()
 		var rv = clientID + '.serviceroot'
 		if(path.indexOf('.') > -1)
 		{
-			var parentpath = path.substring(0, path.indexOf('.'))
-			console.log('parent path = '+parentpath)
+			var parentpath = path.substring(0, path.lastIndexOf('.'))
+			//console.log('parent path = '+parentpath)
 			rv += '.' + parentpath
 		}
-		console.log('getIdForParentPath returns '+rv+' for path '+path)
+		//console.log('getIdForParentPath returns '+rv+' for path '+path)
 		return rv
 	}
 
@@ -487,45 +510,55 @@ $(function()
 		var subscriptions = mServiceSubscriptions[clientID] || []
 		var sid = subscriptions[path]
 		console.log('unsubscribing to path '+path+' -> '+sid+' for clientID '+clientID)
+		var snackbarContainer = document.querySelector('#snackbar');
+		var data =
+		{
+			message: 'Unsubscribing from '+path,
+			timeout: 2000
+		};
+		snackbarContainer.MaterialSnackbar.showSnackbar(data);
 		waitForTimeout()
 		mMainWindow.postMessage({ message: 'eval', code: 'window.evo.instrumentation.unSubscribeToService("'+path+'","'+sid+'")', clientUUID: client.UUID }, '*')
 	}
 
 	function waitForTimeout()
 	{
-		document.getElementById('p2').style.display="block"
-		if(!mTimeoutHandle)
+		if(mTimeoutHandle)
 		{
-			mTimeoutHandle = setTimeout(function()
-			{
-				document.getElementById('p2').style.display="none"
-				var snackbarContainer = document.querySelector('#snackbar');
-				var data =
-				{
-					message: 'Temporarily unable to reach viewer.',
-					timeout: 2000
-				};
-				snackbarContainer.MaterialSnackbar.showSnackbar(data);
-			}, NETWORK_TIMEOUT)
+			cancelNetworkTimeout()
 		}
+		document.getElementById('p2').style.display="block"
+		mTimeoutHandle = setTimeout(function()
+		{
+			document.getElementById('p2').style.display="none"
+			var snackbarContainer = document.querySelector('#snackbar');
+			var data =
+			{
+				message: 'Temporarily unable to reach viewer.',
+				timeout: 2000
+			};
+			snackbarContainer.MaterialSnackbar.showSnackbar(data);
+		}, NETWORK_TIMEOUT)
 	}
 
 	function cancelNetworkTimeout()
 	{
 		document.getElementById('p2').style.display="none"
-		if(!mTimeoutHandle)
+		if(mTimeoutHandle)
 		{
+			console.log('cancelTimeout')
 			clearTimeout(mTimeoutHandle)
+			mTimeoutHandle = undefined
 		}
 	}
 
 	function addServiceDataToViewer(clientID, time, servicedata)
 	{
+		if(!isClientAlreadySubscribedToService(clientID, servicedata.path))
+		{
+			saveServiceSubscription(clientID, {subscriptionID: servicedata.subscriptionID, path: servicedata.path})
+		}
 		var path = servicedata.path
-
-		//console.log('adding service data for path ' + path)
-		//console.dir(servicedata.data)
-
 		var channels = 0
 		for(var k in servicedata.data)
 		{
@@ -540,29 +573,31 @@ $(function()
 				if(key != 'timestamp')
 				{
 					var value = servicedata.data[key]
-					var color = '#00ff00'
+					var color = servicedata.color || 'rgba(255,255,255,0.76)'
+					var fillstyle = servicedata.fillstyle || 'rgba(0,0,0,0.30)'
 					switch(count)
 					{
 						case 0:
-							color = '#f0f000'
+							color = 'rgba(25,255,25,0.76)'
 						case 1:
-							color = '#f0f0f0'
+							color = 'rgba(255,25,25,0.76)'
 						case 2:
-							color = '#bb0af0'
+							color = 'rgba(25,25,255,0.76)'
 						case 3:
-							color = '#aabbcc'
+							color = 'rgba(115,95,205,0.76)'
 						default:
-							color = '#f0f0ff'
+							color = 'rgba(195,205,255,0.76)'
 					}
-					var ts = getTimeSeriesFor(path+'_'+key, chart, color)
+					var ts = getTimeSeriesFor(path+'_'+key, chart, color, fillstyle)
 					//console.log('  -- appending value '+value+' for key '+key+' and timestamp '+time)
 					ts.append(time, value)
 				}
+				count++
 			}
 		}
 	}
 
-	function getTimeSeriesFor(key, chart, color)
+	function getTimeSeriesFor(key, chart, color, fillstyle)
 	{
 		var ts = mTimeSeriesForChart[key]
 		if(!ts)
@@ -570,7 +605,7 @@ $(function()
 			ts = new TimeSeries()
 			mTimeSeriesForChart[key] = ts
 			console.log('  -- adding new timeseries for key '+key+' and color '+color)
-			chart.addTimeSeries(ts, {lineWidth: 1, strokeStyle: color});
+			chart.addTimeSeries(ts, {lineWidth: 1, strokeStyle: color, fillStyle: fillstyle});
 		}
 		return ts
 	}
@@ -606,8 +641,16 @@ $(function()
 
 	function removeChartFor(clientID, path)
 	{
-		console.log('removeChartFor called')
-
+		console.log('removeChartFor called clientID = '+clientID+', path = '+path)
+		setTimeout(function()
+		{
+			var parent = document.getElementById(clientID+'.serviceroot.'+path)
+			var id = clientID+'.serviceroot.'+path+'.chart'
+			var chartnode = document.getElementById(id)
+			parent.removeChild(chartnode)
+			chartnode.id = ""
+			parent.innerHTML = ""
+		}, SUBSCRIPTION_INTERVAL*3)
 	}
 
 	function setupEventListeners()
