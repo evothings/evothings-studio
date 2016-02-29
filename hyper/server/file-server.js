@@ -11,7 +11,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,7 +21,7 @@ limitations under the License.
 */
 
 /*********************************/
-/***     Imported modules      ***/
+/***	 Imported modules	   ***/
 /*********************************/
 
 var OS = require('os')
@@ -36,7 +36,7 @@ var UUID = require('./uuid.js')
 var EVENTS = require('./system-events.js')
 
 /*********************************/
-/***     Module variables      ***/
+/***	 Module variables	   ***/
 /*********************************/
 
 // Workbench version code should be incremented on each new release.
@@ -66,7 +66,7 @@ var mHeartbeatInterval = 20000
 var mBasePath = ''
 
 /*********************************/
-/***     Server functions      ***/
+/***	 Server functions	   ***/
 /*********************************/
 
 /**
@@ -81,7 +81,7 @@ exports.connectToRemoteServer = function()
 	{
 		// Messages from the server to the Workbench.
 		'workbench.set-session-id': onMessageWorkbenchSetSessionID,
-        'workbench.set-connect-key': onMessageWorkbenchSetConnectKey,
+		'workbench.set-connect-key': onMessageWorkbenchSetConnectKey,
 		'workbench.client-info': onMessageWorkbenchClientInfo,
 		'workbench.get-resource': onMessageWorkbenchGetResource,
 		'workbench.log': onMessageWorkbenchLog,
@@ -106,7 +106,7 @@ exports.connectToRemoteServer = function()
 	{
 		LOGGER.log('[file-server.js] Connected to server')
 		mIsConnected = true
-        EVENTS.publish(EVENTS.CONNECT, { event: 'connected' })
+		EVENTS.publish(EVENTS.CONNECT, { event: 'connected' })
 		//exports.requestConnectKey()
 		mSessionID = SETTINGS.getSessionID()
 
@@ -122,7 +122,7 @@ exports.connectToRemoteServer = function()
 		var uuid = SETTINGS.getEvoGUID()
 		//LOGGER.log('[file-server.js] ------ uuid = '+uuid)
 		mDeviceInfo = info
-        sendMessageToServer(mSocket, 'workbench.connected', { sessionID: mSessionID, uuid: uuid, info: info })
+		sendMessageToServer(mSocket, 'workbench.connected', { sessionID: mSessionID, uuid: uuid, info: info })
 		mHeartbeatTimer = setInterval(heartbeat, mHeartbeatInterval)
 		heartbeat()
 	})
@@ -135,17 +135,17 @@ exports.connectToRemoteServer = function()
 	socket.on('disconnect', function()
 	{
 		mIsConnected = false
-        EVENTS.publish(EVENTS.DISCONNECT, {event: 'disconnected' })
+		EVENTS.publish(EVENTS.DISCONNECT, {event: 'disconnected' })
 		clearInterval(mHeartbeatTimer)
 	})
 
 	socket.on('hyper-workbench-message', function(message)
 	{
-        var handler = messageHandlers[message.name]
-        if (handler)
-        {
-        	handler(socket, message)
-        }
+		var handler = messageHandlers[message.name]
+		if (handler)
+		{
+			handler(socket, message)
+		}
 	})
 }
 
@@ -199,7 +199,7 @@ function onMessageWorkbenchSetSessionID(socket, message)
 
 		// Send event width session id.
 		// TODO: Who is listening to this? No one it seems.
-        EVENTS.publish(EVENTS.SETSESSIONID, mSessionID)
+		EVENTS.publish(EVENTS.SETSESSIONID, mSessionID)
 	}
 
 	// Display user message if we got one.
@@ -211,8 +211,8 @@ function onMessageWorkbenchSetSessionID(socket, message)
 
 function onMessageWorkbenchSetConnectKey(socket, message)
 {
-    //console.dir(message)
-    mRequestConnectKeyCallback && mRequestConnectKeyCallback(message)
+	//console.dir(message)
+	mRequestConnectKeyCallback && mRequestConnectKeyCallback(message)
 }
 
 function onMessageWorkbenchClientInfo(socket, message)
@@ -294,7 +294,7 @@ exports.requestConnectKey = function()
 	// On first call mSessionID will be null, if server goes down
 	// and we connect again we will pass our session id so the server
 	// can restore our session.
-    LOGGER.log('[file-server.js] requesting connect key from server')
+	LOGGER.log('[file-server.js] requesting connect key from server')
 	sendMessageToServer(mSocket, 'workbench.request-connect-key', { sessionID: mSessionID })
 }
 
@@ -332,7 +332,7 @@ function serveUsingResponse304()
  */
 function serveResource(platform, path, ifModifiedSince)
 {
-	console.log('[file-server.js] serveResource: ' + path)
+	//console.log('[file-server.js] serveResource: ' + path)
 
 	if (!path || path == '/')
 	{
@@ -391,20 +391,20 @@ function serveCordovaFile(platform, path)
 	// If we are inside a cordova project, we use the
 	// files in that project.
 	// Folder structure:
-	//   www <-- mBasePath (root of running app)
-	//     index.html
-	//   platforms
-	//     android
-	//       assets
-	//         www
-	//           cordova.js
-	//           cordova_plugins.js
-	//           plugins
-	//     ios
-	//       www
-	//         cordova.js
-	//         cordova_plugins.js
-	//         plugins
+	//	 www <-- mBasePath (root of running app)
+	//	   index.html
+	//	 platforms
+	//	   android
+	//		 assets
+	//		   www
+	//			 cordova.js
+	//			 cordova_plugins.js
+	//			 plugins
+	//	   ios
+	//		 www
+	//		   cordova.js
+	//		   cordova_plugins.js
+	//		   plugins
 	//
 	// Set path to Cordova files in current project.
 	// Note that mBasePath ends with path separator.
@@ -536,7 +536,7 @@ exports.runApp = function()
 {
 	//serveUsingResponse200()
 	serveUsingResponse304()
-    console.log('@@@ [file-server.js] run app: ' + getAppURL())
+	console.log('@@@ [file-server.js] run app: ' + getAppURL())
 	sendMessageToServer(mSocket, 'workbench.run',
 		{
 			sessionID: mSessionID,
@@ -612,7 +612,7 @@ exports.setReloadCallbackFun = function(fun)
  */
 exports.setRequestConnectKeyCallbackFun = function(fun)
 {
-    mRequestConnectKeyCallback = fun
+	mRequestConnectKeyCallback = fun
 }
 
 /**
@@ -628,7 +628,7 @@ exports.setRemoteServerURL = function(url)
  */
 exports.getSessionID = function()
 {
-    return mSessionID
+	return mSessionID
 }
 
 exports.sendMessageToServer = sendMessageToServer

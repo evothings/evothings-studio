@@ -46,11 +46,8 @@ exports.defineServerFunctions = function(hyper)
 
 		MONITOR.setFileSystemChangedCallbackFun(function(changedFiles)
 		{
-		    // TODO: Update.
 			// Build changed files and reload.
-
-			// TODO: ENABLE!
-			// hyper.UI.reloadApp(changedFiles)
+			hyper.UI.reloadApp(changedFiles)
 		})
 	}
 
@@ -60,8 +57,6 @@ exports.defineServerFunctions = function(hyper)
 		SERVER.connectToRemoteServer()
 		MONITOR.setTraverseNumDirectoryLevels(
 			SETTINGS.getNumberOfDirecoryLevelsToTraverse())
-		// Starts when clicking Run, do not start here.
-		//MONITOR.startFileSystemMonitor()
 	}
 
 	hyper.UI.stopServer = function()

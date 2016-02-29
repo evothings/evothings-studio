@@ -39,219 +39,283 @@ var FSEXTRA = require('fs-extra')
  */
 exports.defineBuildFunctions = function(hyper)
 {
-    // Protect the run button from rapid clicking.
-	var mRunAppGuardFlag = false
+	// Protect the run button from rapid clicking
+	// and guard against concurrent builds.
+	var mRunAppGuard = false
 
-    var displayBuildResult = function(message)
-    {
-        console.log('@@@ Build result: ' + message)
-        hyper.UI.displayBuildMessage(message)
-    }
+	// Full path to current app.
+	var mAppFullPath = null
 
-	// The Run button in the UI has been clicked.
-	// Clicking too fast can cause muliple windows
-	// to open. Guard against this case.
+	/**
+	 * The Run button in the UI has been clicked.
+	 */
 	hyper.UI.runApp = function(path)
 	{
-		if (!mRunAppGuardFlag)
-		{
-			mRunAppGuardFlag = true
-			runAppNow(path)
-			// Must guard during build, clearing flag below instead.
-			//setTimeout(function() { mRunAppGuardFlag = false }, 500)
-        console.log('@@@ runApp exit')
-		}
-        console.log('@@@ runApp exit 2')
-	}
+		if (mRunAppGuard) { return }
+		mRunAppGuard = true
 
-    // Run the app.
-	var runAppNow = function(path)
-	{
-		LOGGER.log('[main-window-build.js] runAppNow: ' + path)
+		LOGGER.log('[main-window-build.js] runApp: ' + path)
 
-        // Stop monitoring files while building.
-        MONITOR.stopFileSystemMonitor()
+		// Stop monitoring files while building.
+		MONITOR.stopFileSystemMonitor()
 
 		// Prepend application path if this is not an absolute path.
-		var fullPath = hyper.UI.getAppFullPath(path)
+		mAppFullPath = hyper.UI.getAppFullPath(path)
 
-        buildAppIfNeeded(fullPath, null, buildCallback)
+		console.log('@@@ runApp')
 
-        function buildCallback(error)
-        {
-        console.log('@@@ buildCallback: ' + error)
-            if (error)
-            {
-                // Display the build error.
-                displayBuildResult(error.message)
-            }
-            else
-            {
-                // Run the app.
-                runApp()
-            }
+		// Build the app.
+		buildAppIfNeeded(mAppFullPath, null, buildCallback)
 
-        console.log('@@@ runAppNow 2')
+		function buildCallback(error)
+		{
+			if (!error)
+			{
+				runTheApp()
+			}
 
 			// Start monitoring so that live reload will work.
-			// TODO: Enable when montor file paths are fixed.
-			// MONITOR.startFileSystemMonitor()
+			MONITOR.startFileSystemMonitor()
 
-        console.log('@@@ runAppNow 3')
-            // Clear guard flag.
-            setTimeout(function() { mRunAppGuardFlag = false;
-        console.log('@@@ runAppNow 4') }, 200)
-        }
+			// Clear guard flag.
+			setTimeout(
+				function() {
+					mRunAppGuard = false
+				},
+				200)
+		}
 
-        function runApp()
-        {
-        console.log('@@@ runAppNow runApp : ' + path)
-            if (hyper.UI.mNumberOfConnectedClients <= 0)
-            {
-                // This function is defined in hyper-ui.html.
-                hyper.UI.noClientConnectedHander()
-            }
-            else
-            {
-                // Set active app path (note that this is path, not fullPath).
-                hyper.UI.activeAppPath = path
+		function runTheApp()
+		{
+			if (hyper.UI.mNumberOfConnectedClients <= 0)
+			{
+				// This function is defined in hyper-ui.html.
+				hyper.UI.noClientConnectedHander()
+			}
+			else
+			{
+				// Set active app path (note that this is path, not mFullPath).
+				hyper.UI.activeAppPath = path
 
-                // Refresh list of my apps.
-                hyper.UI.displayAppLists()
+				// Refresh list of my apps.
+				hyper.UI.displayProjectList()
 
-                // Otherwise, load the requested file on connected clients.
-                SERVER.runApp()
-            }
-        console.log('@@@ runAppNow runApp exit')
+				// Otherwise, load the requested file on connected clients.
+				SERVER.runApp()
+			}
 		}
 	}
 
+	/**
+	 * Files on the file system has been changed.
+	 * Live reload the app.
+	 */
+	hyper.UI.reloadApp = function(changedFiles)
+	{
+		console.log('@@@reloadApp: ' + changedFiles[0])
+		LOGGER.log('[main-window-build.js] reloadApp')
+
+		if (mRunAppGuard) { return }
+		mRunAppGuard = true
+
+		// Stop monitoring files while building.
+		MONITOR.stopFileSystemMonitor()
+
+		// Build the app.
+		buildAppIfNeeded(mAppFullPath, changedFiles, buildCallback)
+
+		function buildCallback(error)
+		{
+			if (!error)
+			{
+				reloadTheApp()
+			}
+
+			// Start monitoring so that live reload will work.
+			MONITOR.startFileSystemMonitor()
+
+			// Clear guard flag.
+			mRunAppGuard = false
+		}
+
+		function reloadTheApp()
+		{
+			// Refresh list of my apps.
+			hyper.UI.displayProjectList()
+
+			// Reload app.
+			SERVER.reloadApp()
+		}
+	}
+
+	var displayBuildMessage = function(message)
+	{
+		hyper.UI.displayBuildMessage(message)
+	}
+
+	var closeBuildMessageDialog = function()
+	{
+		hyper.UI.closeBuildMessageDialog()
+	}
+
+	var displayFloatingAlert = function(message)
+	{
+		hyper.UI.displayFloatingAlert(message)
+	}
+
+	var closeFloatingAlert = function()
+	{
+		hyper.UI.closeFloatingAlert()
+	}
 
 	/**
 	 * @param fullPath - the project folder root.
 	 */
-    var buildAppIfNeeded = function(fullPath, changedFiles, buildCallback)
-    {
-        console.log('@@@ buildAppIfNeeded fullPath: ' + fullPath)
+	var buildAppIfNeeded = function(fullPath, changedFiles, buildCallback)
+	{
+		console.log('@@@ buildAppIfNeeded fullPath: ' + fullPath)
 
-        // Standard HTML file project.
-	    if (FILEUTIL.fileIsHTML(fullPath))
-	    {
-	        // Set server paths using the location of the HTML file.
-	        var appBasePath = PATH.dirname(fullPath)
-	        var indexFile = PATH.basename(fullPath)
-		    SERVER.setAppPath(appBasePath)
-		    SERVER.setAppFileName(indexFile)
-		    // Set app id, will create evothings.json with new id if not existing.
-		    SERVER.setAppID(APP_SETTINGS.getAppID(appBasePath))
-		    MONITOR.setBasePath(appBasePath)
+		// Standard HTML file project.
+		if (FILEUTIL.fileIsHTML(fullPath))
+		{
+			// Set server paths using the location of the HTML file.
+			var appBasePath = PATH.dirname(fullPath)
+			var indexFile = PATH.basename(fullPath)
+			SERVER.setAppPath(appBasePath)
+			SERVER.setAppFileName(indexFile)
+			// Set app id, will create evothings.json with new id if not existing.
+			SERVER.setAppID(APP_SETTINGS.getAppID(appBasePath))
+			MONITOR.setBasePath(appBasePath)
 
-		    // No build performed when running an HTML file project.
-            buildCallback(null)
-            return
-	    }
-	    // Project specified by directory with evothings.json.
-	    else if (FILEUTIL.fileIsDirectory(fullPath))
-	    {
-	        // Get app to run from evothings.json.
-	        var indexFile = APP_SETTINGS.getIndexFile(fullPath)
-	        if (!indexFile)
-	        {
-	            // Error.
-	            evothingsSettingMissingError()
-	            return
-	        }
+			// No build performed when running an HTML file project.
+			buildCallback(null)
+			return
+		}
+		// Project specified by directory with evothings.json.
+		else if (FILEUTIL.fileIsDirectory(fullPath))
+		{
+			// Get app to run from evothings.json.
+			var indexFile = APP_SETTINGS.getIndexFile(fullPath)
+			if (!indexFile)
+			{
+				// Error.
+				evothingsSettingMissingError()
+				return
+			}
 
-	        // Get www dir.
-	        var wwwDir = APP_SETTINGS.getWwwDir(fullPath)
-	        if (!wwwDir)
-	        {
-	            // Error.
-	            evothingsSettingMissingError()
-	            return
-	        }
+			// Get www dir.
+			var wwwDir = APP_SETTINGS.getWwwDir(fullPath)
+			if (!wwwDir)
+			{
+				// Error.
+				evothingsSettingMissingError()
+				return
+			}
 
-	        // Set server www path. Build continues below.
-		    SERVER.setAppPath(PATH.join(fullPath, wwwDir))
-		    SERVER.setAppFileName(indexFile)
-		    SERVER.setAppID(APP_SETTINGS.getAppID(fullPath))
-		    MONITOR.setBasePath(fullPath)
-	    }
-	    else
-	    {
-	        // Error.
-	        evothingsSettingMissingError()
-	        return
-	    }
+			// Get app source dir from evothings.json.
+			var appDir = APP_SETTINGS.getAppDir(fullPath)
+			if (!appDir)
+			{
+				// Error.
+				evothingsSettingMissingError()
+				return
+			}
 
-	    // Get app source dir from evothings.json.
-	    var appDir = APP_SETTINGS.getAppDir(fullPath)
-	    if (!appDir)
-	    {
-	        // Error.
-	        evothingsSettingMissingError()
-	        return
-	    }
+			// Get list of directories that should not be processed by the build.
+			var dontBuildDirs = APP_SETTINGS.getAppDontBuildDirs(fullPath)
 
-		// Path to source files.
-		var srcPath = PATH.join(fullPath, appDir)
+			// Set server www path. Build continues below.
+			SERVER.setAppPath(PATH.join(fullPath, wwwDir))
+			SERVER.setAppFileName(indexFile)
+			SERVER.setAppID(APP_SETTINGS.getAppID(fullPath))
 
-		// Path where files are served.
-		var destPath = PATH.join(fullPath, wwwDir)
+			MONITOR.setBasePath(PATH.join(fullPath, appDir))
+		}
+		else
+		{
+			// Error.
+			evothingsSettingMissingError()
+			return
+		}
 
-		// Build project
-		buildApp(srcPath, destPath, buildDone)
+		displayFloatingAlert('Building app...')
+
+		// Allow alert to display.
+		setTimeout(function()
+		{
+			// Path to source files.
+			var sourcePath = PATH.join(fullPath, appDir)
+
+			// Path where files are served.
+			var destPath = PATH.join(fullPath, wwwDir)
+
+			// Build project.
+			var sourceFiles = changedFiles || getAllAppFiles(sourcePath)
+			buildAppFiles(sourcePath, sourceFiles, destPath, dontBuildDirs, buildDone)
+		}, 10)
 
 		function buildDone(error)
-        {
-            console.log('Build done')
+		{
+			console.log('Build done')
 
-            if (error)
-            {
-	            callCallbackWithError(error)
-            }
-            else
-            {
-                buildCallback()
-            }
-        }
+			if (error)
+			{
+				closeFloatingAlert()
 
-        function evothingsSettingMissingError()
-        {
-	        callCallbackWithError(
-	            'evothings.json is missing or index-file entry is missing: '
-	            + fullPath)
-	    }
+				// Display the build error.
+				displayBuildMessage(error)
 
-        function callCallbackWithError(errorMessage)
-        {
-	        buildCallback({ message: errorMessage })
-	    }
-    }
+				buildCallback(error)
+			}
+			else
+			{
+				closeFloatingAlert()
 
-	var buildApp = function(sourcePath, destPath, doneCallback)
-	{
-		console.log('buildApp: ' + sourcePath)
+				buildCallback()
+			}
+		}
 
-        var options =
-        {
-            follow: false,
-            nomount: true,
-            nodir: true,
-            root: sourcePath
-        }
-        var sourceFiles = GLOB.sync('/**/*', options)
+		function evothingsSettingMissingError()
+		{
+			buildCallback(
+				'evothings.json is missing or index-file entry is missing: '
+				+ fullPath)
+		}
 
-        console.log('@@@ globbed files: ' + sourceFiles.length)
-        for (var i = 0; i < sourceFiles.length; ++i)
-        {
-            console.log('  ' + sourceFiles[i])
-        }
+		function getAllAppFiles(sourcePath)
+		{
+			console.log('getAllAppFiles: ' + sourcePath)
 
-        buildAppFiles(sourcePath, sourceFiles, destPath, doneCallback)
+			var options =
+			{
+				follow: false,
+				nomount: true,
+				nodir: true,
+				root: sourcePath
+			}
+			var sourceFiles = GLOB.sync('/**/*', options)
+
+			console.log('@@@ globbed files: ' + sourceFiles.length)
+
+			var normalizedSourceFiles = []
+
+			for (var i = 0; i < sourceFiles.length; ++i)
+			{
+				// For some weird reason globbed paths begin with two separators.
+				// Remove them.
+				var path = sourceFiles[i]
+				if (0 == path.indexOf(PATH.sep)) { path = path.substr(1) }
+				if (0 == path.indexOf(PATH.sep)) { path = path.substr(1) }
+				normalizedSourceFiles.push(path)
+
+				console.log('  ' + path)
+			}
+
+			return normalizedSourceFiles
+		}
 	}
 
-	var buildAppFiles = function(sourcePath, sourceFiles, destPath, doneCallback)
+	function buildAppFiles(sourcePath, sourceFiles, destPath, dontBuildDirs, doneCallback)
 	{
 		console.log('buildAppFiles')
 
@@ -260,7 +324,7 @@ exports.defineBuildFunctions = function(hyper)
 			// Is build done?
 			if (0 == sourceFiles.length)
 			{
-		        console.log('buildAppFiles done')
+				console.log('buildAppFiles done')
 				doneCallback()
 				return
 			}
@@ -269,156 +333,101 @@ exports.defineBuildFunctions = function(hyper)
 			var filePath = sourceFiles.pop()
 			var fullSourcePath = PATH.join(sourcePath, filePath)
 			var fullDestPath = PATH.join(destPath, filePath)
+			var fullDestFolderPath = PATH.dirname(fullDestPath)
 
-		    console.log('@@@ buildNextFile: ' + fullSourcePath)
+			console.log('buildNextFile: ' + fullSourcePath)
 
-		    buildAppFile(
-		        fullSourcePath,
-		        fullDestPath,
-		        buildFileComplete)
+			if (shouldBuildFile(filePath))
+			{
+				buildAppFile(
+					fullSourcePath,
+					fullDestFolderPath,
+					buildFileComplete)
+			}
+			else
+			{
+				copyFile(fullSourcePath, fullDestFolderPath)
+				buildNextFile()
+			}
 		}
 
-		function buildFileComplete(error, result, fullDestPath)
+		function shouldBuildFile(filePath)
+		{
+			console.log('@@@ shouldBuildFile filePath: ' + filePath)
+			for (var i = 0; i < dontBuildDirs.length; ++i)
+			{
+				// Does the file path begin with the path in dontBuild?
+				if (0 == filePath.indexOf(dontBuildDirs[i]))
+				{
+					// Don't build this file.
+					return false
+				}
+			}
+			// Build the file.
+			return true
+		}
+
+		function buildFileComplete(error)
 		{
 			if (error)
 			{
-			    console.log('##### Build error: ' + error.message)
+				console.log('### Build error: ' + error)
 
-			    // Build terminates here.
-			    doneCallback(error)
+				// Build terminates here.
+				doneCallback(error)
 			}
-			else if (result)
+			else
 			{
-			    console.log('Build result write')
-			    //console.log(result)
-
-                // Save result.
-                var encoding = ('string' == typeof result) ? 'utf8' : null
-                FSEXTRA.outputFileSync(fullDestPath, result, { encoding: encoding })
-
-			    // Build next file.
-			    buildNextFile()
+				// Build next file.
+				buildNextFile()
 			}
 		}
 
-        // Start building files.
+		// Start building files.
 		buildNextFile()
 	}
 
-	var buildAppFile = function(fullSourcePath, fullDestPath, resultCallback)
+	function buildAppFile(fullSourcePath, fullDestFolderPath, resultCallback)
 	{
-        function buildFile()
-        {
-        console.log('BuildFile: ' + fullSourcePath)
-            // JavaScript.
-		    if ('js' == fullSourcePath.substr(-2))
-		    {
-			    buildJsFile()
-		    }
-		    else
-		    {
-		        // Default if to return file data unprocessed.
-		        buildFileDefault()
-		    }
+		console.log('buildAppFile: ' + fullSourcePath)
 
-		    // TODO: Add SASS, add plugin mechanism.
-		}
-
-	    function buildJsFile()
-	    {
-
-        console.log('buildJsFile')
-
-		    //http://babeljs.io/docs/usage/options/
-		    var presetsPath = PATH.join(
-		        hyper.UI.getWorkbenchPath(),
-		        'node_modules',
-		        'babel-preset-es2015')
-		    var options =
-		    {
-		    	"ast": false,
-		    	"babelrc": false,
-		    	"presets": [presetsPath]
-		    }
-		    BABEL.transformFile(fullSourcePath, options, buildJsComplete)
-		}
-
-		function buildJsComplete(error, result)
+		try
 		{
-            console.log('buildJsComplete')
-
-		    var data = !!result ? result.code : null
-
-		    // Disable strict mode.
-		    if (data)
-		    {
-		        data = data.replace("'use strict';", '')
-		    }
-
-            //console.log('buildJsComplete: ' + data)
-
-		    resultCallback(error, data, fullDestPath)
+			var ext = PATH.extname(fullSourcePath).substr(1)
+			var pluginPath = '../../plugins/build-plugin-' + ext + '.js'
+			var plugin = require(pluginPath)
+			plugin.build(hyper, fullSourcePath, fullDestFolderPath, resultCallback)
 		}
+		catch (error)
+		{
+			if ('MODULE_NOT_FOUND' == error.code)
+			{
+				console.log('No plugin found - default build')
 
-	    function buildFileDefault()
-	    {
-		    var data = FS.readFileSync(fullSourcePath, { encoding: null })
-		    resultCallback(null, data, fullDestPath)
+				// No plugin found, just copy the file to dest.
+				copyFile(fullSourcePath, fullDestFolderPath)
+
+				resultCallback()
+			}
+			else
+			{
+				console.log('buildAppFile error: ' +  error)
+				console.log(error)
+
+				// TODO: Call without error? Remove?
+				resultCallback(error)
+			}
 		}
-
-        // Build the file.
-        buildFile()
 	}
-/*
-	// Live reload.
-	hyper.UI.reloadApp = function(changedFiles)
+
+	/**
+	 * Default is to copy the file untouched.
+	 */
+	function copyFile(fullSourcePath, fullDestFolderPath)
 	{
-		console.log('@@@reloadApp: ' + changedFiles[0])
-		LOGGER.log('[main-window-build.js] reloadApp')
-
-		// Build project (optionally)
-		// TODO: Check settings in evothings.json
-		hyper.UI.buildAppFiles(
-		    sourcePath, sourceFiles, destPath, successFun, errorFun)
-		hyper.UI.buildAppFiles(
-		    'src',
-		    'www',
-		    buildAppSuccess,
-		    buildAppError)
-
-		function buildAppSuccess()
-        {
-            console.log('Build app success')
-
-            runApp()
-
-			// Start monitoring.
-			MONITOR.startFileSystemMonitor()
-        }
-
-		function buildAppError(error)
-        {
-            console.log('Build app error: ' + error.message)
-
-            // TODO: Display build error window.
-
-			// Start monitoring so that live reload will
-			// work when fixing errors.
-			MONITOR.startFileSystemMonitor()
-        }
-
-        // TODO: Move to file monitor callback.
-		function reloadApp()
-		{
-			// Reload app.
-			SERVER.reloadApp()
-
-			// Start monitoring again.
-			MONITOR.startFileSystemMonitor()
-		}
-
-		hyper.UI.displayProjectList()
-    }
-*/
+		var data = FS.readFileSync(fullSourcePath, { encoding: null })
+		var fullDestPath = PATH.join(fullDestFolderPath, PATH.basename(fullSourcePath))
+		FSEXTRA.outputFileSync(fullDestPath, data, { encoding: null })
+	}
 }
 

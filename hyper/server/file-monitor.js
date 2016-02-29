@@ -37,12 +37,13 @@ var mBasePath = null
 var mFileSystemChangedCallback
 var mRunFileSystemMonitor = true
 // TODO: Add to UI settings.
-var mIncludeFilter = ['htm','html','css','js','png','jpg','jpeg','gif']
+//var mIncludeFilter = ['htm','html','css','js','png','jpg','jpeg','gif']
 
 /*** File traversal functions ***/
 
 /**
  * External.
+ * Set path to monitor.
  */
 function setBasePath(path)
 {
@@ -104,14 +105,17 @@ function setFileSystemChangedCallbackFun(fun)
  */
 function shouldMonitorFile(path)
 {
+	return true
+/*
 	for (var i = 0; i < mIncludeFilter.length; ++i)
 	{
-	    if (FILEUTIL.stringEndsWith(path, mIncludeFilter[i]))
-	    {
-	        return true
-	    }
+		if (FILEUTIL.stringEndsWith(path, mIncludeFilter[i]))
+		{
+			return true
+		}
 	}
 	return false
+*/
 }
 
 /**
@@ -129,7 +133,7 @@ function runFileSystemMonitor()
 		mBasePath,
 		mTraverseNumDirecoryLevels,
 		changedFiles)
-	if (filesUpdated)
+	if (changedFiles.length > 0)
 	{
 		// File(s) changed, call the changed function and stop monitoring.
 		mFileSystemChangedCallback && mFileSystemChangedCallback(changedFiles)
@@ -148,16 +152,12 @@ function runFileSystemMonitor()
  */
 function fileSystemMonitorWorker(path, level, changedFiles)
 {
-	if (!path) { return false }
-
-	var filesChanged = false
-
-	var regexp = new RegExp(mIncludeFilter, 'i')
+	if (!path) { return }
 
 	try
 	{
 /*
-        // For debugging.
+		// For debugging.
 		var files = FS.readdirSync(path)
 		for (var i in files)
 		{
@@ -184,18 +184,20 @@ function fileSystemMonitorWorker(path, level, changedFiles)
 				if (stat.isDirectory() && level > 0)
 				{
 					//LOGGER.log('[file-monitor.js] Decending into: ' + path + files[i])
-					filesChanged = fileSystemMonitorWorker(
+					fileSystemMonitorWorker(
 						fullFilePath,
 						level - 1,
 						changedFiles)
 				}
-				//else if (stat.isFile() && regexp.test(fileName) && t > mLastTraverseTime)
 				else if (stat.isFile() && shouldMonitorFile(fileName) && t > mLastTraverseTime)
 				{
-					console.log('[file-monitor.js] ***** File has changed ***** ' + files[i])
+					console.log('[file-monitor.js] @@@ File has changed: ' + files[i])
 					mLastTraverseTime = Date.now()
-					filesChanged = true
-					changedFiles.push(fullFilePath)
+					// Shorten path.
+					var shortPath = fullFilePath.replace(mBasePath, '')
+					if (0 == shortPath.indexOf(PATH.sep)) { shortPath = shortPath.substr(1) }
+					console.log('[file-monitor.js]	   short path: ' + shortPath)
+					changedFiles.push(shortPath)
 				}
 			}
 			catch (err2)
@@ -208,8 +210,6 @@ function fileSystemMonitorWorker(path, level, changedFiles)
 	{
 		LOGGER.log('[file-monitor.js] ERROR in fileSystemMonitorWorker: ' + err1)
 	}
-
-	return filesChanged
 }
 
 /*** Module exports ***/

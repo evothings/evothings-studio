@@ -172,7 +172,7 @@ TODO: Remove, use automatic width for all buttons.
 
 #button-login
 {
-    width: 15%;
+	width: 15%;
 }
 
 #button-tools, #button-forum, #button-examples, #button-projects
@@ -270,7 +270,7 @@ TODO: Remove, use automatic width for all buttons.
 	/*display: none;*/
 	/*vertical-align: middle;*/
 	vertical-align: -3px;
-    display: inline-block;
+	display: inline-block;
 }
 
 /* Spinning icon on the Get Key button */
@@ -286,7 +286,7 @@ TODO: Remove, use automatic width for all buttons.
 
 @-webkit-keyframes "spinanimation" {
 	from { transform: scale( 1 ) rotate( 0deg );   }
-	to   { transform: scale( 1 ) rotate( 360deg ); }
+	to	 { transform: scale( 1 ) rotate( 360deg ); }
 }
 
 #connect-screen-login
@@ -379,6 +379,27 @@ TODO: Remove, use automatic width for all buttons.
 	-webkit-border-radius: 4px;
 	-moz-border-radius: 4px;
 	border-radius: 4px;
+}
+
+.floating-alert-box
+{
+	position: fixed;
+	display: none;
+	left: 50px;
+	right: 50px;
+	top: 100px;
+	z-index: 1000;
+	padding: 10px;
+	border: 1px solid #000000;
+	background-color: rgba(255,255,255,0.9);
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+}
+
+.floating-alert-box-message
+{
+	font-size: 22px;
 }
 
 @media (max-width: 599px)

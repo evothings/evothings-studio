@@ -12,7 +12,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,7 +22,7 @@ limitations under the License.
 */
 
 /*********************************/
-/***     Imported modules      ***/
+/***	 Imported modules	   ***/
 /*********************************/
 
 var FS = require('fs')
@@ -31,7 +31,7 @@ var FILEUTIL = require('./file-util.js')
 var UUID = require('./uuid.js')
 
 /*********************************/
-/***       App settings        ***/
+/***	   App settings		   ***/
 /*********************************/
 
 /**
@@ -148,6 +148,22 @@ exports.getWwwDir = function(appPath)
 	if (settings)
 	{
 		return settings['www-dir']
+	}
+	else
+	{
+		return null
+	}
+}
+
+/**
+ * Directories that should not be processed when building.
+ */
+exports.getAppDontBuildDirs = function(appPath)
+{
+	var settings = readAppSettings(appPath)
+	if (settings)
+	{
+		return settings['dont-build']
 	}
 	else
 	{

@@ -499,7 +499,6 @@ exports.defineUIFunctions = function(hyper)
 	    // Is it a directory?
 	    else if (FILEUTIL.fileIsDirectory(path))
 	    {
-	console.log('@@@ get project name from evotings.json: ' + path)
 	        // Read index file from evothings.json
 	        var indexPath = APP_SETTINGS.getIndexFileFullPath(path)
 	    }
@@ -510,13 +509,11 @@ exports.defineUIFunctions = function(hyper)
 	        return null
 	    }
 
-	console.log('@@@ get project name from indexPath: ' + indexPath)
-
 		// Read app main file.
 		var data = FILEUTIL.readFileSync(indexPath)
 		if (!data)
 		{
-	console.log('@@@ readFileSync retruned null for: ' + indexPath)
+			//console.log('@@@ readFileSync retruned null for: ' + indexPath)
 			// Return null on error.
 			return null
 		}
@@ -568,8 +565,6 @@ exports.defineUIFunctions = function(hyper)
 	// TODO: Simplify, use updateProjectList instead.
 	hyper.UI.addProject = function(path)
 	{
-	    console.log('@@@ Adding project: ' + path)
-
 	    if (FILEUTIL.fileIsHTML(path))
 	    {
 	        // Add the path, including HTML file, to the project list.
@@ -578,15 +573,12 @@ exports.defineUIFunctions = function(hyper)
 	    }
 	    else if (FILEUTIL.fileIsEvothingsSettings(path))
 	    {
-	     console.log('@@@ Adding evothings.json project: ' + PATH.dirname(path))
-
 	        // Add the folder path to the project list.
 		    mProjectList.unshift(PATH.dirname(path))
 		    saveProjectList()
 	    }
 	    else if (FILEUTIL.fileIsDirectory(path))
 	    {
-	     console.log('@@@ Adding dir project: ' + path)
 	        // Add the path to the project list.
 		    mProjectList.unshift(path)
 		    saveProjectList()
@@ -643,7 +635,7 @@ exports.defineUIFunctions = function(hyper)
 		// Debug logging.
 		LOGGER.log('[main-window-func.js] Open folder: ' + path)
 
-		GUI.Shell.showItemInFolder(path)
+		hyper.UI.GUI.Shell.showItemInFolder(path)
 	}
 
 	hyper.UI.setRemoteServerURL = function(url)
@@ -1135,7 +1127,23 @@ exports.defineUIFunctions = function(hyper)
 		{
 			hyper.UI.$('#dialog-build-message').modal('show')
 		}
-		hyper.UI.$('#build-message').html(message)
+		hyper.UI.$('#build-message').text(message)
+	}
+
+	hyper.UI.closeBuildMessageDialog = function()
+	{
+		hyper.UI.$('#dialog-build-message').modal('hide')
+	}
+
+	hyper.UI.displayFloatingAlert = function(message)
+	{
+		hyper.UI.$('.floating-alert-box').show()
+		hyper.UI.$('.floating-alert-box-message').text(message)
+	}
+
+	hyper.UI.closeFloatingAlert = function()
+	{
+		hyper.UI.$('.floating-alert-box').hide()
 	}
 
 	hyper.UI.testSystemMessage = function(message)
