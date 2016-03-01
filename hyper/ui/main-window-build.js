@@ -148,22 +148,26 @@ exports.defineBuildFunctions = function(hyper)
 		}
 	}
 
-	var displayBuildMessage = function(message)
+	function displayBuildMessage(message)
 	{
+		hyper.UI.openBuildMessageDialog()
 		hyper.UI.displayBuildMessage(message)
 	}
 
-	var closeBuildMessageDialog = function()
+	function closeBuildMessageDialog()
 	{
 		hyper.UI.closeBuildMessageDialog()
 	}
 
-	var displayFloatingAlert = function(message)
+	function displayFloatingAlert(message)
 	{
 		hyper.UI.displayFloatingAlert(message)
+
+		// Show message also in build dialog in case it is visible.
+		hyper.UI.displayBuildMessage(message)
 	}
 
-	var closeFloatingAlert = function()
+	function closeFloatingAlert()
 	{
 		hyper.UI.closeFloatingAlert()
 	}
@@ -240,7 +244,7 @@ exports.defineBuildFunctions = function(hyper)
 
 		displayFloatingAlert('Building app...')
 
-		// Allow alert to display.
+		// Use timer to allow alert to display.
 		setTimeout(function()
 		{
 			// Path to source files.
@@ -270,6 +274,8 @@ exports.defineBuildFunctions = function(hyper)
 			else
 			{
 				closeFloatingAlert()
+
+				closeBuildMessageDialog()
 
 				buildCallback()
 			}
@@ -430,4 +436,3 @@ exports.defineBuildFunctions = function(hyper)
 		FSEXTRA.outputFileSync(fullDestPath, data, { encoding: null })
 	}
 }
-

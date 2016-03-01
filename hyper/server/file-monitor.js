@@ -38,6 +38,7 @@ var mFileSystemChangedCallback
 var mRunFileSystemMonitor = true
 // TODO: Add to UI settings.
 //var mIncludeFilter = ['htm','html','css','js','png','jpg','jpeg','gif']
+var mExcludeFilter = ['.DS_Store']
 
 /*** File traversal functions ***/
 
@@ -105,7 +106,15 @@ function setFileSystemChangedCallbackFun(fun)
  */
 function shouldMonitorFile(path)
 {
+	for (var i = 0; i < mExcludeFilter.length; ++i)
+	{
+		if (FILEUTIL.stringEndsWith(path, mExcludeFilter[i]))
+		{
+			return false
+		}
+	}
 	return true
+
 /*
 	for (var i = 0; i < mIncludeFilter.length; ++i)
 	{

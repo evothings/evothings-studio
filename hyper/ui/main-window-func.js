@@ -1121,18 +1121,22 @@ exports.defineUIFunctions = function(hyper)
 		hyper.UI.$('#system-message').text(message)
 	}
 
-	hyper.UI.displayBuildMessage = function(message)
+	hyper.UI.openBuildMessageDialog = function(message)
 	{
 		if (!hyper.UI.$('#dialog-build-message').is(':visible'))
 		{
 			hyper.UI.$('#dialog-build-message').modal('show')
 		}
-		hyper.UI.$('#build-message').text(message)
 	}
 
 	hyper.UI.closeBuildMessageDialog = function()
 	{
 		hyper.UI.$('#dialog-build-message').modal('hide')
+	}
+
+	hyper.UI.displayBuildMessage = function(message)
+	{
+		hyper.UI.$('#build-message').text(message)
 	}
 
 	hyper.UI.displayFloatingAlert = function(message)
