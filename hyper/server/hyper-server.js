@@ -578,7 +578,7 @@ exports.evalJS = function(code, client)
 		{
 			sessionID: mSessionID,
 			code: code,
-			client: client
+			clientUUID: client.UUID
 		})
 }
 

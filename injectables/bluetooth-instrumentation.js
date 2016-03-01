@@ -11,6 +11,9 @@ function generateUUID() {
     return uuid;
 }
 
+evothings.easyble.reset()
+evothings.easyble.reportDeviceOnce(true)
+
 var me = window.evo.bluetooth =
 {
     bluetoothServices: {
@@ -217,12 +220,15 @@ var me = window.evo.bluetooth =
     devices: [],
     connections: [],
     serviceHandles:[],
+    characteristics: [],
     name: 'bluetooth',
     icon: 'images/bt.png',
+    sidcount : 1,
 
     // "b9404000-f5f8-466e-aff9-25556b57fe6d"
-    getNameForServiceUUID: function(UUID)
+    getNameForServiceUUID: function(_UUID)
     {
+        var UUID = _UUID.toUpperCase()
         var rv = undefined
         var me = window.evo.bluetooth
         if(UUID.length == 36)
@@ -230,6 +236,27 @@ var me = window.evo.bluetooth =
             for(var name in me.bluetoothServices)
             {
                 var code = me.bluetoothServices[name]
+                var part = UUID.substring(4,8)
+                if (part == code)
+                {
+                    rv = name
+                    break
+                }
+            }
+        }
+        return rv
+    },
+
+    getNameForCharactersticUUID: function(_UUID)
+    {
+        var UUID = _UUID.toUpperCase()
+        var rv = undefined
+        var me = window.evo.bluetooth
+        if(UUID.length == 36)
+        {
+            for(var name in me.bluetoothCharacteristics)
+            {
+                var code = me.bluetoothCharacteristics[name]
                 var part = UUID.substring(4,8)
                 if (part == code)
                 {
@@ -253,13 +280,33 @@ var me = window.evo.bluetooth =
             subscribeTo: function(params, interval, cb)
             {
                 hyper.log('bluetooth.characteristic.subscribeto called with interval '+interval)
-                var sid =
+                hyper.log(JSON.stringify(params))
+
+                var device = params.device
+                var serviceUUID = params.serviceUUID
+                var characteristicUUID = params.characteristicUUID
+
+                var sid = setInterval(function()
+                {
+                    device.readCharacteristic(characteristicUUID, function(data)
+                    {
+                        hyper.log('BLE characteristic data: ' + data);
+                        var data = evothings.ble.fromUtf8(data)
+
+                        cb(data)
+                    },
+                    function(errorCode)
+                    {
+                       console.log('BLE readServiceCharacteristic error: ' + errorCode);
+                    });
+                }, interval)
                 me.subscriptions[sid] = characteristic
+                return sid
             },
             unSubscribeTo: function(sid)
             {
                 hyper.log('bluetooth.characteristic.unsubscribeto called')
-
+                clearTimeout(sid)
             }
         }
 
@@ -281,13 +328,21 @@ var me = window.evo.bluetooth =
         hyper.log('* bluetooth.selectHierarchy called for path '+path+' typeof path = '+(typeof path))
         var me = window.evo.bluetooth
         var levels = path.split('.')
+
         var address = undefined
         var deviceHandle = undefined
+        var device = undefined
+
         if(levels[0] == 'bluetooth')
         {
+            if(me.devices && me.devices.keys && me.devices.keys.length > 0)
+            {
+                evothings.easyble.reset()
+                return
+            }
             if(levels.length < 2)
             {
-                evothings.ble.startScan(
+                evothings.easyble.startScan(
                     function(device)
                     {
                         // Report success. Sometimes an RSSI of +127 is reported.
@@ -308,57 +363,82 @@ var me = window.evo.bluetooth =
                         hyper.log('bluetooth scan error: '+errorCode)
                     }
                 )
+                setTimeout(function()
+                {
+                    evothings.ble.stopScan()
+                    hyper.log('stopping BLE scan')
+                },60000)
             }
             else
             {
                 address = me.getAddressFromLevels(levels)
-                deviceHandle = me.connections[address]
+                var r = me.connections[address]
+                if(r)
+                {
+                    deviceHandle = r.deviceHandle
+                }
+                device = me.devices[address]
+                hyper.log('deviceHandle is '+deviceHandle)
             }
             //----------------------------------------------------------------------------------------
             if(levels.length == 2)
             {
                 // device selected
                 hyper.log('bluetooth device '+device+' selected')
-                if(!deviceHandle)
+                if(!me.connections[address])
                 {
-                    hyper.log('could not find saved device handle. connecting...')
-                    evothings.ble.connect(address, function (r)
+                    hyper.log('could not find saved device handle. connecting to address '+address)
+                    device.connect(function (r)
                     {
-                        deviceHandle = r.deviceHandle;
                         hyper.log('bleconnect to '+address+' got back')
-                        hyper.log(JSON.stringify(r.deviceHandle))
-                        me.connections[address] = deviceHandle
-                        me.sendServiceHierarchyFor(deviceHandle, path, callback)
+                        hyper.log(JSON.stringify(r))
+                        me.connections[address] = r
+                        me.sendServiceHierarchyFor(device, path, callback)
                     },function(err)
                     {
-                        hyper.log('connect ERROR: '+err)
+                        hyper.log('connect ERROR: '+err+' -> '+me.getErrorDescription(err))
+
                     })
                 }
                 else
                 {
-                    me.sendServiceHierarchyFor(deviceHandle, path, callback)
+                    me.sendServiceHierarchyFor(device, path, callback)
                 }
             }
             else if(levels.length == 3)
             {
-                var service = levels[2]
-                hyper.log('bluetooth service '+service+' selected')
-                var serviceHandle = me.serviceHandles[path]
-                hyper.log('bluetooth serviceHandle is '+serviceHandle)
-                if(deviceHandle && serviceHandle && evothings && evothings.ble)
+                var serviceName = levels[2]
+                var serviceUUID = me.getUUIDFromName(serviceName)
+                var service = me.getServiceFromDevice(device, serviceUUID)
+                hyper.log('bluetooth service '+service+' selected on device '+device+' for serviceName '+serviceName+' and sUUID '+serviceUUID)
+                if(service)
                 {
-                    evothings.ble.characteristics(
-                        deviceHandle,
-                        serviceHandle,
-                        function(characteristics)
+                    for (var characteristicUUID in service.__characteristics)
+                    {
+                        var ch = service.__characteristics[characteristicUUID]
+                        //hyper.log('callback for characteristics!')
+                        // {"handle":11,"uuid":"b9401001-f5f8-466e-aff9-25556b57fe6d","permissions":0,"properties":8,"writeType":2,"device":14,"service":3}
+                        // {"handle":9,"uuid":"00002a04-0000-1000-8000-00805f9b34fb","permissions":0,"properties":2,"writeType":2,"device":14,"service":1}
+                        hyper.log('* characteristic found ' + JSON.stringify(ch))
+                        var cname = me.getNameForCharactersticUUID(ch.uuid)
+                        if (cname)
                         {
-                            characteristics.forEach(function(ch)
-                            {
-                                ch.device = deviceHandle
-                                ch.service = serviceHandle
-                                hyper.log('characteristic found '+JSON.stringify(ch))
-                            })
-                        })
+                            cname += '[' + ch.uuid + ']'
+                        }
+                        else
+                        {
+                            cname = ch.uuid
+                        }
+                        cname = path + '.' + cname
+                        me.characteristics[cname] = ch
+                        hyper.log('calling back characteristic ' + cname)
+                        callback([{name: cname, selectable: false}])
+                    }
+                }
+                else
+                {
+                    hyper.log('ERROR: Service not found! device has '+device.__services.length+' services')
+                    hyper.log(JSON.stringify(device.__services))
                 }
             }
         }
@@ -366,6 +446,42 @@ var me = window.evo.bluetooth =
         {
             callback([])
         }
+    },
+
+    getErrorDescription: function(n)
+    {
+        rv = ''
+        if(n == 2) rv = 'STATUS_CODE_UNKNOWN_CONNECTION_IDENTIFIER'
+        if(n == 8) rv = 'CONNECTION_TIMEOUT'
+        if(n == 58) rv = 'CONTROLLER_BUSY'
+        if(n == 19) rv = 'REMOTE_USER_TERMINATED_CONNECTION'
+        if(n == 128) rv = 'GATT_NO_RESOURCES'
+        if(n == 132) rv = 'GATT_BUSY'
+        if(n == 133) rv = 'GATT_ERROR'
+        return rv
+    },
+
+    getServiceFromDevice:function(device, sUUID)
+    {
+        var rv = undefined
+        device.__services.forEach(function(service)
+        {
+            if(service.uuid == sUUID)
+            {
+                rv = service
+            }
+        })
+        return rv
+    },
+
+    getUUIDFromName: function(name)
+    {
+        rv = name
+        if(name.indexOf('[') > -1)
+        {
+            rv = name.substring(name.indexOf('[')+1, name.indexOf(']'))
+        }
+        return rv
     },
 
     getAddressFromLevels: function(levels)
@@ -378,19 +494,20 @@ var me = window.evo.bluetooth =
         return address
     },
 
-    sendServiceHierarchyFor: function(deviceHandle, path, callback)
+    sendServiceHierarchyFor: function(device, path, callback)
     {
         var me = window.evo.bluetooth
-        if(evothings && evothings.ble && deviceHandle)
+        if(evothings && evothings.ble && device)
         {
             hyper.log('connected, requesting services...');
-            evothings.ble.services(
-                deviceHandle,
+            device.readServices(
+                null,
                 function(services)
                 {
                     hyper.log('got services')
-                    services.forEach(function(service)
+                    for(var sUUID in device.__services)
                     {
+                        var service = device.__services[sUUID]
                         hyper.log('sending service '+JSON.stringify(service))
                         // handle,uuid,type
                         var name = me.getNameForServiceUUID(service.uuid)
@@ -402,27 +519,49 @@ var me = window.evo.bluetooth =
                         {
                             name = service.uuid
                         }
-                        me.serviceHandles[path+'.'+name] = service
-                        callback([{name: path+'.'+name, selectable: true}])
-                    })
+                        var sname = path+'.'+name
+                        me.serviceHandles[sname] = service.handle
+                        hyper.log('saving service as '+sname)
+                        hyper.log(JSON.stringify(service))
+                        callback([{name: sname, selectable: true}])
+                    }
+                },function(err)
+                {
+                    hyper.log('get services ERROR: '+err)
                 })
         }
     },
 
     subscribeTo: function(path, params, interval, callback)
     {
-        hyper.log('bluetooth.subscribeTo called for path '+path+' and interval '+interval)
+        var levels = path.split('.')
         var me = window.evo.bluetooth
-        var serviceName = path.split('.')[1]
-        console.log('serviceName = '+serviceName)
-        var service = me.services[serviceName]
-        if(service)
+        hyper.log('bluetooth.subscribeTo called for path '+path+' and interval '+interval+' levels = '+levels.length)
+        var me = window.evo.bluetooth
+        var address = me.getAddressFromLevels(levels)
+        var device = me.devices[address]
+        hyper.log('subscribeTo looking up address '+address+' connected device -> '+device)
+        hyper.log(JSON.stringify(device))
+        var serviceName = levels[2]
+        var serviceUUID = serviceName
+        if(serviceUUID.indexOf('[') > -1)
         {
-            var sid = service.subscribeTo(params, interval, callback)
-            console.log('saving subscription '+sid+' in '+me.subscriptions)
-            me.subscriptions[sid] = service
-            return sid
+            serviceUUID = serviceUUID.substring(serviceUUID.indexOf('[')+1, serviceUUID.indexOf(']'))
         }
+        if(levels.length == 4)
+        {
+            var characteristic = me.characteristics[path]
+            hyper.log('resolved characteristic uuid = '+characteristic.uuid)
+            var service = me.services['characteristic']
+            if(service)
+            {
+                var params = {device: device, serviceUUID: serviceUUID, characteristicUUID: characteristic.uuid}
+                var sid = service.subscribeTo(params, interval, callback)
+                me.subscriptions[sid] = service
+                return sid
+            }
+        }
+
     },
     unSubscribeTo: function(sid)
     {

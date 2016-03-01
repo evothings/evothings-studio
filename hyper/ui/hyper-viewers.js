@@ -7,6 +7,9 @@ $(function()
 	var GUI = require('nw.gui')
 	var EVENTS = require('../server/events.js')
 	var SERVER = require('../server/hyper-server.js')
+	var ALL	= require('node-promise').allOrNone
+	var PROMISE = require('node-promise').defer
+
 
 	// Main application window
 	var mMainWindow = window.opener
@@ -160,11 +163,11 @@ $(function()
 	{
 		mCurrentClientList = list
 		console.log('renderViewersFromList showing '+list.length+' clients')
+		domlist = document.getElementById('viewer-list')
+		domlist.innerHTML = ""
 		//console.dir(list)
 		if(list && list.length)
 		{
-			domlist = document.getElementById('viewer-list')
-			domlist.innerHTML = ""
 			//console.dir(list)
 			list.forEach(function(viewer)
 			{
@@ -219,22 +222,17 @@ $(function()
 	{
 		var rv = undefined
 		var model = info.model.toLowerCase()
-		if(info.platform == "Android")
-		{
+		if (info.platform == "Android") {
 			rv = 'images/PNG/Nexus7.png'
-			if(model.indexOf('galaxy') > -1)
-			{
+			if (model.indexOf('galaxy') > -1) {
 				rv = 'images/PNG/Galaxy3.png'
 			}
 		}
-		else
-		{
+		else {
 			rv = 'images/PNG/iPhone5.png'
-			if(model.indexOf('ipad') > -1)
-			{
+			if (model.indexOf('ipad') > -1) {
 				rv = 'images/PNG/iPad.png'
-				if(model.indexOf('mini') > -1)
-				{
+				if (model.indexOf('mini') > -1) {
 					rv = 'images/PNG/iPadMini.png'
 				}
 			}
@@ -242,17 +240,9 @@ $(function()
 		return rv
 	}
 
-	function getImageForProvider(pname)
+	function reSubscribeOnReconnect(clientID)
 	{
-		var img = document.createElement('img')
-		img.style.width='30px'
-		switch(pname)
-		{
-			case 'cordova':
-				img.src = 'images/cordova_256.png'
-		}
-
-		return img
+		console.log('reSubscribeOnReconnect called for clientID '+clientID)
 	}
 
 	function onClientSelected(viewer)
@@ -287,40 +277,71 @@ $(function()
 		wd = wd.replace('hyper-ui.html','')
 		document.getElementById('p2').style.display="block"
 		console.log('injecting instrumentation into client '+client.name+' from directory '+wd+', to client '+client.UUID)
-		FS.readFile( wd+'../injectables/instrumentation-manager.js', "utf-8", function (err, f1) {
-			if (err) {
-				throw err;
-			}
-			FS.readFile( wd+'../injectables/bluetooth-instrumentation.js', "utf-8", function (err, f2) {
-				if (err) {
-					throw err;
-				}
-				FS.readFile(wd + '../injectables/cordova-instrumentation.js', "utf-8", function (err, f3) {
-					if (err) {
+		var files =
+		[
+			'../injectables/util.js',
+			'../injectables/easyble.js',
+			'../injectables/instrumentation-manager.js',
+			'../injectables/bluetooth-instrumentation.js',
+			'../injectables/cordova-instrumentation.js',
+			'../injectables/instrumentation-starter.js'
+		]
+		var promises = []
+		var count = 0
+		var filedata = []
+		files.forEach(function(file)
+		{
+			(function(_count)
+			{
+				var p = PROMISE()
+				promises.push(p)
+				FS.readFile( wd+file, "utf-8", function (err, data)
+				{
+					console.log('read file '+file)
+					filedata[_count] = data
+					if (err)
+					{
 						throw err;
 					}
-					FS.readFile(wd + '../injectables/instrumentation-starter.js', "utf-8", function (err, f4) {
-						if (err) {
-							throw err;
-						}
-						console.log('loaded all three injectables')
-						mMainWindow.postMessage({
-							message: 'eval',
-							code: f1 + '; ' + f2 + '; ' + f3 + '; '+f4,
-							clientUUID: client.UUID
-						}, '*')
-						console.log('all injectables injected into client. Evaluating listServices()')
-						//mMainWindow.postMessage({ message: 'eval', code: 'window.evo.instrumentation.listServices()', clientUUID: client.UUID }, '*')
-						selectHierarchy(undefined, client)
-					});
-				});
-			});
-		});
+					p.resolve(data)
+				})
+			})(count++)
+		})
+
+		var fdata = ''
+		var error = function(e)
+		{
+			console.log('-- error in promises : '+e)
+		}
+		Promise.all(promises, error).then(function(datas)
+		{
+			console.log('-- all files loaded')
+			filedata.forEach(function(fd)
+			{
+				fdata += fd + '; '
+			})
+			console.log('loaded all injectables')
+			mMainWindow.postMessage({
+				message: 'eval',
+				code: fdata,
+				client: client
+			}, '*')
+			console.log('all injectables injected into client with UUID '+client.UUID+'. Evaluating listServices()')
+			mMainWindow.postMessage({
+				message: 'eval',
+				code: 'navigator.vibrate(500); window.evo.instrumentation.selectHierarchy()',
+				client: client
+			}, '*')
+
+		}, function(err)
+		{
+			console.log('Oh noes!! '+err)
+		})
 	}
 
 	function onViewersInstrumentation(message)
 	{
-		console.log('------------------ instrumentation received!!')
+		//console.log('------------------ instrumentation received!!')
 		cancelNetworkTimeout()
 		//console.dir(message)
 		mInstrumentationReceivedFrom[message.clientID] = true
@@ -339,6 +360,10 @@ $(function()
 		else if (message.serviceUnsubscribe)
 		{
 			serviceUnsubscribe(message.clientID, message.serviceUnsubscribe)
+		}
+		else if (message.reconnectInstrumentation)
+		{
+			reSubscribeOnReconnect(message.clientID)
 		}
 	}
 
@@ -410,7 +435,8 @@ $(function()
 				ndiv.className = "mdl-button mdl-js-button mdl-button--raised"
 				var ttid = parentnode.id + '.' + name + '_button'
 
-				ndiv.innerHTML = '<div id="'+ttid+'">'+name+'</div>'
+				ndiv.innerHTML = name
+				ndiv.id = ttid
 
 				ndiv.style.width = "150px"
 
@@ -491,16 +517,17 @@ $(function()
 
 	function selectHierarchy(path, client)
 	{
-		console.log('selectHierarchy called for path '+path)
+		console.log('selectHierarchy called for path '+path+' and client ')
+		console.dir(client)
 		waitForTimeout()
-		mMainWindow.postMessage({ message: 'eval', code: 'window.evo.instrumentation.selectHierarchy("'+path+'")', clientUUID: client.UUID }, '*')
+		mMainWindow.postMessage({ message: 'eval', code: 'window.evo.instrumentation.selectHierarchy("'+path+'")', client: client}, '*')
 	}
 
 	function subscribeToService(path, client)
 	{
 		console.log('subscribeToService called for path '+path)
 		waitForTimeout()
-		mMainWindow.postMessage({ message: 'eval', code: 'window.evo.instrumentation.subscribeToService("'+path+'",{}, '+SUBSCRIPTION_INTERVAL+')', clientUUID: client.UUID }, '*')
+		mMainWindow.postMessage({ message: 'eval', code: 'window.evo.instrumentation.subscribeToService("'+path+'",{}, '+SUBSCRIPTION_INTERVAL+')', client: client }, '*')
 	}
 
 	function unsubscribeToService(path, clientID)
@@ -518,7 +545,7 @@ $(function()
 		};
 		snackbarContainer.MaterialSnackbar.showSnackbar(data);
 		waitForTimeout()
-		mMainWindow.postMessage({ message: 'eval', code: 'window.evo.instrumentation.unSubscribeToService("'+path+'","'+sid+'")', clientUUID: client.UUID }, '*')
+		mMainWindow.postMessage({ message: 'eval', code: 'window.evo.instrumentation.unSubscribeToService("'+path+'","'+sid+'")', client: client }, '*')
 	}
 
 	function waitForTimeout()
@@ -574,7 +601,7 @@ $(function()
 				{
 					var value = servicedata.data[key]
 					var color = servicedata.color || 'rgba(255,255,255,0.76)'
-					var fillstyle = servicedata.fillstyle || 'rgba(0,0,0,0.30)'
+					var fillstyle = servicedata.fillstyle || 'rgba(0,255,0,0.30)'
 					switch(count)
 					{
 						case 0:
@@ -627,9 +654,9 @@ $(function()
 			if(parent)
 			{
 				parent.appendChild(chartnode)
-				chart = new SmoothieChart({grid: {verticalSections: 3}, timestampFormatter: SmoothieChart.timeFormatter})
+				chart = new SmoothieChart({grid: {verticalSections: 4}, timestampFormatter: SmoothieChart.timeFormatter})
 				mChartsVisible[id] = chart
-				chart.streamTo(chartnode, 500);
+				chart.streamTo(chartnode, SUBSCRIPTION_INTERVAL);
 			}
 			chartnode.addEventListener('mouseup', function(e)
 			{

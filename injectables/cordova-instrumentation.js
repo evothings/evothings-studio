@@ -117,7 +117,7 @@ var me = window.evo.cordova =
 				var service = me.services[pname]
 				hyper.log('-- adding service '+pname)
 				hyper.log(JSON.stringify(service))
-				rv.push({name: 'cordova.'+service.name, selectable:false})
+				rv.push({name: 'cordova.'+service.name, selectable:false, dataType: 'stream'})
 			}
 			callback(rv)
 		}
