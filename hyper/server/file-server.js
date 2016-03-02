@@ -303,7 +303,7 @@ exports.requestConnectKey = function()
  */
 exports.sendDisconnectAllViewersToServer = function()
 {
-	sendMessageToServer(mSocket, 'workbench.disconnect-all-viewers', { sessionID: mSessionID })
+	sendMessageToServer(mSocket, 'workbench.disconnect-viewers', { sessionID: mSessionID })
 }
 
 /**
