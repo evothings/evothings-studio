@@ -400,7 +400,7 @@ exports.defineBuildFunctions = function(hyper)
 		try
 		{
 			var ext = PATH.extname(fullSourcePath).substr(1)
-			var pluginPath = '../../plugins/build-plugin-' + ext + '.js'
+			var pluginPath = '../plugins/build-plugin-' + ext + '.js'
 			var plugin = require(pluginPath)
 			plugin.build(hyper, fullSourcePath, fullDestFolderPath, resultCallback)
 		}
