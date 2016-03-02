@@ -820,6 +820,18 @@ exports.defineUIFunctions = function(hyper)
 		}
 	}
 
+	hyper.UI.disconnectAllViewers = function()
+	{
+		// Send message to server.
+		hyper.SERVER.sendDisconnectAllViewersToServer()
+
+		// Show dialog.
+		if (!hyper.UI.$('#dialog-disconnect-all-viewers').is(':visible'))
+		{
+			hyper.UI.$('#dialog-disconnect-all-viewers').modal('show')
+		}
+	}
+
 	hyper.UI.openFileFolder = function(path)
 	{
 		// Prepend application path if this is not an absolute path.

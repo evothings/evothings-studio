@@ -63,6 +63,13 @@ exports.defineUIEvents = function(hyper)
 		hyper.UI.saveSettings()
 	})
 
+	// ************** Disconnect all Viewers **************
+
+	hyper.UI.$('#button-disconnect-all-viewers').click(function()
+	{
+		hyper.UI.disconnectAllViewers()
+	})
+
 	// ************** Documentation Button **************
 
 	hyper.UI.$('.button-documentation').click(function()

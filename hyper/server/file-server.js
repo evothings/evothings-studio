@@ -301,6 +301,14 @@ exports.requestConnectKey = function()
 /**
  * External.
  */
+exports.sendDisconnectAllViewersToServer = function()
+{
+	sendMessageToServer(mSocket, 'workbench.disconnect-all-viewers', { sessionID: mSessionID })
+}
+
+/**
+ * External.
+ */
 exports.disconnectFromRemoteServer = function()
 {
 	LOGGER.log('[file-server.js] Disconnecting from remote server')

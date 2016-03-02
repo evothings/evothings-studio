@@ -71,6 +71,9 @@ Copyright (c) 2013-2015 Evothings AB
 						<li><a id="button-share-social"
 							role="button" href="javascript:void(0)">
 							Share in Social Media</a></li>
+						<li><a id="button-disconnect-all-viewers"
+							role="button" href="javascript:void(0)">
+							Disconnect all Viewers</a></li>
 						<li><a id="button-open-settings-dialog"
 							role="button" href="javascript:void(0)">
 							Settings</a></li>
@@ -389,6 +392,39 @@ Copyright (c) 2013-2015 Evothings AB
 						<div class="modal-body">
 							<div class="form-group style-big-para">
 								<p id="build-message">Hello World</p>
+							</div>
+						</div>
+
+						<div class="modal-footer">
+							<button type="button"
+								class="btn btn-default"
+								data-dismiss="modal">
+								Close
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- ModalDialog: dialog-disconnect-all-viewers --->
+			<div class="modal fade"
+				id="dialog-disconnect-all-viewers"
+				tabindex="-1"
+				role="dialog"
+				aria-labelledby="dialog-disconnect-all-viewers-label"
+				aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h4 class="modal-title" id="dialog-disconnect-all-viewers-label">
+								Disconnect all Viewers
+							</h4>
+						</div>
+
+						<div class="modal-body">
+							<div class="form-group style-big-para">
+								<p id="build-message">A message has been sent to the server to disconnect all Viewers connected to this Workbench. The Viewer counter in the lower left corner of the main Workbench window should reach zero after 15-30 seconds. Select the Disconnect all Viewers menu item again if this does not happen.</p>
 							</div>
 						</div>
 
