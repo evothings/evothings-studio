@@ -190,6 +190,7 @@ $(function()
 		div.style.flexDirection = 'column'
 		div.style.justifyContent = 'space-around'
 		div.style.width = '200px'
+		div.style.height = '120px'
 		var span = document.createElement('span')
 		span.innerHTML = viewer.name + ' ('+viewer.info.model+')'
 		var img = document.createElement('img')
@@ -264,7 +265,11 @@ $(function()
 		}
 		else
 		{
-			selectHierarchy(undefined, viewer)
+			var cdiv = document.getElementById(viewer.clientID + '.serviceroot')
+			if(cdiv.childNodes.length == 0)
+			{
+				selectHierarchy(undefined, viewer)
+			}
 		}
 	}
 

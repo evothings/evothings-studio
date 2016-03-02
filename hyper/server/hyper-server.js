@@ -140,7 +140,7 @@ exports.connectToRemoteServer = function()
 	socket.on('disconnect', function()
 	{
 		mIsConnected = false
-        EVENTS.publish(EVENTS.DISCONNECT, {event: 'disconnected' })
+		EVENTS.publish(EVENTS.DISCONNECT, {event: 'disconnected' })
 		clearInterval(mHeartbeatTimer)
 	})
 
@@ -222,8 +222,8 @@ function onMessageWorkbenchSetConnectKey(socket, message)
 function onMessageWorkbenchClientInfo(socket, message)
 {
 	// Notify UI about clients.
-	//LOGGER.log('[hyper-server.js] got client info')
-	//console.dir(message)
+	LOGGER.log('[hyper-server.js] got client info')
+	console.dir(message)
 	EVENTS.publish(EVENTS.VIEWERSUPDATED, message.data)
 	mCLientInfo = message.data
 	mClientInfoCallback && mClientInfoCallback(message)
