@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<!--
+File: hyper-viewers.html
+Description: JavaScript Workbench and Log panel.
+Author: Mikael Kindborg
+Copyright (c) 2013-2014 Mikael Kindborg
+License: Apache Version 2.0
+jQuery Layout: http://layout.jquery-dev.net/
+-->
+<head>
+	<meta charset="utf-8">
+
+	<title>Viewers</title>
+
+	<link href="../libs/bootstrap-3.3.5-dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="../libs/jquery/layout-default-latest.css" />
+
+	<script src="../libs/jquery/jquery-2.1.4.min.js"></script>
+	<script src="../libs/jquery/jquery-ui.min.js"></script>
+	<script src="../libs/jquery/jquery.layout-latest.js"></script>
+
+	<link rel="stylesheet" href="css/hyper-workbench.css" />
+
+</head>
+
+<body style="margin:10px;border:0">
+
+<div class="ui-layout-center" style="padding:10px">
+	<div id="code-area" class="xui-layout-content">
+		<h4>Viewers</h4>
+		<div style="padding:10px;display: flex; flex-direction: row" id="viewer-list">
+
+		</div>
+	</div>
+</div>
+<!-- end "ui-layout-center" -->
+
+<!-- Hidden divs that contain default content for panels. -->
+
+
+<!--
+// -----------------------------------------------------
+//			Welcome to HyperReload Workbench
+// -----------------------------------------------------
+//
+// The Workbench has two parts. This part is a JavaScript
+// editor where you can evaluate selected code on connected
+// devices/browsers.
+//
+// The second part is the message panel below. Here log messages
+// from devices are displayed, and the result from evaluating
+// JavaScript code.
+//
+// Get started by selecting a line of the example code below,
+// then press the "Eval on Devices" button. This will run the
+// selected code on any connected devices/browsers.
+//
+// The button "Eval in NodeWebkit" is an experimental feature
+// that lets you to evaluate code locally in HyperReload, which
+// runs on top of node-webkit. This gives you full interactive
+// access to node-webkit and to node.js, a potentially very
+// powerful feature. This can be used for experimenting with
+// node.js and node-webkit, and for running scripted tests
+// on connected devices.
+// -----------------------------------------------------
+
+// Send log message from connected devices/browsers. Use this
+// in your application code for debugging.
+hyper.log('Hello World')
+
+// Replace the browser content with the given HTML. What do you
+// think will happen if you evaluate this with "Eval in Node"?
+document.body.innerHTML = '<h1>Hello World</h1>'
+-->
+
+
+<script src="hyper-viewers.js"></script>
+
+</body>
+</html>

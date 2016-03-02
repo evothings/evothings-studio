@@ -262,6 +262,13 @@ exports.defineUIEvents = function(hyper)
 		hyper.UI.openToolsWorkbenchWindow()
 	})
 
+	// ************** Viewers Button **************
+
+	hyper.UI.$('#button-viewers').click(function()
+	{
+		hyper.UI.openViewersWindow()
+	})
+
 	// ************** Login Button **************
 
 	// Set login button action handler. The button toggles login/logout.
@@ -318,7 +325,7 @@ exports.defineUIEvents = function(hyper)
 
 	EVENTS.subscribe(EVENTS.LOGOUT, function()
 	{
-		// TODO: Pass user id to the Run/Reload messaging code (hyper-server.js).
+		// TODO: Pass user id to the Run/Reload messaging code (file-server.js).
 		LOGGER.log('[main-window-events.js] *** User has logged out ***')
 
 		displayLoginButton()

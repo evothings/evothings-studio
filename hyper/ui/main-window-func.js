@@ -42,6 +42,7 @@ var GLOB = require('glob')
 exports.defineUIFunctions = function(hyper)
 {
 	var mWorkbenchWindow = null
+	var mViewersWindow = null
 	var mConnectKeyTimer
 	var mProjectList = []
 	var mExampleList = []
@@ -219,7 +220,7 @@ exports.defineUIFunctions = function(hyper)
 		//LOGGER.log('[main-window-func.js] Main got : ' + event.data.message)
 		if ('eval' == event.data.message)
 		{
-			hyper.SERVER.evalJS(event.data.code)
+			hyper.SERVER.evalJS(event.data.code, event.data.client)
 		}
 		else if ('setSession' == event.data.message)
 		{
@@ -668,6 +669,27 @@ exports.defineUIFunctions = function(hyper)
 			mWorkbenchWindow.focus()
 			// Establish contact. Not really needed.
 			mWorkbenchWindow.postMessage({ message: 'hyper.hello' }, '*')
+		}
+	}
+
+	hyper.UI.openViewersWindow = function()
+	{
+		if (mViewersWindow && !mViewersWindow.closed)
+		{
+			// Bring existing window to front.
+			mViewersWindow.focus()
+		}
+		else
+		{
+			// Create new window.
+			mViewersWindow = window.open(
+				'hyper-viewers.html',
+				'Viewers',
+				'resizable=1,width=400,height=300')
+			mViewersWindow.moveTo(150, 150)
+			mViewersWindow.focus()
+			// Establish contact. Not really needed.
+			mViewersWindow.postMessage({ message: 'hyper.hello' }, '*')
 		}
 	}
 
