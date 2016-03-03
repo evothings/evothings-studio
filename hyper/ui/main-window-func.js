@@ -220,7 +220,7 @@ exports.defineUIFunctions = function(hyper)
 		//LOGGER.log('[main-window-func.js] Main got : ' + event.data.message)
 		if ('eval' == event.data.message)
 		{
-			hyper.SERVER.evalJS(event.data.code, event.data.client)
+			hyper.SERVER.evalJS(event.data.code, event.data.clientUUID)
 		}
 		else if ('setSession' == event.data.message)
 		{
@@ -685,7 +685,7 @@ exports.defineUIFunctions = function(hyper)
 			mViewersWindow = window.open(
 				'hyper-viewers.html',
 				'Viewers',
-				'resizable=1,width=400,height=300')
+				'resizable=1,width=800,height=500')
 			mViewersWindow.moveTo(150, 150)
 			mViewersWindow.focus()
 			// Establish contact. Not really needed.
