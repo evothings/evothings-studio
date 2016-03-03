@@ -84,7 +84,7 @@ exports.connectToRemoteServer = function()
 	{
 		// Messages from the server to the Workbench.
 		'workbench.set-session-id': onMessageWorkbenchSetSessionID,
-        'workbench.set-connect-key': onMessageWorkbenchSetConnectKey,
+		'workbench.set-connect-key': onMessageWorkbenchSetConnectKey,
 		'workbench.client-info': onMessageWorkbenchClientInfo,
 		'client.instrumentation': onMessageWorkbenchClientInstrumentation,
 		'workbench.get-resource': onMessageWorkbenchGetResource,
@@ -146,7 +146,7 @@ exports.connectToRemoteServer = function()
 
 	socket.on('hyper-workbench-message', function(message)
 	{
-		//console.log('message = '+message.name)
+		console.log('message = '+message.name)
         var handler = messageHandlers[message.name]
         if (handler)
         {
@@ -572,13 +572,13 @@ exports.reloadApp = function()
 /**
  * External.
  */
-exports.evalJS = function(code, client)
+exports.evalJS = function(code, clientUUID)
 {
 	sendMessageToServer(mSocket, 'workbench.eval',
 		{
 			sessionID: mSessionID,
 			code: code,
-			client: client
+			clientUUID: clientUUID
 		})
 }
 

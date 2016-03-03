@@ -254,7 +254,7 @@ hyper.UI.defineUIFunctions = function()
 		//LOGGER.log('[hyper-ui.js] Main got : ' + event.data.message)
 		if ('eval' == event.data.message)
 		{
-			hyper.SERVER.evalJS(event.data.code, event.data.client)
+			hyper.SERVER.evalJS(event.data.code, event.data.clientUUID)
 		}
         else if ('setSession' == event.data.message)
         {
