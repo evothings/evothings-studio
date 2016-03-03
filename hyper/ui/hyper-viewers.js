@@ -297,6 +297,7 @@ $(function()
 			'../injectables/instrumentation-manager.js',
 			'../injectables/bluetooth-instrumentation.js',
 			'../injectables/cordova-instrumentation.js',
+			'../injectables/watcher-instrumentation.js',
 			'../injectables/instrumentation-starter.js'
 		]
 		var promises = []
