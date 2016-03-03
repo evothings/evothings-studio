@@ -14,6 +14,9 @@ function generateUUID() {
 evothings.easyble.reset()
 evothings.easyble.reportDeviceOnce(true)
 
+/*
+There was a merge conflict, commented out this code.
+
 var me = window.evo.bluetooth =
 {
     bluetoothServices: {
@@ -214,7 +217,7 @@ var me = window.evo.bluetooth =
     "weight_scale_feature": '2A9E',
     "wind_chill": '2A79'
 },
-    
+
     services: [],
     subscriptions: [],
     devices: [],
@@ -576,3 +579,4 @@ var me = window.evo.bluetooth =
 }
 
 me.discover()
+*/

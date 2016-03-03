@@ -193,6 +193,7 @@ $(function()
 		div.style.flexDirection = 'column'
 		div.style.justifyContent = 'space-around'
 		div.style.width = '200px'
+		div.style.height = '120px'
 		var span = document.createElement('span')
 		span.innerHTML = viewer.name + ' ('+viewer.info.model+')'
 		var img = document.createElement('img')
@@ -248,13 +249,18 @@ $(function()
 	function onClientSelected(viewer)
 	{
 		console.log('user selected client '+viewer.name)
+		mMainWindow.postMessage({ message: 'eval', code: 'navigator.vibrate(300)', clientUUID: viewer.UUID }, '*')
 		if(!mInstrumentationReceivedFrom[viewer.clientID])
 		{
 			injectInstrumentationToClient(viewer)
 		}
 		else
 		{
-			selectHierarchy(undefined, viewer)
+			var cdiv = document.getElementById(viewer.clientID + '.serviceroot')
+			if(cdiv.childNodes.length == 0)
+			{
+				selectHierarchy(undefined, viewer)
+			}
 		}
 	}
 
@@ -616,7 +622,7 @@ $(function()
 							color = 'rgba(195,205,255,0.76)'
 					}
 					var ts = getTimeSeriesFor(path+'_'+key, chart, color, fillstyle)
-					//console.log('  -- appending value '+value+' for key '+key+' and timestamp '+time)
+					console.log('  -- appending value '+parseFloat(value)+' for key '+key+' and timestamp '+time)
 					ts.append(time, value)
 				}
 				count++

@@ -63,7 +63,7 @@ var me = window.evo.cordova =
 			{
 				return navigator.compass.getCurrentHeading(function(Obj)
 				{
-					cb(Obj)
+					cb({value: Obj, type: 'plot'})
 				}, function(error)
 				{
 					cb()
@@ -74,7 +74,7 @@ var me = window.evo.cordova =
 				hyper.log('cordova.compass.subscribeto called with interval '+interval)
 				var sid = navigator.compass.watchHeading(function(Obj)
 				{
-					cb(Obj)
+					cb({value: Obj, type: 'plot'})
 				}, function(error)
 				{
 					cb()

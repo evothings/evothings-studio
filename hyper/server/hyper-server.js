@@ -84,7 +84,7 @@ exports.connectToRemoteServer = function()
 	{
 		// Messages from the server to the Workbench.
 		'workbench.set-session-id': onMessageWorkbenchSetSessionID,
-        'workbench.set-connect-key': onMessageWorkbenchSetConnectKey,
+		'workbench.set-connect-key': onMessageWorkbenchSetConnectKey,
 		'workbench.client-info': onMessageWorkbenchClientInfo,
 		'client.instrumentation': onMessageWorkbenchClientInstrumentation,
 		'workbench.get-resource': onMessageWorkbenchGetResource,
@@ -140,13 +140,13 @@ exports.connectToRemoteServer = function()
 	socket.on('disconnect', function()
 	{
 		mIsConnected = false
-        EVENTS.publish(EVENTS.DISCONNECT, {event: 'disconnected' })
+		EVENTS.publish(EVENTS.DISCONNECT, {event: 'disconnected' })
 		clearInterval(mHeartbeatTimer)
 	})
 
 	socket.on('hyper-workbench-message', function(message)
 	{
-		//console.log('message = '+message.name)
+		console.log('message = '+message.name)
         var handler = messageHandlers[message.name]
         if (handler)
         {
@@ -222,8 +222,8 @@ function onMessageWorkbenchSetConnectKey(socket, message)
 function onMessageWorkbenchClientInfo(socket, message)
 {
 	// Notify UI about clients.
-	//LOGGER.log('[hyper-server.js] got client info')
-	//console.dir(message)
+	LOGGER.log('[hyper-server.js] got client info')
+	console.dir(message)
 	EVENTS.publish(EVENTS.VIEWERSUPDATED, message.data)
 	mCLientInfo = message.data
 	mClientInfoCallback && mClientInfoCallback(message)
@@ -572,13 +572,13 @@ exports.reloadApp = function()
 /**
  * External.
  */
-exports.evalJS = function(code, client)
+exports.evalJS = function(code, clientUUID)
 {
 	sendMessageToServer(mSocket, 'workbench.eval',
 		{
 			sessionID: mSessionID,
 			code: code,
-			clientUUID: client.UUID
+			clientUUID: clientUUID
 		})
 }
 
