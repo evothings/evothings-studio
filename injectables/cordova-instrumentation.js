@@ -1,16 +1,6 @@
 
 hyper.log ('cordova intrumentation provider loading....')
 
-function generateUUID() {
-	var d = new Date().getTime();
-	var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-		var r = (d + Math.random()*16)%16 | 0;
-		d = Math.floor(d/16);
-		return (c=='x' ? r : (r&0x3|0x8)).toString(16);
-	});
-	return uuid;
-}
-
 var me = window.evo.cordova =
 {
 	services: [],
@@ -30,7 +20,7 @@ var me = window.evo.cordova =
 			{
 				return navigator.accelerometer.getCurrentAcceleration(function(accelObj)
 				{
-					cb(accelObj)
+					cb({value: accelObj, type: 'plot'})
 				}, function(error)
 				{
 					cb()
@@ -41,7 +31,7 @@ var me = window.evo.cordova =
 				hyper.log('cordova.accelerometer.subscribeto called with interval '+interval)
 				var sid = navigator.accelerometer.watchAcceleration(function(accelObj)
 				{
-					cb(accelObj)
+					cb({value: accelObj, type: 'plot'})
 				}, function(error)
 				{
 					cb()

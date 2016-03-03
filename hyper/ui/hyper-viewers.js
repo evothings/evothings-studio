@@ -248,6 +248,7 @@ $(function()
 	function onClientSelected(viewer)
 	{
 		console.log('user selected client '+viewer.name)
+		mMainWindow.postMessage({message: 'eval',	code: 'navigator.vibrate(500); ',	client: client}, '*')
 		if(!mInstrumentationReceivedFrom[viewer.clientID])
 		{
 			injectInstrumentationToClient(viewer)
@@ -329,7 +330,7 @@ $(function()
 			console.log('all injectables injected into client with UUID '+client.UUID+'. Evaluating listServices()')
 			mMainWindow.postMessage({
 				message: 'eval',
-				code: 'navigator.vibrate(500); window.evo.instrumentation.selectHierarchy()',
+				code: 'window.evo.instrumentation.selectHierarchy()',
 				client: client
 			}, '*')
 

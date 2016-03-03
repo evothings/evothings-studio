@@ -1,16 +1,6 @@
 
 hyper.log ('bluetooth intrumentation provider loading....')
 
-function generateUUID() {
-    var d = new Date().getTime();
-    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        var r = (d + Math.random()*16)%16 | 0;
-        d = Math.floor(d/16);
-        return (c=='x' ? r : (r&3|8)).toString(16);
-    });
-    return uuid;
-}
-
 evothings.easyble.reset()
 evothings.easyble.reportDeviceOnce(true)
 
@@ -291,9 +281,13 @@ var me = window.evo.bluetooth =
                     device.readCharacteristic(characteristicUUID, function(data)
                     {
                         hyper.log('BLE characteristic data: ' + data);
+                        //
+                        //
+                        // - TODO: Identify which types of characteristics are OK as plots, OK as watches and OK as statics
+                        //
+                        //
                         var data = evothings.ble.fromUtf8(data)
-
-                        cb(data)
+                        cb({value: data, type: 'plot'})
                     },
                     function(errorCode)
                     {
