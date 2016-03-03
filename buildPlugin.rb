@@ -12,18 +12,18 @@ def applicationName
 end
 
 def distCopyright
-	"Copyright (c) 2015 Evothings AB"
+	"Copyright (c) 2016 Evothings AB"
 end
 
 # TODO: Update on new release.
 def distVersion
-	"2.0.0"
+	"2.1.0"
 end
 
 # TODO: Update on new release.
 def distVersionLabel
-	# TODO: Remove " Beta 3" for final release.
-	distVersion + " Beta 3"
+	# TODO: Remove alpha/beta label for final release.
+	distVersion + "-alpha1"
 end
 
 # TODO: Update on new release.

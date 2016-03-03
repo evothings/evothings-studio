@@ -20,7 +20,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-var FILEUTIL = require('../server/fileutil.js')
+var FILEUTIL = require('../server/file-util.js')
 var UUID = require('../server/uuid.js')
 
 exports.set = function(key, value)
@@ -149,6 +149,11 @@ systemSetting('DoNotShowUpdateDialogForVersion', null)
 systemSetting('MyAppsPath', FILEUTIL.getEvothingsUserFolderPath())
 
 /**
+ * Session ID for the Workbench.
+ */
+systemSetting('SessionID', null)
+
+/**
  * Settings for user GUID are handled specially to preserve existing ids.
  */
 exports.getEvoGUID = function()
@@ -189,7 +194,48 @@ exports.setReloadServerAddress = function(value) {
 	exports.set('ReloadServerAddressVersion', currentVersion)
 }
 
-/**
- * Session ID.
- */
-systemSetting('SessionID', null)
+exports.setProjectList = function(list)
+{
+	window.localStorage.setItem('project-list', JSON.stringify(list))
+}
+
+exports.getProjectList = function(list)
+{
+	var json = window.localStorage.getItem('project-list')
+	if (json)
+	{
+		return JSON.parse(fixWin32PathDelimiters(json))
+	}
+	else
+	{
+	    return null
+	}
+}
+
+exports.getExampleList = function(list)
+{
+	var json = FILEUTIL.readFileSync('./hyper/settings/example-list.json')
+	if (json)
+	{
+		return JSON.parse(fixWin32PathDelimiters(json))
+	}
+	else
+	{
+	    return null
+	}
+}
+
+// What a hack. Replaces forward slashes with two
+// backslashes, globally in all json data. '/' --> '\\'
+function fixWin32PathDelimiters(aString)
+{
+	// Replace slashes with backslashes on Windows.
+	if (process.platform === 'win32')
+	{
+		return aString.replace(/[\/]/g,'\\\\')
+	}
+	else
+	{
+		return aString
+	}
+}

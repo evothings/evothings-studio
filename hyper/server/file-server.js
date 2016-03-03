@@ -1,5 +1,5 @@
 /*
-File: hyper-server.js
+File: file-server.js
 Description: HyperReload file server.
 Author: Mikael Kindborg
 
@@ -11,7 +11,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,23 +21,22 @@ limitations under the License.
 */
 
 /*********************************/
-/***     Imported modules      ***/
+/***	 Imported modules	   ***/
 /*********************************/
 
 var OS = require('os')
 var FS = require('fs')
 var PATH = require('path')
 var SOCKETIO_CLIENT = require('socket.io-client')
-var FILEUTIL = require('./fileutil.js')
-var LOADER = require('./fileloader.js')
+var FILEUTIL = require('./file-util.js')
+var LOADER = require('./file-loader.js')
 var LOGGER = require('./log.js')
 var SETTINGS = require('../settings/settings.js')
 var UUID = require('./uuid.js')
-var EVENTS = require('./events')
-var APP_SETTINGS = require('./app-settings.js')
+var EVENTS = require('./system-events.js')
 
 /*********************************/
-/***     Module variables      ***/
+/***	 Module variables	   ***/
 /*********************************/
 
 // Workbench version code should be incremented on each new release.
@@ -52,7 +51,6 @@ var mIsConnected = false
 var mSessionID = null
 var mRemoteServerURL = ''
 var mSocket = null
-var mAppPath = null
 var mAppFile = null
 var mAppID = null
 var mMessageCallback = null
@@ -69,7 +67,7 @@ var mCLientInfo = undefined
 var mBasePath = ''
 
 /*********************************/
-/***     Server functions      ***/
+/***	 Server functions	   ***/
 /*********************************/
 
 /**
@@ -77,7 +75,7 @@ var mBasePath = ''
  */
 exports.connectToRemoteServer = function()
 {
-	LOGGER.log('[hyper-server.js] Connecting to remote server')
+	LOGGER.log('[file-server.js] Connecting to remote server')
 
 	// Message handler table.
 	var messageHandlers =
@@ -95,7 +93,7 @@ exports.connectToRemoteServer = function()
 		'workbench.user-logout': onMessageWorkbenchUserLogout
 	}
 
-	LOGGER.log('[hyper-server.js] connecting to server: ' + mRemoteServerURL)
+	LOGGER.log('[file-server.js] connecting to server: ' + mRemoteServerURL)
 
 	// Create socket.io instance.
 	var socket = SOCKETIO_CLIENT(
@@ -108,13 +106,13 @@ exports.connectToRemoteServer = function()
 	// Connect function.
 	socket.on('connect', function()
 	{
-		LOGGER.log('[hyper-server.js] Connected to server')
+		LOGGER.log('[file-server.js] Connected to server')
 		mIsConnected = true
-        EVENTS.publish(EVENTS.CONNECT, { event: 'connected' })
+		EVENTS.publish(EVENTS.CONNECT, { event: 'connected' })
 		//exports.requestConnectKey()
 		mSessionID = SETTINGS.getSessionID()
 
-		LOGGER.log('[hyper-server.js] workbench.connected session: ' + mSessionID)
+		LOGGER.log('[file-server.js] workbench.connected session: ' + mSessionID)
 
 		var info =
 		{
@@ -124,17 +122,16 @@ exports.connectToRemoteServer = function()
 			ostype: OS.type()
 		}
 		var uuid = SETTINGS.getEvoGUID()
-		LOGGER.log('[hyper-server.js] ------ uuid = '+uuid)
+		//LOGGER.log('[file-server.js] ------ uuid = '+uuid)
 		mDeviceInfo = info
-		//
-        sendMessageToServer(mSocket, 'workbench.connected', { sessionID: mSessionID, uuid: uuid, info: info })
+		sendMessageToServer(mSocket, 'workbench.connected', { sessionID: mSessionID, uuid: uuid, info: info })
 		mHeartbeatTimer = setInterval(heartbeat, mHeartbeatInterval)
 		heartbeat()
 	})
 
 	socket.on('error', function(error)
 	{
-		LOGGER.log('[hyper-server.js] socket error: ' + error)
+		LOGGER.log('[file-server.js] socket error: ' + error)
 	})
 
 	socket.on('disconnect', function()
@@ -147,11 +144,12 @@ exports.connectToRemoteServer = function()
 	socket.on('hyper-workbench-message', function(message)
 	{
 		console.log('message = '+message.name)
-        var handler = messageHandlers[message.name]
-        if (handler)
-        {
-        	handler(socket, message)
-        }
+
+		var handler = messageHandlers[message.name]
+		if (handler)
+		{
+			handler(socket, message)
+		}
 	})
 }
 
@@ -178,7 +176,10 @@ function sendMessageToServer(_socket, name, data)
 {
 	var socket = _socket || mSocket
 	var uuid = SETTINGS.getEvoGUID()
-	//LOGGER.log('[hyper-server.js] sendMessageToServer -- uuid = '+uuid)
+	//console.log('[file-server.js] --------------')
+	//console.log('[file-server.js] sendMessageToServer: ' + JSON.stringify(data))
+	//console.log('[file-server.js] --------------')
+	//console.log('[file-server.js] sendMessageToServer -- uuid = '+uuid)
 	socket.emit('hyper-workbench-message', {
 		protocolVersion: mProtocolVersion,
 		workbenchVersionCode: mWorkbenchVersionCode,
@@ -190,7 +191,7 @@ function sendMessageToServer(_socket, name, data)
 
 function onMessageWorkbenchSetSessionID(socket, message)
 {
-	LOGGER.log('[hyper-server.js] onMessageWorkbenchSetSessionID: ' + message.data.sessionID)
+	LOGGER.log('[file-server.js] onMessageWorkbenchSetSessionID: ' + message.data.sessionID)
 
 	// Set/display session id if we got it.
 	if (message.data.sessionID)
@@ -203,7 +204,7 @@ function onMessageWorkbenchSetSessionID(socket, message)
 
 		// Send event width session id.
 		// TODO: Who is listening to this? No one it seems.
-        EVENTS.publish(EVENTS.SETSESSIONID, mSessionID)
+		EVENTS.publish(EVENTS.SETSESSIONID, mSessionID)
 	}
 
 	// Display user message if we got one.
@@ -215,23 +216,28 @@ function onMessageWorkbenchSetSessionID(socket, message)
 
 function onMessageWorkbenchSetConnectKey(socket, message)
 {
-    //console.dir(message)
-    mRequestConnectKeyCallback && mRequestConnectKeyCallback(message)
+	//console.dir(message)
+	mRequestConnectKeyCallback && mRequestConnectKeyCallback(message)
 }
 
 function onMessageWorkbenchClientInfo(socket, message)
 {
-	// Notify UI about clients.
-	LOGGER.log('[hyper-server.js] got client info')
+	console.log('[file-server.js] got client info')
 	console.dir(message)
+
+	// Notify UI about clients.
 	EVENTS.publish(EVENTS.VIEWERSUPDATED, message.data)
 	mCLientInfo = message.data
+
 	mClientInfoCallback && mClientInfoCallback(message)
 }
 
 function onMessageWorkbenchClientInstrumentation(socket, message)
 {
 	// Notify UI about clients.
+	LOGGER.log('[file-server.js] ******** got client instrumentation')
+	console.dir(message)
+
 	EVENTS.publish(EVENTS.VIEWERSINSTRUMENTATION, message.data)
 }
 
@@ -305,8 +311,16 @@ exports.requestConnectKey = function()
 	// On first call mSessionID will be null, if server goes down
 	// and we connect again we will pass our session id so the server
 	// can restore our session.
-    LOGGER.log('[hyper-server.js] requesting connect key from server')
+	LOGGER.log('[file-server.js] requesting connect key from server')
 	sendMessageToServer(mSocket, 'workbench.request-connect-key', { sessionID: mSessionID })
+}
+
+/**
+ * External.
+ */
+exports.sendDisconnectAllViewersToServer = function()
+{
+	sendMessageToServer(mSocket, 'workbench.disconnect-viewers', { sessionID: mSessionID })
 }
 
 /**
@@ -314,7 +328,7 @@ exports.requestConnectKey = function()
  */
 exports.disconnectFromRemoteServer = function()
 {
-	LOGGER.log('[hyper-server.js] Disconnecting from remote server')
+	LOGGER.log('[file-server.js] Disconnecting from remote server')
 
 	if (mSocket)
 	{
@@ -343,7 +357,7 @@ function serveUsingResponse304()
  */
 function serveResource(platform, path, ifModifiedSince)
 {
-	//LOGGER.log('[hyper-server.js] serveResource: ' + path)
+	//console.log('[file-server.js] serveResource: ' + path)
 
 	if (!path || path == '/')
 	{
@@ -361,7 +375,7 @@ function serveResource(platform, path, ifModifiedSince)
 	else if (mBasePath)
 	{
 		return LOADER.response(
-			mBasePath + path.substr(1),
+			PATH.join(mBasePath, path),
 			ifModifiedSince)
 	}
 	else
@@ -402,20 +416,20 @@ function serveCordovaFile(platform, path)
 	// If we are inside a cordova project, we use the
 	// files in that project.
 	// Folder structure:
-	//   www <-- mBasePath (root of running app)
-	//     index.html
-	//   platforms
-	//     android
-	//       assets
-	//         www
-	//           cordova.js
-	//           cordova_plugins.js
-	//           plugins
-	//     ios
-	//       www
-	//         cordova.js
-	//         cordova_plugins.js
-	//         plugins
+	//	 www <-- mBasePath (root of running app)
+	//	   index.html
+	//	 platforms
+	//	   android
+	//		 assets
+	//		   www
+	//			 cordova.js
+	//			 cordova_plugins.js
+	//			 plugins
+	//	   ios
+	//		 www
+	//		   cordova.js
+	//		   cordova_plugins.js
+	//		   plugins
 	//
 	// Set path to Cordova files in current project.
 	// Note that mBasePath ends with path separator.
@@ -469,13 +483,23 @@ function serveCordovaFile(platform, path)
  */
 exports.setAppPath = function(appPath)
 {
-	if (appPath != mAppPath)
-	{
-		mAppPath = appPath.replace(new RegExp('\\' + PATH.sep, 'g'), '/')
-		var pos = mAppPath.lastIndexOf('/') + 1
-		mBasePath = mAppPath.substr(0, pos)
-		mAppFile = mAppPath.substr(pos)
-	}
+	mBasePath = PATH.normalize(appPath.replace(new RegExp('\\' + PATH.sep, 'g'), '/'))
+}
+
+/**
+ * External.
+ */
+exports.setAppFileName = function(fileName)
+{
+	mAppFile = PATH.normalize(fileName.replace(new RegExp('\\' + PATH.sep, 'g'), '/'))
+}
+
+/**
+ * External.
+ */
+exports.setAppID = function(id)
+{
+	mAppID = id
 }
 
 /**
@@ -493,7 +517,7 @@ exports.getAppFileName = function()
  */
 exports.getAppPath = function()
 {
-	return mAppPath
+	return PATH.join(mBasePath, mAppFile)
 }
 
 /**
@@ -509,7 +533,7 @@ exports.getBasePath = function()
  */
 exports.getAppServerURL = function()
 {
-	return mRemoteServerURL + '/hyper/' + mSessionID + '/' + mAppID + '/' + mAppFile
+	return mRemoteServerURL + '/hyper/' + mSessionID + getAppURL()
 }
 
 /**
@@ -542,12 +566,12 @@ exports.runApp = function()
 {
 	//serveUsingResponse200()
 	serveUsingResponse304()
-	mAppID = APP_SETTINGS.getAppID(mBasePath)
+	console.log('@@@ [file-server.js] run app: ' + getAppURL())
 	sendMessageToServer(mSocket, 'workbench.run',
 		{
 			sessionID: mSessionID,
 			appID: mAppID,
-			appName: hyper.UI.getProjectNameFromFile(mAppPath),
+			appName: hyper.UI.getProjectNameFromFile(exports.getAppPath()),
 			url: getAppURL()
 		})
 }
@@ -564,7 +588,7 @@ exports.reloadApp = function()
 		{
 			sessionID: mSessionID,
 			appID: mAppID,
-			appName: hyper.UI.getProjectNameFromFile(mAppPath)
+			appName: hyper.UI.getProjectNameFromFile(exports.getAppPath())
 		})
 	mReloadCallback && mReloadCallback()
 }
@@ -619,7 +643,7 @@ exports.setReloadCallbackFun = function(fun)
  */
 exports.setRequestConnectKeyCallbackFun = function(fun)
 {
-    mRequestConnectKeyCallback = fun
+	mRequestConnectKeyCallback = fun
 }
 
 /**
@@ -635,7 +659,7 @@ exports.setRemoteServerURL = function(url)
  */
 exports.getSessionID = function()
 {
-    return mSessionID
+	return mSessionID
 }
 
 exports.sendMessageToServer = sendMessageToServer

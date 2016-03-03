@@ -5,11 +5,10 @@ $(function()
 	var SETTINGS = require('../settings/settings.js')
 	var LOGGER = require('../server/log.js')
 	var GUI = require('nw.gui')
-	var EVENTS = require('../server/events.js')
-	var SERVER = require('../server/hyper-server.js')
+	var EVENTS = require('../server/system-events.js')
+	var SERVER = require('../server/file-server.js')
 	var ALL	= require('node-promise').allOrNone
 	var PROMISE = require('node-promise').defer
-
 
 	// Main application window
 	var mMainWindow = window.opener

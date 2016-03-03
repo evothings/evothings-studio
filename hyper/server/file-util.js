@@ -11,7 +11,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -37,6 +37,19 @@ exports.readFileSync = function(path, options)
 	}
 }
 
+exports.writeFileSync = function(path, data, options)
+{
+	try
+	{
+		return FS.writeFileSync(path, data, options || {encoding: 'utf8'})
+	}
+	catch (err)
+	{
+		return null
+	}
+}
+
+
 exports.statSync = function(path)
 {
 	try
@@ -51,15 +64,37 @@ exports.statSync = function(path)
 
 exports.isPathAbsolute = function(path)
 {
-	// Check for Linux/OS X and Windows.
+	// Check for Linux, OS X, and Windows.
 	return (path[0] === '/') || (path[0] === PATH.sep) || (path[1] === ':')
+}
+
+// Note: Case insensitive.
+exports.stringEndsWith = function(aString, subString)
+{
+	return subString.toLowerCase() == aString.toLowerCase().substr(-(subString.length))
 }
 
 exports.fileIsHTML = function(path)
 {
-	var pos = path.lastIndexOf('.')
-	var extension = path.substring(pos).toLowerCase()
-	return (extension === '.html' || extension === '.htm')
+	return exports.stringEndsWith(path, '.html') || exports.stringEndsWith(path, '.htm')
+}
+
+exports.fileIsDirectory = function(path)
+{
+	var stat = FS.statSync(path)
+	return stat.isDirectory()
+}
+
+exports.fileIsEvothingsSettings = function(path)
+{
+	return exports.stringEndsWith(path, 'evothings.json')
+}
+
+// If path is an HTML file return the directory, else return path,
+// assuming it is a directory.
+exports.getAppDirectory = function(path)
+{
+	return exports.fileIsHTML(path) ? PATH.dirname(path) : path
 }
 
 // Download a document as a text string.
@@ -107,7 +142,7 @@ exports.getEvothingsUserFolderPath = function()
 				null)
 		if (userDir)
 		{
-			myAppsDir =  PATH.join(userDir, 'EvothingsStudio', 'MyApps')
+			myAppsDir =	 PATH.join(userDir, 'EvothingsStudio', 'MyApps')
 		}
 	}
 	catch (error)

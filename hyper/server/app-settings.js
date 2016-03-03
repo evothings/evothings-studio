@@ -12,7 +12,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,16 +22,16 @@ limitations under the License.
 */
 
 /*********************************/
-/***     Imported modules      ***/
+/***	 Imported modules	   ***/
 /*********************************/
 
 var FS = require('fs')
 var PATH = require('path')
-var FILEUTIL = require('./fileutil.js')
+var FILEUTIL = require('./file-util.js')
 var UUID = require('./uuid.js')
 
 /*********************************/
-/***       App settings        ***/
+/***	   App settings		   ***/
 /*********************************/
 
 /**
@@ -63,7 +63,6 @@ exports.getAppID = function(appPath)
 exports.getAppImage = function(appPath)
 {
 	var settings = readAppSettings(appPath)
-
 	if (settings && settings['app-icon'])
 	{
 		return settings['app-icon']
@@ -80,11 +79,124 @@ exports.getAppImage = function(appPath)
 exports.generateNewAppUUID = function(appPath)
 {
 	var settings = readAppSettings(appPath)
-
 	if (settings)
 	{
 		settings['app-uuid'] = UUID.generateUUID()
 		writeAppSettings(settings, appPath)
+	}
+	else
+	{
+		return null
+	}
+}
+
+/**
+ * Set the app HTML file path.
+ */
+exports.setIndexFile = function(appPath, indexPath)
+{
+	var settings = readAppSettings(appPath)
+	if (settings)
+	{
+		settings['index-file'] = indexPath
+		writeAppSettings(settings, appPath)
+	}
+	else
+	{
+		return null
+	}
+}
+
+/**
+ * Get the app HTML file name.
+ */
+exports.getIndexFile = function(appPath)
+{
+	var settings = readAppSettings(appPath)
+	if (settings)
+	{
+		return settings['index-file']
+	}
+	else
+	{
+		return null
+	}
+}
+
+/**
+ * Directory for app source files.
+ */
+exports.getAppDir = function(appPath)
+{
+	var settings = readAppSettings(appPath)
+	if (settings)
+	{
+		return settings['app-dir']
+	}
+	else
+	{
+		return null
+	}
+}
+
+/**
+ * Directory for built files.
+ */
+exports.getWwwDir = function(appPath)
+{
+	var settings = readAppSettings(appPath)
+	if (settings)
+	{
+		return settings['www-dir']
+	}
+	else
+	{
+		return null
+	}
+}
+
+/**
+ * Directories that should not be processed when building.
+ */
+exports.getAppDontBuildDirs = function(appPath)
+{
+	var settings = readAppSettings(appPath)
+	if (settings)
+	{
+		return settings['dont-build']
+	}
+	else
+	{
+		return null
+	}
+}
+
+/**
+ * Get the app HTML file short path (relative to project root).
+ */
+exports.getIndexFileShortPath = function(appPath)
+{
+	var appDirPath = exports.getAppDir(appPath)
+	var indexPath = exports.getIndexFile(appPath)
+	if (appDirPath && indexPath)
+	{
+		return PATH.join(appDirPath, indexPath)
+	}
+	else
+	{
+		return null
+	}
+}
+
+/**
+ * Get the full HTML file path for the app.
+ */
+exports.getIndexFileFullPath = function(appPath)
+{
+	var indexShortPath = exports.getIndexFileShortPath(appPath)
+	if (indexShortPath)
+	{
+		return PATH.join(appPath, indexShortPath)
 	}
 	else
 	{
@@ -116,6 +228,6 @@ function readAppSettings(appPath)
 function writeAppSettings(settings, appPath)
 {
 	var path = PATH.join(appPath, 'evothings.json')
-	var data = JSON.stringify(settings)
+	var data = JSON.stringify(settings, null, 2)
 	FS.writeFileSync(path, data, {encoding: 'utf8'})
 }

@@ -71,6 +71,9 @@ Copyright (c) 2013-2015 Evothings AB
 						<li><a id="button-share-social"
 							role="button" href="javascript:void(0)">
 							Share in Social Media</a></li>
+						<li><a id="button-disconnect-all-viewers"
+							role="button" href="javascript:void(0)">
+							Disconnect all Viewers</a></li>
 						<li><a id="button-open-settings-dialog"
 							role="button" href="javascript:void(0)">
 							Settings</a></li>
@@ -370,6 +373,72 @@ Copyright (c) 2013-2015 Evothings AB
 				</div>
 			</div>
 
+			<!-- ModalDialog: dialog-build-message --->
+			<div class="modal fade"
+				id="dialog-build-message"
+				tabindex="-1"
+				role="dialog"
+				aria-labelledby="dialog-build-message-label"
+				aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h4 class="modal-title" id="dialog-build-message-label">
+								Build message
+							</h4>
+						</div>
+
+						<div class="modal-body">
+							<div class="form-group style-big-para">
+								<p id="build-message">Hello World</p>
+							</div>
+						</div>
+
+						<div class="modal-footer">
+							<button type="button"
+								class="btn btn-default"
+								data-dismiss="modal">
+								Close
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- ModalDialog: dialog-disconnect-all-viewers --->
+			<div class="modal fade"
+				id="dialog-disconnect-all-viewers"
+				tabindex="-1"
+				role="dialog"
+				aria-labelledby="dialog-disconnect-all-viewers-label"
+				aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h4 class="modal-title" id="dialog-disconnect-all-viewers-label">
+								Disconnect all Viewers
+							</h4>
+						</div>
+
+						<div class="modal-body">
+							<div class="form-group style-big-para">
+								<p id="build-message">A message has been sent to the server to disconnect all Viewers connected to this Workbench. The Viewer counter in the lower left corner of the main Workbench window should reach zero after 15-30 seconds. Select the Disconnect all Viewers menu item again if this does not happen.</p>
+							</div>
+						</div>
+
+						<div class="modal-footer">
+							<button type="button"
+								class="btn btn-default"
+								data-dismiss="modal">
+								Close
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
 			<!-- ModalDialog: dialog-share-social --->
 			<div class="modal fade"
 				id="dialog-share-social"
@@ -396,36 +465,36 @@ Copyright (c) 2013-2015 Evothings AB
 							<p><strong>We would love if you would like to help us spread the word! <br/><br/>Here are some sample tweets, don't worry, you will get a chance to edit the message (or write your own) to make it more personal :)</strong></p>
 
 						  <div class="share-buttons">
-						  	<span id="share-social-1">
+							<span id="share-social-1">
 								<em>Try out a quick way to develop apps for #Eddystone and #iBeacon using #Evothings Studio.</em></span>
 								<a href="#"><img id="button-share-twitter-1"  src="images/twitter.png" alt="Twitter" /></a>
-    					</div>
+						</div>
 							<hr/>
 						  <div class="share-buttons">
 								<span id="share-social-2">
 								<em>With #Evothings Studio you develop apps on as many mobile devices as you like, and see changes instantly on all.</em></span>
 								<a href="#"><img id="button-share-twitter-2" src="images/twitter.png" alt="Twitter" /></a>
-    					</div>
- 							<hr/>
-    					<div class="share-buttons">
+						</div>
+							<hr/>
+						<div class="share-buttons">
 								<span id="share-social-3">
 								<em>Use #Evothings Studio to develop apps for #BLE in #JavaScript and HTML.</em></span>
 								<a href="#"><img id="button-share-twitter-3" src="images/twitter.png" alt="Twitter" /></a>
-    					</div>
- 							<hr/>
-    					<div class="share-buttons">
+						</div>
+							<hr/>
+						<div class="share-buttons">
 								<span id="share-social-4">
 								<em>Develop mobile apps in #Evothings for #Arduino using #JavaScript and HTML.</em></span>
 								<a href="#"><img id="button-share-twitter-4" src="images/twitter.png" alt="Twitter" /></a>
-    					</div>
-    					<hr/>
+						</div>
+						<hr/>
 						<p><strong>...or you can just share us by clicking these :)</strong>
 						<div class="share-buttons">
 							<div id="button-share-linkedin"><a href="#"><img src="images/linkedin.png" alt="LinkedIn" /></a></div>
 							<div id="button-share-digg"><a href="#"><img src="images/diggit.png" alt="Digg" /></a></div>
 							<div id="button-share-facebook"><a href="#"><img src="images/facebook.png" alt="Facebook" /></a></div>
 							<div id="button-share-google"><a href="#"><img src="images/google.png" alt="Google" /></a></div>
-    					</div>
+						</div>
 						</div>
 						</p>
 						<br />
@@ -438,6 +507,11 @@ Copyright (c) 2013-2015 Evothings AB
 						</div>
 					</div>
 				</div>
+			</div>
+
+			<!-- Floating alert box --->
+			<div class="floating-alert-box">
+				<div class="floating-alert-box-message"></div>
 			</div>
 
 			<!-- Getting Started screen -->
@@ -598,6 +672,6 @@ Copyright (c) 2013-2015 Evothings AB
 
 	</div> <!-- panel-page -->
 
-	<script src="hyper-ui.js"></script>
+	<script src="main-window.js"></script>
 </body>
 </html>

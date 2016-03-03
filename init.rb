@@ -31,6 +31,7 @@ end
 def createPackageJson
 	content = open('package-template.json') do |file| file.read; end
 	content.gsub!('__VERSION__', ETS.distVersion)
+	content.gsub!('__VERSION_LABEL__', ETS.distVersionLabel)
 	open('package.json', 'w') do |file| file.write(content); end
 end
 
@@ -59,24 +60,18 @@ end
 ### Install and flatten node modules.
 
 def installNodeModules
-	if(!File.exist?('node_modules/socket.io-client'))
-		sh 'npm install socket.io-client'
-	end
+	# Install modules specified in package.json.
+	sh 'npm install fs-extra'
 
-	if(!File.exist?('node_modules/fs-extra'))
-		sh 'npm install fs-extra'
-	end
-
-	if(File.exist?('node_modules/socket.io/node_modules'))
-		begin
-			sh 'flatten-packages'
-		rescue => e
-			puts 'flatten-packages failed. If module flatten-packages is not found,'
-			puts 'please install it with this command (sudo if needed):'
-			puts '  npm install -g flatten-packages'
-			puts 'Then run init.rb again.'
-			exit(1)
-		end
+	# Run flatten-packages
+	begin
+		sh 'flatten-packages'
+	rescue => e
+		puts 'flatten-packages failed. If module flatten-packages is not found,'
+		puts 'please install it with this command (sudo if needed):'
+		puts '  npm install -g flatten-packages'
+		puts 'Then run init.rb again.'
+		exit(1)
 	end
 end
 

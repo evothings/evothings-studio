@@ -1,5 +1,5 @@
 /*
-File: fileloader.js
+File: file-loader.js
 Description: Module that loads file resources.
 Author: Mikael Kindborg
 
@@ -11,7 +11,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,7 +30,7 @@ var mMimeTypes = getDefaultMimeTypes()
 // Returns a response object.
 function response(path, ifModifiedSince)
 {
-	//LOGGER.log('[fileloader.js] response path: ' + path)
+	//console.log('[file-loader.js] response path: ' + path)
 	var file = getFileStatus(path)
 	if (!file)
 	{
@@ -40,12 +40,7 @@ function response(path, ifModifiedSince)
 	if (file.isDirectory())
 	{
 		// Get default page 'index.html'.
-		// Add ending slash separator if not present.
-		if ('/' != path.charAt(path.length - 1))
-		{
-			path = path + '/'
-		}
-		path = path + 'index.html'
+		path = PATH.join(path, 'index.html')
 		var indexFile = getFileStatus(path)
 		if (!indexFile)
 		{
@@ -77,9 +72,9 @@ function createResponse(data, mtime, contentType, ifModifiedSince)
 		var ifModifiedSinceTime = new Date(ifModifiedSince).getTime()
 		var modifiedTime = mtime.getTime()
 
-		//LOGGER.log('[fileloader.js] ifModifiedSince: ' + ifModifiedSince)
-		//LOGGER.log('[fileloader.js] ifModifiedSinceTime: ' + ifModifiedSinceTime)
-		//LOGGER.log('[fileloader.js] modifiedTime: ' + modifiedTime)
+		//LOGGER.log('[file-loader.js] ifModifiedSince: ' + ifModifiedSince)
+		//LOGGER.log('[file-loader.js] ifModifiedSinceTime: ' + ifModifiedSinceTime)
+		//LOGGER.log('[file-loader.js] modifiedTime: ' + modifiedTime)
 
 		if (modifiedTime <= ifModifiedSinceTime)
 		{
@@ -130,7 +125,7 @@ function getFileStatus(fullPath)
 	}
 	catch (ex)
 	{
-		LOGGER.log('[fileloader.js] resource-loader.js: getFileStatus exception: ' + ex)
+		LOGGER.log('[file-loader.js] resource-loader.js: getFileStatus exception: ' + ex)
 		return null
 	}
 }
