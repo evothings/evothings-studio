@@ -252,10 +252,10 @@ $(function()
 		// There was a merge conflict here.
 
 		// This is from peter/instrumentation (or possibly peter/master_temp).
-		// Commented out this version.
-		//mMainWindow.postMessage({ message: 'eval', code: 'navigator.vibrate(300)', clientUUID: viewer.UUID }, '*')
-		// This is from peter/saved_from_git_magic
-		mMainWindow.postMessage({message: 'eval',	code: 'navigator.vibrate(500); ',	client: client}, '*')
+		mMainWindow.postMessage({ message: 'eval', code: 'navigator.vibrate(300)', clientUUID: viewer.UUID }, '*')
+
+		// This is from peter/saved_from_git_magic. This code does not work.
+		//mMainWindow.postMessage({message: 'eval',	code: 'navigator.vibrate(500); ',	client: client}, '*')
 
 		if(!mInstrumentationReceivedFrom[viewer.clientID])
 		{
@@ -287,7 +287,7 @@ $(function()
 	function injectInstrumentationToClient(client)
 	{
 		var wd = global.require.main.filename+'../'
-		wd = wd.replace('hyper-ui.html','')
+		wd = wd.replace('index.html','')
 		document.getElementById('p2').style.display="block"
 		console.log('injecting instrumentation into client '+client.name+' from directory '+wd+', to client '+client.UUID)
 		var files =
