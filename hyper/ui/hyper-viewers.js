@@ -259,6 +259,7 @@ $(function()
 	function onClientSelected(viewer)
 	{
 		console.log('user selected client '+viewer.name)
+		mMainWindow.postMessage({ message: 'eval', code: 'navigator.vibrate(300)', clientUUID: viewer.UUID }, '*')
 		if(!mInstrumentationReceivedFrom[viewer.clientID])
 		{
 			injectInstrumentationToClient(viewer)
