@@ -12,6 +12,10 @@ if (window.evo && window.evo.instrumentation)
 	{
 		mgr.addServiceProvider(window.evo.bluetooth)
 	}
+	if(window.evo.watcher)
+	{
+		mgr.addServiceProvider(window.evo.watcher)
+	}
 	//
 	hyper.log("INJECTION ACTIVATED")
 }

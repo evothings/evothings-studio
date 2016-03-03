@@ -249,7 +249,15 @@ $(function()
 	function onClientSelected(viewer)
 	{
 		console.log('user selected client '+viewer.name)
-		mMainWindow.postMessage({ message: 'eval', code: 'navigator.vibrate(300)', clientUUID: viewer.UUID }, '*')
+
+		// There was a merge conflict here.
+
+		// This is from peter/instrumentation (or possibly peter/master_temp).
+		// Commented out this version.
+		//mMainWindow.postMessage({ message: 'eval', code: 'navigator.vibrate(300)', clientUUID: viewer.UUID }, '*')
+		// This is from peter/saved_from_git_magic
+		mMainWindow.postMessage({message: 'eval',	code: 'navigator.vibrate(500); ',	client: client}, '*')
+
 		if(!mInstrumentationReceivedFrom[viewer.clientID])
 		{
 			injectInstrumentationToClient(viewer)
@@ -335,7 +343,7 @@ $(function()
 			console.log('all injectables injected into client with UUID '+client.UUID+'. Evaluating listServices()')
 			mMainWindow.postMessage({
 				message: 'eval',
-				code: 'navigator.vibrate(500); window.evo.instrumentation.selectHierarchy()',
+				code: 'window.evo.instrumentation.selectHierarchy()',
 				client: client
 			}, '*')
 
