@@ -61,7 +61,7 @@ end
 
 def installNodeModules
 	# Install modules specified in package.json.
-	sh 'npm install fs-extra'
+	sh 'npm install'
 
 	# Run flatten-packages
 	begin
