@@ -74,6 +74,7 @@ function getNumberOfMonitoredFiles()
  */
 function startFileSystemMonitor()
 {
+console.log('@@@@@@ startFileSystemMonitor: ' + mBasePath)
 	mRunFileSystemMonitor = true
 	runFileSystemMonitor()
 }
@@ -83,6 +84,7 @@ function startFileSystemMonitor()
  */
 function stopFileSystemMonitor()
 {
+console.log('###### stopFileSystemMonitor: ' + mBasePath)
 	mRunFileSystemMonitor = false
 }
 

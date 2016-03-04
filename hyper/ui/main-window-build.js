@@ -172,26 +172,30 @@ exports.defineBuildFunctions = function(hyper)
 		hyper.UI.closeFloatingAlert()
 	}
 
+	function makeProjectCurrentWithoutBuildingIt(fullPath)
+	{
+		// Set server paths using the location of the HTML file.
+		var appBasePath = PATH.dirname(fullPath)
+		var indexFile = PATH.basename(fullPath)
+		SERVER.setAppPath(appBasePath)
+		SERVER.setAppFileName(indexFile)
+		// Set app id, will create evothings.json with new id if not existing.
+		SERVER.setAppID(APP_SETTINGS.getAppID(appBasePath))
+		MONITOR.setBasePath(appBasePath)
+	}
+
 	/**
 	 * @param fullPath - the project folder root.
 	 */
-	var buildAppIfNeeded = function(fullPath, changedFiles, buildCallback)
+	function buildAppIfNeeded(fullPath, changedFiles, buildCallback)
 	{
 		console.log('@@@ buildAppIfNeeded fullPath: ' + fullPath)
 
 		// Standard HTML file project.
 		if (FILEUTIL.fileIsHTML(fullPath))
 		{
-			// Set server paths using the location of the HTML file.
-			var appBasePath = PATH.dirname(fullPath)
-			var indexFile = PATH.basename(fullPath)
-			SERVER.setAppPath(appBasePath)
-			SERVER.setAppFileName(indexFile)
-			// Set app id, will create evothings.json with new id if not existing.
-			SERVER.setAppID(APP_SETTINGS.getAppID(appBasePath))
-			MONITOR.setBasePath(appBasePath)
-
 			// No build performed when running an HTML file project.
+			makeProjectCurrentWithoutBuildingIt(fullPath)
 			buildCallback(null)
 			return
 		}
@@ -202,17 +206,10 @@ exports.defineBuildFunctions = function(hyper)
 			var indexFile = APP_SETTINGS.getIndexFile(fullPath)
 			if (!indexFile)
 			{
-				// Error.
-				evothingsSettingMissingError()
-				return
-			}
-
-			// Get www dir.
-			var wwwDir = APP_SETTINGS.getWwwDir(fullPath)
-			if (!wwwDir)
-			{
-				// Error.
-				evothingsSettingMissingError()
+				// Error. Must have index file.
+				buildCallback(
+					'evothings.json is missing or index-file entry is missing: '
+					+ fullPath)
 				return
 			}
 
@@ -220,8 +217,21 @@ exports.defineBuildFunctions = function(hyper)
 			var appDir = APP_SETTINGS.getAppDir(fullPath)
 			if (!appDir)
 			{
-				// Error.
-				evothingsSettingMissingError()
+				// app dir is missing, run the HTML index file without building.
+				var indexFileFullPath = PATH.join(fullPath, indexFile)
+				makeProjectCurrentWithoutBuildingIt(indexFileFullPath)
+				buildCallback(null)
+				return
+			}
+
+			// Get www dir.
+			var wwwDir = APP_SETTINGS.getWwwDir(fullPath)
+			if (!wwwDir)
+			{
+				// www dir is missing, run the HTML index file without building.
+				var indexFileFullPath = PATH.join(fullPath, appDir, indexFile)
+				makeProjectCurrentWithoutBuildingIt(indexFileFullPath)
+				buildCallback(null)
 				return
 			}
 
@@ -232,13 +242,14 @@ exports.defineBuildFunctions = function(hyper)
 			SERVER.setAppPath(PATH.join(fullPath, wwwDir))
 			SERVER.setAppFileName(indexFile)
 			SERVER.setAppID(APP_SETTINGS.getAppID(fullPath))
-
 			MONITOR.setBasePath(PATH.join(fullPath, appDir))
 		}
 		else
 		{
 			// Error.
-			evothingsSettingMissingError()
+			buildCallback(
+				'Invalid project path: '
+				+ fullPath)
 			return
 		}
 
@@ -279,13 +290,6 @@ exports.defineBuildFunctions = function(hyper)
 
 				buildCallback()
 			}
-		}
-
-		function evothingsSettingMissingError()
-		{
-			buildCallback(
-				'evothings.json is missing or index-file entry is missing: '
-				+ fullPath)
 		}
 
 		function getAllAppFiles(sourcePath)
