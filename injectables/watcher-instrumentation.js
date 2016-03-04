@@ -55,6 +55,7 @@ var me = window.evo.watcher =
 
   watch: function(name, object, property, type)
          {
+           hyper.log('watch called for name ' +name +' obj '+object+' and property '+property)
            var me = window.evo.watcher
            uuid = generateUUID()
            me.watches[uuid] = {name: name, object: object, property: property, type: type}
@@ -117,7 +118,7 @@ var me = window.evo.watcher =
 
   selectHierarchy:function(path, callback)
                   {
-                    hyper.log('* watcher.selectHierarchy called for path '+path+' typeof path = '+(typeof path))
+                    hyper.log('* watcher.selectHierarchy called for path '+path)
                     var me = window.evo.watcher
                     var levels = path.split('.')
                     // --- list watches and select variable
@@ -144,16 +145,63 @@ var me = window.evo.watcher =
                       }
                       else if(levels[1] == 'select')
                       {
-
-
+                        me.sendWebViewHierarchyAt(levels, callback)
                       }
                     }
                     // --- If we're beyond length == 2, then we're most probably drilling down into the variable hierarchy looking for a non-selectable to plot or watch
                     else
                     {
-                      callback([])
+                      if(levels[1] == 'select')
+                      {
+                        me.sendWebViewHierarchyAt(levels, callback)
+                      }
+                      else
+                      {
+                        callback([])
+                      }
                     }
                   },
+
+  sendWebViewHierarchyAt: function(levels, callback)
+                          {
+                            var me = window.evo.watcher
+                            var rv = []
+                            if(levels.length == 2)
+                            {
+                              rv.push({name: 'watch.select.window', selectable: true})
+                              callback(rv)
+                            }
+                            else if(levels.length > 2)
+                            {
+                              bobj = me.getBaseNameAndObjectFromLevels(levels)
+                              for(var p in bobj.base)
+                              {
+                                var prop = bobj.base[p]
+                                hyper.log('iterating next level selectable names : '+p)
+                                rv.push({name: 'watch.select.'+bobj.baseName+'.'+p, selectable: prop && typeof prop == 'object' && !prop.length})
+                              }
+                              callback(rv)
+                            }
+                          },
+  getBaseNameAndObjectFromLevels: function(levels)
+                                  {
+                                    var base = window
+                                    var baseName = ''
+                                    // remove first two levels, so we get to window
+                                    levels.shift()
+                                    levels.shift()
+                                    // drill down until base refers to the object we want to list properties under
+                                    hyper.log('-- levels before base hunting are..')
+                                    hyper.log(JSON.stringify(levels))
+                                    levels.forEach(function(l)
+                                    {
+                                      baseName += l + '.'
+                                      base = base[l]
+                                    })
+                                    baseName = baseName.substr(0, baseName.length-1)
+                                    hyper.log('returning final baseName '+baseName)
+                                    return {base: base, baseName: baseName}
+                                  },
 
   getWatchNames: function()
                  {
@@ -187,7 +235,9 @@ var me = window.evo.watcher =
                  else if(levels[1] == 'select')
                  {
                    // get reference to actual variable and set up timer to publish value every interval
-
+                   var prop = levels.pop()
+                   bobj = me.getBaseNameAndObjectFromLevels(levels)
+                   me.watch(prop, bobj.base, prop, 'scalar')
                  }
                },
   unSubscribeTo: function(sid, callback)

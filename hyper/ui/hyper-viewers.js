@@ -471,73 +471,81 @@ $(function()
 			var parentnode = document.getElementById(getIdForParentPath(clientID, pathlevel.name))
 			if(parentnode)
 			{
-				var sdiv = document.createElement('li')
 				var name = getNameFromPath(pathlevel.name)
-				//sdiv.style.display = 'flex';
-				//sdiv.style.flexDirection = 'row'
-				sdiv.className = "mdl-list__item"
-				sdiv.style.minHeight = '0'
-				sdiv.style.padding = "3px"
-				parentnode.appendChild(sdiv)
-				// create name, image and potential list of children. The latter to have the 'parent' id
-				var ndiv = document.createElement('button')
-				//ndiv.className = "mdl-button mdl-js-button mdl-button--raised"
-				var ttid = parentnode.id + '.' + name + '_button'
-
-				ndiv.innerHTML = name
-				ndiv.id = ttid
-
-				//ndiv.style.width = "150px"
-				ndiv.style.backgroundColor = '#eee'
-				ndiv.style.border = '1px solid grey'
-				ndiv.style.fonFamily = 'Proxima Nova Regular'
-				ndiv.style.height = '30px'
-
-				var tdiv = document.createElement('div')
-				tdiv.className = "mdl-tooltip mdl-tooltip--large"
-				tdiv.for = ndiv.id
-				tdiv.innerHTML = name
-				//tdiv.innerHTML = '<div class="mdl-tooltip mdl-tooltip--large" for="'+ndiv.id+'">'+name+'</div>'
-				parentnode.appendChild(tdiv)
-
-				var img = document.createElement('img')
-				if(pathlevel.icon)
+				var id = parentnode.id + '.' + name
+				if(!document.getElementById(id))
 				{
-					img.src = pathlevel.icon
-					img.style.width='25px'
-					//img.style.height='20px'
-					img.style.paddingLeft = "5px"
-				}
-				var cdiv = document.createElement('ul')
-				cdiv.className = "mdl-list"
-				cdiv.style.paddingLeft = "20px"
-				cdiv.style.paddingTop = "0"
-				cdiv.style.paddingBottom = "0"
-				cdiv.id = parentnode.id + '.' + name
-				sdiv.appendChild(ndiv)
-				ndiv.appendChild(img)
-				parentnode.appendChild(cdiv)
-				console.log('   adding childnode '+cdiv.id+' under parent node '+parentnode.id)
-				sdiv.addEventListener('mouseup', function(e)
-				{
-					if(pathlevel.selectable)
+					var sdiv = document.createElement('li')
+					//sdiv.style.display = 'flex';
+					//sdiv.style.flexDirection = 'row'
+					sdiv.className = "mdl-list__item"
+					sdiv.style.minHeight = '0'
+					sdiv.style.padding = "3px"
+					parentnode.appendChild(sdiv)
+					// create name, image and potential list of children. The latter to have the 'parent' id
+					var ndiv = document.createElement('button')
+					//ndiv.className = "mdl-button mdl-js-button mdl-button--raised"
+					var ttid = parentnode.id + '.' + name + '_button'
+
+					ndiv.innerHTML = name
+					ndiv.id = ttid
+
+					//ndiv.style.width = "150px"
+					ndiv.style.backgroundColor = '#eee'
+					ndiv.style.border = '1px solid grey'
+					ndiv.style.fonFamily = 'Proxima Nova Regular'
+					ndiv.style.height = '30px'
+
+					var tdiv = document.createElement('div')
+					tdiv.className = "mdl-tooltip mdl-tooltip--large"
+					tdiv.for = ndiv.id
+					tdiv.innerHTML = name
+					//tdiv.innerHTML = '<div class="mdl-tooltip mdl-tooltip--large" for="'+ndiv.id+'">'+name+'</div>'
+					parentnode.appendChild(tdiv)
+
+					var img = document.createElement('img')
+					if(pathlevel.icon)
 					{
-						selectHierarchy(pathlevel.name, client)
+						img.src = pathlevel.icon
+						img.style.width='25px'
+						//img.style.height='20px'
+						img.style.paddingLeft = "5px"
 					}
-					else
+					var cdiv = document.createElement('ul')
+					cdiv.className = "mdl-list"
+					cdiv.style.paddingLeft = "20px"
+					cdiv.style.paddingTop = "0"
+					cdiv.style.paddingBottom = "0"
+					cdiv.id = id
+					sdiv.appendChild(ndiv)
+					ndiv.appendChild(img)
+					parentnode.appendChild(cdiv)
+					console.log('   adding childnode '+cdiv.id+' under parent node '+parentnode.id)
+					sdiv.addEventListener('mouseup', function(e)
 					{
-						var provider = pathlevel.name.split('.')[0]
-						if(!isClientAlreadySubscribedToService(clientID, pathlevel.name))
+						if(pathlevel.selectable)
 						{
-							subscribeToService(pathlevel.name, client)
+							selectHierarchy(pathlevel.name, client)
 						}
 						else
 						{
-							console.log('unsubscribing to service '+pathlevel.name)
-							unsubscribeToService(pathlevel.name, clientID)
+							var provider = pathlevel.name.split('.')[0]
+							if(!isClientAlreadySubscribedToService(clientID, pathlevel.name))
+							{
+								subscribeToService(pathlevel.name, client)
+							}
+							else
+							{
+								console.log('unsubscribing to service '+pathlevel.name)
+								unsubscribeToService(pathlevel.name, clientID)
+							}
 						}
-					}
-				})
+					})
+				}
+				else
+				{
+					console.log('not adding same things twice, here!')
+				}
 			}
 			else
 			{
