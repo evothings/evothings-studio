@@ -252,7 +252,7 @@ $(function()
 		// There was a merge conflict here.
 
 		// This is from peter/instrumentation (or possibly peter/master_temp).
-		mMainWindow.postMessage({ message: 'eval', code: 'navigator.vibrate(300)', clientUUID: viewer.UUID }, '*')
+		mMainWindow.postMessage({ message: 'eval', code: 'navigator.vibrate(300)', client: viewer }, '*')
 
 		// This is from peter/saved_from_git_magic. This code does not work.
 		//mMainWindow.postMessage({message: 'eval',	code: 'navigator.vibrate(500); ',	client: client}, '*')
@@ -395,11 +395,18 @@ $(function()
 	{
 		var subscriptions = mServiceSubscriptions[clientID] || []
 		var path = serviceSubscription.path
-		var sid = subscriptions[path]
-		if(sid)
+		var sobj = subscriptions[path]
+		if(sobj)
 		{
 			delete subscriptions[path]
-			removeChartFor(clientID, path)
+			if(sobj.type == 'plot')
+			{
+				removeChartFor(clientID, path)
+			}
+			else
+			{
+				removePlateFor(clientID, path)
+			}
 		}
 	}
 
@@ -410,7 +417,7 @@ $(function()
 
 	function releaseEventHandlers()
 	{
-		console.log('releaseSUbscriptions called (unimplemented')
+		console.log('releaseSubscriptions called (unimplemented')
 	}
 
 	function isClientAlreadySubscribedToService(clientID, path)
@@ -446,13 +453,17 @@ $(function()
 				parentnode.appendChild(sdiv)
 				// create name, image and potential list of children. The latter to have the 'parent' id
 				var ndiv = document.createElement('button')
-				ndiv.className = "mdl-button mdl-js-button mdl-button--raised"
+				//ndiv.className = "mdl-button mdl-js-button mdl-button--raised"
 				var ttid = parentnode.id + '.' + name + '_button'
 
 				ndiv.innerHTML = name
 				ndiv.id = ttid
 
-				ndiv.style.width = "150px"
+				//ndiv.style.width = "150px"
+				ndiv.style.backgroundColor = '#eee'
+				ndiv.style.border = '1px solid grey'
+				ndiv.style.fonFamily = 'Proxima Nova Regular'
+				ndiv.style.minHeight = '22px'
 
 				var tdiv = document.createElement('div')
 				tdiv.className = "mdl-tooltip mdl-tooltip--large"
@@ -494,7 +505,8 @@ $(function()
 						}
 						else
 						{
-							console.log('--- skipping subscription since we are already subscribed to '+pathlevel.name)
+							console.log('unsubscribing to service '+pathlevel.name)
+							unsubscribeToService(pathlevel.name, clientID)
 						}
 					}
 				})
@@ -597,7 +609,7 @@ $(function()
 	{
 		if(!isClientAlreadySubscribedToService(clientID, servicedata.path))
 		{
-			saveServiceSubscription(clientID, {subscriptionID: servicedata.subscriptionID, path: servicedata.path})
+			saveServiceSubscription(clientID, {subscriptionID: servicedata.subscriptionID, path: servicedata.path, type: servicedata.data.type})
 		}
 		var path = servicedata.path
 		var channels = 0
@@ -605,7 +617,7 @@ $(function()
 		{
 			channels++
 		}
-		if(servicedata.type == 'plot')
+		if(servicedata.data.type == 'plot')
 		{
 			plotServiceData(time, servicedata, clientID, path, channels)
 		}
@@ -724,6 +736,10 @@ $(function()
 			{
 				parent.appendChild(platenode)
 			}
+			platenode.addEventListener('mouseup', function(e)
+			{
+				unsubscribeToService(path, clientID)
+			})
 		}
 		return platenode
 	}

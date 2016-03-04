@@ -220,7 +220,7 @@ exports.defineUIFunctions = function(hyper)
 		//LOGGER.log('[main-window-func.js] Main got : ' + event.data.message)
 		if ('eval' == event.data.message)
 		{
-			hyper.SERVER.evalJS(event.data.code, event.data.clientUUID)
+			hyper.SERVER.evalJS(event.data.code, event.data.client)
 		}
 		else if ('setSession' == event.data.message)
 		{

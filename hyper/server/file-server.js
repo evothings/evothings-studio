@@ -596,13 +596,13 @@ exports.reloadApp = function()
 /**
  * External.
  */
-exports.evalJS = function(code, clientUUID)
+exports.evalJS = function(code, client)
 {
 	sendMessageToServer(mSocket, 'workbench.eval',
 		{
 			sessionID: mSessionID,
 			code: code,
-			clientUUID: clientUUID
+			clientUUID: client.UUID
 		})
 }
 

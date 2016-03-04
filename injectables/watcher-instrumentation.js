@@ -194,6 +194,7 @@ var me = window.evo.watcher =
                {
                  hyper.log('watcher.unSubscribeTo called for sid '+sid)
                  clearInterval(sid)
+                 callback()
                }
 }
 
