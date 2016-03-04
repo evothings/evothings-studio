@@ -222,8 +222,8 @@ function onMessageWorkbenchSetConnectKey(socket, message)
 
 function onMessageWorkbenchClientInfo(socket, message)
 {
-	console.log('[file-server.js] got client info')
-	console.dir(message)
+	//console.log('[file-server.js] got client info')
+	//console.dir(message)
 
 	// Notify UI about clients.
 	EVENTS.publish(EVENTS.VIEWERSUPDATED, message.data)

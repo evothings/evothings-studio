@@ -162,9 +162,7 @@ $(function()
 	{
 		mCurrentClientList = list
 		console.log('renderViewersFromList showing '+list.length+' clients')
-		domlist = document.getElementById('viewer-list')
-		domlist.innerHTML = ""
-		//console.dir(list)
+		var domlist = document.getElementById('viewer-list')
 		if(list && list.length)
 		{
 			//console.dir(list)
@@ -173,10 +171,41 @@ $(function()
 				var exist = document.getElementById(viewer.clientID)
 				if(!exist)
 				{
+					console.log('client '+viewer.clientID+' does not exist yet, so adding that...')
 					renderViewer(domlist, viewer)
 				}
 			})
 		}
+	}
+
+	function removeViewersNotInList(list)
+	{
+		console.log('removeViewersNotInList called. We have '+mCurrentClients.length+' old clients and '+list.length+' new clients')
+		var oldClients = mCurrentClients
+		oldClients.forEach(function(oldClient)
+		{
+			var found = false
+			list.forEach(function(newClient)
+			{
+				console.log('checking if new client '+newClient.clientID+' == '+oldClient.clientID)
+				if (newClient.clientID == oldClient.clientID)
+				{
+					found = true
+				}
+			})
+			if(!found)
+			{
+				removeOldClient(oldClient)
+			}
+		})
+	}
+
+	function removeOldClient(oldClient)
+	{
+		console.log('removing old client not seen anymore: '+oldClient.clientID)
+		var domlist = document.getElementById('viewer-list')
+		var client = document.getElementById(oldClient.clientID)
+		domlist.removeChild(client)
 	}
 
 	function renderViewer(domlist, viewer)
@@ -273,13 +302,12 @@ $(function()
 
 	function onViewersUpdated(viewerlist)
 	{
-		//LOGGER.log('[hyper-viewers.js] got viewers updated event');
-		//console.dir(viewerlist)
-		domlist = document.getElementById('viewer-list')
-		domlist.html = ""
-		if(viewerlist.data && viewerlist.data.clients)
+		LOGGER.log('[hyper-viewers.js] got viewers updated event');
+		console.dir(viewerlist)
+		if(viewerlist && viewerlist.clients)
 		{
-			var list = viewerlist.data.clients
+			var list = viewerlist.clients
+			removeViewersNotInList(list)
 			renderViewersFromList(list)
 		}
 	}
@@ -448,7 +476,7 @@ $(function()
 				//sdiv.style.display = 'flex';
 				//sdiv.style.flexDirection = 'row'
 				sdiv.className = "mdl-list__item"
-
+				sdiv.style.minHeight = '0'
 				sdiv.style.padding = "3px"
 				parentnode.appendChild(sdiv)
 				// create name, image and potential list of children. The latter to have the 'parent' id
@@ -463,7 +491,7 @@ $(function()
 				ndiv.style.backgroundColor = '#eee'
 				ndiv.style.border = '1px solid grey'
 				ndiv.style.fonFamily = 'Proxima Nova Regular'
-				ndiv.style.minHeight = '22px'
+				ndiv.style.height = '30px'
 
 				var tdiv = document.createElement('div')
 				tdiv.className = "mdl-tooltip mdl-tooltip--large"
