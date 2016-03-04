@@ -31,7 +31,7 @@ var me = window.evo.cordova =
 				hyper.log('cordova.accelerometer.subscribeto called with interval '+interval)
 				var sid = navigator.accelerometer.watchAcceleration(function(accelObj)
 				{
-					cb({value: accelObj, type: 'plot'})
+					cb({name: 'accelerometer', value: accelObj, type: 'plot'})
 				}, function(error)
 				{
 					cb()
@@ -64,7 +64,7 @@ var me = window.evo.cordova =
 				hyper.log('cordova.compass.subscribeto called with interval '+interval)
 				var sid = navigator.compass.watchHeading(function(Obj)
 				{
-					cb({value: Obj, type: 'plot'})
+					cb({name: 'compass', value: Obj, type: 'plot'})
 				}, function(error)
 				{
 					cb()

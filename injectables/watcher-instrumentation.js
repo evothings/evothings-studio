@@ -17,6 +17,7 @@ var generateUUID = function()
 var me = window.evo.watcher =
 {
   watches: [],
+  watchesShowing: false,
   subscriptions: [],
   name: 'watch',
   icon: 'images/cogs.png',
@@ -52,11 +53,16 @@ var me = window.evo.watcher =
                       return rv
                     },
 
-  watch: function(name, reference, type)
+  watch: function(name, object, property, type)
          {
            var me = window.evo.watcher
            uuid = generateUUID()
-           me.watches[uuid] = {name: name, reference: reference, type: type}
+           me.watches[uuid] = {name: name, object: object, property: property, type: type}
+           if(me.watchesShowing)
+           {
+             var rv = [{name: 'watch.watches.'+name, selectable: false}]
+             window.hyper.sendMessageToServer(window.hyper.IoSocket, 'client.instrumentation', {clientID: window.hyper.clientID, hierarchySelection:  rv })
+           }
            return uuid
          },
 
@@ -91,14 +97,21 @@ var me = window.evo.watcher =
                     {
                       var me = window.evo.watcher
                       hyper.log('subscribeToWatch called for path '+watchname+' and interval '+interval)
-                      var watch = me.watches[watchname]
+                      var watch = me.getWatchFromName(watchname)
                       if(watch)
                       {
                         var sid = setInterval(function()
                         {
-                          callback({name: watch.name, value: watch.reference, type: watch.type})
+                          var v = watch.object[watch.property]
+                          //hyper.log('sendinv value '+v+' for property '+watch.property+' on object '+watch.object)
+                          callback({name: watch.name, value: v, type: watch.type})
                         }, interval)
                         return sid
+                      }
+                      else
+                      {
+                        hyper.log('did not find watch '+watchname)
+                        hyper.log(JSON.stringify(me.watches))
                       }
                     },
 
@@ -110,6 +123,7 @@ var me = window.evo.watcher =
                     // --- list watches and select variable
                     if(levels.length == 1)
                     {
+                      me.watchesShowing = true
                       var rv = [{name: 'watch.watches', selectable: true}, {name: 'watch.select', selectable: true}]
                       callback(rv)
                     }
@@ -119,12 +133,14 @@ var me = window.evo.watcher =
                     {
                       if(levels[1] == 'watches')
                       {
+                        hyper.log('listing watches')
                         var names = me.getWatchNames()
                         var rnames = []
                         names.forEach(function(wname)
                         {
                           rnames.push({name: 'watch.watches.'+wname, selectable: false})
                         })
+                        callback(rnames)
                       }
                       else if(levels[1] == 'select')
                       {
@@ -132,7 +148,7 @@ var me = window.evo.watcher =
 
                       }
                     }
-                    // --- If we're beyond lenght == 2, then we're most probably drilling down into the variable heirarchy looking for a non-selectable to plot or watch
+                    // --- If we're beyond length == 2, then we're most probably drilling down into the variable hierarchy looking for a non-selectable to plot or watch
                     else
                     {
                       callback([])
@@ -147,7 +163,7 @@ var me = window.evo.watcher =
                    for(var pname in me.watches)
                    {
                      var service = me.watches[pname]
-                     rv.push({name: 'watcher.'+service.name, selectable:false})
+                     rv.push(service.name)
                    }
                    return rv
                  },

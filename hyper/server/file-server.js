@@ -143,7 +143,7 @@ exports.connectToRemoteServer = function()
 
 	socket.on('hyper-workbench-message', function(message)
 	{
-		console.log('message = '+message.name)
+		//console.log('message = '+message.name)
 
 		var handler = messageHandlers[message.name]
 		if (handler)
@@ -235,8 +235,8 @@ function onMessageWorkbenchClientInfo(socket, message)
 function onMessageWorkbenchClientInstrumentation(socket, message)
 {
 	// Notify UI about clients.
-	LOGGER.log('[file-server.js] ******** got client instrumentation')
-	console.dir(message)
+	//LOGGER.log('[file-server.js] ******** got client instrumentation')
+	//console.dir(message)
 
 	EVENTS.publish(EVENTS.VIEWERSINSTRUMENTATION, message.data)
 }

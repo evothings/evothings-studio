@@ -4,9 +4,6 @@ hyper.log ('bluetooth intrumentation provider loading....')
 evothings.easyble.reset()
 evothings.easyble.reportDeviceOnce(true)
 
-/*
-There was a merge conflict, commented out this code.
-
 var me = window.evo.bluetooth =
 {
     bluetoothServices: {
@@ -290,7 +287,7 @@ var me = window.evo.bluetooth =
                         //
                         //
                         var data = evothings.ble.fromUtf8(data)
-                        cb({value: data, type: 'plot'})
+                        cb({name: characteristicUUID, value: data, type: 'plot'})
                     },
                     function(errorCode)
                     {
@@ -573,4 +570,4 @@ var me = window.evo.bluetooth =
 }
 
 me.discover()
-*/
+

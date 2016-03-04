@@ -601,39 +601,96 @@ $(function()
 		}
 		var path = servicedata.path
 		var channels = 0
-		for(var k in servicedata.data)
+		for(var k in servicedata.data.value)
 		{
 			channels++
 		}
+		if(servicedata.type == 'plot')
+		{
+			plotServiceData(time, servicedata, clientID, path, channels)
+		}
+		else
+		{
+			displayServiceData(time, servicedata, clientID, path, channels)
+		}
+	}
+
+	function displayServiceData(time, servicedata, clientID, path, channels)
+	{
+		//console.log('displayServiceData-----------------------')
+		//console.dir(servicedata)
+		var plate = getPlateForPath(clientID, path)
+		plate.innerHTML = '<b>'+servicedata.data.name+'</b>: '
+		var part = ''
+
+		if(servicedata.data.value.length)
+		{
+			for(var i = 0; i < servicedata.data.value.length; i++)
+			{
+				var val = servicedata.data.value[i]
+				part += val+', '
+			}
+			part = part.substring(0, part.length-2)
+			plate.innerHTML += part
+		}
+		else if (typeof servicedata.data.value == 'object')
+		{
+
+			for(var k in servicedata.data.value)
+			{
+				var v = servicedata.data.value[k]
+				part += k+' = '+v+','
+			}
+			part = part.substring(0, part.length-1)
+			plate.innerHTML += part
+		}
+		else
+		{
+			plate.innerHTML += servicedata.data.value
+		}
+	}
+
+	function plotServiceData(time, servicedata, clientID, path, channels)
+	{
 		var chart = getChartForPath(clientID, path, channels)
 		if(chart)
 		{
-			var count = 0
-			for(var key in servicedata.data)
+			var color = servicedata.color || 'rgba(255,255,255,0.76)'
+			var fillstyle = servicedata.fillstyle || 'rgba(0,255,0,0.30)'
+			var value = undefined
+			if(typeof servicedata.data.value == 'object')
 			{
-				if(key != 'timestamp')
+				var count = 0
+				for(var key in servicedata.data.value)
 				{
-					var value = servicedata.data[key]
-					var color = servicedata.color || 'rgba(255,255,255,0.76)'
-					var fillstyle = servicedata.fillstyle || 'rgba(0,255,0,0.30)'
-					switch(count)
+					if(key != 'timestamp')
 					{
-						case 0:
-							color = 'rgba(25,255,25,0.76)'
-						case 1:
-							color = 'rgba(255,25,25,0.76)'
-						case 2:
-							color = 'rgba(25,25,255,0.76)'
-						case 3:
-							color = 'rgba(115,95,205,0.76)'
-						default:
-							color = 'rgba(195,205,255,0.76)'
+						value = servicedata.data.value[key]
+						switch(count)
+						{
+							case 0:
+								color = 'rgba(25,255,25,0.76)'
+							case 1:
+								color = 'rgba(255,25,25,0.76)'
+							case 2:
+								color = 'rgba(25,25,255,0.76)'
+							case 3:
+								color = 'rgba(115,95,205,0.76)'
+							default:
+								color = 'rgba(195,205,255,0.76)'
+						}
+						var ts = getTimeSeriesFor(path+'_'+key, chart, color, fillstyle)
+						console.log('  -- appending value '+parseFloat(value)+' for key '+key+' and timestamp '+time)
+						ts.append(time, value)
 					}
-					var ts = getTimeSeriesFor(path+'_'+key, chart, color, fillstyle)
-					console.log('  -- appending value '+parseFloat(value)+' for key '+key+' and timestamp '+time)
-					ts.append(time, value)
+					count++
 				}
-				count++
+			}
+			else
+			{
+				value = servicedata.data.value
+				var ts = getTimeSeriesFor(path, chart, color, fillstyle)
+				ts.append(time, value)
 			}
 		}
 	}
@@ -649,6 +706,39 @@ $(function()
 			chart.addTimeSeries(ts, {lineWidth: 1, strokeStyle: color, fillStyle: fillstyle});
 		}
 		return ts
+	}
+
+	function getPlateForPath(clientID, path)
+	{
+		var id = clientID+'.serviceroot.'+path+'.plate'
+		var platenode = document.getElementById(id)
+		if(!platenode)
+		{
+			platenode = document.createElement('div')
+			platenode.width = "100"
+			platenode.height = "100"
+			platenode.style.fontSize = 18
+			platenode.id = id
+			var parent = document.getElementById(clientID+'.serviceroot.'+path)
+			if(parent)
+			{
+				parent.appendChild(platenode)
+			}
+		}
+		return platenode
+	}
+
+	function removePlateFor(clientID, path)
+	{
+		setTimeout(function()
+		{
+			var parent = document.getElementById(clientID+'.serviceroot.'+path)
+			var id = clientID+'.serviceroot.'+path+'.plate'
+			var platenode = document.getElementById(id)
+			parent.removeChild(platenode)
+			platenode.id = ""
+			parent.innerHTML = ""
+		}, SUBSCRIPTION_INTERVAL*3)
 	}
 
 	function getChartForPath(clientID, path)
