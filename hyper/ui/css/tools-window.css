@@ -137,3 +137,20 @@ button
 	background: white; /* same with body background */
 	height: auto;
 }
+
+/* balls */
+
+div.ball {
+	display: block;
+	width: 10px;
+	height: 10px;
+	/*margin: 2px auto 0;*/
+	margin-bottom: 4px;
+	background-color: #dddddd;
+	border-radius: 50%;
+	box-shadow: inset -2px -2px 2px rgba(0,0,0,.5);
+	background-image: -webkit-linear-gradient(-45deg, rgba(255,255,220,.2) 0%, transparent 100%);
+	background-image: -moz-linear-gradient(-45deg, rgba(255,255,220,.2) 0%, transparent 100%);
+	background-image: -o-linear-gradient(-45deg, rgba(255,255,220,.2) 0%, transparent 100%);
+	background-image: -ms-linear-gradient(-45deg, rgba(255,255,220,.2) 0%, transparent 100%);
+}

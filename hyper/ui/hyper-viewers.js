@@ -213,6 +213,7 @@ $(function()
 		mCurrentClients[viewer.clientID] = viewer
 		var rowdiv = document.createElement('div')
 		rowdiv.id = viewer.clientID
+		rowdiv.style.paddingLeft = '10px'
 		rowdiv.style.display = 'flex';
 		rowdiv.style.flexDirection = 'row'
 		//
@@ -228,7 +229,13 @@ $(function()
 		img.style.width='30px'
 		img.src = getImageForModel(viewer.info)
 		//
+		var ball = document.createElement('div')
+		ball.className = 'ball'
+		ball.id = viewer.clientID+'_ball'
+		//
 		rowdiv.appendChild(div)
+		//
+		div.appendChild(ball)
 		div.appendChild(img)
 		div.appendChild(span)
 		//div.style.backgroundColor = "blue"
@@ -243,8 +250,15 @@ $(function()
 		cdiv.id = viewer.clientID + '.serviceroot'
 		rowdiv.appendChild(cdiv)
 		domlist.appendChild(rowdiv)
-		console.log('adding client')
+		console.log('adding client and requesting status')
 		console.dir(viewer)
+		requestStatus(viewer)
+	}
+
+	function requestStatus(viewer)
+	{
+		console.log('....requesting status.....')
+		mMainWindow.postMessage({ message: 'eval', code: 'window.hyper.sendMessageToServer(window.hyper.IoSocket, "client.instrumentation", {clientID: window.hyper.clientID, serviceStatus: typeof window._instrumentation })', client: viewer }, '*')
 	}
 
 	function getImageForModel(info)
@@ -276,15 +290,8 @@ $(function()
 
 	function onClientSelected(viewer)
 	{
-		console.log('user selected client '+viewer.name)
-
-		// There was a merge conflict here.
-
-		// This is from peter/instrumentation (or possibly peter/master_temp).
+		console.log('user selected client '+viewer.name+' instrumentation loaded: '+mInstrumentationReceivedFrom[viewer.clientID])
 		mMainWindow.postMessage({ message: 'eval', code: 'navigator.vibrate(300)', client: viewer }, '*')
-
-		// This is from peter/saved_from_git_magic. This code does not work.
-		//mMainWindow.postMessage({message: 'eval',	code: 'navigator.vibrate(500); ',	client: client}, '*')
 
 		if(!mInstrumentationReceivedFrom[viewer.clientID])
 		{
@@ -317,7 +324,7 @@ $(function()
 		var wd = global.require.main.filename+'../'
 		wd = wd.replace('index.html','')
 		document.getElementById('p2').style.display="block"
-		console.log('injecting instrumentation into client '+client.name+' from directory '+wd+', to client '+client.UUID)
+		console.log('------------------------------------------------------------- injecting instrumentation into client '+client.name+' from directory '+wd+', to client '+client.UUID)
 		var files =
 		[
 			'../injectables/util.js',
@@ -369,11 +376,8 @@ $(function()
 				client: client
 			}, '*')
 			console.log('all injectables injected into client with UUID '+client.UUID+'. Evaluating listServices()')
-			mMainWindow.postMessage({
-				message: 'eval',
-				code: 'window.evo.instrumentation.selectHierarchy()',
-				client: client
-			}, '*')
+			requestStatus(client)
+
 
 		}, function(err)
 		{
@@ -386,7 +390,7 @@ $(function()
 		//console.log('------------------ instrumentation received!!')
 		cancelNetworkTimeout()
 		//console.dir(message)
-		mInstrumentationReceivedFrom[message.clientID] = true
+
 		if(message.hierarchySelection)
 		{
 			addHierarchySelection(message.clientID, message.hierarchySelection)
@@ -406,6 +410,28 @@ $(function()
 		else if (message.reconnectInstrumentation)
 		{
 			reSubscribeOnReconnect(message.clientID)
+		}
+		else if (message.serviceStatus)
+		{
+			console.log('-- got serviceStatus back: '+message.serviceStatus)
+			var ball = document.getElementById(message.clientID+'_ball')
+			if(message.serviceStatus && message.serviceStatus != 'undefined')
+			{
+				console.log('setting ball '+ball.id+' green')
+				ball.style.backgroundColor = 'green'
+				mInstrumentationReceivedFrom[message.clientID] = true
+				var client = mCurrentClients[message.clientID]
+				mMainWindow.postMessage({
+					message: 'eval',
+					code: 'window.evo.instrumentation.selectHierarchy()',
+					client: client
+				}, '*')
+			}
+			else
+			{
+				console.log('setting ball '+ball.id+' gray')
+				ball.style.backgroundColor = 'gray'
+			}
 		}
 	}
 

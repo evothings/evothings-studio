@@ -19,6 +19,7 @@ if (window.evo && window.evo.instrumentation)
 		mgr.addServiceProvider(window.evo.watcher)
 	}
 	//
+	window._instrumentation = true
 	hyper.log("INJECTION ACTIVATED")
 }
 else
