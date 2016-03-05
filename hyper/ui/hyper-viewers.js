@@ -237,7 +237,7 @@ $(function()
 			onClientSelected(viewer)
 		})
 		var cdiv = document.createElement('ul')
-		cdiv.className = "mdl-list"
+		cdiv.className = "treestyle"
 		cdiv.style.paddingTop = "0"
 		cdiv.style.paddingBottom = "0"
 		cdiv.id = viewer.clientID + '.serviceroot'
@@ -478,12 +478,12 @@ $(function()
 					var sdiv = document.createElement('li')
 					//sdiv.style.display = 'flex';
 					//sdiv.style.flexDirection = 'row'
-					sdiv.className = "mdl-list__item"
+					//sdiv.className = "mdl-list__item"
 					sdiv.style.minHeight = '0'
-					sdiv.style.padding = "3px"
+					sdiv.style.paddingLeft = "10px"
 					parentnode.appendChild(sdiv)
 					// create name, image and potential list of children. The latter to have the 'parent' id
-					var ndiv = document.createElement('button')
+					var ndiv = document.createElement('span')
 					//ndiv.className = "mdl-button mdl-js-button mdl-button--raised"
 					var ttid = parentnode.id + '.' + name + '_button'
 
@@ -491,8 +491,8 @@ $(function()
 					ndiv.id = ttid
 
 					//ndiv.style.width = "150px"
-					ndiv.style.backgroundColor = '#eee'
-					ndiv.style.border = '1px solid grey'
+					//ndiv.style.backgroundColor = '#eee'
+					//ndiv.style.border = '1px solid grey'
 					ndiv.style.fonFamily = 'Proxima Nova Regular'
 					ndiv.style.height = '30px'
 
@@ -512,8 +512,8 @@ $(function()
 						img.style.paddingLeft = "5px"
 					}
 					var cdiv = document.createElement('ul')
-					cdiv.className = "mdl-list"
-					cdiv.style.paddingLeft = "20px"
+					//cdiv.className = "mdl-list"
+					//cdiv.style.paddingLeft = "20px"
 					cdiv.style.paddingTop = "0"
 					cdiv.style.paddingBottom = "0"
 					cdiv.id = id

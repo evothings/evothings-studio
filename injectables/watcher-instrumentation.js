@@ -177,8 +177,11 @@ var me = window.evo.watcher =
                               for(var p in bobj.base)
                               {
                                 var prop = bobj.base[p]
-                                hyper.log('iterating next level selectable names : '+p)
-                                rv.push({name: 'watch.select.'+bobj.baseName+'.'+p, selectable: prop && typeof prop == 'object' && !prop.length})
+                                if(typeof prop != 'function')
+                                {
+                                  hyper.log('iterating next level selectable names : '+p+' of type '+(typeof prop))
+                                  rv.push({name: 'watch.select.'+bobj.baseName+'.'+p, selectable: prop && typeof prop == 'object' && !prop.length})
+                                }
                               }
                               callback(rv)
                             }
