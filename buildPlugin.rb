@@ -23,7 +23,7 @@ end
 # TODO: Update on new release.
 def distVersionLabel
 	# TODO: Remove alpha/beta label for final release.
-	distVersion + "-alpha1"
+	distVersion + "-alpha1-"
 end
 
 # TODO: Update on new release.
@@ -38,8 +38,8 @@ def distPackageVersion
 		time.hour.to_s.rjust(2, '0') +
 		time.min.to_s.rjust(2, '0')
 
-	# TODO: Remove "_Beta3" for final release.
-	distVersion + "_Beta3_" + timestamp
+	# TODO: Remove tag for final release.
+	distVersion + "-alpha1" + timestamp
 end
 
 def root
