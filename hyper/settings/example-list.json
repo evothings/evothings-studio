@@ -1,4 +1,6 @@
 [
+{"path":"examples/ti-sensortag-cc2541-webbluetooth"},
+
 {"path":"examples/hello-world"},
 {"path":"examples/cordova-accelerometer"},
 {"path":"examples/hue-lights"},

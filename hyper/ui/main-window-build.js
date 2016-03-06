@@ -62,8 +62,6 @@ exports.defineBuildFunctions = function(hyper)
 		// Prepend application path if this is not an absolute path.
 		mAppFullPath = hyper.UI.getAppFullPath(path)
 
-		console.log('@@@ runApp')
-
 		// Build the app.
 		buildAppIfNeeded(mAppFullPath, null, buildCallback)
 
@@ -112,9 +110,6 @@ exports.defineBuildFunctions = function(hyper)
 	 */
 	hyper.UI.reloadApp = function(changedFiles)
 	{
-		console.log('@@@reloadApp: ' + changedFiles[0])
-		LOGGER.log('[main-window-build.js] reloadApp')
-
 		if (mRunAppGuard) { return }
 		mRunAppGuard = true
 
@@ -189,8 +184,6 @@ exports.defineBuildFunctions = function(hyper)
 	 */
 	function buildAppIfNeeded(fullPath, changedFiles, buildCallback)
 	{
-		console.log('@@@ buildAppIfNeeded fullPath: ' + fullPath)
-
 		// Standard HTML file project.
 		if (FILEUTIL.fileIsHTML(fullPath))
 		{
@@ -271,8 +264,6 @@ exports.defineBuildFunctions = function(hyper)
 
 		function buildDone(error)
 		{
-			console.log('Build done')
-
 			if (error)
 			{
 				closeFloatingAlert()
@@ -294,8 +285,6 @@ exports.defineBuildFunctions = function(hyper)
 
 		function getAllAppFiles(sourcePath)
 		{
-			console.log('getAllAppFiles: ' + sourcePath)
-
 			var options =
 			{
 				follow: false,
@@ -304,8 +293,6 @@ exports.defineBuildFunctions = function(hyper)
 				root: sourcePath
 			}
 			var sourceFiles = GLOB.sync('/**/*', options)
-
-			console.log('@@@ globbed files: ' + sourceFiles.length)
 
 			var normalizedSourceFiles = []
 
@@ -317,8 +304,6 @@ exports.defineBuildFunctions = function(hyper)
 				if (0 == path.indexOf(PATH.sep)) { path = path.substr(1) }
 				if (0 == path.indexOf(PATH.sep)) { path = path.substr(1) }
 				normalizedSourceFiles.push(path)
-
-				console.log('  ' + path)
 			}
 
 			return normalizedSourceFiles
@@ -327,14 +312,11 @@ exports.defineBuildFunctions = function(hyper)
 
 	function buildAppFiles(sourcePath, sourceFiles, destPath, dontBuildDirs, doneCallback)
 	{
-		console.log('buildAppFiles')
-
 		function buildNextFile()
 		{
 			// Is build done?
 			if (0 == sourceFiles.length)
 			{
-				console.log('buildAppFiles done')
 				doneCallback()
 				return
 			}
@@ -344,8 +326,6 @@ exports.defineBuildFunctions = function(hyper)
 			var fullSourcePath = PATH.join(sourcePath, filePath)
 			var fullDestPath = PATH.join(destPath, filePath)
 			var fullDestFolderPath = PATH.dirname(fullDestPath)
-
-			console.log('buildNextFile: ' + fullSourcePath)
 
 			if (shouldBuildFile(filePath))
 			{
@@ -363,7 +343,6 @@ exports.defineBuildFunctions = function(hyper)
 
 		function shouldBuildFile(filePath)
 		{
-			console.log('@@@ shouldBuildFile filePath: ' + filePath)
 			for (var i = 0; i < dontBuildDirs.length; ++i)
 			{
 				// Does the file path begin with the path in dontBuild?
@@ -399,8 +378,6 @@ exports.defineBuildFunctions = function(hyper)
 
 	function buildAppFile(fullSourcePath, fullDestFolderPath, resultCallback)
 	{
-		console.log('buildAppFile: ' + fullSourcePath)
-
 		try
 		{
 			var ext = PATH.extname(fullSourcePath).substr(1)
@@ -412,8 +389,6 @@ exports.defineBuildFunctions = function(hyper)
 		{
 			if ('MODULE_NOT_FOUND' == error.code)
 			{
-				console.log('No plugin found - default build')
-
 				// No plugin found, just copy the file to dest.
 				copyFile(fullSourcePath, fullDestFolderPath)
 

@@ -29,7 +29,7 @@ var LOGGER = require('./log.js')
 
 /*** File traversal variables ***/
 
-var mLastTraverseTime = Date.now()
+var mLastTraverseTime = 0
 var mTraverseNumDirecoryLevels = 0
 var mFileCounter = 0
 var mNumberOfMonitoredFiles = 0
@@ -74,8 +74,9 @@ function getNumberOfMonitoredFiles()
  */
 function startFileSystemMonitor()
 {
-console.log('@@@@@@ startFileSystemMonitor: ' + mBasePath)
+	console.log('@@@@@@ startFileSystemMonitor: ' + mBasePath)
 	mRunFileSystemMonitor = true
+	mLastTraverseTime = Date.now()
 	runFileSystemMonitor()
 }
 
@@ -84,7 +85,7 @@ console.log('@@@@@@ startFileSystemMonitor: ' + mBasePath)
  */
 function stopFileSystemMonitor()
 {
-console.log('###### stopFileSystemMonitor: ' + mBasePath)
+	console.log('###### stopFileSystemMonitor: ' + mBasePath)
 	mRunFileSystemMonitor = false
 }
 
@@ -146,6 +147,7 @@ function runFileSystemMonitor()
 		changedFiles)
 	if (changedFiles.length > 0)
 	{
+		mLastTraverseTime = Date.now()
 		// File(s) changed, call the changed function and stop monitoring.
 		mFileSystemChangedCallback && mFileSystemChangedCallback(changedFiles)
 	}
@@ -203,7 +205,6 @@ function fileSystemMonitorWorker(path, level, changedFiles)
 				else if (stat.isFile() && shouldMonitorFile(fileName) && t > mLastTraverseTime)
 				{
 					console.log('[file-monitor.js] @@@ File has changed: ' + files[i])
-					mLastTraverseTime = Date.now()
 					// Shorten path.
 					var shortPath = fullFilePath.replace(mBasePath, '')
 					if (0 == shortPath.indexOf(PATH.sep)) { shortPath = shortPath.substr(1) }

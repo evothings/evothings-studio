@@ -266,23 +266,20 @@ exports.defineUIFunctions = function(hyper)
 
 	function handleFileDrop(files)
 	{
+/*
 		// Debug print.
-
-		console.log('@@@@@@@ handleFileDrop');
-
+		console.log('@@@ handleFileDrop');
 		for (var i = 0; i < files.length; ++i)
 		{
 			console.log(files[i].path);
 		}
-
+*/
 
 		for (var i = 0; i < files.length; ++i)
 		{
 			var path = files[i].path
 			if (pathIsValidAppPath(path))
 			{
-				console.log('@@@@@@@ hyper.UI.addProject: ' + path);
-
 				hyper.UI.addProject(path)
 			}
 			else
@@ -311,8 +308,6 @@ exports.defineUIFunctions = function(hyper)
 	 */
 	function createProjectEntry(path, options)
 	{
-		console.log('@@@@ CREATE PROJ ENTRY: ' + path)
-
 		options = options || {}
 
 		// Create div tag for app items.
@@ -330,8 +325,6 @@ exports.defineUIFunctions = function(hyper)
 		// Show app image icon
 		var appPath = hyper.UI.getAppFullPath(path)
 		var imagePath = APP_SETTINGS.getAppImage(appPath)
-
-		console.log('@@@@ APP PATH: ' + appPath)
 
 		if (imagePath)
 		{
@@ -496,15 +489,13 @@ exports.defineUIFunctions = function(hyper)
 
 	hyper.UI.getProjectNameFromFile = function(path)
 	{
-	    //console.log('@@@ getProjectNameFromFile: '  + path)
-
 	    // Is it an HTML file?
 	    if (FILEUTIL.fileIsHTML(path))
 	    {
 	        var indexPath = path
 	    }
-	    // Is it a directory?
-	    else if (FILEUTIL.fileIsDirectory(path))
+	    // Is it a directory with evothings.json in it?
+	    else if (FILEUTIL.directoryHasEvothingsJson(path))
 	    {
 	        // Read index file from evothings.json
 	        var indexPath = APP_SETTINGS.getIndexFileFullPath(path)
@@ -520,7 +511,6 @@ exports.defineUIFunctions = function(hyper)
 		var data = FILEUTIL.readFileSync(indexPath)
 		if (!data)
 		{
-			//console.log('@@@ readFileSync retruned null for: ' + indexPath)
 			// Return null on error.
 			return null
 		}
@@ -572,25 +562,20 @@ exports.defineUIFunctions = function(hyper)
 	// TODO: Simplify, use updateProjectList instead.
 	hyper.UI.addProject = function(path)
 	{
-	console.log('@@@@@@ Inside hyper.UI.addProject')
-
 	    if (FILEUTIL.fileIsHTML(path))
 	    {
-	console.log('@@@@@@ HTML')
 	        // Add the path, including HTML file, to the project list.
 		    mProjectList.unshift(path)
 		    saveProjectList()
 	    }
 	    else if (FILEUTIL.fileIsEvothingsSettings(path))
 	    {
-	console.log('@@@@@@ EVO.JSON')
 	        // Add the folder path to the project list.
 		    mProjectList.unshift(PATH.dirname(path))
 		    saveProjectList()
 	    }
 	    else if (FILEUTIL.fileIsDirectory(path))
 	    {
-	console.log('@@@@@@ DIRECTORY')
 	        // Add the path to the project list.
 		    mProjectList.unshift(path)
 		    saveProjectList()
@@ -859,7 +844,7 @@ exports.defineUIFunctions = function(hyper)
 		path = hyper.UI.getAppFullPath(path)
 
 		// Set source and folder name of app to copy.
-		var sourceDir = PATH.dirname(path)
+		var sourceDir = path
 		var appFolderName = PATH.basename(sourceDir)
 		var myAppsDir = SETTINGS.getMyAppsPath()
 
@@ -875,7 +860,7 @@ exports.defineUIFunctions = function(hyper)
 	hyper.UI.saveCopyApp = function()
 	{
 		// Set up source and target paths.
-		var sourcePath = hyper.UI.$('#input-copy-app-source-path').val()
+		var sourceDir = hyper.UI.$('#input-copy-app-source-path').val()
 		var targetAppFolder = hyper.UI.$('#input-copy-app-target-folder').val()
 		var targetParentDir = hyper.UI.$('#input-copy-app-target-parent-folder').val()
 		var targetDir = PATH.join(targetParentDir, targetAppFolder)
@@ -889,7 +874,7 @@ exports.defineUIFunctions = function(hyper)
 		}
 
 		// Copy the app.
-		copyApp(sourcePath, targetDir)
+		copyApp(sourceDir, targetDir)
 
 		// Hide dialog.
 		hyper.UI.$('#dialog-copy-app').modal('hide')
@@ -913,7 +898,7 @@ exports.defineUIFunctions = function(hyper)
 			APP_SETTINGS.generateNewAppUUID(sourceDir)
 
 			// Add path to "My Apps".
-			hyper.UI.addProject(sourceDir)
+			hyper.UI.addProject(targetDir)
 		}
 		catch (error)
 		{
