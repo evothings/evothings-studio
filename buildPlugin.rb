@@ -3,6 +3,8 @@
 
 require './sibling-repos.rb'
 
+$buildTimeStamp = Time.new
+
 def distPackageName
 	"EvothingsStudio"
 end
@@ -23,12 +25,12 @@ end
 # TODO: Update on new release.
 def distVersionLabel
 	# TODO: Remove alpha/beta label for final release.
-	distVersion + "-alpha1-"
+	distVersion + "-alpha1"
 end
 
 # TODO: Update on new release.
 def distPackageVersion
-	time = Time.new
+	time = $buildTimeStamp
 
 	timestamp =
 		time.year.to_s[-2..-1] +
@@ -39,7 +41,7 @@ def distPackageVersion
 		time.min.to_s.rjust(2, '0')
 
 	# TODO: Remove tag for final release.
-	distVersion + "-alpha1" + timestamp
+	distVersion + "-alpha1_" + timestamp
 end
 
 def root
@@ -150,6 +152,8 @@ def buildOSXIcons
 end
 
 def buildGitVersionFile
+puts 'buildGitVersionFile'
+puts pathDistSource + 'gitVersions.txt'
 	open(pathDistSource + 'gitVersions.txt', 'w') do |file|
 		([SiblingRepo.new(cwdName)]+siblingRepos).each do |repo|
 			path = root+repo.name
