@@ -3,6 +3,8 @@
 
 require './sibling-repos.rb'
 
+$buildTimeStamp = Time.new
+
 def distPackageName
 	"EvothingsStudio"
 end
@@ -28,7 +30,7 @@ end
 
 # TODO: Update on new release.
 def distPackageVersion
-	time = Time.new
+	time = $buildTimeStamp
 
 	timestamp =
 		time.year.to_s[-2..-1] +
