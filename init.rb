@@ -99,14 +99,6 @@ def downloadJavaScriptLibraries
 		'jquery-ui-1.11.4/jquery-ui.min.js')
 end
 
-### Make links required for running Evothings Studio without building a package.
-
-def makeLinksForDevelopment
-#	mklink('documentation', '../evothings-doc')
-	mklink('examples', '../evothings-examples/generated/examples')
-#	mklink('hyper/server/ui', '../evothings-examples/resources/ui')
-end
-
 ### Load custom settings from localConfig.rb
 
 #puts "looking for localConfig..."
@@ -122,4 +114,3 @@ createPackageJson
 getNodeWebkits
 installNodeModules
 downloadJavaScriptLibraries
-makeLinksForDevelopment
