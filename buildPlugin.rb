@@ -152,8 +152,6 @@ def buildOSXIcons
 end
 
 def buildGitVersionFile
-puts 'buildGitVersionFile'
-puts pathDistSource + 'gitVersions.txt'
 	open(pathDistSource + 'gitVersions.txt', 'w') do |file|
 		([SiblingRepo.new(cwdName)]+siblingRepos).each do |repo|
 			path = root+repo.name
