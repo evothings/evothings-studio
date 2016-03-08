@@ -22,13 +22,10 @@ def distVersion
 	"2.0.0"
 end
 
-# TODO: Update on new release.
 def distVersionLabel
-	# TODO: Remove " Beta 3" for final release.
-	distVersion + " Beta 3"
+	distVersion
 end
 
-# TODO: Update on new release.
 def distPackageVersion
 	time = $buildTimeStamp
 
@@ -40,8 +37,7 @@ def distPackageVersion
 		time.hour.to_s.rjust(2, '0') +
 		time.min.to_s.rjust(2, '0')
 
-	# TODO: Remove "_Beta3" for final release.
-	distVersion + "_Beta3_" + timestamp
+	distVersion + "_" + timestamp
 end
 
 def root
