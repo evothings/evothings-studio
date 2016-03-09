@@ -23,12 +23,15 @@ def distVersion
 end
 
 # TODO: Update on new release.
-def distVersionLabel
-	# TODO: Remove alpha/beta label for final release.
-	distVersion + "-alpha1"
+# Leave empty for final release.
+def distLabel
+	"-alpha1"
 end
 
-# TODO: Update on new release.
+def distVersionLabel
+	distVersion + distLabel
+end
+
 def distPackageVersion
 	time = $buildTimeStamp
 
@@ -40,8 +43,7 @@ def distPackageVersion
 		time.hour.to_s.rjust(2, '0') +
 		time.min.to_s.rjust(2, '0')
 
-	# TODO: Remove tag for final release.
-	distVersion + "-alpha1_" + timestamp
+	distVersion + distLabel + "_" + timestamp
 end
 
 def root
