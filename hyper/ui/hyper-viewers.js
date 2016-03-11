@@ -728,7 +728,7 @@ $(function()
 		{
 			if(typeof servicedata.data.value == 'string')
 			{
-				plate.innerHTML = servicedata.data.value
+				plate.innerHTML = '&nbsp;&nbsp;'+servicedata.data.value
 			}
 			else
 			{
