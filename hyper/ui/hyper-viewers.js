@@ -21,7 +21,7 @@ $(function()
 	var mServiceSubscriptions = []
 	var mTimeoutHandle = undefined
 
-	var SUBSCRIPTION_INTERVAL = 250
+	var SUBSCRIPTION_INTERVAL = 300
 	var NETWORK_TIMEOUT = 6000
 
 
@@ -258,7 +258,7 @@ $(function()
 	function requestStatus(viewer)
 	{
 		console.log('....requesting status.....')
-		mMainWindow.postMessage({ message: 'eval', code: 'window.hyper.sendMessageToServer(window.hyper.IoSocket, "client.instrumentation", {clientID: window.hyper.clientID, serviceStatus: typeof window._instrumentation })', client: viewer }, '*')
+		mMainWindow.postMessage({ message: 'eval', code: 'hyper.sendMessageToServer(window.hyper.IoSocket, "client.instrumentation", {clientID: window.hyper.clientID, serviceStatus: typeof window._instrumentation })', client: viewer }, '*')
 	}
 
 	function getImageForModel(info)
@@ -453,11 +453,7 @@ $(function()
 		if(sobj)
 		{
 			delete subscriptions[path]
-			if(sobj.type == 'plot')
-			{
-				removeChartFor(clientID, path)
-			}
-			else
+			if(!removeChartFor(clientID, path))
 			{
 				removePlateFor(clientID, path)
 			}
@@ -505,8 +501,10 @@ $(function()
 					//sdiv.style.display = 'flex';
 					//sdiv.style.flexDirection = 'row'
 					//sdiv.className = "mdl-list__item"
+					sdiv.style.backgroundColor = pathlevel.backgroundColor || '#fff'
 					sdiv.style.minHeight = '0'
 					sdiv.style.paddingLeft = "10px"
+					sdiv.style.margin = '1px'
 					parentnode.appendChild(sdiv)
 					// create name, image and potential list of children. The latter to have the 'parent' id
 					var ndiv = document.createElement('span')
@@ -549,21 +547,38 @@ $(function()
 					console.log('   adding childnode '+cdiv.id+' under parent node '+parentnode.id)
 					sdiv.addEventListener('mouseup', function(e)
 					{
-						if(pathlevel.selectable)
+						if(cdiv.childElementCount == 0)
 						{
-							selectHierarchy(pathlevel.name, client)
-						}
-						else
-						{
-							var provider = pathlevel.name.split('.')[0]
-							if(!isClientAlreadySubscribedToService(clientID, pathlevel.name))
+							cdiv.__opened = true
+							if(pathlevel.selectable)
 							{
-								subscribeToService(pathlevel.name, client)
+								selectHierarchy(pathlevel.name, client)
 							}
 							else
 							{
-								console.log('unsubscribing to service '+pathlevel.name)
-								unsubscribeToService(pathlevel.name, clientID)
+								var provider = pathlevel.name.split('.')[0]
+								if(!isClientAlreadySubscribedToService(clientID, pathlevel.name))
+								{
+									subscribeToService(pathlevel.name, client)
+								}
+								else
+								{
+									console.log('unsubscribing to service '+pathlevel.name)
+									unsubscribeToService(pathlevel.name, clientID)
+								}
+							}
+						}
+						else
+						{
+							if(cdiv.__opened)
+							{
+								cdiv.style.display = 'none'
+								cdiv.__opened = false
+							}
+							else
+							{
+								cdiv.style.display = 'block'
+								cdiv.__opened = true
 							}
 						}
 					})
@@ -697,7 +712,7 @@ $(function()
 		plate.innerHTML = '<b>'+servicedata.data.name+'</b>: '
 		var part = ''
 
-		if(servicedata.data.value.length)
+		if(servicedata && servicedata.data && servicedata.data.value && servicedata.data.value.length)
 		{
 			for(var i = 0; i < servicedata.data.value.length; i++)
 			{
@@ -732,6 +747,9 @@ $(function()
 			var color = servicedata.color || 'rgba(255,255,255,0.76)'
 			var fillstyle = servicedata.fillstyle || 'rgba(0,255,0,0.30)'
 			var value = undefined
+			var lid = clientID+'.serviceroot.'+path+'.chart_legend'
+			var legend = document.getElementById(lid)
+			legend.innerHTML = ''
 			if(typeof servicedata.data.value == 'object')
 			{
 				var count = 0
@@ -740,7 +758,8 @@ $(function()
 					if(key != 'timestamp')
 					{
 						value = servicedata.data.value[key]
-						switch(count)
+						legend.innerHTML += '&nbsp;&nbsp;'+key+': '+value+'<br/>'
+						switch(count++)
 						{
 							case 0:
 								color = 'rgba(25,255,25,0.76)'
@@ -757,12 +776,12 @@ $(function()
 						console.log('  -- appending value '+parseFloat(value)+' for key '+key+' and timestamp '+time)
 						ts.append(time, value)
 					}
-					count++
 				}
 			}
 			else
 			{
 				value = servicedata.data.value
+				legend.innerHTML = getNameFromPath(path)
 				var ts = getTimeSeriesFor(path, chart, color, fillstyle)
 				ts.append(time, value)
 			}
@@ -789,6 +808,7 @@ $(function()
 		if(!platenode)
 		{
 			platenode = document.createElement('div')
+			platenode.style.backgroundColor = '#eee'
 			platenode.width = "100"
 			platenode.height = "100"
 			platenode.style.fontSize = 18
@@ -832,10 +852,13 @@ $(function()
 			chartnode.width = "500"
 			chartnode.height = "100"
 			chartnode.id = id
+			var chartnodelegend = document.createElement('div')
+			chartnodelegend.id = chartnode.id + '_legend'
 			var parent = document.getElementById(clientID+'.serviceroot.'+path)
 			if(parent)
 			{
 				parent.appendChild(chartnode)
+				parent.appendChild(chartnodelegend)
 				chart = new SmoothieChart({grid: {verticalSections: 4}, timestampFormatter: SmoothieChart.timeFormatter})
 				mChartsVisible[id] = chart
 				chart.streamTo(chartnode, SUBSCRIPTION_INTERVAL);
@@ -851,15 +874,24 @@ $(function()
 	function removeChartFor(clientID, path)
 	{
 		console.log('removeChartFor called clientID = '+clientID+', path = '+path)
-		setTimeout(function()
+		var parent = document.getElementById(clientID+'.serviceroot.'+path)
+		var id = clientID+'.serviceroot.'+path+'.chart'
+		var chartnode = document.getElementById(id)
+		if(chartnode)
 		{
-			var parent = document.getElementById(clientID+'.serviceroot.'+path)
-			var id = clientID+'.serviceroot.'+path+'.chart'
-			var chartnode = document.getElementById(id)
-			parent.removeChild(chartnode)
-			chartnode.id = ""
-			parent.innerHTML = ""
-		}, SUBSCRIPTION_INTERVAL*3)
+			setTimeout(function()
+			{
+				parent.removeChild(chartnode)
+				chartnode.id = ""
+				parent.innerHTML = ""
+			}, SUBSCRIPTION_INTERVAL*3)
+			return true
+		}
+		else
+		{
+			return false
+		}
+
 	}
 
 	function setupEventListeners()

@@ -4,12 +4,12 @@ if (window.evo && window.evo.instrumentation)
 	var mgr = window.evo.instrumentation
 	//
 	//
-	/*
+
 	if(window.evo.cordova)
 	{
 		mgr.addServiceProvider(window.evo.cordova)
 	}
-	*/
+
 	if(window.evo.bluetooth)
 	{
 		mgr.addServiceProvider(window.evo.bluetooth)
