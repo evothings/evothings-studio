@@ -101,11 +101,16 @@ var me = window.evo.watcher =
                       var watch = me.getWatchFromName(watchname)
                       if(watch)
                       {
+                        var oldval = undefined
                         var sid = setInterval(function()
                         {
                           var v = watch.object[watch.property]
                           //hyper.log('sendinv value '+v+' for property '+watch.property+' on object '+watch.object)
-                          callback({name: watch.name, value: v, type: watch.type})
+                          if(v != oldval)
+                          {
+                            callback({name: watch.name, value: v, type: watch.type})
+                            oldval = v
+                          }
                         }, interval)
                         return sid
                       }

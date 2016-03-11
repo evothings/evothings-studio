@@ -519,6 +519,18 @@ $(function()
 					//ndiv.style.border = '1px solid grey'
 					ndiv.style.fonFamily = 'Proxima Nova Regular'
 					ndiv.style.height = '30px'
+					if(pathlevel.label)
+					{
+						var ldiv = document.createElement('div')
+						parentnode.appendChild(ldiv)
+						var ltext = ''
+						for(var l in pathlevel.label)
+						{
+							ltext += l + ': '+pathlevel.label[l] + ', '
+						}
+						ltext = ltext.substring(0, ltext.lenght-2)
+						ldiv.innerHTML = ltext
+					}
 
 					var tdiv = document.createElement('div')
 					tdiv.className = "mdl-tooltip mdl-tooltip--large"
@@ -714,13 +726,21 @@ $(function()
 
 		if(servicedata && servicedata.data && servicedata.data.value && servicedata.data.value.length)
 		{
-			for(var i = 0; i < servicedata.data.value.length; i++)
+			if(typeof servicedata.data.value == 'string')
 			{
-				var val = servicedata.data.value[i]
-				part += val+', '
+				plate.innerHTML = servicedata.data.value
 			}
-			part = part.substring(0, part.length-2)
-			plate.innerHTML += part
+			else
+			{
+				for(var i = 0; i < servicedata.data.value.length; i++)
+				{
+					var val = servicedata.data.value[i]
+					part += val+', '
+				}
+				part = part.substring(0, part.length-2)
+				plate.innerHTML += part
+			}
+
 		}
 		else if (typeof servicedata.data.value == 'object')
 		{

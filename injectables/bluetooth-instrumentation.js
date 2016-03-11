@@ -371,7 +371,7 @@ var me = window.evo.bluetooth =
                                 //{"address":"C3:EE:68:01:33:62","rssi":-77,"name":"estimote","scanRecord":"AgEGGv9MAAIVuUB/MPX4Rm6v+SVVa1f+bTNiaAG2CQllc3RpbW90ZQ4WChhiMwFo7sO2YjMBaAAAAAAAAAA="}
                                 var uniquename = device.advertisementData.kCBAdvDataLocalName || JSON.stringify(device.advertisementData) || device.name
                                 var name =  uniquename ? uniquename + '['+device.address + ']' : device.address
-                                callback([{name: 'bluetooth.'+name, backgroundColor: '#cce', selectable: true}])
+                                callback([{name: 'bluetooth.'+name, backgroundColor: '#cce', selectable: true, priority: device.rssi, labels: {rssi: device.rssi}}])
                             }
                         }
                     },
