@@ -793,7 +793,7 @@ $(function()
 								color = 'rgba(195,205,255,0.76)'
 						}
 						var ts = getTimeSeriesFor(path+'_'+key, chart, color, fillstyle)
-						console.log('  -- appending value '+parseFloat(value)+' for key '+key+' and timestamp '+time)
+						//console.log('  -- appending value '+parseFloat(value)+' for key '+key+' and timestamp '+time)
 						ts.append(time, value)
 					}
 				}
