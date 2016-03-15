@@ -365,6 +365,7 @@ TODO: Remove, use automatic width for all buttons.
 {
 	font-size: 70%;
 	padding: 3px;
+	cursor: auto !important;
 }
 
 .project-list .project-entry .app-icon

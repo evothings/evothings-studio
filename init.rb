@@ -61,7 +61,7 @@ end
 
 def installNodeModules
 	# Install modules specified in package.json.
-	sh 'npm install fs-extra'
+	sh 'npm install'
 
 	# Run flatten-packages
 	begin
@@ -94,18 +94,17 @@ def downloadJavaScriptLibraries
 		'jquery-ui-1.11.4/jquery-ui.min.js')
 end
 
-### Make links required for running Evothings Studio without building a package.
-
-def makeLinksForDevelopment
-#	mklink('documentation', '../evothings-doc')
-	mklink('examples', '../evothings-examples/generated/examples')
-#	mklink('hyper/server/ui', '../evothings-examples/resources/ui')
+# Copy Evothings examples folder to make it possible to
+# test examples without building the Workbench.
+def copyExamples
+	FileUtils.copy_entry(
+		"../evothings-examples/generated/examples",
+		"./examples")
 end
 
 ### Load custom settings from localConfig.rb
 
 #puts "looking for localConfig..."
-
 # allow override of defined functions
 if(File.exist?('./localConfig.rb'))
 	load './localConfig.rb'
@@ -117,4 +116,4 @@ createPackageJson
 getNodeWebkits
 installNodeModules
 downloadJavaScriptLibraries
-makeLinksForDevelopment
+copyExamples

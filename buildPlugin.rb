@@ -3,6 +3,8 @@
 
 require './sibling-repos.rb'
 
+$buildTimeStamp = Time.new
+
 def distPackageName
 	"EvothingsStudio"
 end
@@ -21,14 +23,17 @@ def distVersion
 end
 
 # TODO: Update on new release.
-def distVersionLabel
-	# TODO: Remove alpha/beta label for final release.
-	distVersion + "-alpha1"
+# Leave empty for final release.
+def distLabel
+	"-alpha1"
 end
 
-# TODO: Update on new release.
+def distVersionLabel
+	distVersion + distLabel
+end
+
 def distPackageVersion
-	time = Time.new
+	time = $buildTimeStamp
 
 	timestamp =
 		time.year.to_s[-2..-1] +
@@ -38,8 +43,7 @@ def distPackageVersion
 		time.hour.to_s.rjust(2, '0') +
 		time.min.to_s.rjust(2, '0')
 
-	# TODO: Remove "_Beta3" for final release.
-	distVersion + "_Beta3_" + timestamp
+	distVersion + distLabel + "_" + timestamp
 end
 
 def root

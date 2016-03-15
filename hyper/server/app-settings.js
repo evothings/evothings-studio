@@ -182,6 +182,10 @@ exports.getIndexFileShortPath = function(appPath)
 	{
 		return PATH.join(appDirPath, indexPath)
 	}
+	else if (indexPath)
+	{
+		return indexPath
+	}
 	else
 	{
 		return null

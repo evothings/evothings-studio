@@ -62,8 +62,6 @@ exports.defineBuildFunctions = function(hyper)
 		// Prepend application path if this is not an absolute path.
 		mAppFullPath = hyper.UI.getAppFullPath(path)
 
-		console.log('@@@ runApp')
-
 		// Build the app.
 		buildAppIfNeeded(mAppFullPath, null, buildCallback)
 
@@ -112,9 +110,6 @@ exports.defineBuildFunctions = function(hyper)
 	 */
 	hyper.UI.reloadApp = function(changedFiles)
 	{
-		console.log('@@@reloadApp: ' + changedFiles[0])
-		LOGGER.log('[main-window-build.js] reloadApp')
-
 		if (mRunAppGuard) { return }
 		mRunAppGuard = true
 
@@ -172,26 +167,28 @@ exports.defineBuildFunctions = function(hyper)
 		hyper.UI.closeFloatingAlert()
 	}
 
+	function makeProjectCurrentWithoutBuildingIt(fullPath)
+	{
+		// Set server paths using the location of the HTML file.
+		var appBasePath = PATH.dirname(fullPath)
+		var indexFile = PATH.basename(fullPath)
+		SERVER.setAppPath(appBasePath)
+		SERVER.setAppFileName(indexFile)
+		// Set app id, will create evothings.json with new id if not existing.
+		SERVER.setAppID(APP_SETTINGS.getAppID(appBasePath))
+		MONITOR.setBasePath(appBasePath)
+	}
+
 	/**
 	 * @param fullPath - the project folder root.
 	 */
-	var buildAppIfNeeded = function(fullPath, changedFiles, buildCallback)
+	function buildAppIfNeeded(fullPath, changedFiles, buildCallback)
 	{
-		console.log('@@@ buildAppIfNeeded fullPath: ' + fullPath)
-
 		// Standard HTML file project.
 		if (FILEUTIL.fileIsHTML(fullPath))
 		{
-			// Set server paths using the location of the HTML file.
-			var appBasePath = PATH.dirname(fullPath)
-			var indexFile = PATH.basename(fullPath)
-			SERVER.setAppPath(appBasePath)
-			SERVER.setAppFileName(indexFile)
-			// Set app id, will create evothings.json with new id if not existing.
-			SERVER.setAppID(APP_SETTINGS.getAppID(appBasePath))
-			MONITOR.setBasePath(appBasePath)
-
 			// No build performed when running an HTML file project.
+			makeProjectCurrentWithoutBuildingIt(fullPath)
 			buildCallback(null)
 			return
 		}
@@ -202,17 +199,10 @@ exports.defineBuildFunctions = function(hyper)
 			var indexFile = APP_SETTINGS.getIndexFile(fullPath)
 			if (!indexFile)
 			{
-				// Error.
-				evothingsSettingMissingError()
-				return
-			}
-
-			// Get www dir.
-			var wwwDir = APP_SETTINGS.getWwwDir(fullPath)
-			if (!wwwDir)
-			{
-				// Error.
-				evothingsSettingMissingError()
+				// Error. Must have index file.
+				buildCallback(
+					'evothings.json is missing or index-file entry is missing: '
+					+ fullPath)
 				return
 			}
 
@@ -220,8 +210,21 @@ exports.defineBuildFunctions = function(hyper)
 			var appDir = APP_SETTINGS.getAppDir(fullPath)
 			if (!appDir)
 			{
-				// Error.
-				evothingsSettingMissingError()
+				// app dir is missing, run the HTML index file without building.
+				var indexFileFullPath = PATH.join(fullPath, indexFile)
+				makeProjectCurrentWithoutBuildingIt(indexFileFullPath)
+				buildCallback(null)
+				return
+			}
+
+			// Get www dir.
+			var wwwDir = APP_SETTINGS.getWwwDir(fullPath)
+			if (!wwwDir)
+			{
+				// www dir is missing, run the HTML index file without building.
+				var indexFileFullPath = PATH.join(fullPath, appDir, indexFile)
+				makeProjectCurrentWithoutBuildingIt(indexFileFullPath)
+				buildCallback(null)
 				return
 			}
 
@@ -232,13 +235,14 @@ exports.defineBuildFunctions = function(hyper)
 			SERVER.setAppPath(PATH.join(fullPath, wwwDir))
 			SERVER.setAppFileName(indexFile)
 			SERVER.setAppID(APP_SETTINGS.getAppID(fullPath))
-
 			MONITOR.setBasePath(PATH.join(fullPath, appDir))
 		}
 		else
 		{
 			// Error.
-			evothingsSettingMissingError()
+			buildCallback(
+				'Invalid project path: '
+				+ fullPath)
 			return
 		}
 
@@ -260,8 +264,6 @@ exports.defineBuildFunctions = function(hyper)
 
 		function buildDone(error)
 		{
-			console.log('Build done')
-
 			if (error)
 			{
 				closeFloatingAlert()
@@ -281,17 +283,8 @@ exports.defineBuildFunctions = function(hyper)
 			}
 		}
 
-		function evothingsSettingMissingError()
-		{
-			buildCallback(
-				'evothings.json is missing or index-file entry is missing: '
-				+ fullPath)
-		}
-
 		function getAllAppFiles(sourcePath)
 		{
-			console.log('getAllAppFiles: ' + sourcePath)
-
 			var options =
 			{
 				follow: false,
@@ -300,8 +293,6 @@ exports.defineBuildFunctions = function(hyper)
 				root: sourcePath
 			}
 			var sourceFiles = GLOB.sync('/**/*', options)
-
-			console.log('@@@ globbed files: ' + sourceFiles.length)
 
 			var normalizedSourceFiles = []
 
@@ -313,8 +304,6 @@ exports.defineBuildFunctions = function(hyper)
 				if (0 == path.indexOf(PATH.sep)) { path = path.substr(1) }
 				if (0 == path.indexOf(PATH.sep)) { path = path.substr(1) }
 				normalizedSourceFiles.push(path)
-
-				console.log('  ' + path)
 			}
 
 			return normalizedSourceFiles
@@ -323,14 +312,11 @@ exports.defineBuildFunctions = function(hyper)
 
 	function buildAppFiles(sourcePath, sourceFiles, destPath, dontBuildDirs, doneCallback)
 	{
-		console.log('buildAppFiles')
-
 		function buildNextFile()
 		{
 			// Is build done?
 			if (0 == sourceFiles.length)
 			{
-				console.log('buildAppFiles done')
 				doneCallback()
 				return
 			}
@@ -340,8 +326,6 @@ exports.defineBuildFunctions = function(hyper)
 			var fullSourcePath = PATH.join(sourcePath, filePath)
 			var fullDestPath = PATH.join(destPath, filePath)
 			var fullDestFolderPath = PATH.dirname(fullDestPath)
-
-			console.log('buildNextFile: ' + fullSourcePath)
 
 			if (shouldBuildFile(filePath))
 			{
@@ -359,7 +343,6 @@ exports.defineBuildFunctions = function(hyper)
 
 		function shouldBuildFile(filePath)
 		{
-			console.log('@@@ shouldBuildFile filePath: ' + filePath)
 			for (var i = 0; i < dontBuildDirs.length; ++i)
 			{
 				// Does the file path begin with the path in dontBuild?
@@ -395,8 +378,6 @@ exports.defineBuildFunctions = function(hyper)
 
 	function buildAppFile(fullSourcePath, fullDestFolderPath, resultCallback)
 	{
-		console.log('buildAppFile: ' + fullSourcePath)
-
 		try
 		{
 			var ext = PATH.extname(fullSourcePath).substr(1)
@@ -408,8 +389,6 @@ exports.defineBuildFunctions = function(hyper)
 		{
 			if ('MODULE_NOT_FOUND' == error.code)
 			{
-				console.log('No plugin found - default build')
-
 				// No plugin found, just copy the file to dest.
 				copyFile(fullSourcePath, fullDestFolderPath)
 

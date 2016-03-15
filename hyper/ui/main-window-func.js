@@ -267,25 +267,25 @@ exports.defineUIFunctions = function(hyper)
 
 	function handleFileDrop(files)
 	{
+/*
 		// Debug print.
-		/*
+		console.log('@@@ handleFileDrop');
 		for (var i = 0; i < files.length; ++i)
 		{
-			LOGGER.log(files[i].path);
+			console.log(files[i].path);
 		}
-		*/
+*/
 
 		for (var i = 0; i < files.length; ++i)
 		{
 			var path = files[i].path
 			if (pathIsValidAppPath(path))
 			{
-				//hyper.SERVER.setAppPath(path)
 				hyper.UI.addProject(path)
 			}
 			else
 			{
-				alert('Only HTML files (extension .html or .htm) can be used')
+				alert('Only evothings.json or HTML files (extension .html or .htm) can be used')
 				break;
 			}
 		}
@@ -324,7 +324,7 @@ exports.defineUIFunctions = function(hyper)
 		html += '>'
 
 		// Show app image icon
-		var appPath = hyper.UI.getAppFullPath(PATH.dirname(path))
+		var appPath = hyper.UI.getAppFullPath(path)
 		var imagePath = APP_SETTINGS.getAppImage(appPath)
 
 		if (imagePath)
@@ -389,10 +389,10 @@ exports.defineUIFunctions = function(hyper)
 			+ '</div>'
 
 		// Get name of project, use title tag as first choise.
-		var name = hyper.UI.getProjectNameFromFile(path)
+		var name = hyper.UI.getProjectNameFromFile(appPath)
 		if (!name)
 		{
-			LOGGER.log('[main-window-func.js] getProjectNameFromFile failed: ' + path)
+			LOGGER.log('[main-window-func.js] getProjectNameFromFile failed: ' + appPath)
 
 			// Could not open the app main file, skip this app.
 			return
@@ -490,15 +490,13 @@ exports.defineUIFunctions = function(hyper)
 
 	hyper.UI.getProjectNameFromFile = function(path)
 	{
-	    //console.log('@@@ getProjectNameFromFile: '  + path)
-
 	    // Is it an HTML file?
 	    if (FILEUTIL.fileIsHTML(path))
 	    {
 	        var indexPath = path
 	    }
-	    // Is it a directory?
-	    else if (FILEUTIL.fileIsDirectory(path))
+	    // Is it a directory with evothings.json in it?
+	    else if (FILEUTIL.directoryHasEvothingsJson(path))
 	    {
 	        // Read index file from evothings.json
 	        var indexPath = APP_SETTINGS.getIndexFileFullPath(path)
@@ -514,7 +512,6 @@ exports.defineUIFunctions = function(hyper)
 		var data = FILEUTIL.readFileSync(indexPath)
 		if (!data)
 		{
-			//console.log('@@@ readFileSync retruned null for: ' + indexPath)
 			// Return null on error.
 			return null
 		}
@@ -744,7 +741,7 @@ exports.defineUIFunctions = function(hyper)
 				'<div class="style-big-para" style="padding: 0px 10px 10px 10px;">' +
 				'<h2>How to create a new app</h2>' +
 				'<p>Create a new app by copying one of the example apps (click "Copy") or by clicking the "New" button.</p>' +
-				'<p>You can also drag and drop an .html file (typically index.html) to this window.</p>' +
+				'<p>You can also drag and drop an .html file (typically index.html) or an evothings.json file to this window.</p>' +
 				'<p>Arrange apps in the list using drag and drop. Click the close icon (x) to delete an app entry. This will NOT delete the application files.</p>' +
 				'</div>'
 
@@ -869,19 +866,9 @@ exports.defineUIFunctions = function(hyper)
 		path = hyper.UI.getAppFullPath(path)
 
 		// Set source and folder name of app to copy.
-		var sourceDir = PATH.dirname(path)
+		var sourceDir = path
 		var appFolderName = PATH.basename(sourceDir)
 		var myAppsDir = SETTINGS.getMyAppsPath()
-
-		// Now, time to handle a special case. Some of the Evothings example
-		// apps contain a folder named "app" where index.html is found.
-		// If the appFolderName is "app", we go up one level.
-		// It should be noted that this is not a very nice hack,
-		// and there is a corresponding hack in function copyApp().
-		if ('app' ==  appFolderName)
-		{
-			appFolderName = PATH.basename(PATH.dirname(sourceDir))
-		}
 
 		// Set dialog box fields.
 		hyper.UI.$('#input-copy-app-source-path').val(path) // Hidden field.
@@ -895,7 +882,7 @@ exports.defineUIFunctions = function(hyper)
 	hyper.UI.saveCopyApp = function()
 	{
 		// Set up source and target paths.
-		var sourcePath = hyper.UI.$('#input-copy-app-source-path').val()
+		var sourceDir = hyper.UI.$('#input-copy-app-source-path').val()
 		var targetAppFolder = hyper.UI.$('#input-copy-app-target-folder').val()
 		var targetParentDir = hyper.UI.$('#input-copy-app-target-parent-folder').val()
 		var targetDir = PATH.join(targetParentDir, targetAppFolder)
@@ -909,7 +896,7 @@ exports.defineUIFunctions = function(hyper)
 		}
 
 		// Copy the app.
-		copyApp(sourcePath, targetDir)
+		copyApp(sourceDir, targetDir)
 
 		// Hide dialog.
 		hyper.UI.$('#dialog-copy-app').modal('hide')
@@ -918,38 +905,22 @@ exports.defineUIFunctions = function(hyper)
 		showMyApps()
 	}
 
-	function copyApp(sourcePath, targetDir)
+	// sourcePath points to a directory.
+	function copyApp(sourceDir, targetDir)
 	{
 		try
 		{
-			var indexFile = PATH.basename(sourcePath)
-			var sourceDir = PATH.dirname(sourcePath)
 			var appFolderName = PATH.basename(sourceDir)
-			var indexFileTargetPath = PATH.join(targetDir, indexFile)
-
-			// Again, we need to handle the special case when index.html of the
-			// example app is contained in a subfolder named "app".
-			// If the appFolderName is "app", we go up one level.
-			// There is a corresponding hack in function hyper.UI.openCopyAppDialog().
-			if ('app' ==  appFolderName)
-			{
-				sourceDir = PATH.dirname(sourceDir)
-				indexFileTargetPath = PATH.join(targetDir, appFolderName, indexFile)
-			}
-
-			//LOGGER.log('[main-window-func.js] @@@ targetDir: ' + targetDir)
-			//LOGGER.log('[main-window-func.js] @@@ sourceDir: ' + sourceDir)
-			//LOGGER.log('[main-window-func.js] @@@ indexFileTargetPath: ' + indexFileTargetPath)
 
 			// Copy files.
 			FSEXTRA.copySync(sourceDir, targetDir)
 
 			// Remove any app-uuid entry from evothings.json in the copied app.
 			// This is done to prevent duplicated app uuids.
-			APP_SETTINGS.generateNewAppUUID(PATH.dirname(indexFileTargetPath))
+			APP_SETTINGS.generateNewAppUUID(sourceDir)
 
-			// Add path of index.html to "My Apps".
-			hyper.UI.addProject(indexFileTargetPath)
+			// Add path to "My Apps".
+			hyper.UI.addProject(targetDir)
 		}
 		catch (error)
 		{
@@ -976,7 +947,7 @@ exports.defineUIFunctions = function(hyper)
 
 	hyper.UI.saveNewApp = function()
 	{
-		var sourcePath = hyper.UI.getAppFullPath('examples/template-basic-app/index.html')
+		var sourcePath = hyper.UI.getAppFullPath('examples/template-basic-app')
 		var parentFolder = hyper.UI.$('#input-new-app-parent-folder').val()
 		var appFolder = hyper.UI.$('#input-new-app-folder').val()
 		var targetDir = PATH.join(parentFolder, appFolder)
