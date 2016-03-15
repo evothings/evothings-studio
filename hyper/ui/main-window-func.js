@@ -302,6 +302,7 @@ exports.defineUIFunctions = function(hyper)
 	/**
 	 * Possible options include:
 	 *	 options.screen
+	 *	 options.docButton
 	 *	 options.copyButton
 	 *	 options.openButton
 	 *	 options.deleteButton
@@ -325,6 +326,7 @@ exports.defineUIFunctions = function(hyper)
 		// Show app image icon
 		var appPath = hyper.UI.getAppFullPath(path)
 		var imagePath = APP_SETTINGS.getAppImage(appPath)
+		var docURL = APP_SETTINGS.getDocURL(appPath)
 
 		if (imagePath)
 		{
@@ -337,6 +339,17 @@ exports.defineUIFunctions = function(hyper)
 		{
 			// Show a default icon if no image file is provided.
 			html += '<div class="app-icon" style="background-image: url(\'images/app-icon.png\');"></div>'
+		}
+
+		if (docURL && options.docButton)
+		{
+			html +=
+				'<button '
+				+	'type="button" '
+				+	'class="button-doc btn et-btn-yellow-dark" '
+				+	'onclick="window.hyper.UI.openDocURL(\'__DOCURL__\')">'
+				+	'Doc'
+				+ '</button>'
 		}
 
 		if (options.copyButton)
@@ -401,6 +414,7 @@ exports.defineUIFunctions = function(hyper)
 		var escapedPath = path.replace(/[\\]/g,'\\\\')
 
 		// Replace fields in template.
+		html = html.replace('__DOCURL__', docURL)
 		html = html.replace('__PATH1__', escapedPath)
 		html = html.replace('__PATH2__', escapedPath)
 		html = html.replace('__PATH3__', escapedPath)
@@ -708,6 +722,7 @@ exports.defineUIFunctions = function(hyper)
 					{
 						screen: '#screen-projects',
 						openButton: true,
+						docButton: true,
 						deleteButton: true
 					})
 			}
@@ -741,6 +756,7 @@ exports.defineUIFunctions = function(hyper)
 				entry.path,
 				{
 					screen: '#screen-examples',
+					docButton: true,
 					copyButton: true,
 					imagePath: entry.image
 				})
@@ -836,6 +852,11 @@ exports.defineUIFunctions = function(hyper)
 
 		// Show the file in the folder.
 		hyper.UI.openFolder(path)
+	}
+
+	hyper.UI.openDocURL = function(url)
+	{
+		hyper.UI.openInBrowser(url)
 	}
 
 	hyper.UI.openCopyAppDialog = function(path)

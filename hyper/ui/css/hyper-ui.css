@@ -145,6 +145,16 @@ html, body
 	font-weight: bold;
 }
 
+.button-doc
+{
+	position: absolute;
+	right: 200px;
+	top: 10px;
+	bottom: 10px;
+	width: 80px;
+	font-weight: bold;
+}
+
 .button-copy
 {
 	position: absolute;
