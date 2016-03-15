@@ -6,6 +6,28 @@ evothings.easyble.reportDeviceOnce(true)
 
 var me = window.evo.bluetooth =
 {
+    permission : {
+        1: 'PERMISSION_READ',
+        2: 'PERMISSION_READ_ENCRYPTED',
+        4: 'PERMISSION_READ_ENCRYPTED_MITM',
+        16: 'PERMISSION_WRITE',
+        32: 'PERMISSION_WRITE_ENCRYPTED',
+        64: 'PERMISSION_WRITE_ENCRYPTED_MITM',
+        128: 'PERMISSION_WRITE_SIGNED',
+        256: 'PERMISSION_WRITE_SIGNED_MITM',
+    },
+
+    property : {
+        1: 'PROPERTY_BROADCAST',
+        2: 'PROPERTY_READ',
+        4: 'PROPERTY_WRITE_NO_RESPONSE',
+        8: 'PROPERTY_WRITE',
+        16: 'PROPERTY_NOTIFY',
+        32: 'PROPERTY_INDICATE',
+        64: 'PROPERTY_SIGNED_WRITE',
+        128: 'PROPERTY_EXTENDED_PROPS',
+    },
+
     bluetoothServices: {
         "alert_notification": '1811',
         "automation_io": '1815',
@@ -347,8 +369,9 @@ var me = window.evo.bluetooth =
                             {
                                 me.devices[device.address] = device
                                 //{"address":"C3:EE:68:01:33:62","rssi":-77,"name":"estimote","scanRecord":"AgEGGv9MAAIVuUB/MPX4Rm6v+SVVa1f+bTNiaAG2CQllc3RpbW90ZQ4WChhiMwFo7sO2YjMBaAAAAAAAAAA="}
-                                var name = device.name ? device.name + '['+device.address + ']' : device.address
-                                callback([{name: 'bluetooth.'+name, selectable: true}])
+                                var uniquename = device.advertisementData.kCBAdvDataLocalName || JSON.stringify(device.advertisementData) || device.name
+                                var name =  uniquename ? uniquename + '['+device.address + ']' : device.address
+                                callback([{name: 'bluetooth.'+name, backgroundColor: '#cce', selectable: true, priority: device.rssi, labels: {rssi: device.rssi}}])
                             }
                         }
                     },

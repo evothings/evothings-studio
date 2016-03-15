@@ -602,7 +602,7 @@ exports.evalJS = function(code, client)
 		{
 			sessionID: mSessionID,
 			code: code,
-			clientUUID: client.UUID
+			clientUUID: client ? client.UUID: ''
 		})
 }
 
