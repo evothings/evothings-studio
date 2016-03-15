@@ -327,13 +327,13 @@ $(function()
 		console.log('------------------------------------------------------------- injecting instrumentation into client '+client.name+' from directory '+wd+', to client '+client.UUID)
 		var files =
 		[
-			'../injectables/util.js',
-			'../injectables/easyble.js',
-			'../injectables/instrumentation-manager.js',
-			'../injectables/bluetooth-instrumentation.js',
-			'../injectables/cordova-instrumentation.js',
-			'../injectables/watcher-instrumentation.js',
-			'../injectables/instrumentation-starter.js'
+			'./injectables/util.js',
+			'./injectables/easyble.js',
+			'./injectables/instrumentation-manager.js',
+			'./injectables/bluetooth-instrumentation.js',
+			'./injectables/cordova-instrumentation.js',
+			'./injectables/watcher-instrumentation.js',
+			'./injectables/instrumentation-starter.js'
 		]
 		var promises = []
 		var count = 0
