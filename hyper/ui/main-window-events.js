@@ -91,6 +91,13 @@ exports.defineUIEvents = function(hyper)
 	{
 		hyper.UI.openInBrowser('https://evothings.com/doc/')
 	})
+	
+  // ************** FAQ Button **************
+
+	hyper.UI.$('.button-faq').click(function()
+	{
+		hyper.UI.openInBrowser('https://evothings.com/doc/faq.html')
+	})
 
 	// ************** Release Notes Button **************
 
@@ -132,6 +139,13 @@ exports.defineUIEvents = function(hyper)
 	hyper.UI.$('#button-feedback').click(function()
 	{
 		hyper.UI.openInBrowser('https://evothings.com/feedback/')
+	})
+
+	// ************** Chat Button **************
+
+	hyper.UI.$('#button-chat').click(function()
+	{
+		hyper.UI.openInBrowser('https://gitter.im/evothings/evothings')
 	})
 
 	// ************** Forum Button **************
