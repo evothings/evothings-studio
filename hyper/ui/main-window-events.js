@@ -96,7 +96,7 @@ exports.defineUIEvents = function(hyper)
 
 	hyper.UI.$('.button-faq').click(function()
 	{
-		hyper.UI.openInBrowser('https://evothings.com/doc/faq.html')
+		hyper.UI.openInBrowser('https://evothings.com/doc/faq/faq.html')
 	})
 
 	// ************** Release Notes Button **************
