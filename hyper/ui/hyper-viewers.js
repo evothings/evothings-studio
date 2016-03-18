@@ -14,9 +14,12 @@ $(function()
 	var mMainWindow = window.opener
 
 	var mCurrentClients = []
+
+	var	mCurrentClientList = []
+	var mOldClientList = []
+
 	var mChartsVisible = []
 	var mTimeSeriesForChart = []
-	var mCurrentClientList = undefined
 	var mInstrumentationReceivedFrom = []
 	var mServiceSubscriptions = []
 	var mTimeoutHandle = undefined
@@ -160,34 +163,36 @@ $(function()
 
 	function renderViewersFromList(list)
 	{
-		mCurrentClientList = list
 		console.log('renderViewersFromList showing '+list.length+' clients')
 		var domlist = document.getElementById('viewer-list')
 		if(list && list.length)
 		{
+			mCurrentClientList = list
 			//console.dir(list)
 			list.forEach(function(viewer)
 			{
 				var exist = document.getElementById(viewer.clientID)
+				requestStatus(viewer)
 				if(!exist)
 				{
 					console.log('client '+viewer.clientID+' does not exist yet, so adding that...')
 					renderViewer(domlist, viewer)
 				}
 			})
+
 		}
 	}
 
 	function removeViewersNotInList(list)
 	{
 		console.log('removeViewersNotInList called. We have '+mCurrentClients.length+' old clients and '+list.length+' new clients')
-		var oldClients = mCurrentClients
-		oldClients.forEach(function(oldClient)
+		var found = false
+
+		mOldClientList.forEach(function(oldClient)
 		{
-			var found = false
 			list.forEach(function(newClient)
 			{
-				console.log('checking if new client '+newClient.clientID+' == '+oldClient.clientID)
+				console.log('checking if new client ' + newClient.clientID + ' == ' + oldClient.clientID)
 				if (newClient.clientID == oldClient.clientID)
 				{
 					found = true
@@ -198,6 +203,7 @@ $(function()
 				removeOldClient(oldClient)
 			}
 		})
+
 	}
 
 	function removeOldClient(oldClient)
@@ -252,7 +258,6 @@ $(function()
 		domlist.appendChild(rowdiv)
 		console.log('adding client and requesting status')
 		console.dir(viewer)
-		requestStatus(viewer)
 	}
 
 	function requestStatus(viewer)
@@ -316,6 +321,8 @@ $(function()
 			var list = viewerlist.clients
 			removeViewersNotInList(list)
 			renderViewersFromList(list)
+			mOldClientList = mCurrentClientList
+
 		}
 	}
 
@@ -413,25 +420,30 @@ $(function()
 		}
 		else if (message.serviceStatus)
 		{
-			console.log('-- got serviceStatus back: '+message.serviceStatus)
-			var ball = document.getElementById(message.clientID+'_ball')
-			if(message.serviceStatus && message.serviceStatus != 'undefined')
-			{
-				console.log('setting ball '+ball.id+' green')
-				ball.style.backgroundColor = 'green'
-				mInstrumentationReceivedFrom[message.clientID] = true
-				var client = mCurrentClients[message.clientID]
-				mMainWindow.postMessage({
-					message: 'eval',
-					code: 'window.evo.instrumentation.selectHierarchy()',
-					client: client
-				}, '*')
-			}
-			else
-			{
-				console.log('setting ball '+ball.id+' gray')
-				ball.style.backgroundColor = 'gray'
-			}
+			setViewerServiceStatus(message)
+		}
+	}
+
+	function setViewerServiceStatus(message)
+	{
+		console.log('-- got serviceStatus back: '+message.serviceStatus)
+		var ball = document.getElementById(message.clientID+'_ball')
+		if(message.serviceStatus && message.serviceStatus != 'undefined')
+		{
+			console.log('setting ball '+ball.id+' green')
+			ball.style.backgroundColor = 'green'
+			mInstrumentationReceivedFrom[message.clientID] = true
+			var client = mCurrentClients[message.clientID]
+			mMainWindow.postMessage({
+				message: 'eval',
+				code: 'window.evo.instrumentation.selectHierarchy()',
+				client: client
+			}, '*')
+		}
+		else
+		{
+			console.log('setting ball '+ball.id+' gray')
+			ball.style.backgroundColor = 'gray'
 		}
 	}
 
