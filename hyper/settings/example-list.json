@@ -1,7 +1,7 @@
 [
 {"path":"examples/hello-ecmascript6"},
 {"path":"examples/mbed-custom-gatt-webbluetooth"},
-{"path":"examples/ti-sensortag-cc2541-webbluetooth"},
+{"path":"examples/ble-ti-sensortag-cc2541-webbluetooth"},
 
 {"path":"examples/hello-world"},
 {"path":"examples/cordova-accelerometer"},
