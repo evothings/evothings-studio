@@ -1,7 +1,7 @@
 [
 {"path":"examples/hello-ecmascript6"},
 {"path":"examples/mbed-custom-gatt-webbluetooth"},
-{"path":"examples/ti-sensortag-cc2541-webbluetooth"},
+{"path":"examples/ble-ti-sensortag-cc2541-webbluetooth"},
 
 {"path":"examples/hello-world"},
 {"path":"examples/cordova-accelerometer"},
@@ -14,18 +14,18 @@
 {"path":"examples/estimote-beacons"},
 {"path":"examples/estimote-nearables"},
 
-{"path":"examples/ti-sensortag-accelerometer"},
-{"path":"examples/ti-sensortag-sensors"},
-{"path":"examples/ti-sensortag-cc2650-demo"},
-{"path":"examples/ti-sensortag-cc2541-demo"},
+{"path":"examples/ble-ti-sensortag-accelerometer"},
+{"path":"examples/ble-ti-sensortag-sensors"},
+{"path":"examples/ble-ti-sensortag-cc2650-demo"},
+{"path":"examples/ble-ti-sensortag-cc2541-demo"},
 
 {"path":"examples/mbed-custom-gap"},
 {"path":"examples/mbed-custom-gatt"},
-{"path":"examples/nordic-nRF51-dk-ble"},
+{"path":"examples/nordic-nRF51-ble"},
 
 {"path":"examples/arduino-led-onoff-tcp"},
 {"path":"examples/arduino-led-onoff-ble"},
-{"path":"examples/arduino-ble/app"},
+{"path":"examples/arduino-ble"},
 {"path":"examples/arduino-scriptable-tcp"},
 
 {"path":"examples/redbearlab-simplecontrol"},
@@ -35,7 +35,7 @@
 {"path":"examples/mediatek-linkit-connect"},
 
 {"path":"examples/esp8266"},
-{"path":"examples/lightblue-bean-basic"},
+{"path":"examples/lightbluebean-basic"},
 {"path":"examples/rfduino-led-onoff"},
 {"path":"examples/bluno-helloworld"}
 ]

@@ -285,7 +285,7 @@ exports.defineUIFunctions = function(hyper)
 			}
 			else
 			{
-				alert('Only evothings.json or HTML files (extension .html or .htm) can be used')
+				window.alert('Not a valid evothings.json file or HTML file (extension .html or .htm)')
 				break;
 			}
 		}
@@ -295,14 +295,46 @@ exports.defineUIFunctions = function(hyper)
 
     function pathIsValidAppPath(path)
     {
-        return FILEUTIL.fileIsHTML(path) ||
-            FILEUTIL.fileIsEvothingsSettings(path) ||
-            FILEUTIL.fileIsDirectory(path)
+        // Is it an existing HTML file?
+		if (FILEUTIL.fileIsHTML(path) && FILEUTIL.statSync(path))
+		{
+			return true
+		}
+
+		// Directory containing evothings.json file.
+		var dirPath = null
+
+		// If path points to evothings.json file, get the directory
+		if (FILEUTIL.fileIsEvothingsSettings(path))
+		{
+			dirPath = PATH.dirname(path)
+		}
+		else if (FILEUTIL.fileIsDirectory(path))
+		{
+			// Dropped file is a directory.
+			dirPath = path
+		}
+
+		// Must have directory to continue.
+		if (!dirPath)
+		{
+			return false
+		}
+
+        // Does the directory have an evothings.json file pointing to existing index file?
+        var indexPath = APP_SETTINGS.getIndexFileFullPath(dirPath)
+		if (FILEUTIL.statSync(indexPath))
+		{
+			return true
+		}
+
+		return false
     }
 
 	/**
 	 * Possible options include:
 	 *	 options.screen
+	 *	 options.docButton
 	 *	 options.copyButton
 	 *	 options.openButton
 	 *	 options.deleteButton
@@ -326,6 +358,7 @@ exports.defineUIFunctions = function(hyper)
 		// Show app image icon
 		var appPath = hyper.UI.getAppFullPath(path)
 		var imagePath = APP_SETTINGS.getAppImage(appPath)
+		var docURL = APP_SETTINGS.getDocURL(appPath)
 
 		if (imagePath)
 		{
@@ -338,6 +371,27 @@ exports.defineUIFunctions = function(hyper)
 		{
 			// Show a default icon if no image file is provided.
 			html += '<div class="app-icon" style="background-image: url(\'images/app-icon.png\');"></div>'
+		}
+
+		// Get name of app, uses title tag as first choise.
+		// Returns null if HTML file not found.
+		var appName = hyper.UI.getProjectNameFromFile(appPath)
+		var appHasValidHTMLFile = !!appName
+		if (!appHasValidHTMLFile)
+		{
+			// If app name was not found, index.html does not exist.
+			appName = 'Warning: HTML file does not exist'
+		}
+
+		if (docURL && options.docButton)
+		{
+			html +=
+				'<button '
+				+	'type="button" '
+				+	'class="button-doc btn et-btn-yellow-dark" '
+				+	'onclick="window.hyper.UI.openDocURL(\'__DOCURL__\')">'
+				+	'Doc'
+				+ '</button>'
 		}
 
 		if (options.copyButton)
@@ -362,16 +416,17 @@ exports.defineUIFunctions = function(hyper)
 				+ '</button>'
 		}
 
-		// Run button.
-		html +=
-			'<button '
-			+	'type="button" '
-			+	'class="button-run btn et-btn-green" '
-			+	'onclick="window.hyper.UI.runApp(\'__PATH3__\')">'
-			+	'Run'
-			+ '</button>'
-			+ '<h4>__NAME__</h4>'
-			+ '<p>__PATH4__</p>'
+		// Add Run button only if app has an HTML file.
+		if (appHasValidHTMLFile)
+		{
+			html +=
+				'<button '
+				+	'type="button" '
+				+	'class="button-run btn et-btn-green" '
+				+	'onclick="window.hyper.UI.runApp(\'__PATH3__\')">'
+				+	'Run'
+				+ '</button>'
+		}
 
 		if (options.deleteButton)
 		{
@@ -384,30 +439,27 @@ exports.defineUIFunctions = function(hyper)
 				+ '</button>'
 		}
 
+		// App name and path.
+		html +=
+			'<h4>__NAME__</h4>'
+			+ '<p>__PATH4__</p>'
+
 		html +=
 			'<div class="project-list-entry-path" style="display:none;">__PATH5__</div>'
 			+ '</div>'
 
-		// Get name of project, use title tag as first choise.
-		var name = hyper.UI.getProjectNameFromFile(appPath)
-		if (!name)
-		{
-			LOGGER.log('[main-window-func.js] getProjectNameFromFile failed: ' + appPath)
-
-			// Could not open the app main file, skip this app.
-			return
-		}
 
 		// Escape any backslashes in the path (needed on Windows).
 		var escapedPath = path.replace(/[\\]/g,'\\\\')
 
 		// Replace fields in template.
+		html = html.replace('__DOCURL__', docURL)
 		html = html.replace('__PATH1__', escapedPath)
 		html = html.replace('__PATH2__', escapedPath)
 		html = html.replace('__PATH3__', escapedPath)
 		html = html.replace('__PATH4__', getShortPathFromPath(path))
 		html = html.replace('__PATH5__', path)
-		html = html.replace('__NAME__', name)
+		html = html.replace('__NAME__', appName)
 
 		// Create element.
 		var element = hyper.UI.$(html)
@@ -512,7 +564,7 @@ exports.defineUIFunctions = function(hyper)
 		var data = FILEUTIL.readFileSync(indexPath)
 		if (!data)
 		{
-			// Return null on error.
+			// Return null on error (file does not exist).
 			return null
 		}
 
@@ -730,6 +782,7 @@ exports.defineUIFunctions = function(hyper)
 					{
 						screen: '#screen-projects',
 						openButton: true,
+						docButton: true,
 						deleteButton: true
 					})
 			}
@@ -763,6 +816,7 @@ exports.defineUIFunctions = function(hyper)
 				entry.path,
 				{
 					screen: '#screen-examples',
+					docButton: true,
 					copyButton: true,
 					imagePath: entry.image
 				})
@@ -858,6 +912,11 @@ exports.defineUIFunctions = function(hyper)
 
 		// Show the file in the folder.
 		hyper.UI.openFolder(path)
+	}
+
+	hyper.UI.openDocURL = function(url)
+	{
+		hyper.UI.openInBrowser(url)
 	}
 
 	hyper.UI.openCopyAppDialog = function(path)

@@ -86,12 +86,6 @@ exports.fileIsDirectory = function(path)
 	return stat.isDirectory()
 }
 
-exports.fileIsDirectory = function(path)
-{
-	var stat = FS.statSync(path)
-	return stat.isDirectory()
-}
-
 exports.directoryHasEvothingsJson = function(path)
 {
 	var jsonPath = PATH.join(path, 'evothings.json')

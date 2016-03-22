@@ -74,6 +74,22 @@ exports.getAppImage = function(appPath)
 }
 
 /**
+ * Return URL to app documentation online, or null if not set.
+ */
+exports.getDocURL = function(appPath)
+{
+	var settings = readAppSettings(appPath)
+	if (settings && settings['app-doc-url'])
+	{
+		return settings['app-doc-url']
+	}
+	else
+	{
+		return null
+	}
+}
+
+/**
  * Generate and save a new App UUID.
  */
 exports.generateNewAppUUID = function(appPath)
