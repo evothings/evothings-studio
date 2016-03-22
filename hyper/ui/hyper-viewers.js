@@ -161,13 +161,25 @@ $(function()
 			})
 	}
 
+	function onViewersUpdated(viewerlist)
+	{
+		LOGGER.log('[hyper-viewers.js] got viewers updated event-------------------------------------------------------------');
+		console.dir(viewerlist)
+		if(viewerlist && viewerlist.clients)
+		{
+			mCurrentClientList = viewerlist.clients
+			removeViewersNotInList(mCurrentClientList, mOldClientList)
+			renderViewersFromList(mCurrentClientList)
+			mOldClientList = mCurrentClientList
+		}
+	}
+
 	function renderViewersFromList(list)
 	{
 		console.log('renderViewersFromList showing '+list.length+' clients')
 		var domlist = document.getElementById('viewer-list')
 		if(list && list.length)
 		{
-			mCurrentClientList = list
 			//console.dir(list)
 			list.forEach(function(viewer)
 			{
@@ -179,18 +191,16 @@ $(function()
 					renderViewer(domlist, viewer)
 				}
 			})
-
 		}
 	}
 
-	function removeViewersNotInList(list)
+	function removeViewersNotInList(newlist, oldlist)
 	{
-		console.log('removeViewersNotInList called. We have '+mCurrentClients.length+' old clients and '+list.length+' new clients')
+		console.log('removeViewersNotInList called. We have '+oldlist.length+' old clients and '+newlist.length+' new clients')
 		var found = false
-
-		mOldClientList.forEach(function(oldClient)
+		oldlist.forEach(function(oldClient)
 		{
-			list.forEach(function(newClient)
+			newlist.forEach(function(newClient)
 			{
 				console.log('checking if new client ' + newClient.clientID + ' == ' + oldClient.clientID)
 				if (newClient.clientID == oldClient.clientID)
@@ -203,7 +213,6 @@ $(function()
 				removeOldClient(oldClient)
 			}
 		})
-
 	}
 
 	function removeOldClient(oldClient)
@@ -309,20 +318,6 @@ $(function()
 			{
 				selectHierarchy(undefined, viewer)
 			}
-		}
-	}
-
-	function onViewersUpdated(viewerlist)
-	{
-		LOGGER.log('[hyper-viewers.js] got viewers updated event');
-		console.dir(viewerlist)
-		if(viewerlist && viewerlist.clients)
-		{
-			var list = viewerlist.clients
-			removeViewersNotInList(list)
-			renderViewersFromList(list)
-			mOldClientList = mCurrentClientList
-
 		}
 	}
 
@@ -444,6 +439,7 @@ $(function()
 		{
 			console.log('setting ball '+ball.id+' gray')
 			ball.style.backgroundColor = 'gray'
+			mInstrumentationReceivedFrom[message.clientID] = false
 		}
 	}
 
@@ -934,6 +930,8 @@ $(function()
 		var info = SERVER.getClientInfo()
 		if(info && info.clients)
 		renderViewersFromList(info.clients)
+		mCurrentClientList = info.clients
+		mOldClientList = info.clients
 	}
 
 	// Set up event listeners.

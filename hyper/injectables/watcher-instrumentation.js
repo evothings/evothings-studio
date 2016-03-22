@@ -36,7 +36,7 @@ var me = window.evo.watcher =
     }
     return rv
   },
-
+ 
   getWatchFromName: function(name)
                     {
                       var me = window.evo.watcher
