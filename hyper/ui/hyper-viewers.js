@@ -248,22 +248,32 @@ $(function()
 		var span = document.createElement('span')
 		span.innerHTML = viewer.name + ' ('+viewer.info.model+')'
 		var img = document.createElement('img')
-		img.style.width='25px'
-		img.style.height = '100px'
+		img.style.width='20px'
+		img.style.height = '35px'
 		img.src = getImageForModel(viewer.info)
+		img.addEventListener('mouseup', function(e)
+		{
+			vibrateClient(viewer)
+		})
 		//
 		var ball = document.createElement('div')
 		ball.className = 'ball'
 		ball.id = viewer.clientID+'_ball'
-		ball.style.height = '40px'
+		ball.style.height = '15px'
 		ball.style.width = '15px'
 		//
 		rowdiv.appendChild(div)
 		//
 		div.appendChild(ball)
-		div.appendChild(img)
+
+		var imgrow = document.createElement('div')
+		imgrow.style.display = 'flex';
+		imgrow.style.flexDirection = 'row'
+		imgrow.appendChild(img)
+
+		div.appendChild(imgrow)
 		div.appendChild(span)
-		addMenuToClient(viewer, div)
+		addMenuToClient(viewer, rowdiv)
 		var cdiv = document.createElement('ul')
 		cdiv.className = "treestyle"
 		cdiv.style.paddingTop = "0"
@@ -277,28 +287,34 @@ $(function()
 
 	function addMenuToClient(viewer, div)
 	{
-		/*
-		 <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
-		 Button
-		 </button>
-		 */
+		var buttonrow = document.createElement('div')
+		buttonrow.style.display = 'flex';
+		buttonrow.style.flexDirection = 'column'
+		div.appendChild(buttonrow)
 		var ubutton = document.createElement('button')
 		ubutton.className = "mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
-		ubutton.style.width = '140px'
-		ubutton.style.height = '60px'
+		ubutton.id = viewer.clientID + '_ubutton'
+		ubutton.style.margin = '5px'
+		ubutton.style.fontSize = '10px'
+		ubutton.style.height = '62px'
+		//ubutton.style.height = '150px'
 		ubutton.innerHTML = 'Inject File(s)'
-		div.appendChild(ubutton)
+
+		//buttonrow.appendChild(ubutton)
+
 		ubutton.addEventListener('mouseup', function(e)
 		{
 			showInjectionMenu(viewer, div)
 		})
-
 		var sbutton = document.createElement('button')
 		sbutton.className = "mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
-		sbutton.style.width = '140px'
-		sbutton.style.height = '60px'
+		sbutton.id = viewer.clientID + '_sbutton'
+		sbutton.style.margin = '5px'
+		sbutton.style.fontSize = '10px'
+		sbutton.style.height = '62px'
+		//sbutton.style.height = '150px'
 		sbutton.innerHTML = 'Show Instrumentation'
-		div.appendChild(sbutton)
+		buttonrow.appendChild(sbutton)
 		sbutton.addEventListener('mouseup', function(e)
 		{
 			onClientSelected(viewer)
@@ -353,8 +369,6 @@ $(function()
 	function onClientSelected(viewer)
 	{
 		console.log('user selected client '+viewer.name+' instrumentation loaded: '+mInstrumentationReceivedFrom[viewer.clientID])
-		mMainWindow.postMessage({ message: 'eval', code: 'navigator.vibrate(300)', client: viewer }, '*')
-
 		if(!mInstrumentationReceivedFrom[viewer.clientID])
 		{
 			injectInstrumentationToClient(viewer)
@@ -367,6 +381,11 @@ $(function()
 				selectHierarchy(undefined, viewer)
 			}
 		}
+	}
+
+	function vibrateClient(viewer)
+	{
+		mMainWindow.postMessage({ message: 'eval', code: 'navigator.vibrate(300)', client: viewer }, '*')
 	}
 
 	function injectInstrumentationToClient(client)
@@ -471,6 +490,7 @@ $(function()
 	{
 		console.log('-- got serviceStatus back: '+message.serviceStatus)
 		var ball = document.getElementById(message.clientID+'_ball')
+		var sbutton = document.getElementById(message.clientID + '_sbutton')
 		if(message.serviceStatus && message.serviceStatus != 'undefined')
 		{
 			console.log('setting ball '+ball.id+' green')
@@ -482,12 +502,15 @@ $(function()
 				code: 'window.evo.instrumentation.selectHierarchy()',
 				client: client
 			}, '*')
+
+			hideElement(sbutton)
 		}
 		else
 		{
 			console.log('setting ball '+ball.id+' gray')
 			ball.style.backgroundColor = 'gray'
 			mInstrumentationReceivedFrom[message.clientID] = false
+			showElement(sbutton)
 		}
 	}
 
