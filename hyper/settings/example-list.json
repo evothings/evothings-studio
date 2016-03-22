@@ -25,7 +25,7 @@
 
 {"path":"examples/arduino-led-onoff-tcp"},
 {"path":"examples/arduino-led-onoff-ble"},
-{"path":"examples/arduino-ble/app"},
+{"path":"examples/arduino-ble"},
 {"path":"examples/arduino-scriptable-tcp"},
 
 {"path":"examples/redbearlab-simplecontrol"},
