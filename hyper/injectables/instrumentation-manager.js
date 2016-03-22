@@ -1,6 +1,10 @@
 if(!window.evo)
 {
 	window.evo = {}
+	if(!window.evo.fileCallbacks)
+	{
+		window.evo.fileCallbacks = []
+	}
 }
 
 hyper.log ('intrumentation manager loading...')

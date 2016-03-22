@@ -243,7 +243,7 @@ $(function()
 		div.style.display = 'flex';
 		div.style.flexDirection = 'column'
 		div.style.justifyContent = 'space-around'
-		div.style.width = '200px'
+		//div.style.width = '200px'
 		div.style.height = '120px'
 		var span = document.createElement('span')
 		span.innerHTML = viewer.name + ' ('+viewer.info.model+')'
@@ -296,11 +296,11 @@ $(function()
 		ubutton.id = viewer.clientID + '_ubutton'
 		ubutton.style.margin = '5px'
 		ubutton.style.fontSize = '10px'
-		ubutton.style.height = '62px'
+		//ubutton.style.height = '62px'
 		//ubutton.style.height = '150px'
 		ubutton.innerHTML = 'Inject File(s)'
 
-		//buttonrow.appendChild(ubutton)
+		buttonrow.appendChild(ubutton)
 
 		ubutton.addEventListener('mouseup', function(e)
 		{
@@ -311,7 +311,7 @@ $(function()
 		sbutton.id = viewer.clientID + '_sbutton'
 		sbutton.style.margin = '5px'
 		sbutton.style.fontSize = '10px'
-		sbutton.style.height = '62px'
+		//sbutton.style.height = '62px'
 		//sbutton.style.height = '150px'
 		sbutton.innerHTML = 'Show Instrumentation'
 		buttonrow.appendChild(sbutton)
@@ -331,6 +331,9 @@ $(function()
 		 <div id="filedrag">or drop files here</div>
 		 </div>
 		 */
+		var udialog = document.getElementById('udialog')
+		udialog.viewer = viewer
+		udialog.showModal()
 	}
 
 	function requestStatus(viewer)
@@ -1022,17 +1025,6 @@ $(function()
 		var chartnodelegend = document.getElementById(chartnode.id + '_legend')
 		if(chartnode)
 		{
-			/*
-			setTimeout(function()
-			{
-				//parent.removeChild(chartnode)
-				toggleShowOnElement(chartnode)
-				delete mChartsVisible[id]
-				delete mTimeSeriesForChart[path]
-				chartnode.id = ""
-				parent.innerHTML = ""
-			}, SUBSCRIPTION_INTERVAL*3)
-			*/
 			hideElement(chartnode)
 			hideElement(chartnodelegend)
 			return true
@@ -1053,6 +1045,58 @@ $(function()
 		renderViewersFromList(info.clients)
 		mCurrentClientList = info.clients
 		mOldClientList = info.clients
+
+		var uploadFiles = []
+
+		document.getElementById('uploadbutton').addEventListener('click', function()
+		{
+			var dialog = document.getElementById('udialog')
+			dialog.close()
+			sendUploadFiles(uploadFiles, dialog.viewer)
+		});
+		document.getElementById('uclose').addEventListener('click', function()
+		{
+			document.getElementById('udialog').close()
+		});
+		document.getElementById('fileselect').addEventListener('change', function()
+		{
+			uploadFiles = []
+			for(var i = 0; i<this.files.length; i++)
+			{
+				var file =  this.files[i];
+				uploadFiles.push(file)
+				// This code is only for demo ...
+				console.group("File "+i);
+				console.log("name : " + file.name);
+				console.log("size : " + file.size);
+				console.log("type : " + file.type);
+				console.log("date : " + file.lastModified);
+				console.groupEnd();
+			}
+		}, false);
+	}
+
+	function sendUploadFiles(files, viewer)
+	{
+		files.forEach(function(file)
+		{
+			var reader = new FileReader();
+			reader.onload = function(event)
+			{
+				console.dir(event)
+				var fdata = 'var file={data:"'+event.target.result+'", name: "'+file.name+'", size: "'+file.size+'"}; '
+				fdata += 'if(!window._evofiles){ window._evofiles = [] }; window._evofiles.push(file); '
+				fdata += 'if(window.evo && window.evo.fileCallbacks){ window.evo.fileCallbacks.forEach(function(cb){ cb(file) }) }'
+				console.log('sending file ')
+				console.log(fdata)
+				mMainWindow.postMessage({
+					message: 'eval',
+					code: fdata,
+					client: viewer
+				}, '*')
+			}
+			reader.readAsDataURL(file);
+		})
 	}
 
 	// Set up event listeners.
