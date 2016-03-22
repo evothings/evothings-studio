@@ -94,7 +94,7 @@ var me = window.evo.watcher =
               }
             },
 
-  subscribeToWatch: function(watchname, params, interval, callback)
+  subscribeToWatch: function(watchname, params, interval, timeout, callback)
                     {
                       var me = window.evo.watcher
                       hyper.log('subscribeToWatch called for path '+watchname+' and interval '+interval)
@@ -102,6 +102,7 @@ var me = window.evo.watcher =
                       if(watch)
                       {
                         var oldval = undefined
+                        var start = Date.now()
                         var sid = setInterval(function()
                         {
                           var v = watch.object[watch.property]
@@ -110,6 +111,14 @@ var me = window.evo.watcher =
                           {
                             callback({name: watch.name, value: v, type: watch.type})
                             oldval = v
+                          }
+                          var diff = Date.now() - start
+                          if(diff > timeout)
+                          {
+                            me.unSubscribeTo(sid, function()
+                            {
+                              window.evo.instrumentation.unSubscribeToService(watchname, sid)
+                            })
                           }
                         }, interval)
                         return sid
@@ -224,7 +233,7 @@ var me = window.evo.watcher =
                    return rv
                  },
 
-  subscribeTo: function(path, params, interval, callback)
+  subscribeTo: function(path, params, interval, timeout, callback)
                {
                  hyper.log('watcher.subscribeTo called for path '+path+' and interval '+interval)
                  var me = window.evo.watcher
@@ -234,7 +243,7 @@ var me = window.evo.watcher =
                    var watchname = levels[2]
                    if(watchname)
                    {
-                     var sid = me.subscribeToWatch(watchname, params, interval, callback)
+                     var sid = me.subscribeToWatch(watchname, params, interval, timeout, callback)
                      hyper.log('saving subscription '+sid+' in '+me.subscriptions)
                      me.subscriptions[sid] = watchname
                      return sid

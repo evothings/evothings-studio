@@ -62,9 +62,11 @@ var me = window.evo.instrumentation =
 		}
 	},
 
-	subscribeToService: function(path, params, interval)
+	subscribeToService: function(path, params, _interval, _timeout)
 	{
 		var me = window.evo.instrumentation
+		var timeout = _timeout || 10 * 60 * 1000
+		var interval = _interval < 250 ? 250 : _interval
 		hyper.log('inst.subscribeToService called for path '+path)
 		if(path && path != 'undefined')
 		{
@@ -73,7 +75,7 @@ var me = window.evo.instrumentation =
 			var serviceProviderName = levels[0]
 			hyper.log('looking up serviceprovider '+serviceProviderName)
 			var serviceProvider = me.serviceProviders[serviceProviderName]
-			var subscriptionID = serviceProvider.subscribeTo(path, params, interval, function(data)
+			var subscriptionID = serviceProvider.subscribeTo(path, params, interval, timeout, function(data)
 			{
 				// data is an object with key, value pairs (obivously), where the kay is the name of the data channel and the value is, well.. the value. Most channels will only have one pair, but the cordova accelerometer have three (x,y,z)
 				window.hyper.sendMessageToServer(window.hyper.IoSocket, 'client.instrumentation', {clientID: window.hyper.clientID, time: Date.now(), serviceData: {path: path, data: data, subscriptionID: subscriptionID} })

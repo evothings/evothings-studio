@@ -26,12 +26,19 @@ var me = window.evo.cordova =
 					cb()
 				})
 			},
-			subscribeTo: function(params, interval, cb)
+			subscribeTo: function(params, interval, timeout, cb)
 			{
 				hyper.log('cordova.accelerometer.subscribeto called with interval '+interval)
+				var start = Date.now()
 				var sid = navigator.accelerometer.watchAcceleration(function(accelObj)
 				{
 					cb({name: 'accelerometer', value: accelObj, type: 'plot'})
+					var diff = Date.now() - start
+					if(diff > timeout)
+					{
+						navigator.accelerometer.clearWatch(sid)
+						window.evo.instrumentation.unSubscribeToService(params.path, sid)
+					}
 				}, function(error)
 				{
 					cb()
@@ -59,12 +66,19 @@ var me = window.evo.cordova =
 					cb()
 				})
 			},
-			subscribeTo: function(params, interval, cb)
+			subscribeTo: function(params, interval, timeout, cb)
 			{
 				hyper.log('cordova.compass.subscribeto called with interval '+interval)
+				var start = Date.now()
 				var sid = navigator.compass.watchHeading(function(Obj)
 				{
 					cb({name: 'compass', value: Obj, type: 'plot'})
+					var diff = Date.now() - start
+					if(diff > timeout)
+					{
+						navigator.compass.clearWatch(sid)
+						window.evo.instrumentation.unSubscribeToService(params.path, sid)
+					}
 				}, function(error)
 				{
 					cb()
@@ -117,15 +131,16 @@ var me = window.evo.cordova =
 		}
 	},
 
-	subscribeTo: function(path, params, interval, callback)
+	subscribeTo: function(path, params, interval, timeout, callback)
 	{
 		hyper.log('cordova.subscribeTo called for path '+path+' and interval '+interval)
 		var me = window.evo.cordova
 		var serviceName = path.split('.')[1]
 		var service = me.services[serviceName]
+		params.path = path
 		if(service)
 		{
-			var sid = service.subscribeTo(params, interval, callback)
+			var sid = service.subscribeTo(params, interval, timeout, callback)
 			hyper.log('saving subscription '+sid+' in '+me.subscriptions)
 			me.subscriptions[sid] = service
 			return sid

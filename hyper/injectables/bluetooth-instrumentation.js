@@ -289,7 +289,7 @@ var me = window.evo.bluetooth =
         {
             name: 'characteristic',
 
-            subscribeTo: function(params, interval, cb)
+            subscribeTo: function(params, interval, timeout, cb)
             {
                 hyper.log('bluetooth.characteristic.subscribeto called with interval '+interval)
                 hyper.log(JSON.stringify(params))
@@ -298,6 +298,7 @@ var me = window.evo.bluetooth =
                 var serviceUUID = params.serviceUUID
                 var characteristicUUID = params.characteristicUUID
 
+                var start = Date.now()
                 var sid = setInterval(function()
                 {
                     device.readCharacteristic(characteristicUUID, function(data)
@@ -310,6 +311,12 @@ var me = window.evo.bluetooth =
                         //
                         var data = evothings.ble.fromUtf8(data)
                         cb({name: characteristicUUID, value: data, type: 'plot'})
+                        var diff = Date.now() - start
+                        if(diff > timeout)
+                        {
+                            clearTimeout(sid)
+                            window.evo.instrumentation.unSubscribeToService(params.path, sid)
+                        }
                     },
                     function(errorCode)
                     {
@@ -549,7 +556,7 @@ var me = window.evo.bluetooth =
         }
     },
 
-    subscribeTo: function(path, params, interval, callback)
+    subscribeTo: function(path, params, interval, timeout, callback)
     {
         var levels = path.split('.')
         var me = window.evo.bluetooth
@@ -572,8 +579,8 @@ var me = window.evo.bluetooth =
             var service = me.services['characteristic']
             if(service)
             {
-                var params = {device: device, serviceUUID: serviceUUID, characteristicUUID: characteristic.uuid}
-                var sid = service.subscribeTo(params, interval, callback)
+                var params = {path: path, device: device, serviceUUID: serviceUUID, characteristicUUID: characteristic.uuid}
+                var sid = service.subscribeTo(params, interval, timeout, callback)
                 me.subscriptions[sid] = service
                 return sid
             }

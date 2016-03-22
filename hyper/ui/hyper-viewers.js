@@ -220,11 +220,18 @@ $(function()
 		console.log('removing old client not seen anymore: '+oldClient.clientID)
 		var domlist = document.getElementById('viewer-list')
 		var client = document.getElementById(oldClient.clientID)
-		domlist.removeChild(client)
+		if(client)
+		{
+			domlist.removeChild(client)
+		}
+		//
+		// TODO: Remove event handlers!
+		//
 	}
 
 	function renderViewer(domlist, viewer)
 	{
+
 		mCurrentClients[viewer.clientID] = viewer
 		var rowdiv = document.createElement('div')
 		rowdiv.id = viewer.clientID
@@ -241,23 +248,22 @@ $(function()
 		var span = document.createElement('span')
 		span.innerHTML = viewer.name + ' ('+viewer.info.model+')'
 		var img = document.createElement('img')
-		img.style.width='30px'
+		img.style.width='25px'
+		img.style.height = '100px'
 		img.src = getImageForModel(viewer.info)
 		//
 		var ball = document.createElement('div')
 		ball.className = 'ball'
 		ball.id = viewer.clientID+'_ball'
+		ball.style.height = '40px'
+		ball.style.width = '15px'
 		//
 		rowdiv.appendChild(div)
 		//
 		div.appendChild(ball)
 		div.appendChild(img)
 		div.appendChild(span)
-		//div.style.backgroundColor = "blue"
-		div.addEventListener('mouseup', function(e)
-		{
-			onClientSelected(viewer)
-		})
+		addMenuToClient(viewer, div)
 		var cdiv = document.createElement('ul')
 		cdiv.className = "treestyle"
 		cdiv.style.paddingTop = "0"
@@ -267,6 +273,48 @@ $(function()
 		domlist.appendChild(rowdiv)
 		console.log('adding client and requesting status')
 		console.dir(viewer)
+	}
+
+	function addMenuToClient(viewer, div)
+	{
+		/*
+		 <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+		 Button
+		 </button>
+		 */
+		var ubutton = document.createElement('button')
+		ubutton.className = "mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+		ubutton.style.width = '140px'
+		ubutton.style.height = '60px'
+		ubutton.innerHTML = 'Inject File(s)'
+		div.appendChild(ubutton)
+		ubutton.addEventListener('mouseup', function(e)
+		{
+			showInjectionMenu(viewer, div)
+		})
+
+		var sbutton = document.createElement('button')
+		sbutton.className = "mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+		sbutton.style.width = '140px'
+		sbutton.style.height = '60px'
+		sbutton.innerHTML = 'Show Instrumentation'
+		div.appendChild(sbutton)
+		sbutton.addEventListener('mouseup', function(e)
+		{
+			onClientSelected(viewer)
+		})
+	}
+
+	function showInjectionMenu(viewer, div)
+	{
+		console.log('showInjectionMenu called (undefined)')
+		/*
+		 <div>
+		 <label for="fileselect">Files to upload:</label>
+		 <input type="file" id="fileselect" name="fileselect[]" multiple="multiple" />
+		 <div id="filedrag">or drop files here</div>
+		 </div>
+		 */
 	}
 
 	function requestStatus(viewer)
@@ -567,40 +615,26 @@ $(function()
 					console.log('   adding childnode '+cdiv.id+' under parent node '+parentnode.id)
 					sdiv.addEventListener('mouseup', function(e)
 					{
-						if(cdiv.childElementCount == 0)
+						console.log('user selected path '+pathlevel.name)
+						cdiv.__opened = true
+						if(pathlevel.selectable)
 						{
-							cdiv.__opened = true
-							if(pathlevel.selectable)
-							{
-								selectHierarchy(pathlevel.name, client)
-							}
-							else
-							{
-								var provider = pathlevel.name.split('.')[0]
-								if(!isClientAlreadySubscribedToService(clientID, pathlevel.name))
-								{
-									subscribeToService(pathlevel.name, client)
-								}
-								else
-								{
-									console.log('unsubscribing to service '+pathlevel.name)
-									unsubscribeToService(pathlevel.name, clientID)
-								}
-							}
+							selectHierarchy(pathlevel.name, client)
 						}
 						else
 						{
-							if(cdiv.__opened)
+							var provider = pathlevel.name.split('.')[0]
+							if(!isClientAlreadySubscribedToService(clientID, pathlevel.name))
 							{
-								cdiv.style.display = 'none'
-								cdiv.__opened = false
+								subscribeToService(pathlevel.name, client)
 							}
 							else
 							{
-								cdiv.style.display = 'block'
-								cdiv.__opened = true
+								console.log('unsubscribing to service '+pathlevel.name)
+								unsubscribeToService(pathlevel.name, clientID)
 							}
 						}
+
 					})
 				}
 				else
@@ -613,6 +647,33 @@ $(function()
 				console.log('addHierarchySelection could not find parent node for '+pathlevel.name+' !!!')
 			}
 		})
+	}
+
+	function toggleShowOnElement(cdiv)
+	{
+		console.log('toggleShowOnElement for element '+cdiv.id)
+		if(cdiv.__opened)
+		{
+			cdiv.style.display = 'none'
+			cdiv.__opened = false
+		}
+		else
+		{
+			cdiv.style.display = 'block'
+			cdiv.__opened = true
+		}
+	}
+
+	function showElement(cdiv)
+	{
+		cdiv.style.display = 'block'
+		cdiv.__opened = true
+	}
+
+	function hideElement(cdiv)
+	{
+		cdiv.style.display = 'none'
+		cdiv.__opened = false
 	}
 
 	function getNameFromPath(path)
@@ -770,6 +831,7 @@ $(function()
 	function plotServiceData(time, servicedata, clientID, path, channels)
 	{
 		var chart = getChartForPath(clientID, path, channels)
+		//console.log('plotservicedata got chart '+chart)
 		if(chart)
 		{
 			var color = servicedata.color || 'rgba(255,255,255,0.76)'
@@ -822,10 +884,31 @@ $(function()
 		if(!ts)
 		{
 			ts = new TimeSeries()
+			ts._instrumentation_key = key
 			mTimeSeriesForChart[key] = ts
 			console.log('  -- adding new timeseries for key '+key+' and color '+color)
 			chart.addTimeSeries(ts, {lineWidth: 1, strokeStyle: color, fillStyle: fillstyle});
+			console.dir(chart)
 		}
+		/*
+		else
+		{
+			var found = false
+			chart.seriesSet.forEach(function(series)
+			{
+				if(series.timeSeries._instrumentation_key == key)
+				{
+					found = true
+				}
+			})
+			if(!found)
+			{
+				console.log('---found old timeseries for '+key)
+				ts._instrumentation_key = key
+				chart.addTimeSeries(ts, {lineWidth: 1, strokeStyle: color, fillStyle: fillstyle});
+			}
+		}
+		*/
 		return ts
 	}
 
@@ -880,8 +963,10 @@ $(function()
 			chartnode.width = "500"
 			chartnode.height = "100"
 			chartnode.id = id
+			chartnode.__openend = true
 			var chartnodelegend = document.createElement('div')
 			chartnodelegend.id = chartnode.id + '_legend'
+			chartnodelegend.__opened = true
 			var parent = document.getElementById(clientID+'.serviceroot.'+path)
 			if(parent)
 			{
@@ -894,7 +979,13 @@ $(function()
 			chartnode.addEventListener('mouseup', function(e)
 			{
 				unsubscribeToService(path, clientID)
+
 			})
+		}
+		else if (!chartnode.__opened)
+		{
+			showElement(chartnode)
+			showElement(document.getElementById(chartnode.id+'_legend'))
 		}
 		return chart
 	}
@@ -905,21 +996,28 @@ $(function()
 		var parent = document.getElementById(clientID+'.serviceroot.'+path)
 		var id = clientID+'.serviceroot.'+path+'.chart'
 		var chartnode = document.getElementById(id)
+		var chartnodelegend = document.getElementById(chartnode.id + '_legend')
 		if(chartnode)
 		{
+			/*
 			setTimeout(function()
 			{
-				parent.removeChild(chartnode)
+				//parent.removeChild(chartnode)
+				toggleShowOnElement(chartnode)
+				delete mChartsVisible[id]
+				delete mTimeSeriesForChart[path]
 				chartnode.id = ""
 				parent.innerHTML = ""
 			}, SUBSCRIPTION_INTERVAL*3)
+			*/
+			hideElement(chartnode)
+			hideElement(chartnodelegend)
 			return true
 		}
 		else
 		{
 			return false
 		}
-
 	}
 
 	function setupEventListeners()
