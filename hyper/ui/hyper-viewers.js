@@ -768,14 +768,19 @@ $(function()
 		mTimeoutHandle = setTimeout(function()
 		{
 			document.getElementById('p2').style.display="none"
-			var snackbarContainer = document.querySelector('#snackbar');
-			var data =
-			{
-				message: 'Temporarily unable to reach viewer.',
-				timeout: 2000
-			};
-			snackbarContainer.MaterialSnackbar.showSnackbar(data);
+			showMessageInSnackbar('Temporarily unable to reach viewer.')
 		}, NETWORK_TIMEOUT)
+	}
+
+	function showMessageInSnackbar(message)
+	{
+		var snackbarContainer = document.querySelector('#snackbar');
+		var data =
+		{
+			message: message,
+			timeout: 2000
+		};
+		snackbarContainer.MaterialSnackbar.showSnackbar(data);
 	}
 
 	function cancelNetworkTimeout()
@@ -1042,17 +1047,29 @@ $(function()
 		console.log('getting initial list of clients from server '+SERVER)
 		var info = SERVER.getClientInfo()
 		if(info && info.clients)
-		renderViewersFromList(info.clients)
-		mCurrentClientList = info.clients
-		mOldClientList = info.clients
+		{
+			renderViewersFromList(info.clients)
+			mCurrentClientList = info.clients
+			mOldClientList = info.clients
+		}
+
 
 		var uploadFiles = []
+		var state = 'off'
 
 		document.getElementById('uploadbutton').addEventListener('click', function()
 		{
 			var dialog = document.getElementById('udialog')
 			dialog.close()
-			sendUploadFiles(uploadFiles, dialog.viewer)
+			if(state == 'off')
+			{
+				sendUploadFiles(uploadFiles, dialog.viewer)
+			}
+			else
+			{
+				executeUploadFiles(uploadFiles, dialog.viewer)
+			}
+
 		});
 		document.getElementById('uclose').addEventListener('click', function()
 		{
@@ -1074,10 +1091,24 @@ $(function()
 				console.groupEnd();
 			}
 		}, false);
+
+		var uswitch = document.getElementById('switch-1')
+		var label = document.getElementById('uswitchlabel')
+
+		uswitch.addEventListener('change', function(e)
+		{
+			console.dir(e)
+			console.log('upload file type switch ')
+			console.dir(uswitch.value)
+			state = state == 'on' ? 'off' : 'on'
+			uswitchlabel.innerHTML = state  == 'on' ? "send file as javaScript and eval immediately" : "Send file as Base64"
+		})
 	}
+
 
 	function sendUploadFiles(files, viewer)
 	{
+		showMessageInSnackbar('Injecting files and calling callbacks')
 		files.forEach(function(file)
 		{
 			var reader = new FileReader();
@@ -1096,6 +1127,25 @@ $(function()
 				}, '*')
 			}
 			reader.readAsDataURL(file);
+		})
+	}
+
+	function executeUploadFiles(files, viewer)
+	{
+		showMessageInSnackbar('Injecting and executing JS files.')
+		files.forEach(function(file)
+		{
+			var reader = new FileReader();
+			reader.onload = function(event)
+			{
+				console.dir(event)
+				mMainWindow.postMessage({
+					message: 'eval',
+					code: event.target.result,
+					client: viewer
+				}, '*')
+			}
+			reader.readAsText(file);
 		})
 	}
 

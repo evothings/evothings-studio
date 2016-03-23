@@ -91,8 +91,11 @@ jQuery Layout: http://layout.jquery-dev.net/
 		<div class="mdl-dialog__content">
 			<div>
 				<label for="fileselect">Files to upload:</label>
-				<input type="file" id="fileselect" name="fileselect[]" multiple="multiple" />
-				<div id="filedrag">or drop files here</div>
+				<input type="file" id="fileselect" name="fileselect[]" multiple="multiple" style="margin:10px"/>
+				<label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-1" style="margin:10px">
+					<input type="checkbox" id="switch-1" class="mdl-switch__input" checked>
+					<span class="mdl-switch__label" id="uswitchlabel">Send file as Base64</span>
+				</label>
 			</div>
 		</div>
 
