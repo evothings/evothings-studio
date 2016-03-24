@@ -119,6 +119,13 @@ systemSetting('WorkbenchCodeEditorContent')
 systemSetting('WorkbenchResultEditorContent')
 
 /**
+ * Viewers window settings.
+ */
+systemSetting('ViewersFontSize', '18px')
+systemSetting('ViewersFontFamily', 'monospace')
+systemSetting('ViewersWindowGeometry')
+
+/**
  * Web server port.
  * Not used.
  */

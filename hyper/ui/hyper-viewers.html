@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<!--
+File: hyper-viewers.html
+Description: JavaScript Workbench and Log panel.
+Author: Mikael Kindborg
+Copyright (c) 2013-2014 Mikael Kindborg
+License: Apache Version 2.0
+jQuery Layout: http://layout.jquery-dev.net/
+-->
+<head>
+	<meta charset="utf-8">
+
+	<title>Viewers</title>
+
+	<link href="../libs/bootstrap-3.3.5-dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="../libs/jquery/layout-default-latest.css" />
+
+	<script src="../libs/jquery/jquery-2.1.4.min.js"></script>
+	<script src="../libs/jquery/jquery-ui.min.js"></script>
+	<script src="../libs/jquery/jquery.layout-latest.js"></script>
+	<script src="smoothie.js"></script>
+	<link rel="stylesheet" href="../../node_modules/material-design-lite/material.min.css">
+	<script src="../../node_modules/material-design-lite/material.min.js"></script>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+	<link rel="stylesheet" href="css/tools-window.css" />
+
+</head>
+
+<body style="margin:10px;border:0">
+	<div id="p2" class="mdl-progress mdl-js-progress mdl-progress__indeterminate" style="display:none"></div>
+	<div id="snackbar" class="mdl-js-snackbar mdl-snackbar">
+		<div class="mdl-snackbar__text" id="snackbartext"></div>
+		<button class="mdl-snackbar__action" type="button">:/</button>
+	</div>
+
+	<div class="ui-layout-center" style="padding:10px">
+		<div id="code-area" class="xui-layout-content">
+			<h4>Viewers</h4>
+			<div style="padding:10px;display: flex; flex-direction: row; font-size:15px" id="viewer-list">
+
+			</div>
+		</div>
+	</div>
+	<!-- end "ui-layout-center" -->
+
+	<!-- Hidden divs that contain default content for panels. -->
+
+
+	<!--
+	// -----------------------------------------------------
+	//			Welcome to HyperReload Workbench
+	// -----------------------------------------------------
+	//
+	// The Workbench has two parts. This part is a JavaScript
+	// editor where you can evaluate selected code on connected
+	// devices/browsers.
+	//
+	// The second part is the message panel below. Here log messages
+	// from devices are displayed, and the result from evaluating
+	// JavaScript code.
+	//
+	// Get started by selecting a line of the example code below,
+	// then press the "Eval on Devices" button. This will run the
+	// selected code on any connected devices/browsers.
+	//
+	// The button "Eval in NodeWebkit" is an experimental feature
+	// that lets you to evaluate code locally in HyperReload, which
+	// runs on top of node-webkit. This gives you full interactive
+	// access to node-webkit and to node.js, a potentially very
+	// powerful feature. This can be used for experimenting with
+	// node.js and node-webkit, and for running scripted tests
+	// on connected devices.
+	// -----------------------------------------------------
+
+	// Send log message from connected devices/browsers. Use this
+	// in your application code for debugging.
+	hyper.log('Hello World')
+
+	// Replace the browser content with the given HTML. What do you
+	// think will happen if you evaluate this with "Eval in Node"?
+	document.body.innerHTML = '<h1>Hello World</h1>'
+	-->
+
+
+	<script src="hyper-viewers.js"></script>
+
+	<dialog class="mdl-dialog" id="udialog" style="width:480px">
+		<h4 class="mdl-dialog__title">Upload file(s) to client</h4>
+		<div class="mdl-dialog__content">
+			<div>
+				<label for="fileselect">Files to upload:</label>
+				<input type="file" id="fileselect" name="fileselect[]" multiple="multiple" style="margin:10px"/>
+				<label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-1" style="margin:10px">
+					<input type="checkbox" id="switch-1" class="mdl-switch__input" checked>
+					<span class="mdl-switch__label" id="uswitchlabel">Send file as Base64</span>
+				</label>
+			</div>
+		</div>
+
+		<div class="mdl-dialog__actions">
+			<button type="button" class="mdl-button" id="uploadbutton">Upload</button>
+			<button type="button" class="mdl-button close" id="uclose">Close</button>
+		</div>
+	</dialog>
+	<script>
+
+	</script>
+</body>
+</html>

@@ -61,6 +61,7 @@ var mCheckIfModifiedSince = false
 var mHeartbeatTimer = undefined
 var mDeviceInfo = {}
 var mHeartbeatInterval = 20000
+var mCLientInfo = undefined
 
 // The current base directory. Must NOT end with a slash.
 var mBasePath = ''
@@ -83,6 +84,7 @@ exports.connectToRemoteServer = function()
 		'workbench.set-session-id': onMessageWorkbenchSetSessionID,
 		'workbench.set-connect-key': onMessageWorkbenchSetConnectKey,
 		'workbench.client-info': onMessageWorkbenchClientInfo,
+		'client.instrumentation': onMessageWorkbenchClientInstrumentation,
 		'workbench.get-resource': onMessageWorkbenchGetResource,
 		'workbench.log': onMessageWorkbenchLog,
 		'workbench.javascript-result': onMessageWorkbenchJavaScriptResult,
@@ -141,6 +143,8 @@ exports.connectToRemoteServer = function()
 
 	socket.on('hyper-workbench-message', function(message)
 	{
+		//console.log('message = '+message.name)
+
 		var handler = messageHandlers[message.name]
 		if (handler)
 		{
@@ -175,6 +179,7 @@ function sendMessageToServer(_socket, name, data)
 	//console.log('[file-server.js] --------------')
 	//console.log('[file-server.js] sendMessageToServer: ' + JSON.stringify(data))
 	//console.log('[file-server.js] --------------')
+	//console.log('[file-server.js] sendMessageToServer -- uuid = '+uuid)
 	socket.emit('hyper-workbench-message', {
 		protocolVersion: mProtocolVersion,
 		workbenchVersionCode: mWorkbenchVersionCode,
@@ -217,11 +222,23 @@ function onMessageWorkbenchSetConnectKey(socket, message)
 
 function onMessageWorkbenchClientInfo(socket, message)
 {
-	//LOGGER.log('[file-server.js] got client info')
+	//console.log('[file-server.js] got client info')
 	//console.dir(message)
 
 	// Notify UI about clients.
+	EVENTS.publish(EVENTS.VIEWERSUPDATED, message.data)
+	mCLientInfo = message.data
+
 	mClientInfoCallback && mClientInfoCallback(message)
+}
+
+function onMessageWorkbenchClientInstrumentation(socket, message)
+{
+	// Notify UI about clients.
+	//LOGGER.log('[file-server.js] ******** got client instrumentation')
+	//console.dir(message)
+
+	EVENTS.publish(EVENTS.VIEWERSINSTRUMENTATION, message.data)
 }
 
 function onMessageWorkbenchGetResource(socket, message)
@@ -535,6 +552,11 @@ exports.getUserKey = function()
 	return mUserKey
 }
 
+exports.getClientInfo = function()
+{
+	return mCLientInfo
+}
+
 /**
  * External.
  *
@@ -574,12 +596,13 @@ exports.reloadApp = function()
 /**
  * External.
  */
-exports.evalJS = function(code)
+exports.evalJS = function(code, client)
 {
 	sendMessageToServer(mSocket, 'workbench.eval',
 		{
 			sessionID: mSessionID,
-			code: code
+			code: code,
+			clientUUID: client ? client.UUID: ''
 		})
 }
 

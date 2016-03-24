@@ -86,3 +86,71 @@ button
 #result-editor
 {
 }
+
+/*   Tree stuff */
+
+
+.treestyle,
+.treestyle ul {
+	margin:0 0 0 1em; /* indentation */
+	padding:0;
+	list-style:none;
+	color:#369;
+	position:relative;
+}
+
+/* .treestyle ul {margin-left:.5em} (indentation/2) */
+
+.treestyle:before,
+.treestyle ul:before {
+	content:"";
+	display:block;
+	width:0;
+	position:absolute;
+	top:0;
+	bottom:0;
+	left:0;
+	border-left:1px solid;
+}
+
+.treestyle li {
+	margin:0;
+	padding:0 1.5em; /* indentation + .5em */
+	line-height:2em; /* default list item's `line-height` */
+	font-weight:bold;
+	position:relative;
+}
+
+.treestyle li:before {
+	content:"";
+	display:block;
+	width:10px; /* same with indentation */
+	height:0;
+	border-top:1px solid;
+	margin-top:-1px; /* border top width */
+	position:absolute;
+	top:1em; /* (line-height/2) */
+	left:0;
+}
+
+.treestyle li:last-child:before {
+	background: white; /* same with body background */
+	height: auto;
+}
+
+/* balls */
+
+div.ball {
+	display: block;
+	width: 10px;
+	height: 10px;
+	/*margin: 2px auto 0;*/
+	margin-bottom: 4px;
+	background-color: #dddddd;
+	border-radius: 50%;
+	box-shadow: inset -2px -2px 2px rgba(0,0,0,.5);
+	background-image: -webkit-linear-gradient(-45deg, rgba(255,255,220,.2) 0%, transparent 100%);
+	background-image: -moz-linear-gradient(-45deg, rgba(255,255,220,.2) 0%, transparent 100%);
+	background-image: -o-linear-gradient(-45deg, rgba(255,255,220,.2) 0%, transparent 100%);
+	background-image: -ms-linear-gradient(-45deg, rgba(255,255,220,.2) 0%, transparent 100%);
+}
