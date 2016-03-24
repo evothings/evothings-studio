@@ -25,6 +25,7 @@
 {"path":"examples/mbed-custom-gatt"},
 {"path":"examples/nordic-nRF51-ble"},
 
+{"path":"examples/arduino101-led-onoff"},
 {"path":"examples/arduino-led-onoff-tcp"},
 {"path":"examples/arduino-led-onoff-ble"},
 {"path":"examples/arduino-ble"},
