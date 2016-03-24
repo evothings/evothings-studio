@@ -313,7 +313,7 @@ $(function()
 		sbutton.style.fontSize = '10px'
 		//sbutton.style.height = '62px'
 		//sbutton.style.height = '150px'
-		sbutton.innerHTML = 'Show Instrumentation'
+		sbutton.innerHTML = 'Start Instrumentation'
 		buttonrow.appendChild(sbutton)
 		sbutton.addEventListener('mouseup', function(e)
 		{
@@ -400,6 +400,7 @@ $(function()
 		var files =
 		[
 			'./injectables/util.js',
+			'./injectables/mqttws31.js',
 			'./injectables/easyble.js',
 			'./injectables/instrumentation-manager.js',
 			'./injectables/bluetooth-instrumentation.js',

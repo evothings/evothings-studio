@@ -151,6 +151,11 @@ var me = window.evo.watcher =
                         hyper.log('listing watches')
                         var names = me.getWatchNames()
                         var rnames = []
+                        names.sort(function(a,b)
+                        {
+                          return a == b ? 0 : a < b ? -1 : 1
+                        })
+                        hyper.log('sorted names array is '+names)
                         names.forEach(function(wname)
                         {
                           rnames.push({name: 'watch.watches.'+wname, selectable: false})
@@ -197,6 +202,10 @@ var me = window.evo.watcher =
                                   rv.push({name: 'watch.select.'+bobj.baseName+'.'+p, selectable: prop && typeof prop == 'object' && !prop.length})
                                 }
                               }
+                              rv.sort(function(a,b)
+                              {
+                                return a.name == b.name ? 0 : a.name < b.name ? -1 : 1
+                              })
                               callback(rv)
                             }
                           },
