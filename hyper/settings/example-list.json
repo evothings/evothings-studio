@@ -7,7 +7,7 @@
 {"path":"examples/ble-ti-sensortag-cc2541-webbluetooth"},
 
 {"path":"examples/microbit-led"},
-{"path":"examples/microbit-demo"},
+{"path":"examples/microbit-accelerometer"},
 {"path":"examples/microbit-sensors"},
 
 {"path":"examples/cordova-accelerometer"},
