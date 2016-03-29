@@ -6,6 +6,10 @@
 {"path":"examples/mbed-custom-gatt-webbluetooth"},
 {"path":"examples/ble-ti-sensortag-cc2541-webbluetooth"},
 
+{"path":"examples/microbit-led"},
+{"path":"examples/microbit-demo"},
+{"path":"examples/microbit-sensors"},
+
 {"path":"examples/cordova-accelerometer"},
 {"path":"examples/hue-lights"},
 
