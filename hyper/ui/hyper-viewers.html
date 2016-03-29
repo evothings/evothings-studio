@@ -96,6 +96,10 @@ jQuery Layout: http://layout.jquery-dev.net/
 					<input type="checkbox" id="switch-1" class="mdl-switch__input" checked>
 					<span class="mdl-switch__label" id="uswitchlabel">Send file as Base64</span>
 				</label>
+				<div>
+					If file is sent in Base64 format, the injector will look for an array called window.evo.fileCallbacks and
+					call each function in the array with the transferred file object, with the format {data: "Base64 file data", name: "file name", size: "file size"}
+				</div>
 			</div>
 		</div>
 

@@ -9,6 +9,11 @@ $(function()
 	var SERVER = require('../server/file-server.js')
 	var ALL	= require('node-promise').allOrNone
 	var PROMISE = require('node-promise').defer
+	var MQTT = require('mqtt')
+
+	var paho = require('../server/mqttws31.js')
+
+	var mqtt_client  = ''
 
 	// Main application window
 	var mMainWindow = window.opener
@@ -25,6 +30,7 @@ $(function()
 	var mTimeoutHandle = undefined
 
 	var SUBSCRIPTION_INTERVAL = 300
+	var SUBSCRIPTION_TIMEOUT = 600000
 	var NETWORK_TIMEOUT = 6000
 
 
@@ -324,13 +330,6 @@ $(function()
 	function showInjectionMenu(viewer, div)
 	{
 		console.log('showInjectionMenu called (undefined)')
-		/*
-		 <div>
-		 <label for="fileselect">Files to upload:</label>
-		 <input type="file" id="fileselect" name="fileselect[]" multiple="multiple" />
-		 <div id="filedrag">or drop files here</div>
-		 </div>
-		 */
 		var udialog = document.getElementById('udialog')
 		udialog.viewer = viewer
 		udialog.showModal()
@@ -495,6 +494,7 @@ $(function()
 		console.log('-- got serviceStatus back: '+message.serviceStatus)
 		var ball = document.getElementById(message.clientID+'_ball')
 		var sbutton = document.getElementById(message.clientID + '_sbutton')
+		var cdiv = document.getElementById(message.clientID + '.serviceroot')
 		if(message.serviceStatus && message.serviceStatus != 'undefined')
 		{
 			console.log('setting ball '+ball.id+' green')
@@ -506,7 +506,7 @@ $(function()
 				code: 'window.evo.instrumentation.selectHierarchy()',
 				client: client
 			}, '*')
-
+			showElement(cdiv)
 			hideElement(sbutton)
 		}
 		else
@@ -515,6 +515,7 @@ $(function()
 			ball.style.backgroundColor = 'gray'
 			mInstrumentationReceivedFrom[message.clientID] = false
 			showElement(sbutton)
+			hideElement(cdiv)
 		}
 	}
 
@@ -738,7 +739,8 @@ $(function()
 	{
 		console.log('subscribeToService called for path '+path)
 		waitForTimeout()
-		mMainWindow.postMessage({ message: 'eval', code: 'window.evo.instrumentation.subscribeToService("'+path+'",{}, '+SUBSCRIPTION_INTERVAL+')', client: client }, '*')
+		//subscribeToMqttChannel(client.clientID, path)
+		mMainWindow.postMessage({ message: 'eval', code: 'window.evo.instrumentation.subscribeToService("'+path+'",{}, '+SUBSCRIPTION_INTERVAL+', '+SUBSCRIPTION_TIMEOUT+')', client: client }, '*')
 	}
 
 	function unsubscribeToService(path, clientID)
@@ -747,6 +749,7 @@ $(function()
 		var client = mCurrentClients[clientID]
 		var subscriptions = mServiceSubscriptions[clientID] || []
 		var sid = subscriptions[path]
+		//unSubscribeToMqttChannel(clientID, path)
 		console.log('unsubscribing to path '+path+' -> '+sid+' for clientID '+clientID)
 		var snackbarContainer = document.querySelector('#snackbar');
 		var data =
@@ -757,6 +760,20 @@ $(function()
 		snackbarContainer.MaterialSnackbar.showSnackbar(data);
 		waitForTimeout()
 		mMainWindow.postMessage({ message: 'eval', code: 'window.evo.instrumentation.unSubscribeToService("'+path+'","'+sid+'")', client: client }, '*')
+	}
+
+	function subscribeToMqttChannel(clientID, path)
+	{
+		var channel = '/instrumentation/'+clientID+'/'+path
+		console.log('subscribing to mqtt channel '+channel)
+		mqtt_client.subscribe(channel)
+	}
+
+	function unSubscribeToMqttChannel(clientID, path)
+	{
+		var channel = '/instrumentation/'+clientID+'/'+path
+		console.log('subscribing to mqtt channel '+channel)
+		mqtt_client.unsubscribe(channel)
 	}
 
 	function waitForTimeout()
@@ -797,6 +814,8 @@ $(function()
 
 	function addServiceDataToViewer(clientID, time, servicedata)
 	{
+		//console.log('adding servicedata')
+		//console.dir(servicedata)
 		if(!isClientAlreadySubscribedToService(clientID, servicedata.path))
 		{
 			saveServiceSubscription(clientID, {subscriptionID: servicedata.subscriptionID, path: servicedata.path, type: servicedata.data.type})
@@ -860,13 +879,15 @@ $(function()
 		}
 	}
 
-	function plotServiceData(time, servicedata, clientID, path, channels)
+	function plotServiceData(_time, servicedata, clientID, path, channels)
 	{
+		var time = parseInt(_time)
 		var chart = getChartForPath(clientID, path, channels)
 		//console.log('plotservicedata got chart '+chart)
+		//console.dir(chart)
 		if(chart)
 		{
-			var color = servicedata.color || 'rgba(255,255,255,0.76)'
+			var color = servicedata.color || 'rgb(255,255,255)'
 			var fillstyle = servicedata.fillstyle || 'rgba(0,255,0,0.30)'
 			var value = undefined
 			var lid = clientID+'.serviceroot.'+path+'.chart_legend'
@@ -879,20 +900,25 @@ $(function()
 				{
 					if(key != 'timestamp')
 					{
-						value = servicedata.data.value[key]
+						value = parseFloat(servicedata.data.value[key])
 						legend.innerHTML += '&nbsp;&nbsp;'+key+': '+value+'<br/>'
 						switch(count++)
 						{
 							case 0:
-								color = 'rgba(25,255,25,0.76)'
+								color = 'rgb(25, 255, 25)'
+								break;
 							case 1:
-								color = 'rgba(255,25,25,0.76)'
+								color = 'rgba(255, 25, 25, 0.76)'
+								break;
 							case 2:
-								color = 'rgba(25,25,255,0.76)'
+								color = 'rgba(25, 25, 255, 0.76)'
+								break;
 							case 3:
-								color = 'rgba(115,95,205,0.76)'
+								color = 'rgb(115, 95, 205)'
+								break;
 							default:
-								color = 'rgba(195,205,255,0.76)'
+								color = 'rgb(195, 205, 255)'
+								break;
 						}
 						var ts = getTimeSeriesFor(path+'_'+key, chart, color, fillstyle)
 						//console.log('  -- appending value '+parseFloat(value)+' for key '+key+' and timestamp '+time)
@@ -902,7 +928,7 @@ $(function()
 			}
 			else
 			{
-				value = servicedata.data.value
+				value = parseFloat(servicedata.data.value)
 				legend.innerHTML = getNameFromPath(path)
 				var ts = getTimeSeriesFor(path, chart, color, fillstyle)
 				ts.append(time, value)
@@ -919,28 +945,10 @@ $(function()
 			ts._instrumentation_key = key
 			mTimeSeriesForChart[key] = ts
 			console.log('  -- adding new timeseries for key '+key+' and color '+color)
-			chart.addTimeSeries(ts, {lineWidth: 1, strokeStyle: color, fillStyle: fillstyle});
+			chart.addTimeSeries(ts, {lineWidth: 2, strokeStyle: color, fillStyle: fillstyle});
+			//chart.addTimeSeries(ts)
 			console.dir(chart)
 		}
-		/*
-		else
-		{
-			var found = false
-			chart.seriesSet.forEach(function(series)
-			{
-				if(series.timeSeries._instrumentation_key == key)
-				{
-					found = true
-				}
-			})
-			if(!found)
-			{
-				console.log('---found old timeseries for '+key)
-				ts._instrumentation_key = key
-				chart.addTimeSeries(ts, {lineWidth: 1, strokeStyle: color, fillStyle: fillstyle});
-			}
-		}
-		*/
 		return ts
 	}
 
@@ -976,9 +984,12 @@ $(function()
 			var parent = document.getElementById(clientID+'.serviceroot.'+path)
 			var id = clientID+'.serviceroot.'+path+'.plate'
 			var platenode = document.getElementById(id)
-			parent.removeChild(platenode)
-			platenode.id = ""
-			parent.innerHTML = ""
+			if(platenode)
+			{
+				parent.removeChild(platenode)
+				platenode.id = ""
+				parent.innerHTML = ""
+			}
 		}, SUBSCRIPTION_INTERVAL*3)
 	}
 
@@ -1006,7 +1017,8 @@ $(function()
 				parent.appendChild(chartnodelegend)
 				chart = new SmoothieChart({grid: {verticalSections: 4}, timestampFormatter: SmoothieChart.timeFormatter})
 				mChartsVisible[id] = chart
-				chart.streamTo(chartnode, SUBSCRIPTION_INTERVAL);
+				console.log('chart '+path+' streaming to node '+chartnode.id+' with interval '+SUBSCRIPTION_INTERVAL)
+				chart.streamTo(chartnode,SUBSCRIPTION_INTERVAL);
 			}
 			chartnode.addEventListener('mouseup', function(e)
 			{
@@ -1028,10 +1040,11 @@ $(function()
 		var parent = document.getElementById(clientID+'.serviceroot.'+path)
 		var id = clientID+'.serviceroot.'+path+'.chart'
 		var chartnode = document.getElementById(id)
-		var chartnodelegend = document.getElementById(chartnode.id + '_legend')
+
 		if(chartnode)
 		{
 			hideElement(chartnode)
+			var chartnodelegend = document.getElementById(chartnode.id + '_legend')
 			hideElement(chartnodelegend)
 			return true
 		}
@@ -1104,6 +1117,72 @@ $(function()
 			state = state == 'on' ? 'off' : 'on'
 			uswitchlabel.innerHTML = state  == 'on' ? "send file as javaScript and eval immediately" : "Send file as Base64"
 		})
+
+		var uuid = SETTINGS.getEvoGUID()
+
+		//mqtt_client = MQTT.connect('wss://vernemq.evothings.com:8084', options)
+		//mqtt_client = MQTT.connect('mqtt://test.mosquitto.org')
+		/*
+		mqtt_client.on('message', function(topic, message)
+		{
+			console.log('mqtt message received on channel '+topic)
+			console.dir(message)
+			addServiceDataToViewer(message.clientID, message.time, message.serviceData)
+		})
+
+		mqtt_client.on('error', function(error)
+		{
+			console.log('mqtt ERROR: '+error)
+		})
+
+		mqtt_client.on('connect', function()
+		{
+			console.log('++ MQTT client connected ++')
+		})
+
+		mqtt_client.on('offline', function ()
+		{
+			console.log('offline');
+		});
+
+		mqtt_client.on('close', function ()
+		{
+			console.log('close');
+			mqtt_client.end();
+		})
+		*/
+
+		/*
+
+		mqtt_client = new paho.MQTT.Client('vernemq.evothings.com', 8084, uuid)
+		var options = {
+			useSSL: true,
+			onSuccess: function()
+			{
+				console.log('MQTT connected')
+
+			},
+			onFailure: function(err)
+			{
+				console.log('MQTT Error: '+JSON.stringify(arguments))
+			}
+		}
+		mqtt_client.connect(options);
+
+		mqtt_client.onMessageArrived = function(message)
+		{
+
+			console.log("Message Arrived: " + message.payloadString);
+			console.log("Topic:     " + message.destinationName);
+			console.log("QoS:       " + message.qos);
+			console.log("Retained:  " + message.retained);
+			// Read Only, set if message might be a duplicate sent from broker
+			console.log("Duplicate: " + message.duplicate);
+
+			var pl = JSON.parse(message.payloadString)
+			addServiceDataToViewer(pl.clientID, pl.time, pl.serviceData)
+		}
+		*/
 	}
 
 

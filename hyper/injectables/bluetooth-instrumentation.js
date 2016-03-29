@@ -289,7 +289,7 @@ var me = window.evo.bluetooth =
         {
             name: 'characteristic',
 
-            subscribeTo: function(params, interval, timeout, cb)
+            subscribeTo: function(path, params, interval, timeout, cb)
             {
                 hyper.log('bluetooth.characteristic.subscribeto called with interval '+interval)
                 hyper.log(JSON.stringify(params))
@@ -580,7 +580,7 @@ var me = window.evo.bluetooth =
             if(service)
             {
                 var params = {path: path, device: device, serviceUUID: serviceUUID, characteristicUUID: characteristic.uuid}
-                var sid = service.subscribeTo(params, interval, timeout, callback)
+                var sid = service.subscribeTo(path, params, interval, timeout, callback)
                 me.subscriptions[sid] = service
                 return sid
             }

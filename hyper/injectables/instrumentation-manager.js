@@ -81,8 +81,21 @@ var me = window.evo.instrumentation =
 			var serviceProvider = me.serviceProviders[serviceProviderName]
 			var subscriptionID = serviceProvider.subscribeTo(path, params, interval, timeout, function(data)
 			{
-				// data is an object with key, value pairs (obivously), where the kay is the name of the data channel and the value is, well.. the value. Most channels will only have one pair, but the cordova accelerometer have three (x,y,z)
-				window.hyper.sendMessageToServer(window.hyper.IoSocket, 'client.instrumentation', {clientID: window.hyper.clientID, time: Date.now(), serviceData: {path: path, data: data, subscriptionID: subscriptionID} })
+				//hyper.log('sending data to mqtt channel "'+'/instrumentation/'+window.hyper.clientID+'/'+path+'" connected == '+window.evo.instrumentation.mqttconnected)
+				var message = {clientID: window.hyper.clientID, time: Date.now(), serviceData: {path: path, data: data, subscriptionID: subscriptionID}}
+				if(window.evo.instrumentation.mqttconnected)
+				{
+					var mqtt_message = new Paho.MQTT.Message(JSON.stringify(message))
+					mqtt_message.destinationName = '/instrumentation/'+window.hyper.clientID+'/'+path
+					hyper.log('sending data to '+mqtt_message.destinationName)
+					window.evo.instrumentation.mqttclient.send(mqtt_message)
+				}
+				else
+				{
+					// data is an object with key, value pairs (obivously), where the kay is the name of the data channel and the value is, well.. the value. Most channels will only have one pair, but the cordova accelerometer have three (x,y,z)
+					window.hyper.sendMessageToServer(window.hyper.IoSocket, 'client.instrumentation', message)
+				}
+
 			})
 			hyper.log('got sid '+subscriptionID+' back for subscription on path '+path)
 			window.hyper.sendMessageToServer(window.hyper.IoSocket, 'client.instrumentation', {clientID: window.hyper.clientID, serviceSubscription: {path: path, subscriptionID: subscriptionID} })
@@ -109,3 +122,20 @@ var me = window.evo.instrumentation =
 		}
 	}
 }
+
+/*
+window.evo.instrumentation.mqttclient = new Paho.MQTT.Client('vernemq.evothings.com', 8084, window.hyper.clientID)
+var options = {
+	useSSL: true,
+	onSuccess: function()
+	{
+		hyper.log('MQTT connected')
+		window.evo.instrumentation.mqttconnected = true
+	},
+	onFailure: function(err)
+	{
+		hyper.log('MQTT Error: '+JSON.stringify(arguments))
+	}
+}
+window.evo.instrumentation.mqttclient.connect(options);
+	*/
