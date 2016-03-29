@@ -497,8 +497,12 @@ $(function()
 		var cdiv = document.getElementById(message.clientID + '.serviceroot')
 		if(message.serviceStatus && message.serviceStatus != 'undefined')
 		{
-			console.log('setting ball '+ball.id+' green')
-			ball.style.backgroundColor = 'green'
+			if(ball)
+			{
+				console.log('setting ball '+ball.id+' green')
+				ball.style.backgroundColor = 'green'
+			}
+
 			mInstrumentationReceivedFrom[message.clientID] = true
 			var client = mCurrentClients[message.clientID]
 			mMainWindow.postMessage({
@@ -511,8 +515,12 @@ $(function()
 		}
 		else
 		{
-			console.log('setting ball '+ball.id+' gray')
-			ball.style.backgroundColor = 'gray'
+			if(ball)
+			{
+				console.log('setting ball '+ball.id+' gray')
+				ball.style.backgroundColor = 'gray'
+			}
+
 			mInstrumentationReceivedFrom[message.clientID] = false
 			showElement(sbutton)
 			hideElement(cdiv)
