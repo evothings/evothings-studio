@@ -428,3 +428,8 @@ TODO: Remove, use automatic width for all buttons.
 	display: block;
 }
 }
+
+#button-viewers:hover
+{
+	font-weight:bold
+}

@@ -26,12 +26,13 @@ var me = window.evo.cordova =
 					cb()
 				})
 			},
-			subscribeTo: function(params, interval, timeout, cb)
+			subscribeTo: function(path, params, interval, timeout, cb)
 			{
 				hyper.log('cordova.accelerometer.subscribeto called with interval '+interval)
 				var start = Date.now()
 				var sid = navigator.accelerometer.watchAcceleration(function(accelObj)
 				{
+					//hyper.log('acc getting data..')
 					cb({name: 'accelerometer', value: accelObj, type: 'plot'})
 					var diff = Date.now() - start
 					if(diff > timeout)
@@ -41,8 +42,9 @@ var me = window.evo.cordova =
 					}
 				}, function(error)
 				{
+					console.log('cordova accelereomter error: '+error)
 					cb()
-				}, {frequency: interval})
+				}, {frequency: parseInt(interval)})
 				me.subscriptions[sid] = accelerometer
 				return sid
 			},
@@ -66,7 +68,7 @@ var me = window.evo.cordova =
 					cb()
 				})
 			},
-			subscribeTo: function(params, interval, timeout, cb)
+			subscribeTo: function(path, params, interval, timeout, cb)
 			{
 				hyper.log('cordova.compass.subscribeto called with interval '+interval)
 				var start = Date.now()
@@ -82,7 +84,7 @@ var me = window.evo.cordova =
 				}, function(error)
 				{
 					cb()
-				}, {frequency: interval})
+				}, {frequency: parseInt(interval)})
 				me.subscriptions[sid] = accelerometer
 				return sid
 			},
@@ -140,7 +142,7 @@ var me = window.evo.cordova =
 		params.path = path
 		if(service)
 		{
-			var sid = service.subscribeTo(params, interval, timeout, callback)
+			var sid = service.subscribeTo(path, params, interval, timeout, callback)
 			hyper.log('saving subscription '+sid+' in '+me.subscriptions)
 			me.subscriptions[sid] = service
 			return sid
