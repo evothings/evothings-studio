@@ -25,7 +25,7 @@ end
 # TODO: Update on new release.
 # Leave empty for final release.
 def distLabel
-	"-alpha1"
+	"-alpha2"
 end
 
 def distVersionLabel
