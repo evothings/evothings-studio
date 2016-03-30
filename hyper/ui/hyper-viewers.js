@@ -652,22 +652,32 @@ $(function()
 					sdiv.addEventListener('mouseup', function(e)
 					{
 						console.log('user selected path '+pathlevel.name)
-						cdiv.__opened = true
-						if(pathlevel.selectable)
+						if(cdiv.__opened)
 						{
-							selectHierarchy(pathlevel.name, client)
+							hideElement(cdiv)
 						}
 						else
 						{
-							var provider = pathlevel.name.split('.')[0]
-							if(!isClientAlreadySubscribedToService(clientID, pathlevel.name))
+							showElement(cdiv)
+							if(cdiv.childElementCount == 0)
 							{
-								subscribeToService(pathlevel.name, client)
-							}
-							else
-							{
-								console.log('unsubscribing to service '+pathlevel.name)
-								unsubscribeToService(pathlevel.name, clientID)
+								if(pathlevel.selectable)
+								{
+									selectHierarchy(pathlevel.name, client)
+								}
+								else
+								{
+									var provider = pathlevel.name.split('.')[0]
+									if(!isClientAlreadySubscribedToService(clientID, pathlevel.name))
+									{
+										subscribeToService(pathlevel.name, client)
+									}
+									else
+									{
+										console.log('unsubscribing to service '+pathlevel.name)
+										unsubscribeToService(pathlevel.name, clientID)
+									}
+								}
 							}
 						}
 
@@ -1203,7 +1213,8 @@ $(function()
 			reader.onload = function(event)
 			{
 				console.dir(event)
-				var fdata = 'var file={data:"'+event.target.result+'", name: "'+file.name+'", size: "'+file.size+'"}; '
+				var filedata = btoa(event.target.result)
+				var fdata = 'var file={data:"'+filedata+'", name: "'+file.name+'", size: "'+file.size+'"}; '
 				fdata += 'if(!window._evofiles){ window._evofiles = [] }; window._evofiles.push(file); '
 				fdata += 'if(window.evo && window.evo.fileCallbacks){ window.evo.fileCallbacks.forEach(function(cb){ cb(file) }) }'
 				console.log('sending file ')
@@ -1214,7 +1225,7 @@ $(function()
 					client: viewer
 				}, '*')
 			}
-			reader.readAsDataURL(file);
+			reader.readAsBinaryString(file);
 		})
 	}
 
