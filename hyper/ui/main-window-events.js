@@ -119,6 +119,13 @@ exports.defineUIEvents = function(hyper)
 	{
 		hyper.UI.openInBrowser('https://evothings.com/doc/tutorials/ecmascript6.html')
 	})
+	
+	// ************** Instrumentation Documentation Button **************
+
+	hyper.UI.$('.button-instrumentation-documentation').click(function()
+	{
+		hyper.UI.openInBrowser('https://evothings.com/doc/tutorials/instrumentation.html')
+	})
 
 	// ************** Connect Screen Button **************
 
