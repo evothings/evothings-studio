@@ -196,6 +196,11 @@ $(function()
 					console.log('client '+viewer.clientID+' does not exist yet, so adding that...')
 					renderViewer(domlist, viewer)
 				}
+				else
+				{
+					var applabel = document.getElementById(viewer.clientID+'_applabel')
+					applabel.innerHTML = '<b>['+viewer.currentproject+']</b>'
+				}
 			})
 		}
 	}
@@ -253,6 +258,9 @@ $(function()
 		div.style.height = '120px'
 		var span = document.createElement('span')
 		span.innerHTML = viewer.name + ' ('+viewer.info.model+')'
+		var span2 = document.createElement('span')
+		span2.id = viewer.clientID + '_applabel'
+		span2.innerHTML = '<b>['+viewer.currentproject+']</b>'
 		var img = document.createElement('img')
 		img.style.width='20px'
 		img.style.height = '35px'
@@ -279,6 +287,7 @@ $(function()
 
 		div.appendChild(imgrow)
 		div.appendChild(span)
+		div.appendChild(span2)
 		addMenuToClient(viewer, rowdiv)
 		var cdiv = document.createElement('ul')
 		cdiv.className = "treestyle"
@@ -296,35 +305,49 @@ $(function()
 		var buttonrow = document.createElement('div')
 		buttonrow.style.display = 'flex';
 		buttonrow.style.flexDirection = 'column'
+		buttonrow.style.marginLeft = '5px'
 		div.appendChild(buttonrow)
-		var ubutton = document.createElement('button')
-		ubutton.className = "mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
-		ubutton.id = viewer.clientID + '_ubutton'
-		ubutton.style.margin = '5px'
-		ubutton.style.fontSize = '10px'
-		//ubutton.style.height = '62px'
-		//ubutton.style.height = '150px'
-		ubutton.innerHTML = 'Inject File(s)'
 
+		var ubutton = createButton('Inject File(s)', viewer.clientID + '_ubutton')
 		buttonrow.appendChild(ubutton)
-
 		ubutton.addEventListener('mouseup', function(e)
 		{
 			showInjectionMenu(viewer, div)
 		})
-		var sbutton = document.createElement('button')
-		sbutton.className = "mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
-		sbutton.id = viewer.clientID + '_sbutton'
-		sbutton.style.margin = '5px'
-		sbutton.style.fontSize = '10px'
-		//sbutton.style.height = '62px'
-		//sbutton.style.height = '150px'
-		sbutton.innerHTML = 'Start Instrumentation'
+
+		var sbutton = createButton('Start Instrumentation', viewer.clientID + '_sbutton')
 		buttonrow.appendChild(sbutton)
 		sbutton.addEventListener('mouseup', function(e)
 		{
 			onClientSelected(viewer)
 		})
+
+		var lebutton = createButton('Load Example', viewer.clientID + '_lebutton')
+		buttonrow.appendChild(lebutton)
+		lebutton.addEventListener('mouseup', function(e)
+		{
+			console.log('load example for viewer (not implemented)')
+		})
+
+		var labutton = createButton('Load App', viewer.clientID + '_labutton')
+		buttonrow.appendChild(labutton)
+		labutton.addEventListener('mouseup', function(e)
+		{
+			console.log('load app for viewer (not implemented)')
+		})
+	}
+
+	function createButton(name, id)
+	{
+		var sbutton = document.createElement('button')
+		sbutton.className = "mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+		sbutton.id = id
+		sbutton.style.margin = '5px'
+		sbutton.style.fontSize = '10px'
+		sbutton.style.height = '30px'
+		//sbutton.style.height = '150px'
+		sbutton.innerHTML = name
+		return sbutton
 	}
 
 	function showInjectionMenu(viewer, div)
