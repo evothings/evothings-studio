@@ -183,9 +183,10 @@ def buildDistBinaryMac64
 	info = macPatchValue(info, "CFBundleVersion", distCopyright)
 	#puts(info)
 	fileSaveContent(infoPlistPath, info)
-		
+
 	# Fix up permissions on executables to make other users (multiuser machines) be able to run the Workbench
 	FileUtils.chmod "go=rx", appPath + "/Contents/MacOS/nwjs"
+	FileUtils.chmod "go=rx", appPath + "/Contents/Frameworks/nwjs Framework.framework/nwjs Framework"
   FileUtils.chmod "go=rx", appPath + "/Contents/Frameworks/nwjs Helper.app/Contents/MacOS/nwjs Helper"
   FileUtils.chmod "go=rx", appPath + "/Contents/Frameworks/nwjs Helper NP.app/Contents/MacOS/nwjs Helper NP"
   FileUtils.chmod "go=rx", appPath + "/Contents/Frameworks/nwjs Helper EH.app/Contents/MacOS/nwjs Helper EH"
