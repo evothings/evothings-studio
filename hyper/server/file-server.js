@@ -148,7 +148,12 @@ exports.connectToRemoteServer = function()
 		var handler = messageHandlers[message.name]
 		if (handler)
 		{
+
 			handler(socket, message)
+		}
+		else
+		{
+			console.log('HANDLER NOT FOUND for message '+message.name+' !!!')
 		}
 	})
 }
@@ -176,10 +181,12 @@ function sendMessageToServer(_socket, name, data)
 {
 	var socket = _socket || mSocket
 	var uuid = SETTINGS.getEvoGUID()
-	//console.log('[file-server.js] --------------')
-	//console.log('[file-server.js] sendMessageToServer: ' + JSON.stringify(data))
-	//console.log('[file-server.js] --------------')
-	//console.log('[file-server.js] sendMessageToServer -- uuid = '+uuid)
+	/*
+	console.log('[file-server.js] --------------')
+	console.log('[file-server.js] sendMessageToServer: ' + JSON.stringify(data))
+	console.log('[file-server.js] --------------')
+	console.log('[file-server.js] sendMessageToServer -- uuid = '+uuid)
+	*/
 	socket.emit('hyper-workbench-message', {
 		protocolVersion: mProtocolVersion,
 		workbenchVersionCode: mWorkbenchVersionCode,
@@ -272,16 +279,21 @@ function onMessageWorkbenchLog(socket, message)
 function onMessageWorkbenchJavaScriptResult(socket, message)
 {
 	var data = message.data.result
-
-	// Functions cause a cloning error, as a fix just show the type.
-	if (typeof data == 'function')
+	// For common eval ops like OOB file sync and instrumentation availability polling, we don't want results logging
+	if(data != '_DONOT_')
 	{
-		data = typeof data
-	}
+		// Functions cause a cloning error, as a fix just show the type.
+		if (typeof data == 'function')
+		{
+			data = typeof data
+		}
 
-	// Pass message to Tools window.
-	mMessageCallback && mMessageCallback(
-		{ message: 'hyper.result', result: data })
+		// Pass message to Tools window.
+		console.log('js log result callback = '+mMessageCallback)
+		mMessageCallback && mMessageCallback(
+			{ message: 'hyper.result', result: data })
+		EVENTS.publish(EVENTS.HYPER_RESULT, data)
+	}
 }
 
 function onMessageWorkbenchUserMessage(socket, message)
@@ -598,6 +610,7 @@ exports.reloadApp = function()
  */
 exports.evalJS = function(code, client)
 {
+	console.log('file-server.js evalJS')
 	sendMessageToServer(mSocket, 'workbench.eval',
 		{
 			sessionID: mSessionID,
@@ -663,3 +676,50 @@ exports.getSessionID = function()
 }
 
 exports.sendMessageToServer = sendMessageToServer
+
+exports.sendUploadFiles = function (files, viewer)
+{
+	files.forEach(function(file)
+	{
+		var reader = new FileReader();
+		reader.onload = function(event)
+		{
+			console.dir(event)
+			var filedata = btoa(event.target.result)
+			exports.injectFileData(filedata, viewer)
+		}
+		reader.readAsBinaryString(file);
+	})
+}
+
+exports.injectFileData = function(file, viewer)
+{
+	var fdata = '(function(){var file={data:"'+file.data+'", name: "'+file.name+'", size: "'+file.size+'"}; '
+	fdata += 'if(!window._evofiles){ window._evofiles = [] }; window._evofiles.push(file); '
+	fdata += 'if(window.evo && window.evo.fileCallbacks){ window.evo.fileCallbacks.forEach(function(cb){ cb(file) }) };return "_DONOT_";})()'
+	console.log('sending file ')
+	console.log(fdata)
+	exports.evalJS(fdata, viewer)
+}
+
+exports.executeFileData = function(filedata, viewer)
+{
+	console.log('executeFileData called')
+	exports.evalJS('(function(){'+filedata+' ;return "_DONOT_"; })()', viewer)
+}
+
+exports.executeUploadFiles = function (files, viewer)
+{
+	console.log('executeUploadFiles called')
+	files.forEach(function(file)
+	{
+		var reader = new FileReader();
+		reader.onload = function(event)
+		{
+			var filedata = event.target.result
+			exports.executeFileData(filedata, viewer)
+		}
+		reader.readAsText(file);
+	})
+}
+

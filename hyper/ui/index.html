@@ -9,10 +9,15 @@ Copyright (c) 2013-2015 Evothings AB
 <!-- HTML 5 differences from HTML 4: http://www.w3.org/TR/2008/WD-html5-diff-20080122/ -->
 <head>
 	<meta charset="utf-8">
+	<link rel="stylesheet" href="../../node_modules/material-design-lite/material.min.css">
 	<link href="../libs/bootstrap-3.3.5-dist/css/bootstrap.min.css" rel="stylesheet">
 	<script src="../libs/jquery/jquery-2.1.4.min.js"></script>
 	<script src="../libs/jquery/jquery-ui.min.js"></script>
 	<script src="../libs/bootstrap-3.3.5-dist/js/bootstrap.min.js"></script>
+
+
+	<script src="../../node_modules/material-design-lite/material.min.js"></script>
+
 	<link href="css/hyper-common.css" rel="stylesheet" />
 	<link href="css/hyper-ui.css" rel="stylesheet" />
 </head>
@@ -40,12 +45,16 @@ Copyright (c) 2013-2015 Evothings AB
 			<!-- Menu button - version with text -->
 			<div id="panel-tool-menu">
 				<div class="btn-group btn-group-justified">
+					<!--
 					<button id="button-tool-menu" role="button"
 						class="btn btn-primary dropdown-toggle btn-hyper-toolbar et-btn-charcoal"
 						data-toggle="dropdown"
 						aria-haspopup="true" aria-expanded="false">
 						More <span class="caret"></span>
 					</button>
+					-->
+					<button type="button" class="btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="button-tool-menu" data-toggle="dropdown"
+							aria-haspopup="true" aria-expanded="false">More</button>
 					<ul class="dropdown-menu">
 						<li><a class="button-getting-started"
 							role="button" href="javascript:void(0)">
@@ -65,7 +74,7 @@ Copyright (c) 2013-2015 Evothings AB
 						<li><a class="button-release-notes"
 							role="button" href="javascript:void(0)">
 							Release Notes</a></li>
-						<li><a id="button-chat"
+						<li style="background-color:springgreen"><a id="button-chat"
 							role="button" href="javascript:void(0)">
 							Chat on Gitter</a></li>
 						<li><a id="button-forum"
@@ -94,7 +103,9 @@ Copyright (c) 2013-2015 Evothings AB
 			</div>
 
 			<div id="panel-tool-buttons">
-				<div class="btn-group btn-group-justified" role="group">
+				<!-- <div class="btn-group btn-group-justified" role="group"> -->
+				<div style="display: flex; flex-direction: row; ">
+					<!--
 					<a id="button-connect"
 					   class="btn btn-hyper-toolbar et-btn-stone"
 					   href="javascript:void(0)">Connect</a>
@@ -110,6 +121,14 @@ Copyright (c) 2013-2015 Evothings AB
 					<a id="button-tools" role="button"
 						class="btn btn-hyper-toolbar btn-toolbar et-btn-blue"
 						href="javascript:void(0)" style="border-left">Tools</a>
+						-->
+
+					<button type="button" class="btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="button-connect">Connect</button>
+					<button type="button" class="btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="button-examples">Examples</button>
+					<button type="button" class="btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="button-projects">My Apps</button>
+					<button type="button" class="btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="button-new-app">New</button>
+					<button type="button" class="btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="button-tools">Tools</button>
+					<button type="button" class="btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="button-viewers">Viewers</button>
 				</div>
 			</div>
 
@@ -178,7 +197,7 @@ Copyright (c) 2013-2015 Evothings AB
 							<div class="form-group">
 								<label for="input-setting-reload-server-address">
 									Address of Reload Server:</label>
-								<input type="text"
+					 			<input type="text"
 									id="input-setting-reload-server-address"
 									class="form-control"/>
 							</div>
@@ -672,7 +691,7 @@ Copyright (c) 2013-2015 Evothings AB
 			<div>
 				<p style="float:left;">Status: <b><span id="connect-address">Waiting to connect</span></b></p>
 				<p style="float:left;margin-left:25px"><b><span id="login-info">Not Logged In</span></b></p>
-				<p style="float:right;" id="button-viewers">Viewers: <b><span id="connect-counter">0</span></b> Files: <b><span id="files-counter">0</span></b></p>
+				<p style="float:right;">Viewers: <b><span id="connect-counter">0</span></b> Files: <b><span id="files-counter">0</span></b></p>
 			</div>
 		</div>
 

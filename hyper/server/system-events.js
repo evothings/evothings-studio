@@ -12,6 +12,7 @@ var Events =
 	LOGINDISCONNECT:        'logindisconnect',
 	VIEWERSUPDATED:         'viewersupdated',
 	VIEWERSINSTRUMENTATION: 'viewersinstrumentation',
+    HYPER_RESULT:           'hyper.result',
 
     listeners:  [],
 

@@ -475,10 +475,11 @@ exports.defineUIEvents = function(hyper)
 		hyper.UI.$('#screen-connect').hide()
 		hyper.UI.$('#screen-examples').hide()
 		hyper.UI.$('#screen-projects').hide()
-		hyper.UI.$('#button-connect, #button-examples, #button-projects')
+/*
+		hyper.UI.$('#button-connect, #button-examples, #button-projects ')
 			.removeClass('et-btn-et-btn-white-only')
 			.addClass('et-btn-stone')
-
+*/
 		// Show selected tab.
 		var screenId = '#screen-' + tabname
 		var buttonId = '#button-' + tabname
