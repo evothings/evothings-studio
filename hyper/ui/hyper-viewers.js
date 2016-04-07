@@ -322,6 +322,7 @@ $(function()
 			onClientSelected(viewer)
 		})
 
+		/*
 		var lebutton = createButton('Load Example', viewer.clientID + '_lebutton')
 		buttonrow.appendChild(lebutton)
 		lebutton.addEventListener('mouseup', function(e)
@@ -335,6 +336,7 @@ $(function()
 		{
 			console.log('load app for viewer (not implemented)')
 		})
+		*/
 	}
 
 	function createButton(name, id)
@@ -361,7 +363,7 @@ $(function()
 	function requestStatus(viewer)
 	{
 		console.log('....requesting status.....')
-		mMainWindow.postMessage({ message: 'eval', code: 'hyper.sendMessageToServer(window.hyper.IoSocket, "client.instrumentation", {clientID: window.hyper.clientID, serviceStatus: typeof window._instrumentation })', client: viewer }, '*')
+		mMainWindow.postMessage({ message: 'eval', code: '(function(){ hyper.sendMessageToServer(window.hyper.IoSocket, "client.instrumentation", {clientID: window.hyper.clientID, serviceStatus: typeof window._instrumentation });return "_DONOT_"; })();', client: viewer }, '*')
 	}
 
 	function getImageForModel(info)
@@ -1118,11 +1120,13 @@ $(function()
 			dialog.close()
 			if(state == 'off')
 			{
-				sendUploadFiles(uploadFiles, dialog.viewer)
+				showMessageInSnackbar('Injecting files and calling callbacks')
+				SERVER.sendUploadFiles(uploadFiles, dialog.viewer)
 			}
 			else
 			{
-				executeUploadFiles(uploadFiles, dialog.viewer)
+				showMessageInSnackbar('Injecting and executing JS files.')
+				SERVER.executeUploadFiles(uploadFiles, dialog.viewer)
 			}
 
 		});
@@ -1227,49 +1231,7 @@ $(function()
 	}
 
 
-	function sendUploadFiles(files, viewer)
-	{
-		showMessageInSnackbar('Injecting files and calling callbacks')
-		files.forEach(function(file)
-		{
-			var reader = new FileReader();
-			reader.onload = function(event)
-			{
-				console.dir(event)
-				var filedata = btoa(event.target.result)
-				var fdata = 'var file={data:"'+filedata+'", name: "'+file.name+'", size: "'+file.size+'"}; '
-				fdata += 'if(!window._evofiles){ window._evofiles = [] }; window._evofiles.push(file); '
-				fdata += 'if(window.evo && window.evo.fileCallbacks){ window.evo.fileCallbacks.forEach(function(cb){ cb(file) }) }'
-				console.log('sending file ')
-				console.log(fdata)
-				mMainWindow.postMessage({
-					message: 'eval',
-					code: fdata,
-					client: viewer
-				}, '*')
-			}
-			reader.readAsBinaryString(file);
-		})
-	}
 
-	function executeUploadFiles(files, viewer)
-	{
-		showMessageInSnackbar('Injecting and executing JS files.')
-		files.forEach(function(file)
-		{
-			var reader = new FileReader();
-			reader.onload = function(event)
-			{
-				console.dir(event)
-				mMainWindow.postMessage({
-					message: 'eval',
-					code: event.target.result,
-					client: viewer
-				}, '*')
-			}
-			reader.readAsText(file);
-		})
-	}
 
 	// Set up event listeners.
 	window.addEventListener('message', receiveMessage, false)

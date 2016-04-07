@@ -53,6 +53,7 @@ html, body
 #panel-tool-buttons .btn
 {
 	text-transform: none !important;
+	flex:1
 }
 
 .btn-hyper-toolbar

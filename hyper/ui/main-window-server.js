@@ -27,6 +27,8 @@ var SERVER = require('../server/file-server.js')
 var MONITOR = require('../server/file-monitor.js')
 var LOGGER = require('../server/log.js')
 
+var FS = require('fs')
+
 /**
  * Server/IO functions.
  */
@@ -47,7 +49,58 @@ exports.defineServerFunctions = function(hyper)
 		MONITOR.setFileSystemChangedCallbackFun(function(changedFiles)
 		{
 			// Build changed files and reload.
-			hyper.UI.reloadApp(changedFiles)
+			//
+			// Intercept _filesync directory files and let them go to file upload without reload
+			//
+			console.log('-- changed files callback --')
+			console.dir(changedFiles)
+			var syncFiles = []
+			var normalFiles = []
+			changedFiles.forEach(function(filepath)
+			{
+				if(filepath.indexOf('_filesync') > -1)
+				{
+					syncFiles.push(filepath)
+				}
+				else
+				{
+					normalFiles.push(filepath)
+				}
+			})
+			//
+			//
+			if(normalFiles.length > 0)
+			{
+				hyper.UI.reloadApp(changedFiles)
+			}
+			if(syncFiles.length > 0)
+			{
+				console.log('sync files detected!!')
+				console.dir(syncFiles)
+
+				syncFiles.forEach(function(path)
+				{
+					var ap = SERVER.getBasePath()
+					var fullPath = ap+'/'+path
+					var name = path.substring(path.lastIndexOf('/'+1, path.length))
+					var data = FS.readFileSync(fullPath, 'utf8')
+					var stat = FS.statSync(fullPath)
+					console.log('stat for '+name)
+					console.log(JSON.stringify(stat))
+					console.log('data for '+name)
+					console.dir(data)
+					if(path.indexOf('.js') > -1)
+					{
+						SERVER.executeFileData(data, {})
+					}
+					else
+					{
+						var file = {name:name , size: stat.size, data: window.btoa(data)}
+						SERVER.injectFileData(file, {})
+					}
+					MONITOR.startFileSystemMonitor()
+				})
+			}
 		})
 	}
 
