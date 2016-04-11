@@ -26,6 +26,7 @@ var SETTINGS = require('../settings/settings.js')
 var LOGGER = require('../server/log.js')
 var EVENTS = require('../server/system-events.js')
 var USER_HANDLER = require('../server/user-handler.js')
+const CLIPBOARD = require('electron').clipboard;
 
 /**
  * Setup UI events and button actions.
@@ -237,8 +238,7 @@ exports.defineUIEvents = function(hyper)
 
 	function copyToClipboard(text)
 	{
-		var clipboard = hyper.UI.GUI.Clipboard.get()
-		clipboard.set(text, 'text')
+		CLIPBOARD.writeText(text, 'text')
 	}
 
 	// ************** Test-system-message Button **************

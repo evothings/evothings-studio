@@ -22,6 +22,8 @@ limitations under the License.
 
 /*** Imported modules ***/
 
+const SHELL = require('electron').shell;
+
 var PATH = require('path')
 var OS = require('os')
 var PATH = require('path')
@@ -72,7 +74,7 @@ exports.defineUIFunctions = function(hyper)
 	// https://github.com/rogerwang/node-webkit/wiki/Menu#menucreatemacbuiltinappname
 	function createSystemMenuForOSX()
 	{
-		if ('darwin' == OS.platform())
+		/*if ('darwin' == OS.platform())
 		{
 			try
 			{
@@ -86,7 +88,7 @@ exports.defineUIFunctions = function(hyper)
 			{
 				LOGGER.log('[main-window-func.js] Error creating OS X menubar: ' + ex.message);
 			}
-		}
+		}*/
 	}
 
 	// Helper function that returns the application name
@@ -144,7 +146,7 @@ exports.defineUIFunctions = function(hyper)
 	function setWindowActions()
 	{
 		// Listen to main window's close event
-		hyper.UI.GUI.Window.get().on('close', function()
+		/*hyper.UI.GUI.Window.get().on('close', function()
 		{
 			try
 			{
@@ -162,12 +164,12 @@ exports.defineUIFunctions = function(hyper)
 			}
 
 			hyper.UI.GUI.App.quit()
-		})
+		})*/
 	}
 
 	function saveUIState()
 	{
-		var win = hyper.UI.GUI.Window.get()
+		/*var win = hyper.UI.GUI.Window.get()
 
 		// Do not save if window is minimized on Windows.
 		// On Windows an icon has x,y coords -32000 when
@@ -183,12 +185,12 @@ exports.defineUIFunctions = function(hyper)
 			y: win.y,
 			width: win.width,
 			height: win.height
-			})
+			})*/
 	}
 
 	function restoreSavedUIState()
 	{
-		var geometry = SETTINGS.getProjectWindowGeometry()
+		/*var geometry = SETTINGS.getProjectWindowGeometry()
 		if (geometry)
 		{
 			var win = hyper.UI.GUI.Window.get()
@@ -209,7 +211,7 @@ exports.defineUIFunctions = function(hyper)
 			win.y = geometry.y
 			win.width = geometry.width
 			win.height = geometry.height
-		}
+		}*/
 		// Restore remember me state for logout action
 		var checked = SETTINGS.getRememberMe()
 		hyper.UI.$('#remember-checkbox').attr('checked', checked)
@@ -685,7 +687,8 @@ exports.defineUIFunctions = function(hyper)
 		// Debug logging.
 		LOGGER.log('[main-window-func.js] Open folder: ' + path)
 
-		hyper.UI.GUI.Shell.showItemInFolder(path)
+		//hyper.UI.GUI.Shell.showItemInFolder(path)
+		SHELL.showItemInFolder(path)
 	}
 
 	hyper.UI.setRemoteServerURL = function(url)
@@ -1072,7 +1075,8 @@ exports.defineUIFunctions = function(hyper)
 
 	hyper.UI.openInBrowser = function(url)
 	{
-		hyper.UI.GUI.Shell.openExternal(url)
+		//hyper.UI.GUI.Shell.openExternal(url)
+		SHELL.openExternal(url);
 	}
 
 	hyper.UI.showInitialScreen = function()

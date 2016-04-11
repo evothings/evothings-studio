@@ -28,7 +28,6 @@ limitations under the License.
 
 /*** Imported modules ***/
 
-var GUI = require('nw.gui')
 var UI_FUNC = require('./main-window-func.js')
 var UI_EVENTS = require('./main-window-events.js')
 var UI_SERVER = require('./main-window-server.js')
@@ -63,9 +62,6 @@ hyper.UI.DOM.document = window.document
 
 // Reference to DOM document object.
 hyper.UI.DOM.localStorage = window.localStorage
-
-// Reference to nw.js GUI module.
-hyper.UI.GUI = GUI
 
 // Currently active app path (set when clicking RUN,
 // used to highlight list item).
