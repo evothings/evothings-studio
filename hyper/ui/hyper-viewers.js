@@ -1102,12 +1102,17 @@ $(function()
 
 		files.forEach(function(file)
 		{
+			console.log('------------------------------------------ file')
+			console.dir(file)
+			var name = file.name
+			var size = file.size
 			var reader = new FileReader();
 			reader.onload = function(event)
 			{
 				console.dir(event)
 				var filedata = btoa(event.target.result)
-				injectFileData({file: filedata, viewer: viewer})
+				var file = {name: name, size: size, data: window.btoa(filedata)}
+				injectFileData({file: file, viewer: viewer})
 			}
 			reader.readAsBinaryString(file);
 		})
@@ -1131,6 +1136,8 @@ $(function()
 
 	function injectFileData (arg)
 	{
+		console.log('========================= inectFile data args..===============')
+		console.dir(arg)
 		var file = arg.file
 		var viewer = arg.viewer
 		var fdata = '(function(){var file={data:"'+file.data+'", name: "'+file.name+'", size: "'+file.size+'"}; '
@@ -1163,7 +1170,6 @@ $(function()
 			mCurrentClientList = info.clients
 			mOldClientList = info.clients
 		}
-
 
 		var uploadFiles = []
 		var state = 'off'
