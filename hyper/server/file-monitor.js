@@ -148,6 +148,8 @@ function runFileSystemMonitor()
 	if (changedFiles.length > 0)
 	{
 		mLastTraverseTime = Date.now()
+		console.log('file-monitor changedFiles')
+		console.dir(changedFiles)
 		// File(s) changed, call the changed function and stop monitoring.
 		mFileSystemChangedCallback && mFileSystemChangedCallback(changedFiles)
 	}

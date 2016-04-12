@@ -1219,3 +1219,28 @@ exports.defineUIFunctions = function(hyper)
 		EVENTS.publish(EVENTS.USERMESSAGE, 'This is a test.')
 	}
 }
+
+EVENTS.subscribe(EVENTS.EXECUTEFILEDATA, executeFileData.bind(this))
+EVENTS.subscribe(EVENTS.INJECTFILEDATA,  injectFileData.bind(this))
+
+function injectFileData (arg)
+{
+	console.log('========================= inectFile data args..===============')
+	console.dir(arg)
+	var file = arg.file
+	var viewer = arg.viewer
+	var fdata = '(function(){var file={data:"'+file.data+'", name: "'+file.name+'", size: "'+file.size+'"}; '
+	fdata += 'if(!window._evofiles){ window._evofiles = [] }; window._evofiles.push(file); '
+	fdata += 'if(window.evo && window.evo.fileCallbacks){ window.evo.fileCallbacks.forEach(function(cb){ cb(file) }) };return "_DONOT_";})()'
+	console.log('sending file ')
+	console.log(fdata)
+	SERVER.evalJS(fdata, viewer)
+}
+
+function executeFileData(arg)
+{
+	var filedata = arg.file
+	var viewer = arg.viewer
+	console.log('executeFileData called')
+	SERVER.evalJS('(function(){'+filedata+' ;return "_DONOT_"; })()', viewer)
+}
