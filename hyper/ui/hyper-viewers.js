@@ -1111,7 +1111,7 @@ $(function()
 			{
 				console.dir(event)
 				var filedata = btoa(event.target.result)
-				var file = {name: name, size: size, data: window.btoa(filedata)}
+				var file = {name: name, size: size, data: filedata}
 				injectFileData({file: file, viewer: viewer})
 			}
 			reader.readAsBinaryString(file);
