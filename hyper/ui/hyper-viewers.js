@@ -1097,10 +1097,64 @@ $(function()
 		}
 	}
 
+	function sendUploadFiles (files, viewer)
+	{
+
+		files.forEach(function(file)
+		{
+			var reader = new FileReader();
+			reader.onload = function(event)
+			{
+				console.dir(event)
+				var filedata = btoa(event.target.result)
+				injectFileData({file: filedata, viewer: viewer})
+			}
+			reader.readAsBinaryString(file);
+		})
+	}
+
+	function executeUploadFile (files, viewer)
+	{
+
+		console.log('executeUploadFiles called')
+		files.forEach(function(file)
+		{
+			var reader = new FileReader();
+			reader.onload = function(event)
+			{
+				var filedata = event.target.result
+				executeFileData({filedata: filedata, viewer: viewer})
+			}
+			reader.readAsText(file);
+		})
+	}
+
+	function injectFileData (arg)
+	{
+		var file = arg.file
+		var viewer = arg.viewer
+		var fdata = '(function(){var file={data:"'+file.data+'", name: "'+file.name+'", size: "'+file.size+'"}; '
+		fdata += 'if(!window._evofiles){ window._evofiles = [] }; window._evofiles.push(file); '
+		fdata += 'if(window.evo && window.evo.fileCallbacks){ window.evo.fileCallbacks.forEach(function(cb){ cb(file) }) };return "_DONOT_";})()'
+		console.log('sending file ')
+		console.log(fdata)
+		SERVER.evalJS(fdata, viewer)
+	}
+
+	function executeFileData(arg)
+	{
+		var filedata = arg.file
+		var viewer = arg.viewer
+		console.log('executeFileData called')
+		SERVER.evalJS('(function(){'+filedata+' ;return "_DONOT_"; })()', viewer)
+	}
+
 	function setupEventListeners()
 	{
 		EVENTS.subscribe(EVENTS.VIEWERSUPDATED, onViewersUpdated.bind(this))
 		EVENTS.subscribe(EVENTS.VIEWERSINSTRUMENTATION, onViewersInstrumentation.bind(this))
+		EVENTS.subscribe(EVENTS.EXECUTEFILEDATA, executeFileData.bind(this))
+		EVENTS.subscribe(EVENTS.INJECTFILEDATA,  injectFileData.bind(this))
 		console.log('getting initial list of clients from server '+SERVER)
 		var info = SERVER.getClientInfo()
 		if(info && info.clients)
@@ -1121,12 +1175,12 @@ $(function()
 			if(state == 'off')
 			{
 				showMessageInSnackbar('Injecting files and calling callbacks')
-				SERVER.sendUploadFiles(uploadFiles, dialog.viewer)
+				sendUploadFiles(uploadFiles, dialog.viewer)
 			}
 			else
 			{
 				showMessageInSnackbar('Injecting and executing JS files.')
-				SERVER.executeUploadFiles(uploadFiles, dialog.viewer)
+				executeUploadFile(uploadFiles, dialog.viewer)
 			}
 
 		});

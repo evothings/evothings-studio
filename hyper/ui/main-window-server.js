@@ -26,7 +26,7 @@ var SETTINGS = require('../settings/settings.js')
 var SERVER = require('../server/file-server.js')
 var MONITOR = require('../server/file-monitor.js')
 var LOGGER = require('../server/log.js')
-
+var EVENTS = require('../server/system-events.js')
 var FS = require('fs')
 
 /**
@@ -91,12 +91,14 @@ exports.defineServerFunctions = function(hyper)
 					console.dir(data)
 					if(path.indexOf('.js') > -1)
 					{
-						SERVER.executeFileData(data, {})
+						//SERVER.executeFileData(data, {})
+						EVENTS.publish(EVENTS.EXECUTEFILEDATA,{file: data, viewer:{}} )
 					}
 					else
 					{
 						var file = {name:name , size: stat.size, data: window.btoa(data)}
-						SERVER.injectFileData(file, {})
+						//SERVER.injectFileData(file, {})
+						EVENTS.publish(EVENTS.INJECTFILEDATA,{file: file, viewer:{}} )
 					}
 					MONITOR.startFileSystemMonitor()
 				})
