@@ -28,6 +28,7 @@ var MONITOR = require('../server/file-monitor.js')
 var LOGGER = require('../server/log.js')
 var EVENTS = require('../server/system-events.js')
 var FS = require('fs')
+var APP_SETTINGS = require('../server/app-settings.js')
 
 /**
  * Server/IO functions.
@@ -81,7 +82,14 @@ exports.defineServerFunctions = function(hyper)
 				syncFiles.forEach(function(path)
 				{
 					var ap = SERVER.getBasePath()
+					if(ap.indexOf('/www'))
+					{
+						ap = ap.replace('/www','/app')
+					}
 					var fullPath = ap+'/'+path
+
+					console.log('+++++++++++++++++++++++ fullPath')
+					console.dir(fullPath)
 					var name = path.substring(path.lastIndexOf('/'+1, path.length))
 					var data = FS.readFileSync(fullPath, 'utf8')
 					var stat = FS.statSync(fullPath)
