@@ -1111,8 +1111,9 @@ $(function()
 			{
 				console.dir(event)
 				var filedata = btoa(event.target.result)
-				var file = {name: name, size: size, data: window.btoa(filedata)}
-				injectFileData({file: file, viewer: viewer})
+				var file = {name: name, size: size, data: filedata}
+				//injectFileData({file: file, viewer: viewer})
+				EVENTS.publish(EVENTS.INJECTFILEDATA,{file: file, viewer:{}} )
 			}
 			reader.readAsBinaryString(file);
 		})
@@ -1128,40 +1129,20 @@ $(function()
 			reader.onload = function(event)
 			{
 				var filedata = event.target.result
-				executeFileData({filedata: filedata, viewer: viewer})
+				//executeFileData({filedata: filedata, viewer: viewer})
+				EVENTS.publish(EVENTS.EXECUTEFILEDATA,{file: filedata, viewer:{}} )
 			}
 			reader.readAsText(file);
 		})
 	}
 
-	function injectFileData (arg)
-	{
-		console.log('========================= inectFile data args..===============')
-		console.dir(arg)
-		var file = arg.file
-		var viewer = arg.viewer
-		var fdata = '(function(){var file={data:"'+file.data+'", name: "'+file.name+'", size: "'+file.size+'"}; '
-		fdata += 'if(!window._evofiles){ window._evofiles = [] }; window._evofiles.push(file); '
-		fdata += 'if(window.evo && window.evo.fileCallbacks){ window.evo.fileCallbacks.forEach(function(cb){ cb(file) }) };return "_DONOT_";})()'
-		console.log('sending file ')
-		console.log(fdata)
-		SERVER.evalJS(fdata, viewer)
-	}
 
-	function executeFileData(arg)
-	{
-		var filedata = arg.file
-		var viewer = arg.viewer
-		console.log('executeFileData called')
-		SERVER.evalJS('(function(){'+filedata+' ;return "_DONOT_"; })()', viewer)
-	}
 
 	function setupEventListeners()
 	{
 		EVENTS.subscribe(EVENTS.VIEWERSUPDATED, onViewersUpdated.bind(this))
 		EVENTS.subscribe(EVENTS.VIEWERSINSTRUMENTATION, onViewersInstrumentation.bind(this))
-		EVENTS.subscribe(EVENTS.EXECUTEFILEDATA, executeFileData.bind(this))
-		EVENTS.subscribe(EVENTS.INJECTFILEDATA,  injectFileData.bind(this))
+
 		console.log('getting initial list of clients from server '+SERVER)
 		var info = SERVER.getClientInfo()
 		if(info && info.clients)
