@@ -13,6 +13,8 @@ var Events =
 	VIEWERSUPDATED:         'viewersupdated',
 	VIEWERSINSTRUMENTATION: 'viewersinstrumentation',
     HYPER_RESULT:           'hyper.result',
+    EXECUTEFILEDATA:        'execute_file_data',
+    INJECTFILEDATA:         'inject_file_data',
 
     listeners:  [],
 

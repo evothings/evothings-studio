@@ -677,49 +677,8 @@ exports.getSessionID = function()
 
 exports.sendMessageToServer = sendMessageToServer
 
-exports.sendUploadFiles = function (files, viewer)
-{
-	files.forEach(function(file)
-	{
-		var reader = new FileReader();
-		reader.onload = function(event)
-		{
-			console.dir(event)
-			var filedata = btoa(event.target.result)
-			exports.injectFileData(filedata, viewer)
-		}
-		reader.readAsBinaryString(file);
-	})
-}
 
-exports.injectFileData = function(file, viewer)
-{
-	var fdata = '(function(){var file={data:"'+file.data+'", name: "'+file.name+'", size: "'+file.size+'"}; '
-	fdata += 'if(!window._evofiles){ window._evofiles = [] }; window._evofiles.push(file); '
-	fdata += 'if(window.evo && window.evo.fileCallbacks){ window.evo.fileCallbacks.forEach(function(cb){ cb(file) }) };return "_DONOT_";})()'
-	console.log('sending file ')
-	console.log(fdata)
-	exports.evalJS(fdata, viewer)
-}
 
-exports.executeFileData = function(filedata, viewer)
-{
-	console.log('executeFileData called')
-	exports.evalJS('(function(){'+filedata+' ;return "_DONOT_"; })()', viewer)
-}
 
-exports.executeUploadFiles = function (files, viewer)
-{
-	console.log('executeUploadFiles called')
-	files.forEach(function(file)
-	{
-		var reader = new FileReader();
-		reader.onload = function(event)
-		{
-			var filedata = event.target.result
-			exports.executeFileData(filedata, viewer)
-		}
-		reader.readAsText(file);
-	})
-}
+
 
