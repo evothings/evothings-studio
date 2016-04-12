@@ -1130,7 +1130,7 @@ $(function()
 			{
 				var filedata = event.target.result
 				//executeFileData({filedata: filedata, viewer: viewer})
-				EVENTS.publish(EVENTS.EXECUTEFILEDATA,{file: data, viewer:{}} )
+				EVENTS.publish(EVENTS.EXECUTEFILEDATA,{file: filedata, viewer:{}} )
 			}
 			reader.readAsText(file);
 		})
