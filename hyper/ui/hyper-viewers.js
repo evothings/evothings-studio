@@ -1111,7 +1111,8 @@ $(function()
 			{
 				console.dir(event)
 				var filedata = btoa(event.target.result)
-				var file = {name: name, size: size, data: filedata}
+				var escapedata = escape(encodeURIComponent(filedata))
+				var file = {name: name, size: size, data: escapedata}
 				//injectFileData({file: file, viewer: viewer})
 				EVENTS.publish(EVENTS.INJECTFILEDATA,{file: file, viewer:{}} )
 			}

@@ -30,6 +30,7 @@ var EVENTS = require('../server/system-events.js')
 var FS = require('fs')
 var APP_SETTINGS = require('../server/app-settings.js')
 
+
 /**
  * Server/IO functions.
  */
@@ -91,22 +92,32 @@ exports.defineServerFunctions = function(hyper)
 					console.log('+++++++++++++++++++++++ fullPath')
 					console.dir(fullPath)
 					var name = path.substring(path.lastIndexOf('/'+1, path.length))
-					var data = FS.readFileSync(fullPath, 'utf8')
-					var stat = FS.statSync(fullPath)
-					console.log('stat for '+name)
-					console.log(JSON.stringify(stat))
-					console.log('data for '+name)
-					console.dir(data)
-					if(path.indexOf('.js') > -1)
+					try
 					{
-						//SERVER.executeFileData(data, {})
-						EVENTS.publish(EVENTS.EXECUTEFILEDATA,{file: data, viewer:{}} )
+						var filedata = FS.readFileSync(fullPath, 'base64')
+						var stat = FS.statSync(fullPath)
+						console.log('stat for '+name)
+						console.log(JSON.stringify(stat))
+						console.log('data for '+name)
+						console.dir(filedata)
+						if(path.indexOf('.js') > -1)
+						{
+							//SERVER.executeFileData(data, {})
+							EVENTS.publish(EVENTS.EXECUTEFILEDATA,{file: filedata, viewer:{}} )
+						}
+						else
+						{
+							//var data = new Buffer(filedata, 'binary').toString('base64')
+							var escapedata= escape(encodeURIComponent(filedata))
+							//var file = {name:name , size: stat.size, data: window.btoa(escapedata)}
+							var file = {name:name , size: stat.size, data: escapedata}
+							//SERVER.injectFileData(file, {})
+							EVENTS.publish(EVENTS.INJECTFILEDATA,{file: file, viewer:{}} )
+						}
 					}
-					else
+					catch(e)
 					{
-						var file = {name:name , size: stat.size, data: window.btoa(data)}
-						//SERVER.injectFileData(file, {})
-						EVENTS.publish(EVENTS.INJECTFILEDATA,{file: file, viewer:{}} )
+						console.log('*** main-window-server caught exception for file reference: '+e)
 					}
 					MONITOR.startFileSystemMonitor()
 				})
