@@ -25,9 +25,10 @@ limitations under the License.
 // global browser scope.
 ;(function()
 {
+/*** Electron modules ***/
+const ipcRenderer = require('electron').ipcRenderer
 
 /*** Imported modules ***/
-
 var UI_FUNC = require('./main-window-func.js')
 var UI_EVENTS = require('./main-window-events.js')
 var UI_SERVER = require('./main-window-server.js')
@@ -72,6 +73,16 @@ hyper.UI.activeAppPath = ''
 // This function is called at the end of this file.
 hyper.UI.main = function()
 {
+    // Added to handle Electron ipc events
+    ipcRenderer.on('msg', function(event, arg) {
+      console.log('Sent from tools-workbench-window ', JSON.stringify(arg));
+      if ('eval' == arg.message) {
+        hyper.SERVER.evalJS(arg.code, arg.client)
+      } else if ('setSession' == arg.message) {
+        LOGGER.log('[main-window-func.js] ==== session set to ' + arg.sid)
+      }
+    });
+
     // Define functions on the hyper.UI object.
     UI_FUNC.defineUIFunctions(hyper)
     UI_SERVER.defineServerFunctions(hyper)
