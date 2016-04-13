@@ -21,8 +21,9 @@ limitations under the License.
 */
 
 /*** Imported modules ***/
-
 const SHELL = require('electron').shell;
+const ipcRenderer = require('electron').ipcRenderer
+var MAIN = require('electron').remote.getGlobal('main');
 
 var PATH = require('path')
 var OS = require('os')
@@ -134,9 +135,6 @@ exports.defineUIFunctions = function(hyper)
 			hyper.UI.$('#screen-projects').disableSelection()
 		})
 
-		// Message handler.
-		window.addEventListener('message', receiveMessage, false)
-
 		// Display of file monitor counter.
 		setInterval(function() {
 			hyper.UI.displayNumberOfMonitoredFiles() },
@@ -146,30 +144,16 @@ exports.defineUIFunctions = function(hyper)
 	function setWindowActions()
 	{
 		// Listen to main window's close event
-		/*hyper.UI.GUI.Window.get().on('close', function()
-		{
-			try
-			{
-				saveUIState()
-
-				if (mWorkbenchWindow && !mWorkbenchWindow.closed)
-				{
-					mWorkbenchWindow.window.saveUIState()
-				}
-			}
-			catch(e)
-			{
-				// app is closing; no way to handle errors beyond logging them.
-				LOGGER.log('[main-window-func.js] Error on window close: ' + e);
-			}
-
-			hyper.UI.GUI.App.quit()
-		})*/
+		var win = MAIN.getWorkbenchWindow()
+	        win.on('close', function() {
+		        saveUIState()
+		        this.close(true)
+	        })
 	}
 
 	function saveUIState()
 	{
-		/*var win = hyper.UI.GUI.Window.get()
+		var win = MAIN.getWorkbenchWindow().getBounds()
 
 		// Do not save if window is minimized on Windows.
 		// On Windows an icon has x,y coords -32000 when
@@ -185,15 +169,15 @@ exports.defineUIFunctions = function(hyper)
 			y: win.y,
 			width: win.width,
 			height: win.height
-			})*/
+		})
 	}
 
 	function restoreSavedUIState()
 	{
-		/*var geometry = SETTINGS.getProjectWindowGeometry()
+		var geometry = SETTINGS.getProjectWindowGeometry()
 		if (geometry)
 		{
-			var win = hyper.UI.GUI.Window.get()
+			var win = MAIN.getWorkbenchWindow()
 
 			// Make sure top-left corner is visible.
 			var offsetY = 0
@@ -207,27 +191,11 @@ exports.defineUIFunctions = function(hyper)
 			geometry.y = Math.min(geometry.y, hyper.UI.DOM.screen.height - 200)
 
 			// Set window size.
-			win.x = geometry.x
-			win.y = geometry.y
-			win.width = geometry.width
-			win.height = geometry.height
-		}*/
+			win.setBounds(geometry)
+		}
 		// Restore remember me state for logout action
 		var checked = SETTINGS.getRememberMe()
 		hyper.UI.$('#remember-checkbox').attr('checked', checked)
-	}
-
-	function receiveMessage(event)
-	{
-		//LOGGER.log('[main-window-func.js] Main got : ' + event.data.message)
-		if ('eval' == event.data.message)
-		{
-			hyper.SERVER.evalJS(event.data.code, event.data.client)
-		}
-		else if ('setSession' == event.data.message)
-		{
-			LOGGER.log('[main-window-func.js] ==== session set to '+event.data.sid)
-		}
 	}
 
 	function setUpFileDrop()
@@ -698,30 +666,7 @@ exports.defineUIFunctions = function(hyper)
 
 	hyper.UI.openToolsWorkbenchWindow = function()
 	{
-		if (mWorkbenchWindow && !mWorkbenchWindow.closed)
-		{
-			// Bring existing window to front.
-			mWorkbenchWindow.focus()
-		}
-		else
-		{
-			// Create new window.
-			/* This does not work:
-			mWorkbenchWindow = hyper.UI.GUI.Window.open('tools-window.html', {
-				//position: 'mouse',
-				width: 901,
-				height: 600,
-				focus: true
-			})*/
-			mWorkbenchWindow = window.open(
-				'tools-window.html',
-				'workbench',
-				'resizable=1,width=800,height=600')
-			mWorkbenchWindow.moveTo(50, 50)
-			mWorkbenchWindow.focus()
-			// Establish contact. Not really needed.
-			mWorkbenchWindow.postMessage({ message: 'hyper.hello' }, '*')
-		}
+		MAIN.openToolsWorkbenchWindow()
 	}
 
 	hyper.UI.openViewersWindow = function()
@@ -829,13 +774,9 @@ exports.defineUIFunctions = function(hyper)
 	hyper.UI.setServerMessageFun = function()
 	{
 		// Set server message callback to forward message to the Workbench.
-		hyper.SERVER.setMessageCallbackFun(function(msg)
-		{
-			// TODO: Send string do JSON.stringify on msg.
-			if (mWorkbenchWindow)
-			{
-				mWorkbenchWindow.postMessage(msg, '*')
-			}
+		hyper.SERVER.setMessageCallbackFun(function(msg) {
+		  ipcRenderer.send('tools-workbench-window', msg);
+		  // TODO: Send string do JSON.stringify on msg.
 		})
 	}
 
@@ -1057,25 +998,8 @@ exports.defineUIFunctions = function(hyper)
 		hyper.UI.$('#dialog-remove-app').modal('hide')
 	}
 
-	/*
-	// Unused - documentation is online-only.
-	hyper.UI.openDocumentation = function()
-	{
-		var url = 'file://' + PATH.resolve('./documentation/index.html')
-		hyper.UI.openInBrowser(url)
-	}
-
-	// Unused - documentation is online-only.
-	hyper.UI.openReleaseNotes = function()
-	{
-		var url = 'file://' + PATH.resolve('./documentation/studio/release-notes.html')
-		hyper.UI.openInBrowser(url)
-	}
-	*/
-
 	hyper.UI.openInBrowser = function(url)
 	{
-		//hyper.UI.GUI.Shell.openExternal(url)
 		SHELL.openExternal(url);
 	}
 
