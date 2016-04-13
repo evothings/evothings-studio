@@ -1,12 +1,12 @@
 $(function()
 {
+        /*** Electron modules ***/
+        const ipcRenderer = require('electron').ipcRenderer
+
 	var OS = require('os')
 	var SETTINGS = require('../settings/settings.js')
 	var LOGGER = require('../server/log.js')
-	var GUI = require('nw.gui')
-
-	// Main application window
-	var mMainWindow = window.opener
+	var MAIN = require('electron').remote.getGlobal('main');
 
 	// Editor component.
 	var mEditor = CodeMirror.fromTextArea(document.getElementById('code-editor'),
@@ -33,12 +33,6 @@ $(function()
 
 	$('#button-eval').click(function()
 	{
-		if (!mMainWindow)
-		{
-			showResult('ERR: Could not find main window - report to developer')
-			return
-		}
-
 		if (!mEditor.somethingSelected())
 		{
 			showResult('Select some code to evaluate')
@@ -46,18 +40,12 @@ $(function()
 		}
 
 		var code = mEditor.getSelection()
-		mMainWindow.postMessage({ message: 'eval', code: code }, '*')
+		ipcRenderer.send('workbench-window', { message: 'eval', code: code });
 	})
 
 	// Evaluate in node-webkit. Not used.
 	$('#button-eval-node').click(function()
 	{
-		if (!mMainWindow)
-		{
-			showResult('ERR: Could not find main window - report to developer')
-			return
-		}
-
 		if (!mEditor.somethingSelected())
 		{
 			showResult('Select some code to evaluate')
@@ -212,7 +200,7 @@ $(function()
 		return s
 	}
 
-	function receiveMessage(event)
+	/*function receiveMessage(event)
 	{
 		//LOGGER.log('[user-workbench.js] Workbench got : ' + event.data.message)
 		if ('hyper.hello' == event.data.message)
@@ -227,12 +215,22 @@ $(function()
 		{
 			showResult('RES: ' + event.data.result)
 		}
-	}
+	}*/
+	ipcRenderer.on('msg', function(event, arg) {
+            console.log('Received in tools-workbench-window ', JSON.stringify(arg));
+            if ('hyper.hello' == arg.message) {
+              //mMainWindow = event.source
+            } else if ('hyper.log' == arg.message) {
+              showResult('LOG: ' + arg.logMessage)
+            } else if ('hyper.result' == arg.message) {
+              showResult('RES: ' + arg.result)
+            }
+          }
+        )
 
 	function saveUIState()
 	{
 		// Save editor and log content.
-
 		var maxStorageSize = 100000
 		var editorContent = mEditor.getValue()
 		var resultContent = mResult.getValue()
@@ -250,7 +248,8 @@ $(function()
 
 		// Save window layout.
 
-		var win = GUI.Window.get()
+		//var win = GUI.Window.get()
+		var win = MAIN.getToolsWorkbenchWindow().getBounds()
 
 		// Do not save if window is minimized on Windows.
 		// On Windows an icon has x,y coords -32000 when
@@ -266,7 +265,7 @@ $(function()
 			y: win.y,
 			width: win.width,
 			height: win.height
-			})
+		})
 
 		var layout = $('body').layout()
 		SETTINGS.setWorkbenchWindowDividerPosition(layout.state.south.size)
@@ -287,8 +286,6 @@ $(function()
 		var geometry = SETTINGS.getWorkbenchWindowGeometry()
 		if (geometry)
 		{
-			var win = GUI.Window.get()
-
 			// Make sure top-left corner is visible.
 			var offsetY = 0
 			if ('darwin' == OS.platform())
@@ -301,10 +298,7 @@ $(function()
 			geometry.y = Math.min(geometry.y, screen.height - 200)
 
 			// Set window size.
-			win.x = geometry.x
-			win.y = geometry.y
-			win.width = geometry.width
-			win.height = geometry.height
+			MAIN.getToolsWorkbenchWindow().setBounds(geometry)
 		}
 
 		var size = SETTINGS.getWorkbenchWindowDividerPosition()
@@ -335,9 +329,9 @@ $(function()
 	}
 
 	// Set up event listeners.
-	window.addEventListener('message', receiveMessage, false)
+	//window.addEventListener('message', receiveMessage, false)
 
-	var win = GUI.Window.get()
+	var win = MAIN.getToolsWorkbenchWindow()
 	win.on('close', function()
 	{
 		saveUIState()
