@@ -3,20 +3,26 @@
 const VERSION = '2.1.0 alpha3';
 const electron = require('electron');
 
-//const remote = require('electron').remote;
 const Menu = electron.Menu;
 const MenuItem = electron.MenuItem;
+const ipcMain = electron.ipcMain;
 
-// Module to control application life.
+// Module to control application life
 const app = electron.app;
-// Module to create native browser window.
+
+// Module to create native browser windows
 const BrowserWindow = electron.BrowserWindow;
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 
-function addMenu() {
+// A global object makes it easy to reach functions here via Electron remote
+global.main = {}
+
+var mWorkbenchWindow = null;
+
+main.addMenu = function() {
   var template = [
     {
       label: 'Edit',
@@ -196,36 +202,73 @@ function addMenu() {
   }
 
   var menu = Menu.buildFromTemplate(template);
-  Menu.setApplicationMenu(menu);  
+  Menu.setApplicationMenu(menu);
 }
 
-function createWindow () {
-  // Create the browser window.
+main.createMainWindow = function() {
   mainWindow = new BrowserWindow({
     title: 'Evothings Workbench ' + VERSION,
     icon: 'hyper/ui/images/app-icon.png',
     width: 800, height: 600, webSecurity: false});
 
-  // and load the index.html of the app.
   mainWindow.loadURL('file://' + __dirname + '/hyper/ui/index.html');
-
-  // Open the DevTools.
   mainWindow.webContents.openDevTools();
 
-  // Emitted when the window is closed.
   mainWindow.on('closed', function() {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
     mainWindow = null;
   });
-  
-  addMenu();
+
+  main.addMenu();
 }
+
+main.openToolsWorkbenchWindow = function() {
+  if (mWorkbenchWindow) {
+    mWorkbenchWindow.show()
+  } else {
+    mWorkbenchWindow = new BrowserWindow({
+      title: 'Javascript Tools',
+      width: 800,
+      height: 600,
+      show: false
+    })
+    mWorkbenchWindow.webContents.openDevTools();
+
+    mWorkbenchWindow.on('closed', function() {
+      mWorkbenchWindow = null;
+    });
+
+    mWorkbenchWindow.loadURL('file://' + __dirname + '/hyper/ui/tools-window.html')
+    mWorkbenchWindow.center()
+    mWorkbenchWindow.show()
+  }
+}
+
+// We like to reach these via remote for saving position and extent etc
+main.getToolsWorkbenchWindow = function() {
+  return mWorkbenchWindow;
+}
+
+main.getWorkbenchWindow = function() {
+  return mainWindow;
+}
+
+// Work as relay between our BrowserWindows since they can not talk to
+// each other directly. We simply have one relay handler per window.
+ipcMain.on('workbench-window', function(event, arg) {
+  if (mainWindow) {
+    mainWindow.webContents.send('msg', arg);
+  }
+});
+ipcMain.on('tools-workbench-window', function(event, arg) {
+  if (mWorkbenchWindow) {
+    mWorkbenchWindow.webContents.send('msg', arg);
+  }
+});
+
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
-app.on('ready', createWindow);
+app.on('ready', main.createMainWindow);
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
@@ -240,6 +283,6 @@ app.on('activate', function () {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (mainWindow === null) {
-    createWindow();
+    createMainWindow();
   }
 });
