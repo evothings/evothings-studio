@@ -1230,6 +1230,7 @@ function injectFileData (arg)
 	var file = arg.file
 	var viewer = arg.viewer
 	var fdata = '(function(){var file={data:"'+file.data+'", name: "'+file.name+'", size: "'+file.size+'"}; '
+	fdata += 'file.data = window.atob(decodeURIComponent(unescape(file.data)));'
 	fdata += 'if(!window._evofiles){ window._evofiles = [] }; window._evofiles.push(file); '
 	fdata += 'if(window.evo && window.evo.fileCallbacks){ window.evo.fileCallbacks.forEach(function(cb){ cb(file) }) };return "_DONOT_";})()'
 	console.log('sending file ')
