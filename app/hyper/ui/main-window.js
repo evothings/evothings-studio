@@ -75,13 +75,41 @@ hyper.UI.main = function()
 {
     // Added to handle Electron ipc events
     ipcRenderer.on('msg', function(event, arg) {
-      console.log('Sent from tools-workbench-window ', JSON.stringify(arg));
+      //console.log('Message from tools-workbench-window ', JSON.stringify(arg));
       if ('eval' == arg.message) {
         hyper.SERVER.evalJS(arg.code, arg.client)
       } else if ('setSession' == arg.message) {
         LOGGER.log('[main-window-func.js] ==== session set to ' + arg.sid)
       }
     });
+
+    // Added to handle Electron command messages
+    ipcRenderer.on('command', function(event, arg) {
+      console.log('Command from tools-workbench-window ', JSON.stringify(arg));
+      switch (arg.message) {
+        case 'newApp':
+          hyper.UI.openNewAppDialog()
+          break
+        case 'openToolsWorkbenchWindow':
+          hyper.UI.openToolsWorkbenchWindow()
+	  break
+        case 'openViewersWindow':
+          hyper.UI.openViewersWindow()
+          break
+        case 'openSettingsDialog':
+          hyper.UI.openSettingsDialog()
+          break
+        case 'disconnectAllViewers':
+          hyper.UI.disconnectAllViewers()
+          break
+        case 'gettingStarted':
+          hyper.UI.showTab('getting-started')
+          break
+        case 'shareInSocialMedia':
+          hyper.UI.$('#dialog-share-social').modal('show')
+          break
+      }
+    })
 
     // Define functions on the hyper.UI object.
     UI_FUNC.defineUIFunctions(hyper)

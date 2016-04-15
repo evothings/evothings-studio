@@ -92,7 +92,7 @@ exports.defineUIEvents = function(hyper)
 	{
 		hyper.UI.openInBrowser('https://evothings.com/doc/')
 	})
-	
+
   // ************** FAQ Button **************
 
 	hyper.UI.$('.button-faq').click(function()
@@ -120,7 +120,7 @@ exports.defineUIEvents = function(hyper)
 	{
 		hyper.UI.openInBrowser('https://evothings.com/doc/tutorials/ecmascript6.html')
 	})
-	
+
 	// ************** Instrumentation Documentation Button **************
 
 	hyper.UI.$('.button-instrumentation-documentation').click(function()
@@ -246,6 +246,13 @@ exports.defineUIEvents = function(hyper)
 	hyper.UI.$('#button-test-system-message').click(function()
 	{
 		hyper.UI.testSystemMessage()
+	})
+
+	// ************** Getting Started Tab Button **************
+
+	hyper.UI.$('#button-getting-started').click(function()
+	{
+		hyper.UI.showTab('getting-started')
 	})
 
 	// ************** Examples Tab Button **************
@@ -475,7 +482,7 @@ exports.defineUIEvents = function(hyper)
 		hyper.UI.$('#screen-connect').hide()
 		hyper.UI.$('#screen-examples').hide()
 		hyper.UI.$('#screen-projects').hide()
-		hyper.UI.$('#button-connect, #button-examples, #button-projects')
+		hyper.UI.$('#button-connect, #button-getting-started, #button-examples, #button-projects')
 			.removeClass('et-btn-et-btn-white-only')
 			.addClass('et-btn-stone')
 

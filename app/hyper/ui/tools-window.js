@@ -8,6 +8,19 @@ $(function()
 	var LOGGER = require('../server/log.js')
 	var MAIN = require('electron').remote.getGlobal('main');
 
+        // Listener for messages from main.js
+        ipcRenderer.on('msg', function(event, arg) {
+            console.log('Received in tools-workbench-window ', JSON.stringify(arg));
+            if ('hyper.hello' == arg.message) {
+              //mMainWindow = event.source
+            } else if ('hyper.log' == arg.message) {
+              showResult('LOG: ' + arg.logMessage)
+            } else if ('hyper.result' == arg.message) {
+              showResult('RES: ' + arg.result)
+            }
+          }
+        )
+
 	// Editor component.
 	var mEditor = CodeMirror.fromTextArea(document.getElementById('code-editor'),
 	{
@@ -200,34 +213,6 @@ $(function()
 		return s
 	}
 
-	/*function receiveMessage(event)
-	{
-		//LOGGER.log('[user-workbench.js] Workbench got : ' + event.data.message)
-		if ('hyper.hello' == event.data.message)
-		{
-			mMainWindow = event.source
-		}
-		else if ('hyper.log' == event.data.message)
-		{
-			showResult('LOG: ' + event.data.logMessage)
-		}
-		else if ('hyper.result' == event.data.message)
-		{
-			showResult('RES: ' + event.data.result)
-		}
-	}*/
-	ipcRenderer.on('msg', function(event, arg) {
-            console.log('Received in tools-workbench-window ', JSON.stringify(arg));
-            if ('hyper.hello' == arg.message) {
-              //mMainWindow = event.source
-            } else if ('hyper.log' == arg.message) {
-              showResult('LOG: ' + arg.logMessage)
-            } else if ('hyper.result' == arg.message) {
-              showResult('RES: ' + arg.result)
-            }
-          }
-        )
-
 	function saveUIState()
 	{
 		// Save editor and log content.
@@ -247,9 +232,7 @@ $(function()
 		SETTINGS.setWorkbenchResultEditorContent(resultContent)
 
 		// Save window layout.
-
-		//var win = GUI.Window.get()
-		var win = MAIN.getToolsWorkbenchWindow().getBounds()
+		var geometry = MAIN.getToolsWorkbenchWindow().getBounds()
 
 		// Do not save if window is minimized on Windows.
 		// On Windows an icon has x,y coords -32000 when
@@ -261,10 +244,10 @@ $(function()
 		}
 
 		SETTINGS.setWorkbenchWindowGeometry({
-			x: win.x,
-			y: win.y,
-			width: win.width,
-			height: win.height
+			x: geometry.x,
+			y: geometry.y,
+			width: geometry.width,
+			height: geometry.height
 		})
 
 		var layout = $('body').layout()

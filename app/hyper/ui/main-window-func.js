@@ -153,7 +153,7 @@ exports.defineUIFunctions = function(hyper)
 
 	function saveUIState()
 	{
-		var win = MAIN.getWorkbenchWindow().getBounds()
+		var geometry = MAIN.getWorkbenchWindow().getBounds()
 
 		// Do not save if window is minimized on Windows.
 		// On Windows an icon has x,y coords -32000 when
@@ -164,12 +164,7 @@ exports.defineUIFunctions = function(hyper)
 			return;
 		}
 
-		SETTINGS.setProjectWindowGeometry({
-			x: win.x,
-			y: win.y,
-			width: win.width,
-			height: win.height
-		})
+		SETTINGS.setProjectWindowGeometry(geometry)
 	}
 
 	function restoreSavedUIState()
@@ -671,23 +666,7 @@ exports.defineUIFunctions = function(hyper)
 
 	hyper.UI.openViewersWindow = function()
 	{
-		if (mViewersWindow && !mViewersWindow.closed)
-		{
-			// Bring existing window to front.
-			mViewersWindow.focus()
-		}
-		else
-		{
-			// Create new window.
-			mViewersWindow = window.open(
-				'hyper-viewers.html',
-				'Viewers',
-				'resizable=1,width=800,height=500')
-			mViewersWindow.moveTo(150, 150)
-			mViewersWindow.focus()
-			// Establish contact. Not really needed.
-			mViewersWindow.postMessage({ message: 'hyper.hello' }, '*')
-		}
+	        MAIN.openViewersWindow()
 	}
 
 	hyper.UI.displayConnectStatus = function(status)
