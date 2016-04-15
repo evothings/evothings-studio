@@ -66,8 +66,8 @@ end
 def fetchAndUnpack(pack, url, container, target)
 	return if(Dir::exist?(container+'/'+target))
 	mkdir_p(container)
-	filename = 'build/'+File.basename(URI.parse(url).path)
-	sh("wget --no-check-certificate -c \"#{url}\" -Pbuild")
+	filename = 'downloads/'+File.basename(URI.parse(url).path)
+	sh("wget --no-check-certificate -c \"#{url}\" -Pdownloads")
 	pack.unpack(filename, container, target)
 	raise hell if(!Dir::exist?(container+'/'+target))
 end
@@ -87,10 +87,10 @@ def fetchAndUnzipSingleFile(url, container, source)
 	target = lastPathSegment(source)
 	return if(File.exist?(container+'/'+target))
 	mkdir_p container
-	sh("wget --no-check-certificate -c \"#{url}\" -Pbuild")
-	zipname = 'build/'+lastPathSegment(url)
-	sh("unzip -o -q \"#{zipname}\" \"#{source}\" -d build")
-	mv('build/'+source, container+'/'+target)
+	sh("wget --no-check-certificate -c \"#{url}\" -Pdownloads")
+	zipname = 'downloads/'+lastPathSegment(url)
+	sh("unzip -o -q \"#{zipname}\" \"#{source}\" -d downloads")
+	mv('downloads/'+source, container+'/'+target)
 end
 
 # create a symbolic link pointing to target.

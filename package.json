@@ -10,7 +10,8 @@
     "iconUrl": "(windows only)"
   },
   "scripts": {
-    "deps": "npm install app && ruby init.rb"
+    "libs": "ruby init.rb",
+    "deps": "npm install app",
     "postinstall": "install-app-deps",
     "pack": "build",
     "dist": "build",

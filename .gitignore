@@ -1,9 +1,10 @@
 .DS_Store
 /dist
+/downloads
 /localConfig.rb
 /app/hyper/libs
 /app/node_modules
 /node_modules
 /hyper/server/ui
-/examples
+/app/examples
 /documentation

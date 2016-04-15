@@ -1,7 +1,6 @@
 #!/usr/bin/ruby
 
-# This script will make sure that the folders 'hyper/libs' and
-# 'node_modules' are appropriately populated.
+# This script will make sure that the folders 'app/hyper/libs' and
 # It may fetch files from the Internet.
 
 require 'fileutils'
@@ -49,7 +48,7 @@ def downloadJavaScriptLibraries
 		'app/hyper/libs/jquery')
 	fetch('http://layout.jquery-dev.com/lib/css/layout-default-latest.css',
 		'app/hyper/libs/jquery')
-	fetch('http://code.jquery.com/jquery-2.1.4.min.js', 'hyper/libs/jquery')
+	fetch('http://code.jquery.com/jquery-2.1.4.min.js', 'app/hyper/libs/jquery')
 	fetchAndUnzipSingleFile('http://jqueryui.com/resources/download/jquery-ui-1.11.4.zip',
 		'app/hyper/libs/jquery',
 		'jquery-ui-1.11.4/jquery-ui.min.js')
