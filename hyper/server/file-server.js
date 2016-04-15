@@ -62,6 +62,7 @@ var mHeartbeatTimer = undefined
 var mDeviceInfo = {}
 var mHeartbeatInterval = 20000
 var mCLientInfo = undefined
+var mCloudToken = undefined
 
 // The current base directory. Must NOT end with a slash.
 var mBasePath = ''
@@ -76,12 +77,14 @@ var mBasePath = ''
 exports.connectToRemoteServer = function()
 {
 	LOGGER.log('[file-server.js] Connecting to remote server')
-
+	mCloudToken = SETTINGS.getEvoCloudToken()
+	console.log('cloud token = '+mCloudToken)
 	// Message handler table.
 	var messageHandlers =
 	{
 		// Messages from the server to the Workbench.
 		'workbench.set-session-id': onMessageWorkbenchSetSessionID,
+		'workbench.token-rejected': onMessageWorkbenchTokenRejected,
 		'workbench.set-connect-key': onMessageWorkbenchSetConnectKey,
 		'workbench.client-info': onMessageWorkbenchClientInfo,
 		'client.instrumentation': onMessageWorkbenchClientInstrumentation,
@@ -172,6 +175,12 @@ function onMessageWorkbenchUserLogin(socket, message)
 	}
 }
 
+function onMessageWorkbenchTokenRejected(socket, message)
+{
+	console.log('++++++++++++++++++ Cloud Token Rejected by Proxy !!!!!  ++++++++++++++++++++')
+	EVENTS.publish(EVENTS.OPENTOKENDIALOG, 'Token unidentified!')
+}
+
 function onMessageWorkbenchUserLogout(socket, message)
 {
 	EVENTS.publish(EVENTS.LOGOUT, {event: 'logout'})
@@ -179,21 +188,35 @@ function onMessageWorkbenchUserLogout(socket, message)
 
 function sendMessageToServer(_socket, name, data)
 {
+	//console.log('sendMessage to server called. token is '+mCloudToken)
 	var socket = _socket || mSocket
 	var uuid = SETTINGS.getEvoGUID()
-	/*
-	console.log('[file-server.js] --------------')
-	console.log('[file-server.js] sendMessageToServer: ' + JSON.stringify(data))
-	console.log('[file-server.js] --------------')
-	console.log('[file-server.js] sendMessageToServer -- uuid = '+uuid)
-	*/
-	socket.emit('hyper-workbench-message', {
-		protocolVersion: mProtocolVersion,
-		workbenchVersionCode: mWorkbenchVersionCode,
-		name: name,
-		sessionID: mSessionID,
-		UUID: uuid,
-		data: data })
+	if(!mCloudToken)
+	{
+		mCloudToken = SETTINGS.getEvoCloudToken()
+		if(!mCloudToken)
+		{
+			console.log('trying to open token dialog....')
+			EVENTS.publish(EVENTS.OPENTOKENDIALOG, '')
+		}
+	}
+	else
+	{
+		/*
+		 console.log('[file-server.js] --------------')
+		 console.log('[file-server.js] sendMessageToServer: ' + JSON.stringify(data))
+		 console.log('[file-server.js] --------------')
+		 console.log('[file-server.js] sendMessageToServer -- uuid = '+uuid)
+		*/
+		socket.emit('hyper-workbench-message', {
+			protocolVersion: mProtocolVersion,
+			workbenchVersionCode: mWorkbenchVersionCode,
+			cloudApiToken: mCloudToken,
+			name: name,
+			sessionID: mSessionID,
+			UUID: uuid,
+			data: data })
+	}
 }
 
 function onMessageWorkbenchSetSessionID(socket, message)

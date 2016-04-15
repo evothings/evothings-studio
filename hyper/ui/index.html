@@ -571,7 +571,7 @@ Copyright (c) 2013-2015 Evothings AB
 
 							<p>Go to the <button type="button" class="btn et-btn-stone-no-highlight style-small-button" style="border-radius:0;padding-left:8px;padding-right:8px;">Connect</button> screen and click the <button type="button" class="btn et-btn-green-no-highlight style-small-button">Get Key</button> button to obtain a connect key. Use this key when connecting from the Viewer. Once connected, your session has no time limit. Click the "Get Key" button again if the connect key times out.</p>
 
-							<p>Click <button type="button" class="btn et-btn-blue-no-highlight style-small-button">Login</button> on the Connect screen to get a Quick-Connect button in the Evothings Viewer app. This button is displayed when you restart the Viewer and allows you to reconnect to the Workbench where you are logged in, without entering a connect key again. This makes it much quicker to connect to the same Workbench.</p>
+							<p>Click <button type="button" class="btn et-btn-blue-no-highlight style-small-button">Personalize</button> on the Connect screen to get a Quick-Connect button in the Evothings Viewer app. This button is displayed when you restart the Viewer and allows you to reconnect to the Workbench where you are logged in, without entering a connect key again. This makes it much quicker to connect to the same Workbench.</p>
 
 							<h2>Step 3: How to create a new app</h2>
 
@@ -610,7 +610,7 @@ Copyright (c) 2013-2015 Evothings AB
 						<img class="screen-start-logotype"
 							src="images/logo.svg" alt="Evothings" />
 
-						<h1>Connect and Login</h1>
+						<h1>Connect and Personalize</h1>
 
 						<div class="screen-start-help style-big-para">
 
@@ -634,17 +634,15 @@ Copyright (c) 2013-2015 Evothings AB
 						</div>
 
 						<div class="screen-start-help framed-box style-big-para">
-							<p><strong>Login</strong> to get a quick-connect button in Evothings Viewer. This button is displayed when you restart the Viewer and allows you to reconnect to the Workbench where you are logged in, without entering a connect code.</p>
+							<p><strong>Personalize</strong> to get a quick-connect button in Evothings Viewer. This button is displayed when you restart the Viewer and allows you to reconnect to the Workbench where you are logged in, without entering a connect code.</p>
 						</div>
 
 						<span>
 							<button id="button-login"
 								type="button"
 								class="btn et-btn-blue connect-screen-element">
-								Login
+								Personalize
 							</button>
-							<input id="remember-checkbox" type="checkbox">
-							<label for="remember-checkbox">Remember my Google account on next login</label>
 						</span>
 <!--
 						<div class="screen-start-help framed-box style-big-para">
@@ -690,7 +688,7 @@ Copyright (c) 2013-2015 Evothings AB
 		<div id="panel-bottom">
 			<div>
 				<p style="float:left;">Status: <b><span id="connect-address">Waiting to connect</span></b></p>
-				<p style="float:left;margin-left:25px"><b><span id="login-info">Not Logged In</span></b></p>
+				<p style="float:left;margin-left:25px"><b><span id="login-info"></span></b></p>
 				<p style="float:right;">Viewers: <b><span id="connect-counter">0</span></b> Files: <b><span id="files-counter">0</span></b></p>
 			</div>
 		</div>
@@ -706,6 +704,26 @@ Copyright (c) 2013-2015 Evothings AB
 
 	</div> <!-- panel-page -->
 
+	<dialog class="mdl-dialog" id="tdialog" style="width:480px">
+		<h4 class="mdl-dialog__title">Enter your Cloud API Token</h4>
+		<div class="mdl-dialog__content">
+			<div id="tokentext"></div>
+			<div>
+				<label for="tokeninput">Token:</label>
+				<input class="mdl-textfield__input" type="text" id="tokeninput" name="tokeninput" style="margin:10px"/>
+				<div>
+					If you don't have any token, you can get one for free at http://xxx.yyy.com
+				</div>
+			</div>
+		</div>
+
+		<div class="mdl-dialog__actions">
+			<button type="button" class="mdl-button" id="tokenbutton">Save</button>
+			<button type="button" class="mdl-button close" id="tclose">Close</button>
+		</div>
+	</dialog>
 	<script src="main-window.js"></script>
+
+
 </body>
 </html>

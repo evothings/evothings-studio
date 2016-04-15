@@ -50,6 +50,7 @@ exports.defineUIFunctions = function(hyper)
 
 	hyper.UI.setupUI = function()
 	{
+		ensureCloudApiTokenExists()
 		createSystemMenuForOSX()
 		styleUI()
 		setUIActions()
@@ -57,6 +58,7 @@ exports.defineUIFunctions = function(hyper)
 		setUpFileDrop()
 		restoreSavedUIState()
 		initAppLists()
+
 	}
 
 	function initAppLists()
@@ -65,6 +67,34 @@ exports.defineUIFunctions = function(hyper)
 		readProjectList()
 		hyper.UI.displayAppLists()
 		hyper.UI.setServerMessageFun()
+	}
+
+	function ensureCloudApiTokenExists()
+	{
+		var token = SETTINGS.getEvoCloudToken()
+		var dialog = hyper.UI.$('#tdialog')[0]
+		if(!token)
+		{
+			console.dir(dialog)
+			//dialog.showModal()
+		}
+		else
+		{
+			console.log('existing cloud api token found: '+token)
+		}
+		console.log('------------------ setting up open token dialog listener...')
+		EVENTS.subscribe(EVENTS.OPENTOKENDIALOG, function(message)
+		{
+			console.log('open cloud token dialog')
+			if(message)
+			{
+				hyper.UI.$('#tokentext')[0].innerHTML = message
+			}
+			if(!dialog.open)
+			{
+				dialog.showModal()
+			}
+		})
 	}
 
 	// System menus must be explicitly created on OS X,

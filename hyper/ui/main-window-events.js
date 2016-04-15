@@ -302,11 +302,7 @@ exports.defineUIEvents = function(hyper)
 	// Set login button action handler. The button toggles login/logout.
 	hyper.UI.$('#button-login').click(function()
 	{
-		if (USER_HANDLER.getUser())
-		{
-			logoutUser()
-		}
-		else
+		if (!USER_HANDLER.getUser())
 		{
 			loginUser()
 		}
@@ -321,12 +317,29 @@ exports.defineUIEvents = function(hyper)
 
 	// ************** Remember me checkbox **************
 
+	/*
 	hyper.UI.$('#remember-checkbox').change(function(e)
 	{
 		var remember = e.target.checked;
-		LOGGER.log('[main-window-events.js] remmember me changed value to '+remember);
+		LOGGER.log('[main-window-events.js] remember me changed value to '+remember);
 		SETTINGS.setRememberMe(remember)
 	})
+	*/
+
+	hyper.UI.$('#tokenbutton').click(function()
+	{
+		var dialog = hyper.UI.$('#tdialog')[0]
+		dialog.close()
+		var token = hyper.UI.$('#tokeninput')[0].value
+		console.log('token is '+token)
+		SETTINGS.setEvoCloudToken(token)
+		hyper.UI.$('#tokentext')[0].innerHTML = ""
+	});
+	hyper.UI.$('#tclose').click(function()
+	{
+		hyper.UI.$('#tokentext')[0].innerHTML = ""
+		hyper.UI.$('#tdialog').close()
+	});
 
 
 	// ************** Login Events **************
@@ -349,6 +362,7 @@ exports.defineUIEvents = function(hyper)
 
 		hideLoginScreen()
 		showUserInfo(user)
+		hideLoginButton()
 	})
 
 	EVENTS.subscribe(EVENTS.LOGOUT, function()
@@ -420,6 +434,11 @@ exports.defineUIEvents = function(hyper)
 		hyper.UI.$('#button-login').removeAttr('disabled')
 	}
 
+	function hideLoginButton()
+	{
+		hyper.UI.$('#button-login').hide()
+	}
+
 	function displayLoginButton()
 	{
 		hyper.UI.$('#button-login').html('Login')
@@ -458,7 +477,7 @@ exports.defineUIEvents = function(hyper)
 			hyper.UI.$('#login-info').html(infoHTML)
 
 			// Change login button text to logout.
-			hyper.UI.$('#button-login').html('Logout')
+			//hyper.UI.$('#button-login').html('Logout')
 		}
 		else
 		{

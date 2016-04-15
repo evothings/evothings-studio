@@ -167,9 +167,19 @@ exports.getEvoGUID = function()
 	return uuid
 }
 
-exports.setEvoGUID = function(value)
+exports.setEvoCloudToken = function(value)
 {
 	window.localStorage.setItem('evo-guid', value)
+}
+
+exports.getEvoCloudToken = function()
+{
+	return window.localStorage.getItem('evo-cloudtoken')
+}
+
+exports.setEvoCloudToken = function(value)
+{
+	window.localStorage.setItem('evo-cloudtoken', value)
 }
 
 /**
