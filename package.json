@@ -11,6 +11,7 @@
   },
   "scripts": {
     "libs": "ruby init.rb",
+    "devdeps": "npm install",
     "deps": "npm install app",
     "postinstall": "install-app-deps",
     "pack": "build",

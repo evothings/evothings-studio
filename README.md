@@ -15,9 +15,13 @@ If you wish to build Evothings Studio, here is an overview of the steps required
 
 2. Clone this repository and enter it `git clone git@github.com:evothings/evothings-studio.git && cd evothings-studio`.
 
-3. Run `npm run deps` to get all needed dependencies.
+3. Run `npm run libs` to download all needed js libraries that are not npm modules.
 
-4. Build installers `npm run dist`, you will find them in the `dist` directory.
+4. Run `npm run devdeps` to get all needed npm dependencies for development and building.
+
+5. Run `npm run deps` to get all needed npm dependencies for the application.
+
+6. Build installers `npm run dist`, you will find them in the `dist` directory.
 
 
 ## Info

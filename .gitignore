@@ -5,6 +5,5 @@
 /app/hyper/libs
 /app/node_modules
 /node_modules
-/hyper/server/ui
 /app/examples
 /documentation

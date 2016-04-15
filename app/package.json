@@ -1,5 +1,6 @@
 {
   "name": "evothings-studio",
+  "productName": "Evothings Studio",
   "description": "HTML/JS IoT mobile app development tool",
   "version": "2.1.0",
   "author": "Evothings <info@evothings.com>",
@@ -9,7 +10,7 @@
     "mobile",
     "JavaScript"
   ],
-  "homepage": "http://evothings.com/",
+  "homepage": "https://evothings.com",
   "bugs": {
     "url": "https://github.com/evothings/evothings-studio/issues",
     "email": "info@evothings.com"
@@ -27,7 +28,7 @@
     "mqtt": "^1.7.4"
   },
   "other-dependencies": {
-    "comment": "See functions downloadJavaScriptLibraries and getNodeWebkits in init.rb"
+    "comment": "See functions downloadJavaScriptLibraries in init.rb"
   },
   "private": true
 }
