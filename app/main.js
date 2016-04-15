@@ -28,23 +28,15 @@ main.addMenu = function() {
       submenu: [
         {
           label: 'New App...',
-          role: 'newapp',
           click: function() { mainWindow.webContents.send('command', {message: 'newApp'}) }
         },
         {
           label: 'Getting Started',
-          role: 'gettingstarted',
           click: function() { mainWindow.webContents.send('command', {message: 'gettingStarted'}) }
         },
         {
           label: 'Share in Social Media',
-          role: 'shareinsocialmedia',
           click: function() { mainWindow.webContents.send('command', {message: 'shareInSocialMedia'}) }
-        },
-        {
-          label: 'Quit',
-          accelerator: 'CmdOrCtrl+Q',
-          click: function() { app.quit(); }
         }
       ]
     },
@@ -89,18 +81,15 @@ main.addMenu = function() {
         },
         {
           label: 'Settings',
-          role: 'settings',
           click: function() { mainWindow.webContents.send('command', {message: 'openSettingsDialog'}) }
         }
       ]
     },
     {
       label: 'Viewers',
-      role: 'viewers',
       submenu: [
         {
           label: 'Disconnect all Viewers',
-          role: 'disconnectallviewers',
           click: function() { mainWindow.webContents.send('command', {message: 'disconnectAllViewers'}) }
         }
       ]
@@ -112,13 +101,11 @@ main.addMenu = function() {
         {
           label: 'JavaScript Console',
           accelerator: 'CmdOrCtrl+J',
-          role: 'javacriptconsole',
           click: function() { mainWindow.webContents.send('command', {message: 'openToolsWorkbenchWindow'}) }
         },
         {
           label: 'Viewers Explorer',
           accelerator: 'CmdOrCtrl+E',
-          role: 'viewersexplorer',
           click: function() { mainWindow.webContents.send('command', {message: 'openViewersWindow'}) }
         },
       ]
@@ -232,17 +219,16 @@ main.addMenu = function() {
   ];
 
   if (process.platform == 'darwin') {
-    var name = app.getName();
     template.unshift({
-      label: name,
+      label: 'Evothings Studio',
       submenu: [
-        {
+        /*{
           label: 'About ' + name,
           role: 'about'
         },
         {
           type: 'separator'
-        },
+        },*/
         {
           label: 'Services',
           role: 'services',
@@ -252,7 +238,7 @@ main.addMenu = function() {
           type: 'separator'
         },
         {
-          label: 'Hide ' + name,
+          label: 'Hide Evothings Studio',
           accelerator: 'Command+H',
           role: 'hide'
         },
@@ -272,11 +258,11 @@ main.addMenu = function() {
           label: 'Quit',
           accelerator: 'Command+Q',
           click: function() { app.quit(); }
-        },
+        }
       ]
-    });
+    })
     // Window menu.
-    template[3].submenu.push(
+    template[5].submenu.push(
       {
         type: 'separator'
       },
@@ -285,6 +271,15 @@ main.addMenu = function() {
         role: 'front'
       }
     );
+  } else {
+    // Quit for Linux/Windows
+    template[1].submenu.push(
+      {
+        label: 'Quit',
+        accelerator: 'CmdOrCtrl+Q',
+        click: function() { app.quit(); }
+      }
+    )
   }
 
   var menu = Menu.buildFromTemplate(template);
@@ -332,7 +327,7 @@ main.openViewersWindow = function() {
     viewersWindow.show()
   } else {
     viewersWindow = new BrowserWindow({
-      title: 'Javascript Tools',
+      title: 'Viewers Explorer',
       width: 800,
       height: 600,
       show: false
@@ -392,6 +387,6 @@ app.on('activate', function () {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (mainWindow === null) {
-    createMainWindow();
+    app.createMainWindow();
   }
 });
