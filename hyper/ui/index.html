@@ -201,6 +201,8 @@ Copyright (c) 2013-2015 Evothings AB
 									id="input-setting-reload-server-address"
 									class="form-control"/>
 							</div>
+
+
 						</div>
 
 						<div class="modal-footer">
@@ -638,11 +640,10 @@ Copyright (c) 2013-2015 Evothings AB
 						</div>
 
 						<span>
-							<button id="button-login"
-								type="button"
-								class="btn et-btn-blue connect-screen-element">
-								Personalize
-							</button>
+						<div class="form-group">
+								<label>	Factory Reset:</label>
+								<button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="resetbutton">Can't be undone</button>
+							</div>
 						</span>
 <!--
 						<div class="screen-start-help framed-box style-big-para">
@@ -689,6 +690,12 @@ Copyright (c) 2013-2015 Evothings AB
 			<div>
 				<p style="float:left;">Status: <b><span id="connect-address">Waiting to connect</span></b></p>
 				<p style="float:left;margin-left:25px"><b><span id="login-info"></span></b></p>
+				<button id="button-login"
+						type="button"
+						style="margin-top:-6px; margin-left:5px"
+						class="et-btn-blue mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+					Personalize
+				</button>
 				<p style="float:right;">Viewers: <b><span id="connect-counter">0</span></b> Files: <b><span id="files-counter">0</span></b></p>
 			</div>
 		</div>
@@ -709,7 +716,7 @@ Copyright (c) 2013-2015 Evothings AB
 		<div class="mdl-dialog__content">
 			<div id="tokentext"></div>
 			<div>
-				<label for="tokeninput">Token:</label>
+				<label for="tokeninput">Please Enter Your Token</label>
 				<input class="mdl-textfield__input" type="text" id="tokeninput" name="tokeninput" style="margin:10px"/>
 				<div>
 					If you don't have any token, you can get one for free at http://xxx.yyy.com
@@ -718,8 +725,8 @@ Copyright (c) 2013-2015 Evothings AB
 		</div>
 
 		<div class="mdl-dialog__actions">
-			<button type="button" class="mdl-button" id="tokenbutton">Save</button>
-			<button type="button" class="mdl-button close" id="tclose">Close</button>
+			<button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="tokenbutton">Save</button>
+			<button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="tclose">Close</button>
 		</div>
 	</dialog>
 	<script src="main-window.js"></script>

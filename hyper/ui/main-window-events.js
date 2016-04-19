@@ -26,6 +26,7 @@ var SETTINGS = require('../settings/settings.js')
 var LOGGER = require('../server/log.js')
 var EVENTS = require('../server/system-events.js')
 var USER_HANDLER = require('../server/user-handler.js')
+var SERVER = require('../server/file-server.js')
 
 /**
  * Setup UI events and button actions.
@@ -302,7 +303,9 @@ exports.defineUIEvents = function(hyper)
 	// Set login button action handler. The button toggles login/logout.
 	hyper.UI.$('#button-login').click(function()
 	{
-		if (!USER_HANDLER.getUser())
+		console.log('personalize clicked')
+		var user = USER_HANDLER.getUser()
+		if (user && !user.picture)
 		{
 			loginUser()
 		}
@@ -328,19 +331,27 @@ exports.defineUIEvents = function(hyper)
 
 	hyper.UI.$('#tokenbutton').click(function()
 	{
+		console.log('--------------- token button clicked-------------')
 		var dialog = hyper.UI.$('#tdialog')[0]
 		dialog.close()
 		var token = hyper.UI.$('#tokeninput')[0].value
 		console.log('token is '+token)
 		SETTINGS.setEvoCloudToken(token)
 		hyper.UI.$('#tokentext')[0].innerHTML = ""
+		SERVER.sendConnectMessage()
 	});
 	hyper.UI.$('#tclose').click(function()
 	{
 		hyper.UI.$('#tokentext')[0].innerHTML = ""
 		hyper.UI.$('#tdialog').close()
 	});
-
+	hyper.UI.$('#resetbutton').click(function()
+	{
+		console.log('factory reset clicked')
+		SETTINGS.setEvoCloudToken('')
+		SETTINGS.setSessionID('')
+		SERVER.sendConnectMessage()
+	})
 
 	// ************** Login Events **************
 
@@ -362,7 +373,14 @@ exports.defineUIEvents = function(hyper)
 
 		hideLoginScreen()
 		showUserInfo(user)
-		hideLoginButton()
+		if(user.picture)
+		{
+			hideLoginButton()
+		}
+		else
+		{
+			showLoginButton()
+		}
 	})
 
 	EVENTS.subscribe(EVENTS.LOGOUT, function()
@@ -439,6 +457,11 @@ exports.defineUIEvents = function(hyper)
 		hyper.UI.$('#button-login').hide()
 	}
 
+	function showLoginButton()
+	{
+		hyper.UI.$('#button-login').show()
+	}
+
 	function displayLoginButton()
 	{
 		hyper.UI.$('#button-login').html('Login')
@@ -460,19 +483,27 @@ exports.defineUIEvents = function(hyper)
 
 	function showUserInfo(user)
 	{
-		if (user && user.name && user.picture)
+		if (user && user.name)
 		{
 			// Display user data.
-			if(user.picture.indexOf('http') == -1)
+			var picture = user.picture
+			if(picture)
 			{
-				user.picture = user.EVO_SERVER + '/' + user.picture
+				if (picture.indexOf('http') == -1)
+				{
+					picture = user.EVO_SERVER + '/' + user.picture
+				}
+			}
+			else
+			{
+				picture = 'images/kitty.png'
 			}
 			// Show user picture on login button and change text to "Logout".
 			var imageHTML =
 				'<img style="height:30px;with:auto;margin-right:5px;margin-top:-3px" '
 				+	'class="pull-left" '
-				+	'src="' + user.picture + '">'
-			var infoText = 'Logged in as '+user.name
+				+	'src="' + picture + '">'
+			var infoText = ' '+user.name
 			var infoHTML = imageHTML + infoText
 			hyper.UI.$('#login-info').html(infoHTML)
 
@@ -541,5 +572,7 @@ exports.defineUIEvents = function(hyper)
 		// Display a message for the user.
 		hyper.UI.displaySystemMessage(message)
 	})
+
+	hideLoginButton()
 }
 

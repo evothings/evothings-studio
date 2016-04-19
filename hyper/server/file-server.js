@@ -41,7 +41,7 @@ var EVENTS = require('./system-events.js')
 
 // Workbench version code should be incremented on each new release.
 // The version code can be used by the server to display info.
-var mWorkbenchVersionCode = 6
+var mWorkbenchVersionCode = 7
 
 // Version of the server message protocol implemented on top of socket.io.
 // Increment when the protocol has changed.
@@ -62,7 +62,7 @@ var mHeartbeatTimer = undefined
 var mDeviceInfo = {}
 var mHeartbeatInterval = 20000
 var mCLientInfo = undefined
-var mCloudToken = undefined
+
 
 // The current base directory. Must NOT end with a slash.
 var mBasePath = ''
@@ -77,8 +77,8 @@ var mBasePath = ''
 exports.connectToRemoteServer = function()
 {
 	LOGGER.log('[file-server.js] Connecting to remote server')
-	mCloudToken = SETTINGS.getEvoCloudToken()
-	console.log('cloud token = '+mCloudToken)
+	var cloudToken = SETTINGS.getEvoCloudToken()
+	console.log('cloud token = '+cloudToken)
 	// Message handler table.
 	var messageHandlers =
 	{
@@ -104,6 +104,7 @@ exports.connectToRemoteServer = function()
 		{ 'force new connection': true })
 
 	// Save global reference to socket.io object.
+	console.log('---------------- setting socket')
 	mSocket = socket
 
 	// Connect function.
@@ -117,19 +118,7 @@ exports.connectToRemoteServer = function()
 
 		LOGGER.log('[file-server.js] workbench.connected session: ' + mSessionID)
 
-		var info =
-		{
-			arch: OS.arch(),
-			platform: OS.platform(),
-			osrelease: OS.release(),
-			ostype: OS.type()
-		}
-		var uuid = SETTINGS.getEvoGUID()
-		//LOGGER.log('[file-server.js] ------ uuid = '+uuid)
-		mDeviceInfo = info
-		sendMessageToServer(mSocket, 'workbench.connected', { sessionID: mSessionID, uuid: uuid, info: info })
-		mHeartbeatTimer = setInterval(heartbeat, mHeartbeatInterval)
-		heartbeat()
+		sendConnectMessage()
 	})
 
 	socket.on('error', function(error)
@@ -146,7 +135,7 @@ exports.connectToRemoteServer = function()
 
 	socket.on('hyper-workbench-message', function(message)
 	{
-		//console.log('message = '+message.name)
+		console.log('hyper-workbench-message: message = '+message.name)
 
 		var handler = messageHandlers[message.name]
 		if (handler)
@@ -159,6 +148,23 @@ exports.connectToRemoteServer = function()
 			console.log('HANDLER NOT FOUND for message '+message.name+' !!!')
 		}
 	})
+}
+
+function sendConnectMessage()
+{
+	var info =
+	{
+		arch: OS.arch(),
+		platform: OS.platform(),
+		osrelease: OS.release(),
+		ostype: OS.type()
+	}
+	var uuid = SETTINGS.getEvoGUID()
+	//LOGGER.log('[file-server.js] ------ uuid = '+uuid)
+	mDeviceInfo = info
+	sendMessageToServer(mSocket, 'workbench.connected', { sessionID: mSessionID, uuid: uuid, info: info })
+	mHeartbeatTimer = setInterval(heartbeat, mHeartbeatInterval)
+	heartbeat()
 }
 
 function heartbeat()
@@ -178,7 +184,7 @@ function onMessageWorkbenchUserLogin(socket, message)
 function onMessageWorkbenchTokenRejected(socket, message)
 {
 	console.log('++++++++++++++++++ Cloud Token Rejected by Proxy !!!!!  ++++++++++++++++++++')
-	EVENTS.publish(EVENTS.OPENTOKENDIALOG, 'Token unidentified!')
+	EVENTS.publish(EVENTS.OPENTOKENDIALOG, "We couldn't find the token you provided")
 }
 
 function onMessageWorkbenchUserLogout(socket, message)
@@ -191,10 +197,11 @@ function sendMessageToServer(_socket, name, data)
 	//console.log('sendMessage to server called. token is '+mCloudToken)
 	var socket = _socket || mSocket
 	var uuid = SETTINGS.getEvoGUID()
-	if(!mCloudToken)
+	var cloudToken = SETTINGS.getEvoCloudToken()
+	if(!cloudToken)
 	{
-		mCloudToken = SETTINGS.getEvoCloudToken()
-		if(!mCloudToken)
+		cloudToken = SETTINGS.getEvoCloudToken()
+		if(!cloudToken)
 		{
 			console.log('trying to open token dialog....')
 			EVENTS.publish(EVENTS.OPENTOKENDIALOG, '')
@@ -211,7 +218,7 @@ function sendMessageToServer(_socket, name, data)
 		socket.emit('hyper-workbench-message', {
 			protocolVersion: mProtocolVersion,
 			workbenchVersionCode: mWorkbenchVersionCode,
-			cloudApiToken: mCloudToken,
+			cloudApiToken: cloudToken,
 			name: name,
 			sessionID: mSessionID,
 			UUID: uuid,
@@ -699,6 +706,7 @@ exports.getSessionID = function()
 }
 
 exports.sendMessageToServer = sendMessageToServer
+exports.sendConnectMessage = sendConnectMessage
 
 
 

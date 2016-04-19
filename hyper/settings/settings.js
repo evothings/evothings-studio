@@ -167,10 +167,6 @@ exports.getEvoGUID = function()
 	return uuid
 }
 
-exports.setEvoCloudToken = function(value)
-{
-	window.localStorage.setItem('evo-guid', value)
-}
 
 exports.getEvoCloudToken = function()
 {
@@ -179,6 +175,7 @@ exports.getEvoCloudToken = function()
 
 exports.setEvoCloudToken = function(value)
 {
+	console.log('* setting evo-cloudtoken to '+value)
 	window.localStorage.setItem('evo-cloudtoken', value)
 }
 
