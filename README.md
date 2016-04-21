@@ -8,22 +8,35 @@ You are most welcome to visit [evothings.com](http://evothings.com) to learn mor
 
 ## Building from source
 
-If you wish to build Evothings Studio, here is an overview of the steps required.
+If you wish to build Evothings Studio you need either Linux or OSX. Linux builds Linux32, Linux64 and Windows, but you need an OSX machine to also build for Mac.
 
-Software needed:
+## OSX
 
-* Node.js
-* Ruby
-* Git
-* TODO: Add additional prerequisites
+Easiest is to begin with installing Homebrew (http://brew.sh):
 
-Install node module "flatten-packages" if not installed. On Windows:
+    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+
+Then install prerequisites:
+
+    brew install wget nodejs
+
+Install node module flatten-packages:
 
     npm install -g flatten-packages
 
-On Linux or OS X:
+Then proceed below under heading Build.
+
+## Debian/Ubuntu Linux
+
+Install nodejs, ruby, git, wget:
+
+    sudo apt-get install nodejs ruby git wget
+
+Install node module flatten-packages:
 
     sudo npm install -g flatten-packages
+
+## Building
 
 Clone this repository:
 
@@ -33,7 +46,7 @@ Run init.rb before first build, this will download required repositories:
 
     ruby init.rb
 
-Build with:
+Build only with:
 
     ruby build.rb
 

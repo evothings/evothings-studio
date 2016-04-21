@@ -1006,7 +1006,7 @@ exports.defineUIFunctions = function(hyper)
 
 			// Remove any app-uuid entry from evothings.json in the copied app.
 			// This is done to prevent duplicated app uuids.
-			APP_SETTINGS.generateNewAppUUID(sourceDir)
+			APP_SETTINGS.generateNewAppUUID(targetDir)
 
 			// Add path to "My Apps".
 			hyper.UI.addProject(targetDir)

@@ -10,6 +10,8 @@
 {"path":"examples/microbit-accelerometer"},
 {"path":"examples/microbit-sensors"},
 
+{"path":"examples/rpi3-system-information"},
+
 {"path":"examples/cordova-accelerometer"},
 {"path":"examples/hue-lights"},
 
