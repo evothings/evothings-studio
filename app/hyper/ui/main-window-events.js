@@ -24,7 +24,10 @@ limitations under the License.
 
 var SETTINGS = require('../settings/settings.js')
 var LOGGER = require('../server/log.js')
+var MAIN = require('electron').remote.getGlobal('main');
 var EVENTS = require('../server/system-events.js')
+// Awful, but I am not sure how to get hold of the BrowserWindow.id otherwise
+EVENTS.myID = MAIN.workbenchWindow.id
 var USER_HANDLER = require('../server/user-handler.js')
 const CLIPBOARD = require('electron').clipboard;
 
@@ -290,11 +293,11 @@ exports.defineUIEvents = function(hyper)
 		hyper.UI.saveCopyApp()
 	})
 
-	// ************** Tools Button **************
+	// ************** Console Button **************
 
 	hyper.UI.$('#button-tools').click(function()
 	{
-		hyper.UI.openToolsWorkbenchWindow()
+		hyper.UI.openConsoleWindow()
 	})
 
 	// ************** Viewers Button **************

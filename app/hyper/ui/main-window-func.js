@@ -31,6 +31,8 @@ var PATH = require('path')
 var FSEXTRA = require('fs-extra')
 var FILEUTIL = require('../server/file-util.js')
 var EVENTS = require('../server/system-events.js')
+// Awful, but I am not sure how to get hold of the BrowserWindow.id otherwise
+EVENTS.myID = MAIN.workbenchWindow.id
 var APP_SETTINGS = require('../server/app-settings.js')
 var SETTINGS = require('../settings/settings.js')
 var LOGGER = require('../server/log.js')
@@ -144,16 +146,16 @@ exports.defineUIFunctions = function(hyper)
 	function setWindowActions()
 	{
 		// Listen to main window's close event
-		var win = MAIN.getWorkbenchWindow()
-	        win.on('close', function() {
-		        saveUIState()
-		        this.close(true)
-	        })
+		var win = MAIN.workbenchWindow
+    win.on('close', function() {
+      saveUIState()
+      this.close(true)
+    })
 	}
 
 	function saveUIState()
 	{
-		var geometry = MAIN.getWorkbenchWindow().getBounds()
+		var geometry = MAIN.workbenchWindow.getBounds()
 
 		// Do not save if window is minimized on Windows.
 		// On Windows an icon has x,y coords -32000 when
@@ -172,7 +174,7 @@ exports.defineUIFunctions = function(hyper)
 		var geometry = SETTINGS.getProjectWindowGeometry()
 		if (geometry)
 		{
-			var win = MAIN.getWorkbenchWindow()
+			var win = MAIN.workbenchWindow
 
 			// Make sure top-left corner is visible.
 			var offsetY = 0
@@ -659,14 +661,14 @@ exports.defineUIFunctions = function(hyper)
 		SERVER.setRemoteServerURL(url)
 	}
 
-	hyper.UI.openToolsWorkbenchWindow = function()
+	hyper.UI.openConsoleWindow = function()
 	{
-		MAIN.openToolsWorkbenchWindow()
+		MAIN.openConsoleWindow()
 	}
 
 	hyper.UI.openViewersWindow = function()
 	{
-	        MAIN.openViewersWindow()
+		MAIN.openViewersWindow()
 	}
 
 	hyper.UI.displayConnectStatus = function(status)

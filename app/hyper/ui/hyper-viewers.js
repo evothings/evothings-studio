@@ -1,13 +1,16 @@
 $(function()
 {
-        /*** Electron modules ***/
-        const ipcRenderer = require('electron').ipcRenderer
+  /*** Electron modules ***/
+	const ipcRenderer = require('electron').ipcRenderer
 	var MAIN = require('electron').remote.getGlobal('main');
 	var OS = require('os')
 	var FS = require('fs')
 	var SETTINGS = require('../settings/settings.js')
 	var LOGGER = require('../server/log.js')
 	var EVENTS = require('../server/system-events.js')
+	// Awful, but I am not sure how to get hold of the BrowserWindow.id otherwise
+	EVENTS.myID = MAIN.viewersWindow.id
+	console.log("MyID = " + EVENTS.myID)
 	var SERVER = require('../server/file-server.js')
 	var ALL	= require('node-promise').allOrNone
 	var PROMISE = require('node-promise').defer
@@ -32,7 +35,7 @@ $(function()
 	var SUBSCRIPTION_TIMEOUT = 600000
 	var NETWORK_TIMEOUT = 6000
 
-        ipcRenderer.on('msg', function(event, arg) {
+	ipcRenderer.on('msg', function(event, arg) {
 	  //LOGGER.log('[user-Viewers.js] Viewers got : ' + event.data.message)
 	  switch (arg.message) {
 	    case 'hyper.log':
@@ -41,7 +44,7 @@ $(function()
 	    case 'hyper.result':
 		    showResult('RES: ' + event.data.result)
 	  }
-        })
+	})
 
 	window.hyper = {}
 
@@ -97,7 +100,7 @@ $(function()
 
 		// Save window layout.
 
-		var geometry = MAIN.getViewersWindow().getBounds()
+		var geometry = MAIN.viewersWindow.getBounds()
 
 		// Do not save if window is minimized on Windows.
 		// On Windows an icon has x,y coords -32000 when
@@ -134,7 +137,7 @@ $(function()
 			geometry.y = Math.min(geometry.y, screen.height - 200)
 
 			// Set window size.
-                        MAIN.getViewersWindow().setBounds(geometry)
+	MAIN.viewersWindow.setBounds(geometry)
 		}
 
 	}
@@ -1230,7 +1233,7 @@ $(function()
 		})
 	}
 
-	var win = MAIN.getViewersWindow()
+	var win = MAIN.viewersWindow
 	win.on('close', function()
 	{
 		releaseSubscriptions()

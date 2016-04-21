@@ -11,15 +11,13 @@ const ipcMain = electron.ipcMain
 const app = electron.app
 const BrowserWindow = electron.BrowserWindow
 
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
-let mainWindow
 
-// A global object makes it easy to reach functions here via Electron remote
+// A global object makes it easy to reach windows and functions
+// from BrowserWindows via Electron remote
 global.main = {}
 
-var mWorkbenchWindow = null
-var viewersWindow = null
+// Keeping track of Windows (windowID) listening to each channel
+main.listeners = new Map()
 
 main.addMenu = function() {
   var template = [
@@ -28,15 +26,15 @@ main.addMenu = function() {
       submenu: [
         {
           label: 'New App...',
-          click: function() { mainWindow.webContents.send('command', {message: 'newApp'}) }
+          click: function() { main.workbenchWindow.webContents.send('command', {message: 'newApp'}) }
         },
         {
           label: 'Getting Started',
-          click: function() { mainWindow.webContents.send('command', {message: 'gettingStarted'}) }
+          click: function() { main.workbenchWindow.webContents.send('command', {message: 'gettingStarted'}) }
         },
         {
           label: 'Share in Social Media',
-          click: function() { mainWindow.webContents.send('command', {message: 'shareInSocialMedia'}) }
+          click: function() { main.workbenchWindow.webContents.send('command', {message: 'shareInSocialMedia'}) }
         }
       ]
     },
@@ -81,7 +79,7 @@ main.addMenu = function() {
         },
         {
           label: 'Settings',
-          click: function() { mainWindow.webContents.send('command', {message: 'openSettingsDialog'}) }
+          click: function() { main.workbenchWindow.webContents.send('command', {message: 'openSettingsDialog'}) }
         }
       ]
     },
@@ -90,7 +88,7 @@ main.addMenu = function() {
       submenu: [
         {
           label: 'Disconnect all Viewers',
-          click: function() { mainWindow.webContents.send('command', {message: 'disconnectAllViewers'}) }
+          click: function() { main.workbenchWindow.webContents.send('command', {message: 'disconnectAllViewers'}) }
         }
       ]
     },
@@ -101,12 +99,12 @@ main.addMenu = function() {
         {
           label: 'JavaScript Console',
           accelerator: 'CmdOrCtrl+J',
-          click: function() { mainWindow.webContents.send('command', {message: 'openToolsWorkbenchWindow'}) }
+          click: function() { main.workbenchWindow.webContents.send('command', {message: 'openConsoleWindow'}) }
         },
         {
           label: 'Viewers Explorer',
           accelerator: 'CmdOrCtrl+E',
-          click: function() { mainWindow.webContents.send('command', {message: 'openViewersWindow'}) }
+          click: function() { main.workbenchWindow.webContents.send('command', {message: 'openViewersWindow'}) }
         },
       ]
     },
@@ -286,93 +284,118 @@ main.addMenu = function() {
   Menu.setApplicationMenu(menu);
 }
 
-main.createMainWindow = function() {
-  mainWindow = new BrowserWindow({
+main.createWorkbenchWindow = function() {
+  main.workbenchWindow = new BrowserWindow({
     title: 'Evothings Workbench ' + VERSION,
     icon: 'hyper/ui/images/app-icon.png',
-    width: 800, height: 600, webSecurity: false});
-
-  mainWindow.loadURL('file://' + __dirname + '/hyper/ui/index.html');
-
-  mainWindow.on('closed', function() {
-    mainWindow = null;
+    width: 800, height: 600, webSecurity: false
   });
 
+  main.workbenchWindow.on('closed', function() {
+    main.workbenchWindow = null;
+  });
+  
+  main.workbenchWindow.loadURL('file://' + __dirname + '/hyper/ui/index.html');
   main.addMenu();
+  main.workbenchWindow.center()
+  main.workbenchWindow.show()
 }
 
-main.openToolsWorkbenchWindow = function() {
-  if (mWorkbenchWindow) {
-    mWorkbenchWindow.show()
+main.openConsoleWindow = function() {
+  if (main.consoleWindow) {
+    main.consoleWindow.show()
   } else {
-    mWorkbenchWindow = new BrowserWindow({
+    main.consoleWindow = new BrowserWindow({
       title: 'Javascript Tools',
       width: 800,
       height: 600,
       show: false
     })
 
-    mWorkbenchWindow.on('closed', function() {
-      mWorkbenchWindow = null;
+    main.consoleWindow.on('closed', function() {
+      main.consoleWindow = null;
     });
 
-    mWorkbenchWindow.loadURL('file://' + __dirname + '/hyper/ui/tools-window.html')
-    mWorkbenchWindow.center()
-    mWorkbenchWindow.show()
+    main.consoleWindow.loadURL('file://' + __dirname + '/hyper/ui/tools-window.html')
+    main.consoleWindow.center()
+    main.consoleWindow.show()
   }
 }
 
 main.openViewersWindow = function() {
-  if (viewersWindow) {
-    viewersWindow.show()
+  if (main.viewersWindow) {
+    main.viewersWindow.show()
   } else {
-    viewersWindow = new BrowserWindow({
+    main.viewersWindow = new BrowserWindow({
       title: 'Viewers Explorer',
       width: 800,
       height: 600,
       show: false
     })
 
-    viewersWindow.on('closed', function() {
-      viewersWindow = null;
+    main.viewersWindow.on('closed', function() {
+      main.viewersWindow = null;
     });
 
-    viewersWindow.loadURL('file://' + __dirname + '/hyper/ui/hyper-viewers.html')
-    viewersWindow.center()
-    viewersWindow.show()
+    main.viewersWindow.loadURL('file://' + __dirname + '/hyper/ui/hyper-viewers.html')
+    main.viewersWindow.center()
+    main.viewersWindow.show()
   }
 }
 
-// We like to reach these via remote for saving position and extent etc
-main.getToolsWorkbenchWindow = function() {
-  return mWorkbenchWindow;
-}
-
-main.getWorkbenchWindow = function() {
-  return mainWindow;
-}
-
-main.getViewersWindow = function() {
-  return viewersWindow;
-}
 
 // Work as relay between our BrowserWindows since they can not talk to
 // each other directly. We simply have one relay handler per window.
 ipcMain.on('workbench-window', function(event, arg) {
-  if (mainWindow) {
-    mainWindow.webContents.send('msg', arg);
+  if (main.workbenchWindow) {
+    main.workbenchWindow.webContents.send('msg', arg);
   }
 });
-ipcMain.on('tools-workbench-window', function(event, arg) {
-  if (mWorkbenchWindow) {
-    mWorkbenchWindow.webContents.send('msg', arg);
+ipcMain.on('console-window', function(event, arg) {
+  if (main.consoleWindow) {
+    main.consoleWindow.webContents.send('msg', arg);
+  }
+});
+ipcMain.on('viewers-window', function(event, arg) {
+  if (main.viewersWindow) {
+    main.viewersWindow.webContents.send('msg', arg);
+  }
+});
+
+// This is yet another means of communicating between BrowserWindows
+// but using a publish subscribe model, this was the previous EVENTS module
+ipcMain.on('events-subscribe', function(event, channel, windowID) {
+  var listeners = main.listeners[channel] || new Set()
+  console.log("Subscribed window " + windowID + " to " + channel)
+  listeners.add(windowID) 
+  main.listeners[channel] = listeners
+});
+ipcMain.on('events-unsubscribe', function(event, channel, windowID) {
+  var listeners = main.listeners[channel]
+  if (listeners) {
+    listeners.delete(windowID)
+    console.log("Unsubscribed window " + windowID + " from " + channel)
+  }
+});
+// Forward the event to all registered windows for this channel
+ipcMain.on('events-publish', function(event, channel, obj) {
+  var listeners = main.listeners[channel]
+  console.log("Published "+ JSON.stringify(obj) + " to " + JSON.stringify(channel))
+  if (listeners) {
+    for (let windowID of listeners) {
+      var window = BrowserWindow.fromId(windowID)
+      if (window) {
+        console.log("Sending " + JSON.stringify(obj) + " to " + channel + " in window " + windowID)
+        window.webContents.send('events-event', channel, obj);
+      }
+    }
   }
 });
 
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
-app.on('ready', main.createMainWindow);
+app.on('ready', main.createWorkbenchWindow);
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
@@ -386,7 +409,7 @@ app.on('window-all-closed', function () {
 app.on('activate', function () {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
-  if (mainWindow === null) {
-    app.createMainWindow();
+  if (main.workbenchWindow === null) {
+    app.createWorkbenchWindow();
   }
 });

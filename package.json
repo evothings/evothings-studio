@@ -16,6 +16,6 @@
     "postinstall": "install-app-deps",
     "pack": "build",
     "dist": "build",
-    "start": "electron app"
+    "start": "cd app && electron main.js"
   }
 }

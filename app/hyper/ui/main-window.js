@@ -85,14 +85,13 @@ hyper.UI.main = function()
 
     // Added to handle Electron command messages
     ipcRenderer.on('command', function(event, arg) {
-      console.log('Command from tools-workbench-window ', JSON.stringify(arg));
       switch (arg.message) {
         case 'newApp':
           hyper.UI.openNewAppDialog()
           break
-        case 'openToolsWorkbenchWindow':
-          hyper.UI.openToolsWorkbenchWindow()
-	  break
+        case 'openConsoleWindow':
+          hyper.UI.openConsoleWindow()
+          break
         case 'openViewersWindow':
           hyper.UI.openViewersWindow()
           break

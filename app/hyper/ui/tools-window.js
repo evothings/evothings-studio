@@ -1,25 +1,24 @@
 $(function()
 {
-        /*** Electron modules ***/
-        const ipcRenderer = require('electron').ipcRenderer
+  /*** Electron modules ***/
+  const ipcRenderer = require('electron').ipcRenderer
 
 	var OS = require('os')
 	var SETTINGS = require('../settings/settings.js')
 	var LOGGER = require('../server/log.js')
 	var MAIN = require('electron').remote.getGlobal('main');
 
-        // Listener for messages from main.js
-        ipcRenderer.on('msg', function(event, arg) {
-            console.log('Received in tools-workbench-window ', JSON.stringify(arg));
-            if ('hyper.hello' == arg.message) {
-              //mMainWindow = event.source
-            } else if ('hyper.log' == arg.message) {
-              showResult('LOG: ' + arg.logMessage)
-            } else if ('hyper.result' == arg.message) {
-              showResult('RES: ' + arg.result)
-            }
-          }
-        )
+  // Listener for messages from main.js
+  ipcRenderer.on('msg', function(event, arg) {
+      if ('hyper.hello' == arg.message) {
+        //mMainWindow = event.source
+      } else if ('hyper.log' == arg.message) {
+        showResult('LOG: ' + arg.logMessage)
+      } else if ('hyper.result' == arg.message) {
+        showResult('RES: ' + arg.result)
+      }
+    }
+  )
 
 	// Editor component.
 	var mEditor = CodeMirror.fromTextArea(document.getElementById('code-editor'),
@@ -232,7 +231,7 @@ $(function()
 		SETTINGS.setWorkbenchResultEditorContent(resultContent)
 
 		// Save window layout.
-		var geometry = MAIN.getToolsWorkbenchWindow().getBounds()
+		var geometry = MAIN.consoleWindow.getBounds()
 
 		// Do not save if window is minimized on Windows.
 		// On Windows an icon has x,y coords -32000 when
@@ -281,7 +280,7 @@ $(function()
 			geometry.y = Math.min(geometry.y, screen.height - 200)
 
 			// Set window size.
-			MAIN.getToolsWorkbenchWindow().setBounds(geometry)
+			MAIN.consoleWindow.setBounds(geometry)
 		}
 
 		var size = SETTINGS.getWorkbenchWindowDividerPosition()
@@ -314,7 +313,7 @@ $(function()
 	// Set up event listeners.
 	//window.addEventListener('message', receiveMessage, false)
 
-	var win = MAIN.getToolsWorkbenchWindow()
+	var win = MAIN.consoleWindow
 	win.on('close', function()
 	{
 		saveUIState()
