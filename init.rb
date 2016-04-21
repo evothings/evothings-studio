@@ -10,13 +10,11 @@ require './sibling-repos.rb'
 include FileUtils::Verbose
 
 ### Clone Git repos required for the build, if they do not exist.
-
 siblingRepos.each do |sr|
 	clone(sr.name, sr.url)
 end
 
 ### Load EvoThingsStudio settings into a namespace where they won't conflict with our globals.
-
 module ETS
 	module Foo
 		eval(File.read('./buildPlugin.rb'))
@@ -25,18 +23,7 @@ module ETS
 	#p ETS.methods
 end
 
-### Create package.json.
-
-def createPackageJson
-	content = open('package-template.json') do |file| file.read; end
-	content.gsub!('__VERSION__', ETS.distVersion)
-	content.gsub!('__VERSION_LABEL__', ETS.distVersionLabel)
-	open('package.json', 'w') do |file| file.write(content); end
-end
-
-
 ### Download JavaScript libraries.
-
 def downloadJavaScriptLibraries
 	fetchAndUnpack(ZIP,
 		'http://codemirror.net/codemirror-3.24.zip', 'app/hyper/libs',
@@ -63,7 +50,6 @@ def copyExamples
 end
 
 ### Load custom settings from localConfig.rb
-
 #puts "looking for localConfig..."
 # allow override of defined functions
 if(File.exist?('./localConfig.rb'))
@@ -71,8 +57,5 @@ if(File.exist?('./localConfig.rb'))
 end
 
 ### Run all steps.
-
-#createPackageJson
-#installNodeModules
 downloadJavaScriptLibraries
 copyExamples
