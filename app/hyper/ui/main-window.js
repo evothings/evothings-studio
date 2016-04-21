@@ -25,10 +25,10 @@ limitations under the License.
 // global browser scope.
 ;(function()
 {
+/*** Electron modules ***/
+const ipcRenderer = require('electron').ipcRenderer
 
 /*** Imported modules ***/
-
-var GUI = require('nw.gui')
 var UI_FUNC = require('./main-window-func.js')
 var UI_EVENTS = require('./main-window-events.js')
 var UI_SERVER = require('./main-window-server.js')
@@ -64,9 +64,6 @@ hyper.UI.DOM.document = window.document
 // Reference to DOM document object.
 hyper.UI.DOM.localStorage = window.localStorage
 
-// Reference to nw.js GUI module.
-hyper.UI.GUI = GUI
-
 // Currently active app path (set when clicking RUN,
 // used to highlight list item).
 hyper.UI.activeAppPath = ''
@@ -76,6 +73,43 @@ hyper.UI.activeAppPath = ''
 // This function is called at the end of this file.
 hyper.UI.main = function()
 {
+    // Added to handle Electron ipc events
+    ipcRenderer.on('msg', function(event, arg) {
+      //console.log('Message from tools-workbench-window ', JSON.stringify(arg));
+      if ('eval' == arg.message) {
+        hyper.SERVER.evalJS(arg.code, arg.client)
+      } else if ('setSession' == arg.message) {
+        LOGGER.log('[main-window-func.js] ==== session set to ' + arg.sid)
+      }
+    });
+
+    // Added to handle Electron command messages
+    ipcRenderer.on('command', function(event, arg) {
+      switch (arg.message) {
+        case 'newApp':
+          hyper.UI.openNewAppDialog()
+          break
+        case 'openConsoleWindow':
+          hyper.UI.openConsoleWindow()
+          break
+        case 'openViewersWindow':
+          hyper.UI.openViewersWindow()
+          break
+        case 'openSettingsDialog':
+          hyper.UI.openSettingsDialog()
+          break
+        case 'disconnectAllViewers':
+          hyper.UI.disconnectAllViewers()
+          break
+        case 'gettingStarted':
+          hyper.UI.showTab('getting-started')
+          break
+        case 'shareInSocialMedia':
+          hyper.UI.$('#dialog-share-social').modal('show')
+          break
+      }
+    })
+
     // Define functions on the hyper.UI object.
     UI_FUNC.defineUIFunctions(hyper)
     UI_SERVER.defineServerFunctions(hyper)

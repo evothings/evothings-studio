@@ -24,9 +24,13 @@ limitations under the License.
 
 var SETTINGS = require('../settings/settings.js')
 var LOGGER = require('../server/log.js')
+var MAIN = require('electron').remote.getGlobal('main');
 var EVENTS = require('../server/system-events.js')
+// Awful, but I am not sure how to get hold of the BrowserWindow.id otherwise
+EVENTS.myID = MAIN.workbenchWindow.id
 var USER_HANDLER = require('../server/user-handler.js')
 var SERVER = require('../server/file-server.js')
+const CLIPBOARD = require('electron').clipboard;
 
 /**
  * Setup UI events and button actions.
@@ -238,8 +242,7 @@ exports.defineUIEvents = function(hyper)
 
 	function copyToClipboard(text)
 	{
-		var clipboard = hyper.UI.GUI.Clipboard.get()
-		clipboard.set(text, 'text')
+		CLIPBOARD.writeText(text, 'text')
 	}
 
 	// ************** Test-system-message Button **************
@@ -247,6 +250,13 @@ exports.defineUIEvents = function(hyper)
 	hyper.UI.$('#button-test-system-message').click(function()
 	{
 		hyper.UI.testSystemMessage()
+	})
+
+	// ************** Getting Started Tab Button **************
+
+	hyper.UI.$('#button-getting-started').click(function()
+	{
+		hyper.UI.showTab('getting-started')
 	})
 
 	// ************** Examples Tab Button **************
@@ -284,11 +294,11 @@ exports.defineUIEvents = function(hyper)
 		hyper.UI.saveCopyApp()
 	})
 
-	// ************** Tools Button **************
+	// ************** Console Button **************
 
 	hyper.UI.$('#button-tools').click(function()
 	{
-		hyper.UI.openToolsWorkbenchWindow()
+		hyper.UI.openConsoleWindow()
 	})
 
 	// ************** Viewers Button **************
@@ -324,7 +334,7 @@ exports.defineUIEvents = function(hyper)
 	hyper.UI.$('#remember-checkbox').change(function(e)
 	{
 		var remember = e.target.checked;
-		LOGGER.log('[main-window-events.js] remember me changed value to '+remember);
+		LOGGER.log('[main-window-events.js] remmember me changed value to '+remember);
 		SETTINGS.setRememberMe(remember)
 	})
 	*/
@@ -526,7 +536,7 @@ exports.defineUIEvents = function(hyper)
 		hyper.UI.$('#screen-examples').hide()
 		hyper.UI.$('#screen-projects').hide()
 /*
-		hyper.UI.$('#button-connect, #button-examples, #button-projects ')
+		hyper.UI.$('#button-connect, #button-getting-started, #button-examples, #button-projects')
 			.removeClass('et-btn-et-btn-white-only')
 			.addClass('et-btn-stone')
 */
