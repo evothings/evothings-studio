@@ -17,7 +17,7 @@
     },
     "app-bundle-id": "com.evothings.studio",
     "app-category-type": "public.app-category.developer-tools",
-    "iconUrl": "(windows only)"
+    "iconUrl": "http://evothings.com/evothings-logo.ico"
   },
   "scripts": {
     "libs": "ruby init.rb",
@@ -26,6 +26,8 @@
     "postinstall": "install-app-deps",
     "pack": "build",
     "dist": "build",
+    "dist:win64": "build --platform win32 --arch x64",
+    "dist:win32": "build --platform win32 --arch ia32",
     "start": "cd app && electron main.js"
   }
 }
