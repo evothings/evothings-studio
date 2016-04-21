@@ -1,6 +1,6 @@
 'use strict';
 
-const VERSION = '2.1.0 alpha3'
+const VERSION = '2.1.0-alpha6'
 
 const electron = require('electron')
 const Menu = electron.Menu
@@ -271,7 +271,7 @@ main.addMenu = function() {
     );
   } else {
     // Quit for Linux/Windows
-    template[1].submenu.push(
+    template[0].submenu.push(
       {
         label: 'Quit',
         accelerator: 'CmdOrCtrl+Q',
@@ -306,7 +306,7 @@ main.openConsoleWindow = function() {
     main.consoleWindow.show()
   } else {
     main.consoleWindow = new BrowserWindow({
-      title: 'Javascript Tools',
+      title: 'Javascript Console',
       width: 800,
       height: 600,
       show: false
