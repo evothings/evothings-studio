@@ -1,11 +1,16 @@
 $(function()
 {
+  /*** Electron modules ***/
+	const ipcRenderer = require('electron').ipcRenderer
+	var MAIN = require('electron').remote.getGlobal('main');
 	var OS = require('os')
 	var FS = require('fs')
 	var SETTINGS = require('../settings/settings.js')
 	var LOGGER = require('../server/log.js')
-	var GUI = require('nw.gui')
 	var EVENTS = require('../server/system-events.js')
+	// Awful, but I am not sure how to get hold of the BrowserWindow.id otherwise
+	EVENTS.myID = MAIN.viewersWindow.id
+	console.log("MyID = " + EVENTS.myID)
 	var SERVER = require('../server/file-server.js')
 	var ALL	= require('node-promise').allOrNone
 	var PROMISE = require('node-promise').defer
@@ -15,12 +20,9 @@ $(function()
 
 	var mqtt_client  = ''
 
-	// Main application window
-	var mMainWindow = window.opener
-
 	var mCurrentClients = []
 
-	var	mCurrentClientList = []
+	var mCurrentClientList = []
 	var mOldClientList = []
 
 	var mChartsVisible = []
@@ -33,6 +35,16 @@ $(function()
 	var SUBSCRIPTION_TIMEOUT = 600000
 	var NETWORK_TIMEOUT = 6000
 
+	ipcRenderer.on('msg', function(event, arg) {
+	  //LOGGER.log('[user-Viewers.js] Viewers got : ' + event.data.message)
+	  switch (arg.message) {
+	    case 'hyper.log':
+	      showResult('LOG: ' + event.data.logMessage)
+	      break
+	    case 'hyper.result':
+		    showResult('RES: ' + event.data.result)
+	  }
+	})
 
 	window.hyper = {}
 
@@ -80,23 +92,6 @@ $(function()
 		return s
 	}
 
-	function receiveMessage(event)
-	{
-		//LOGGER.log('[user-Viewers.js] Viewers got : ' + event.data.message)
-		if ('hyper.hello' == event.data.message)
-		{
-			mMainWindow = event.source
-		}
-		else if ('hyper.log' == event.data.message)
-		{
-			showResult('LOG: ' + event.data.logMessage)
-		}
-		else if ('hyper.result' == event.data.message)
-		{
-			showResult('RES: ' + event.data.result)
-		}
-	}
-
 	function saveUIState()
 	{
 		// Save editor and log content.
@@ -105,7 +100,7 @@ $(function()
 
 		// Save window layout.
 
-		var win = GUI.Window.get()
+		var geometry = MAIN.viewersWindow.getBounds()
 
 		// Do not save if window is minimized on Windows.
 		// On Windows an icon has x,y coords -32000 when
@@ -116,12 +111,7 @@ $(function()
 			return;
 		}
 
-		SETTINGS.setViewersWindowGeometry({
-			x: win.x,
-			y: win.y,
-			width: win.width,
-			height: win.height
-		})
+		SETTINGS.setViewersWindowGeometry(geometry)
 
 		var layout = $('body').layout()
 
@@ -135,8 +125,6 @@ $(function()
 		var geometry = SETTINGS.getViewersWindowGeometry()
 		if (geometry)
 		{
-			var win = GUI.Window.get()
-
 			// Make sure top-left corner is visible.
 			var offsetY = 0
 			if ('darwin' == OS.platform())
@@ -149,10 +137,7 @@ $(function()
 			geometry.y = Math.min(geometry.y, screen.height - 200)
 
 			// Set window size.
-			win.x = geometry.x
-			win.y = geometry.y
-			win.width = geometry.width
-			win.height = geometry.height
+			MAIN.viewersWindow.setBounds(geometry)
 		}
 
 	}
@@ -363,7 +348,7 @@ $(function()
 	function requestStatus(viewer)
 	{
 		console.log('....requesting status.....')
-		mMainWindow.postMessage({ message: 'eval', code: '(function(){ hyper.sendMessageToServer(window.hyper.IoSocket, "client.instrumentation", {clientID: window.hyper.clientID, serviceStatus: typeof window._instrumentation });return "_DONOT_"; })();', client: viewer }, '*')
+		ipcRenderer.send('workbench-window', { message: 'eval', code: '(function(){ hyper.sendMessageToServer(window.hyper.IoSocket, "client.instrumentation", {clientID: window.hyper.clientID, serviceStatus: typeof window._instrumentation });return "_DONOT_"; })();', client: viewer })
 	}
 
 	function getImageForModel(info)
@@ -412,7 +397,7 @@ $(function()
 
 	function vibrateClient(viewer)
 	{
-		mMainWindow.postMessage({ message: 'eval', code: 'navigator.vibrate(300)', client: viewer }, '*')
+		ipcRenderer.send('workbench-window', { message: 'eval', code: 'navigator.vibrate(300)', client: viewer })
 	}
 
 	function injectInstrumentationToClient(client)
@@ -467,11 +452,11 @@ $(function()
 				fdata += fd + '; '
 			})
 			console.log('loaded all injectables')
-			mMainWindow.postMessage({
+			ipcRenderer.send('workbench-window', {
 				message: 'eval',
 				code: fdata,
 				client: client
-			}, '*')
+			})
 			console.log('all injectables injected into client with UUID '+client.UUID+'. Evaluating listServices()')
 			requestStatus(client)
 
@@ -530,11 +515,11 @@ $(function()
 
 			mInstrumentationReceivedFrom[message.clientID] = true
 			var client = mCurrentClients[message.clientID]
-			mMainWindow.postMessage({
+			ipcRenderer.send('workbench-window', {
 				message: 'eval',
 				code: 'window.evo.instrumentation.selectHierarchy()',
 				client: client
-			}, '*')
+			})
 			showElement(cdiv)
 			hideElement(sbutton)
 		}
@@ -775,7 +760,7 @@ $(function()
 		console.log('selectHierarchy called for path '+path+' and client ')
 		console.dir(client)
 		waitForTimeout()
-		mMainWindow.postMessage({ message: 'eval', code: 'window.evo.instrumentation.selectHierarchy("'+path+'")', client: client}, '*')
+		ipcRenderer.send('workbench-window', { message: 'eval', code: 'window.evo.instrumentation.selectHierarchy("'+path+'")', client: client})
 	}
 
 	function subscribeToService(path, client)
@@ -783,7 +768,7 @@ $(function()
 		console.log('subscribeToService called for path '+path)
 		waitForTimeout()
 		//subscribeToMqttChannel(client.clientID, path)
-		mMainWindow.postMessage({ message: 'eval', code: 'window.evo.instrumentation.subscribeToService("'+path+'",{}, '+SUBSCRIPTION_INTERVAL+', '+SUBSCRIPTION_TIMEOUT+')', client: client }, '*')
+		ipcRenderer.send('workbench-window', { message: 'eval', code: 'window.evo.instrumentation.subscribeToService("'+path+'",{}, '+SUBSCRIPTION_INTERVAL+', '+SUBSCRIPTION_TIMEOUT+')', client: client })
 	}
 
 	function unsubscribeToService(path, clientID)
@@ -802,7 +787,7 @@ $(function()
 		};
 		snackbarContainer.MaterialSnackbar.showSnackbar(data);
 		waitForTimeout()
-		mMainWindow.postMessage({ message: 'eval', code: 'window.evo.instrumentation.unSubscribeToService("'+path+'","'+sid+'")', client: client }, '*')
+		ipcRenderer.send('workbench-window', { message: 'eval', code: 'window.evo.instrumentation.unSubscribeToService("'+path+'","'+sid+'")', client: client })
 	}
 
 	function subscribeToMqttChannel(clientID, path)
@@ -1153,6 +1138,7 @@ $(function()
 			mOldClientList = info.clients
 		}
 
+
 		var uploadFiles = []
 		var state = 'off'
 
@@ -1275,10 +1261,7 @@ $(function()
 
 
 
-	// Set up event listeners.
-	window.addEventListener('message', receiveMessage, false)
-
-	var win = GUI.Window.get()
+	var win = MAIN.viewersWindow
 	win.on('close', function()
 	{
 		releaseSubscriptions()

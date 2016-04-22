@@ -11,7 +11,7 @@ Copyright (c) 2013-2015 Evothings AB
 	<meta charset="utf-8">
 	<link rel="stylesheet" href="../../node_modules/material-design-lite/material.min.css">
 	<link href="../libs/bootstrap-3.3.5-dist/css/bootstrap.min.css" rel="stylesheet">
-	<script src="../libs/jquery/jquery-2.1.4.min.js"></script>
+	<script>window.$ = window.jQuery = require('../libs/jquery/jquery-2.1.4.min.js');</script>
 	<script src="../libs/jquery/jquery-ui.min.js"></script>
 	<script src="../libs/bootstrap-3.3.5-dist/js/bootstrap.min.js"></script>
 
@@ -42,7 +42,7 @@ Copyright (c) 2013-2015 Evothings AB
 			</div>
 			-->
 
-			<!-- Menu button - version with text -->
+			<!-- Menu button - version with text 
 			<div id="panel-tool-menu">
 				<div class="btn-group btn-group-justified">
 					<!--
@@ -52,7 +52,7 @@ Copyright (c) 2013-2015 Evothings AB
 						aria-haspopup="true" aria-expanded="false">
 						More <span class="caret"></span>
 					</button>
-					-->
+
 					<button type="button" class="btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="button-tool-menu" data-toggle="dropdown"
 							aria-haspopup="true" aria-expanded="false">More</button>
 					<ul class="dropdown-menu">
@@ -80,9 +80,6 @@ Copyright (c) 2013-2015 Evothings AB
 						<li><a id="button-forum"
 							role="button" href="javascript:void(0)">
 							Forum</a></li>
-						<!--<li><a id="button-news"
-							role="button" href="javascript:void(0)">
-							News</a></li>-->
 						<li><a id="button-feedback"
 							role="button" href="javascript:void(0)">
 							Feedback</a></li>
@@ -95,12 +92,9 @@ Copyright (c) 2013-2015 Evothings AB
 						<li><a id="button-open-settings-dialog"
 							role="button" href="javascript:void(0)">
 							Settings</a></li>
-						<!--<li><a id="button-test-system-message"
-							role="button" href="javascript:void(0)">
-							Test system message</a></li>-->
 					</ul>
 				</div>
-			</div>
+			</div>-->
 
 			<div id="panel-tool-buttons">
 				<!-- <div class="btn-group btn-group-justified" role="group"> -->
@@ -109,6 +103,9 @@ Copyright (c) 2013-2015 Evothings AB
 					<a id="button-connect"
 					   class="btn btn-hyper-toolbar et-btn-stone"
 					   href="javascript:void(0)">Connect</a>
+					<a id="button-getting-started"
+					   class="btn btn-hyper-toolbar et-btn-stone"
+					   href="javascript:void(0)">Getting Started</a>
 					<a id="button-examples" role="button"
 						class="btn btn-hyper-toolbar et-btn-stone"
 						href="javascript:void(0)">Examples</a>
@@ -124,10 +121,11 @@ Copyright (c) 2013-2015 Evothings AB
 						-->
 
 					<button type="button" class="btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="button-connect">Connect</button>
+					<button type="button" class="btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="button-getting-started">Getting Started</button>
 					<button type="button" class="btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="button-examples">Examples</button>
 					<button type="button" class="btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="button-projects">My Apps</button>
 					<button type="button" class="btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="button-new-app">New</button>
-					<button type="button" class="btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="button-tools">Tools</button>
+					<button type="button" class="btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="button-tools">Console</button>
 					<button type="button" class="btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="button-viewers">Viewers</button>
 				</div>
 			</div>
@@ -555,7 +553,7 @@ Copyright (c) 2013-2015 Evothings AB
 						<div class="style-big-para style-small-h2">
 							<h1>Getting Started</h1>
 
-							<p>You can view this screen at any time by selecting "Getting Started" in the "More" dropdown menu.</p>
+							<p>You can view this screen at any time by selecting "Getting Started" in the "File" menu.</p>
 
 							<h2>Introduction</h2>
 

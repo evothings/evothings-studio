@@ -1,0 +1,33 @@
+{
+  "homepage": "https://evothings.com",
+  "author": "Evothings <info@evothings.com>",
+  "bugs": {
+    "url": "https://github.com/evothings/evothings-studio/issues",
+    "email": "info@evothings.com"
+  },
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "electron-builder": "^3.5.1",
+    "electron-packager": "^6.0.2",
+    "electron-prebuilt": "^0.37.5"
+  },
+  "build": {
+    "linux": {
+      "vendor": "Evothings <info@evothings.com>"
+    },
+    "app-bundle-id": "com.evothings.studio",
+    "app-category-type": "public.app-category.developer-tools",
+    "iconUrl": "http://evothings.com/evothings-logo.ico"
+  },
+  "scripts": {
+    "libs": "ruby init.rb",
+    "devdeps": "npm install",
+    "deps": "npm install app",
+    "postinstall": "install-app-deps",
+    "pack": "build",
+    "dist": "build",
+    "dist:win64": "build --platform win32 --arch x64",
+    "dist:win32": "build --platform win32 --arch ia32",
+    "start": "cd app && electron main.js"
+  }
+}
