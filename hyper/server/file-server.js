@@ -167,6 +167,23 @@ function sendConnectMessage()
 	heartbeat()
 }
 
+function sendResetMessage()
+{
+	var info =
+	{
+		arch: OS.arch(),
+		platform: OS.platform(),
+		osrelease: OS.release(),
+		ostype: OS.type()
+	}
+	var uuid = SETTINGS.getEvoGUID()
+	//LOGGER.log('[file-server.js] ------ uuid = '+uuid)
+	mDeviceInfo = info
+	sendMessageToServer(mSocket, 'workbench.factory-reset', { sessionID: mSessionID, uuid: uuid, info: info })
+	mHeartbeatTimer = setInterval(heartbeat, mHeartbeatInterval)
+	heartbeat()
+}
+
 function heartbeat()
 {
 	var uuid = SETTINGS.getEvoGUID()
@@ -184,7 +201,7 @@ function onMessageWorkbenchUserLogin(socket, message)
 function onMessageWorkbenchTokenRejected(socket, message)
 {
 	console.log('++++++++++++++++++ Cloud Token Rejected by Proxy !!!!!  ++++++++++++++++++++')
-	EVENTS.publish(EVENTS.OPENTOKENDIALOG, "We couldn't find the token you provided")
+	EVENTS.publish(EVENTS.OPENTOKENDIALOG, message.reason || "We couldn't find the token you provided")
 }
 
 function onMessageWorkbenchUserLogout(socket, message)
@@ -707,6 +724,7 @@ exports.getSessionID = function()
 
 exports.sendMessageToServer = sendMessageToServer
 exports.sendConnectMessage = sendConnectMessage
+exports.sendresetMessage = sendResetMessage
 
 
 
