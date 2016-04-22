@@ -284,6 +284,10 @@ main.addMenu = function() {
   Menu.setApplicationMenu(menu);
 }
 
+main.getAppPath = function() {
+  return app.getAppPath()
+}
+
 main.createWorkbenchWindow = function() {
   main.workbenchWindow = new BrowserWindow({
     title: 'Evothings Workbench ' + VERSION,
