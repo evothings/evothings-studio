@@ -403,19 +403,19 @@ $(function()
 	function injectInstrumentationToClient(client)
 	{
 		var wd = global.require.main.filename+'../'
-		wd = wd.replace('index.html','')
+		wd = wd.replace('hyper-viewers.html','')
 		document.getElementById('p2').style.display="block"
 		console.log('------------------------------------------------------------- injecting instrumentation into client '+client.name+' from directory '+wd+', to client '+client.UUID)
 		var files =
 		[
-			'./injectables/util.js',
-			'./injectables/mqttws31.js',
-			'./injectables/easyble.js',
-			'./injectables/instrumentation-manager.js',
-			'./injectables/bluetooth-instrumentation.js',
-			'./injectables/cordova-instrumentation.js',
-			'./injectables/watcher-instrumentation.js',
-			'./injectables/instrumentation-starter.js'
+			'/injectables/util.js',
+			'/injectables/mqttws31.js',
+			'/injectables/easyble.js',
+			'/injectables/instrumentation-manager.js',
+			'/injectables/bluetooth-instrumentation.js',
+			'/injectables/cordova-instrumentation.js',
+			'/injectables/watcher-instrumentation.js',
+			'/injectables/instrumentation-starter.js'
 		]
 		var promises = []
 		var count = 0
@@ -909,7 +909,7 @@ $(function()
 
 	function plotServiceData(_time, servicedata, clientID, path, channels)
 	{
-		var time = parseInt(_time)
+		var time = Date.now()
 		var chart = getChartForPath(clientID, path, channels)
 		//console.log('plotservicedata got chart '+chart)
 		//console.dir(chart)
