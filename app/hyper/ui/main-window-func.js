@@ -786,7 +786,7 @@ exports.defineUIFunctions = function(hyper)
 	{
 		// Set server message callback to forward message to the Workbench.
 		hyper.SERVER.setMessageCallbackFun(function(msg) {
-		  ipcRenderer.send('tools-workbench-window', msg);
+		  ipcRenderer.send('console-window', msg);
 		  // TODO: Send string do JSON.stringify on msg.
 		})
 	}
