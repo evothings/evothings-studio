@@ -17,7 +17,8 @@
     },
     "app-bundle-id": "com.evothings.studio",
     "app-category-type": "public.app-category.developer-tools",
-    "iconUrl": "http://evothings.com/evothings-logo.ico"
+    "iconUrl": "http://evothings.com/evothings-logo.ico",
+    "asar-unpack-dir": "examples"
   },
   "scripts": {
     "libs": "ruby init.rb",
