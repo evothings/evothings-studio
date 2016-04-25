@@ -284,6 +284,10 @@ main.addMenu = function() {
   Menu.setApplicationMenu(menu);
 }
 
+main.getAppPath = function() {
+  return app.getAppPath()
+}
+
 main.createWorkbenchWindow = function() {
   main.workbenchWindow = new BrowserWindow({
     title: 'Evothings Workbench ' + VERSION,
@@ -410,6 +414,6 @@ app.on('activate', function () {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (main.workbenchWindow === null) {
-    app.createWorkbenchWindow();
+    main.createWorkbenchWindow();
   }
 });
