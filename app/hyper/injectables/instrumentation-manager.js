@@ -87,7 +87,7 @@ var me = window.evo.instrumentation =
 				{
 					var mqtt_message = new Paho.MQTT.Message(JSON.stringify(message))
 					mqtt_message.destinationName = '/instrumentation/'+window.hyper.clientID+'/'+path
-					hyper.log('sending data to '+mqtt_message.destinationName)
+					//hyper.log('sending data to '+mqtt_message.destinationName)
 					window.evo.instrumentation.mqttclient.send(mqtt_message)
 				}
 				else
@@ -123,7 +123,7 @@ var me = window.evo.instrumentation =
 	}
 }
 
-/*
+
 window.evo.instrumentation.mqttclient = new Paho.MQTT.Client('vernemq.evothings.com', 8084, window.hyper.clientID)
 var options = {
 	useSSL: true,
@@ -138,4 +138,3 @@ var options = {
 	}
 }
 window.evo.instrumentation.mqttclient.connect(options);
-	*/
