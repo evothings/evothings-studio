@@ -11,15 +11,16 @@ It's easy, get all dependencies first with `npm run install` and then start it w
 Evothings Studio is an [Electron](http://electron.atom.io) application and can be easily built for both Windows, OSX and Linux. We use [electron-builder](https://github.com/electron-userland/electron-builder) to produce our installers.
 If you wish to build Evothings Studio, here is an overview of the steps required.
 
-1. Make sure you have [NodeJS](https://nodejs.org/en/download/) installed which includes npm. Also make sure you have git and ruby.
+1. Make sure you have [NodeJS](https://nodejs.org/en/download/) installed which includes npm.
+ - Ubuntu 14.04 LTS: The regular nodejs is too old, [use this instead](https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions). Also make sure you have git and unzip, get them with `sudo apt-get install git unzip`.
 
 2. Clone this repository and enter it `git clone git@github.com:evothings/evothings-studio.git && cd evothings-studio`.
 
-3. Run `npm run libs` to download all needed js libraries that are not npm modules.
+3. Run `npm run libs` to download all needed js libraries that are not npm modules, it also clones a few extra repositories in `..`.
 
 4. Run `npm run devdeps` to get all needed npm dependencies for development and building.
 
-5. Run `npm run deps` to get all needed npm dependencies for the application.
+5. Run `npm run deps` to get all needed npm dependencies for the application itself.
 
 6. Build installers `npm run dist`, you will find them in the `dist` directory.
 

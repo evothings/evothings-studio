@@ -5,6 +5,10 @@
     "url": "https://github.com/evothings/evothings-studio/issues",
     "email": "info@evothings.com"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/evothings/evothings-studio.git"
+  },
   "license": "Apache-2.0",
   "devDependencies": {
     "electron-builder": "^3.5.1",
@@ -24,7 +28,6 @@
     "libs": "ruby init.rb",
     "devdeps": "npm install",
     "deps": "npm install app",
-    "postinstall": "install-app-deps",
     "pack": "build",
     "dist": "build --platform linux --platform win32 --platform darwin --arch all",
     "dist:darwin": "build --platform darwin --arch x64",
