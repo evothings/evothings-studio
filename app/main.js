@@ -284,8 +284,8 @@ main.addMenu = function() {
   Menu.setApplicationMenu(menu);
 }
 
-main.getAppPath = function() {
-  return app.getAppPath()
+main.getRootDir = function() {
+  return __dirname
 }
 
 main.createWorkbenchWindow = function() {
