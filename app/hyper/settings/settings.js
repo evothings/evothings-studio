@@ -21,7 +21,9 @@ limitations under the License.
 */
 
 var FILEUTIL = require('../server/file-util.js')
+var PATH = require('path')
 var UUID = require('../server/uuid.js')
+var MAIN = require('electron').remote.getGlobal('main')
 
 exports.set = function(key, value)
 {
@@ -221,7 +223,9 @@ exports.getProjectList = function(list)
 
 exports.getExampleList = function(list)
 {
-	var json = FILEUTIL.readFileSync('./hyper/settings/example-list.json')
+  var path = MAIN.getRootDir()
+  var fullPath = PATH.join(path, 'hyper/settings/example-list.json')
+	var json = FILEUTIL.readFileSync(fullPath)
 	if (json)
 	{
 		return JSON.parse(fixWin32PathDelimiters(json))
