@@ -730,7 +730,7 @@ exports.getSessionID = function()
 
 exports.sendMessageToServer = sendMessageToServer
 exports.sendConnectMessage = sendConnectMessage
-exports.sendresetMessage = sendResetMessage
+exports.sendResetMessage = sendResetMessage
 
 
 

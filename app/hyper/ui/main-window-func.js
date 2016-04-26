@@ -51,7 +51,7 @@ exports.defineUIFunctions = function(hyper)
 	var mConnectKeyTimer
 	var mProjectList = []
 	var mExampleList = []
-	var mWorkbenchPath = MAIN.getAppPath() //process.cwd()
+	var mWorkbenchPath = MAIN.getRootDir() //process.cwd()
 
 	hyper.UI.setupUI = function()
 	{

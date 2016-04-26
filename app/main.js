@@ -300,8 +300,8 @@ main.getCurrentViewers = function()
 //
 //
 
-main.getAppPath = function() {
-  return app.getAppPath()
+main.getRootDir = function() {
+  return __dirname
 }
 
 main.createWorkbenchWindow = function() {
