@@ -308,7 +308,7 @@ main.createWorkbenchWindow = function() {
   main.workbenchWindow = new BrowserWindow({
     title: 'Evothings Workbench ' + VERSION,
     icon: 'hyper/ui/images/app-icon.png',
-    width: 800, height: 600, webSecurity: false
+    width: 800, height: 720, webSecurity: false
   });
 
   main.workbenchWindow.on('closed', function() {
