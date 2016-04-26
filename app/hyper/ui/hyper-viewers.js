@@ -909,7 +909,7 @@ $(function()
 
 	function plotServiceData(_time, servicedata, clientID, path, channels)
 	{
-		var time = parseInt(_time)
+		var time = Date.now(); // parseInt(_time)
 		var chart = getChartForPath(clientID, path, channels)
 		//console.log('plotservicedata got chart '+chart)
 		//console.dir(chart)
