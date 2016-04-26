@@ -284,6 +284,22 @@ main.addMenu = function() {
   Menu.setApplicationMenu(menu);
 }
 
+//
+//  TODO: Create a generic way to hold app state
+//
+main.setCurrentViewers = function(data)
+{
+  main.currentViewers = data
+}
+
+main.getCurrentViewers = function()
+{
+  return main.currentViewers
+}
+//
+//
+//
+
 main.getAppPath = function() {
   return app.getAppPath()
 }
@@ -298,6 +314,8 @@ main.createWorkbenchWindow = function() {
   main.workbenchWindow.on('closed', function() {
     main.workbenchWindow = null;
   });
+
+
   
   main.workbenchWindow.loadURL('file://' + __dirname + '/hyper/ui/index.html');
   main.addMenu();

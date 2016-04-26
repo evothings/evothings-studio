@@ -68,6 +68,8 @@ hyper.UI.DOM.localStorage = window.localStorage
 // used to highlight list item).
 hyper.UI.activeAppPath = ''
 
+
+
 /*** Main setup function ***/
 
 // This function is called at the end of this file.
@@ -128,5 +130,6 @@ hyper.UI.main = function()
 
 // Call main function to setup UI and server.
 hyper.UI.main()
+module.exports.hyper = hyper
 
 })() // End of closure wrapper.

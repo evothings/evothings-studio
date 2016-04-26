@@ -24,6 +24,8 @@ limitations under the License.
 /***	 Imported modules	   ***/
 /*********************************/
 
+var MAIN = require('electron').remote.getGlobal('main');
+
 var OS = require('os')
 var FS = require('fs')
 var PATH = require('path')
@@ -61,9 +63,9 @@ var mCheckIfModifiedSince = false
 var mHeartbeatTimer = undefined
 var mDeviceInfo = {}
 var mHeartbeatInterval = 20000
-var mCLientInfo = undefined
+exports.mClientInfo = undefined
 
-
+mFoo = UUID.generateUUID()
 // The current base directory. Must NOT end with a slash.
 var mBasePath = ''
 
@@ -277,13 +279,15 @@ function onMessageWorkbenchSetConnectKey(socket, message)
 function onMessageWorkbenchClientInfo(socket, message)
 {
 	//console.log('[file-server.js] got client info')
-	//console.dir(message)
+	console.dir(message)
 
 	// Notify UI about clients.
 	EVENTS.publish(EVENTS.VIEWERSUPDATED, message.data)
-	mCLientInfo = message.data
-
-	mClientInfoCallback && mClientInfoCallback(message)
+	exports.mClientInfo = message.data
+	console.log('=======================================  '+mFoo+'  ================SERVER clientinfo')
+	console.dir(exports.mClientInfo)
+	MAIN.setCurrentViewers(message.data)
+	exports.mClientInfoCallback && mClientInfoCallback(message)
 }
 
 function onMessageWorkbenchClientInstrumentation(socket, message)
@@ -613,7 +617,9 @@ exports.getUserKey = function()
 
 exports.getClientInfo = function()
 {
-	return mCLientInfo
+	console.log('++++++++++++++++++++++++++ '+mFoo+' ++++++++++SERVER.getClientInfo returning')
+	console.dir(exports.mClientInfo)
+	return exports.mClientInfo
 }
 
 /**

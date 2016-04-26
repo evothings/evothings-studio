@@ -3,6 +3,7 @@ $(function()
   /*** Electron modules ***/
 	const ipcRenderer = require('electron').ipcRenderer
 	var MAIN = require('electron').remote.getGlobal('main');
+
 	var OS = require('os')
 	var FS = require('fs')
 	var SETTINGS = require('../settings/settings.js')
@@ -246,6 +247,9 @@ $(function()
 		var span2 = document.createElement('span')
 		span2.id = viewer.clientID + '_applabel'
 		span2.innerHTML = '<b>['+viewer.currentproject+']</b>'
+		var span3 = document.createElement('span')
+		span3.id = viewer.clientID + '_latency'
+
 		var img = document.createElement('img')
 		img.style.width='20px'
 		img.style.height = '35px'
@@ -273,6 +277,7 @@ $(function()
 		div.appendChild(imgrow)
 		div.appendChild(span)
 		div.appendChild(span2)
+		div.appendChild(span3)
 		addMenuToClient(viewer, rowdiv)
 		var cdiv = document.createElement('ul')
 		cdiv.className = "treestyle"
@@ -348,7 +353,7 @@ $(function()
 	function requestStatus(viewer)
 	{
 		console.log('....requesting status.....')
-		ipcRenderer.send('workbench-window', { message: 'eval', code: '(function(){ hyper.sendMessageToServer(window.hyper.IoSocket, "client.instrumentation", {clientID: window.hyper.clientID, serviceStatus: typeof window._instrumentation });return "_DONOT_"; })();', client: viewer })
+		ipcRenderer.send('workbench-window', { message: 'eval', code: '(function(){ hyper.sendMessageToServer(window.hyper.IoSocket, "client.instrumentation", {clientID: window.hyper.clientID, serviceStatus: typeof window._instrumentation, startTime: '+Date.now()+' });return "_DONOT_"; })();', client: viewer })
 	}
 
 	function getImageForModel(info)
@@ -501,7 +506,8 @@ $(function()
 
 	function setViewerServiceStatus(message)
 	{
-		//console.log('-- got serviceStatus back: '+message.serviceStatus)
+		console.log('-- got serviceStatus back: '+message.serviceStatus)
+		console.dir(message)
 		var ball = document.getElementById(message.clientID+'_ball')
 		var sbutton = document.getElementById(message.clientID + '_sbutton')
 		var cdiv = document.getElementById(message.clientID + '.serviceroot')
@@ -535,6 +541,10 @@ $(function()
 			showElement(sbutton)
 			hideElement(cdiv)
 		}
+		var latencyNode = document.getElementById(message.clientID+'_latency')
+		var startTime= message.startTime
+		var diff = Date.now() -  parseInt(startTime)
+		latencyNode.innerHTML = 'Latency: '+diff+'ms'
 	}
 
 	function saveServiceSubscription(clientID, serviceSubscription)
@@ -1132,7 +1142,10 @@ $(function()
 		EVENTS.subscribe(EVENTS.VIEWERSINSTRUMENTATION, onViewersInstrumentation.bind(this))
 
 		console.log('getting initial list of clients from server '+SERVER)
-		var info = SERVER.getClientInfo()
+		console.dir(SERVER)
+		//var info = SERVER.getClientInfo.bind(SERVER)()
+		var info = MAIN.getCurrentViewers()
+		console.dir(info)
 		if(info && info.clients)
 		{
 			renderViewersFromList(info.clients)
