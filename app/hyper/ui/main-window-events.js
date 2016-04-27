@@ -358,9 +358,9 @@ exports.defineUIEvents = function(hyper)
 	hyper.UI.$('#resetbutton').click(function()
 	{
 		console.log('factory reset clicked')
+		SERVER.sendResetMessage()
 		SETTINGS.setEvoCloudToken('')
 		SETTINGS.setSessionID('')
-		SERVER.sendResetMessage()
 	})
 
 	// ************** Login Events **************
