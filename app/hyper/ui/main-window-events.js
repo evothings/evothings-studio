@@ -353,14 +353,14 @@ exports.defineUIEvents = function(hyper)
 	hyper.UI.$('#tclose').click(function()
 	{
 		hyper.UI.$('#tokentext')[0].innerHTML = ""
-		hyper.UI.$('#tdialog').close()
+		hyper.UI.$('#tdialog')[0].close()
 	});
 	hyper.UI.$('#resetbutton').click(function()
 	{
 		console.log('factory reset clicked')
 		SETTINGS.setEvoCloudToken('')
 		SETTINGS.setSessionID('')
-		SERVER.sendConnectMessage()
+		SERVER.sendResetMessage()
 	})
 
 	// ************** Login Events **************
@@ -474,7 +474,7 @@ exports.defineUIEvents = function(hyper)
 
 	function displayLoginButton()
 	{
-		hyper.UI.$('#button-login').html('Login')
+		hyper.UI.$('#button-login').html('Personalize')
 		hyper.UI.$('#login-info').html('Not Logged In')
 		hyper.UI.$('#connect-screen-login').hide()
 	}
@@ -483,7 +483,11 @@ exports.defineUIEvents = function(hyper)
 	{
 		hyper.UI.$('#connect-screen-login').show()
 		//hyper.UI.$('#connect-screen-login-loading-message').show()
-		hyper.UI.$('#connect-screen-login-iframe').attr('src', loginURL)
+		//hyper.UI.$('#connect-screen-login-iframe').attr('src', loginURL)
+		//
+		// TODO: The below actually works fins, we just need to polish the post-login experience
+		//
+		hyper.UI.openInBrowser(loginURL)
 	}
 
 	function hideLoginScreen()

@@ -24,6 +24,8 @@ limitations under the License.
 /***	 Imported modules	   ***/
 /*********************************/
 
+var MAIN = require('electron').remote.getGlobal('main');
+
 var OS = require('os')
 var FS = require('fs')
 var PATH = require('path')
@@ -61,9 +63,9 @@ var mCheckIfModifiedSince = false
 var mHeartbeatTimer = undefined
 var mDeviceInfo = {}
 var mHeartbeatInterval = 20000
-var mCLientInfo = undefined
+exports.mClientInfo = undefined
 
-
+mFoo = UUID.generateUUID()
 // The current base directory. Must NOT end with a slash.
 var mBasePath = ''
 
@@ -167,6 +169,23 @@ function sendConnectMessage()
 	heartbeat()
 }
 
+function sendResetMessage()
+{
+	var info =
+	{
+		arch: OS.arch(),
+		platform: OS.platform(),
+		osrelease: OS.release(),
+		ostype: OS.type()
+	}
+	var uuid = SETTINGS.getEvoGUID()
+	//LOGGER.log('[file-server.js] ------ uuid = '+uuid)
+	mDeviceInfo = info
+	sendMessageToServer(mSocket, 'workbench.factory-reset', { sessionID: mSessionID, uuid: uuid, info: info })
+	mHeartbeatTimer = setInterval(heartbeat, mHeartbeatInterval)
+	heartbeat()
+}
+
 function heartbeat()
 {
 	var uuid = SETTINGS.getEvoGUID()
@@ -184,7 +203,7 @@ function onMessageWorkbenchUserLogin(socket, message)
 function onMessageWorkbenchTokenRejected(socket, message)
 {
 	console.log('++++++++++++++++++ Cloud Token Rejected by Proxy !!!!!  ++++++++++++++++++++')
-	EVENTS.publish(EVENTS.OPENTOKENDIALOG, "We couldn't find the token you provided")
+	EVENTS.publish(EVENTS.OPENTOKENDIALOG, message.reason || "We couldn't find the token you provided")
 }
 
 function onMessageWorkbenchUserLogout(socket, message)
@@ -260,12 +279,14 @@ function onMessageWorkbenchSetConnectKey(socket, message)
 function onMessageWorkbenchClientInfo(socket, message)
 {
 	//console.log('[file-server.js] got client info')
-	//console.dir(message)
+	console.dir(message)
 
 	// Notify UI about clients.
 	EVENTS.publish(EVENTS.VIEWERSUPDATED, message.data)
-	mCLientInfo = message.data
-
+	exports.mClientInfo = message.data
+	console.log('=======================================  '+mFoo+'  ================SERVER clientinfo')
+	console.dir(exports.mClientInfo)
+	MAIN.setCurrentViewers(message.data)
 	mClientInfoCallback && mClientInfoCallback(message)
 }
 
@@ -596,7 +617,9 @@ exports.getUserKey = function()
 
 exports.getClientInfo = function()
 {
-	return mCLientInfo
+	console.log('++++++++++++++++++++++++++ '+mFoo+' ++++++++++SERVER.getClientInfo returning')
+	console.dir(exports.mClientInfo)
+	return exports.mClientInfo
 }
 
 /**
@@ -707,6 +730,7 @@ exports.getSessionID = function()
 
 exports.sendMessageToServer = sendMessageToServer
 exports.sendConnectMessage = sendConnectMessage
+exports.sendResetMessage = sendResetMessage
 
 
 

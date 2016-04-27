@@ -3,6 +3,7 @@ $(function()
   /*** Electron modules ***/
 	const ipcRenderer = require('electron').ipcRenderer
 	var MAIN = require('electron').remote.getGlobal('main');
+
 	var OS = require('os')
 	var FS = require('fs')
 	var SETTINGS = require('../settings/settings.js')
@@ -16,7 +17,7 @@ $(function()
 	var PROMISE = require('node-promise').defer
 	var MQTT = require('mqtt')
 
-	var paho = require('../server/mqttws31.js')
+	//var paho = require('../server/mqttws31.js')
 
 	var mqtt_client  = ''
 
@@ -167,7 +168,7 @@ $(function()
 
 	function renderViewersFromList(list)
 	{
-		console.log('renderViewersFromList showing '+list.length+' clients')
+		//console.log('renderViewersFromList showing '+list.length+' clients')
 		var domlist = document.getElementById('viewer-list')
 		if(list && list.length)
 		{
@@ -192,7 +193,7 @@ $(function()
 
 	function removeViewersNotInList(newlist, oldlist)
 	{
-		console.log('removeViewersNotInList called. We have '+oldlist.length+' old clients and '+newlist.length+' new clients')
+		//console.log('removeViewersNotInList called. We have '+oldlist.length+' old clients and '+newlist.length+' new clients')
 		var found = false
 		oldlist.forEach(function(oldClient)
 		{
@@ -246,6 +247,9 @@ $(function()
 		var span2 = document.createElement('span')
 		span2.id = viewer.clientID + '_applabel'
 		span2.innerHTML = '<b>['+viewer.currentproject+']</b>'
+		var span3 = document.createElement('span')
+		span3.id = viewer.clientID + '_latency'
+
 		var img = document.createElement('img')
 		img.style.width='20px'
 		img.style.height = '35px'
@@ -273,6 +277,7 @@ $(function()
 		div.appendChild(imgrow)
 		div.appendChild(span)
 		div.appendChild(span2)
+		div.appendChild(span3)
 		addMenuToClient(viewer, rowdiv)
 		var cdiv = document.createElement('ul')
 		cdiv.className = "treestyle"
@@ -348,7 +353,7 @@ $(function()
 	function requestStatus(viewer)
 	{
 		console.log('....requesting status.....')
-		ipcRenderer.send('workbench-window', { message: 'eval', code: '(function(){ hyper.sendMessageToServer(window.hyper.IoSocket, "client.instrumentation", {clientID: window.hyper.clientID, serviceStatus: typeof window._instrumentation });return "_DONOT_"; })();', client: viewer })
+		ipcRenderer.send('workbench-window', { message: 'eval', code: '(function(){ hyper.sendMessageToServer(window.hyper.IoSocket, "client.instrumentation", {clientID: window.hyper.clientID, serviceStatus: typeof window._instrumentation, startTime: '+Date.now()+' });return "_DONOT_"; })();', client: viewer })
 	}
 
 	function getImageForModel(info)
@@ -403,19 +408,19 @@ $(function()
 	function injectInstrumentationToClient(client)
 	{
 		var wd = global.require.main.filename+'../'
-		wd = wd.replace('index.html','')
+		wd = wd.replace('hyper-viewers.html','')
 		document.getElementById('p2').style.display="block"
 		console.log('------------------------------------------------------------- injecting instrumentation into client '+client.name+' from directory '+wd+', to client '+client.UUID)
 		var files =
 		[
-			'./injectables/util.js',
-			'./injectables/mqttws31.js',
-			'./injectables/easyble.js',
-			'./injectables/instrumentation-manager.js',
-			'./injectables/bluetooth-instrumentation.js',
-			'./injectables/cordova-instrumentation.js',
-			'./injectables/watcher-instrumentation.js',
-			'./injectables/instrumentation-starter.js'
+			'/injectables/util.js',
+			'/injectables/mqttws31.js',
+			'/injectables/easyble.js',
+			'/injectables/instrumentation-manager.js',
+			'/injectables/bluetooth-instrumentation.js',
+			'/injectables/cordova-instrumentation.js',
+			'/injectables/watcher-instrumentation.js',
+			'/injectables/instrumentation-starter.js'
 		]
 		var promises = []
 		var count = 0
@@ -502,6 +507,7 @@ $(function()
 	function setViewerServiceStatus(message)
 	{
 		console.log('-- got serviceStatus back: '+message.serviceStatus)
+		console.dir(message)
 		var ball = document.getElementById(message.clientID+'_ball')
 		var sbutton = document.getElementById(message.clientID + '_sbutton')
 		var cdiv = document.getElementById(message.clientID + '.serviceroot')
@@ -509,7 +515,7 @@ $(function()
 		{
 			if(ball)
 			{
-				console.log('setting ball '+ball.id+' green')
+				//console.log('setting ball '+ball.id+' green')
 				ball.style.backgroundColor = 'green'
 			}
 
@@ -527,7 +533,7 @@ $(function()
 		{
 			if(ball)
 			{
-				console.log('setting ball '+ball.id+' gray')
+				//console.log('setting ball '+ball.id+' gray')
 				ball.style.backgroundColor = 'gray'
 			}
 
@@ -535,6 +541,10 @@ $(function()
 			showElement(sbutton)
 			hideElement(cdiv)
 		}
+		var latencyNode = document.getElementById(message.clientID+'_latency')
+		var startTime= message.startTime
+		var diff = Date.now() -  parseInt(startTime)
+		latencyNode.innerHTML = 'Latency: '+diff+'ms'
 	}
 
 	function saveServiceSubscription(clientID, serviceSubscription)
@@ -545,6 +555,7 @@ $(function()
 		subscriptions[path] = sid
 		console.log('saving service subscription for '+path+' -> '+sid+' under clientID '+clientID)
 		mServiceSubscriptions[clientID] = subscriptions
+		subscribeToMqttChannel(clientID, path)
 	}
 
 	function serviceUnsubscribe(clientID, serviceSubscription)
@@ -560,6 +571,7 @@ $(function()
 				removePlateFor(clientID, path)
 			}
 		}
+		unSubscribeToMqttChannel(clientID, path)
 	}
 
 	function releaseSubscriptions()
@@ -591,7 +603,7 @@ $(function()
 		var client = mCurrentClients[clientID]
 		paths.forEach(function(pathlevel)
 		{
-			console.log('addHierarchySelection called for '+pathlevel.name)
+			//console.log('addHierarchySelection called for '+pathlevel.name)
 			var parentnode = document.getElementById(getIdForParentPath(clientID, pathlevel.name))
 			if(parentnode)
 			{
@@ -658,7 +670,7 @@ $(function()
 					sdiv.appendChild(ndiv)
 					ndiv.appendChild(img)
 					parentnode.appendChild(cdiv)
-					console.log('   adding childnode '+cdiv.id+' under parent node '+parentnode.id)
+					//console.log('   adding childnode '+cdiv.id+' under parent node '+parentnode.id)
 					sdiv.addEventListener('mouseup', function(e)
 					{
 						console.log('user selected path '+pathlevel.name)
@@ -695,12 +707,12 @@ $(function()
 				}
 				else
 				{
-					console.log('not adding same things twice, here!')
+					//console.log('not adding same things twice, here!')
 				}
 			}
 			else
 			{
-				console.log('addHierarchySelection could not find parent node for '+pathlevel.name+' !!!')
+				//console.log('addHierarchySelection could not find parent node for '+pathlevel.name+' !!!')
 			}
 		})
 	}
@@ -793,14 +805,14 @@ $(function()
 	function subscribeToMqttChannel(clientID, path)
 	{
 		var channel = '/instrumentation/'+clientID+'/'+path
-		console.log('subscribing to mqtt channel '+channel)
+		console.log('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  subscribing to mqtt channel '+channel)
 		mqtt_client.subscribe(channel)
 	}
 
 	function unSubscribeToMqttChannel(clientID, path)
 	{
 		var channel = '/instrumentation/'+clientID+'/'+path
-		console.log('subscribing to mqtt channel '+channel)
+		console.log('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ unsubscribing to mqtt channel '+channel)
 		mqtt_client.unsubscribe(channel)
 	}
 
@@ -843,7 +855,7 @@ $(function()
 	function addServiceDataToViewer(clientID, time, servicedata)
 	{
 		//console.log('adding servicedata')
-		//console.dir(servicedata)
+		console.dir(servicedata)
 		if(!isClientAlreadySubscribedToService(clientID, servicedata.path))
 		{
 			saveServiceSubscription(clientID, {subscriptionID: servicedata.subscriptionID, path: servicedata.path, type: servicedata.data.type})
@@ -1130,7 +1142,10 @@ $(function()
 		EVENTS.subscribe(EVENTS.VIEWERSINSTRUMENTATION, onViewersInstrumentation.bind(this))
 
 		console.log('getting initial list of clients from server '+SERVER)
-		var info = SERVER.getClientInfo()
+		console.dir(SERVER)
+		//var info = SERVER.getClientInfo.bind(SERVER)()
+		var info = MAIN.getCurrentViewers()
+		console.dir(info)
 		if(info && info.clients)
 		{
 			renderViewersFromList(info.clients)
@@ -1193,73 +1208,51 @@ $(function()
 
 		var uuid = SETTINGS.getEvoGUID()
 
-		//mqtt_client = MQTT.connect('wss://vernemq.evothings.com:8084', options)
-		//mqtt_client = MQTT.connect('mqtt://test.mosquitto.org')
-		/*
-		mqtt_client.on('message', function(topic, message)
+		var options =
 		{
-			console.log('mqtt message received on channel '+topic)
-			console.dir(message)
+			//clientId: SETTINGS.getEvoGUID(),
+			//rejectUnauthorized: false,
+			//protocolId: 'MQIsdp',
+			//protocolVersion: 3
+		}
+		mqtt_client = MQTT.connect('wss://vernemq.evothings.com:8084/mqtt', options)
+		//mqtt_client = MQTT.connect('mqtt://test.mosquitto.org')
+
+		mqtt_client.on('message', function(topic, _message)
+		{
+			console.log('==============================================================  mqtt message received on channel '+topic)
+			var msg = _message.toString()
+			console.dir(msg)
+			var message = JSON.parse(msg)
 			addServiceDataToViewer(message.clientID, message.time, message.serviceData)
 		})
 
 		mqtt_client.on('error', function(error)
 		{
-			console.log('mqtt ERROR: '+error)
+			console.log('============================================================== mqtt ERROR: '+error)
+			console.dir(arguments)
 		})
 
 		mqtt_client.on('connect', function()
 		{
-			console.log('++ MQTT client connected ++')
+			console.log('==============================================================  ++ MQTT client connected ++')
+			console.dir(arguments)
 		})
 
 		mqtt_client.on('offline', function ()
 		{
-			console.log('offline');
+			console.log('==============================================================  mqtt offline');
+			console.dir(arguments)
 		});
 
 		mqtt_client.on('close', function ()
 		{
-			console.log('close');
+			console.log('==============================================================  mqtt close');
+			console.dir(arguments)
 			mqtt_client.end();
 		})
-		*/
 
-		/*
-
-		mqtt_client = new paho.MQTT.Client('vernemq.evothings.com', 8084, uuid)
-		var options = {
-			useSSL: true,
-			onSuccess: function()
-			{
-				console.log('MQTT connected')
-
-			},
-			onFailure: function(err)
-			{
-				console.log('MQTT Error: '+JSON.stringify(arguments))
-			}
-		}
-		mqtt_client.connect(options);
-
-		mqtt_client.onMessageArrived = function(message)
-		{
-
-			console.log("Message Arrived: " + message.payloadString);
-			console.log("Topic:     " + message.destinationName);
-			console.log("QoS:       " + message.qos);
-			console.log("Retained:  " + message.retained);
-			// Read Only, set if message might be a duplicate sent from broker
-			console.log("Duplicate: " + message.duplicate);
-
-			var pl = JSON.parse(message.payloadString)
-			addServiceDataToViewer(pl.clientID, pl.time, pl.serviceData)
-		}
-		*/
 	}
-
-
-
 
 	var win = MAIN.viewersWindow
 	win.on('close', function()

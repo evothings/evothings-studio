@@ -17,6 +17,7 @@ var Events =
     EXECUTEFILEDATA:        'execute_file_data',
     INJECTFILEDATA:         'inject_file_data',
     OPENTOKENDIALOG:        'open_token_dialog',
+    REQUESTINITIALVIEWERS:        'request_initial_viewers',
 
     listeners:  [],
 
@@ -48,7 +49,7 @@ var Events =
 
     publish: function(channel, obj)
     {
-        console.log("Publish "+JSON.stringify(obj) + " on "+channel)
+        //console.log("Publish "+JSON.stringify(obj) + " on "+channel)
         ipcRenderer.send('events-publish', channel, obj);
     }
 }
@@ -56,9 +57,9 @@ var Events =
 
 ipcRenderer.on('events-event', function(event, channel, obj) {
   var listeners = Events.listeners[channel] || []
-  console.log("Got an event " + JSON.stringify(obj) + " on channel " + channel)
+  //console.log("Got an event " + JSON.stringify(obj) + " on channel " + channel)
   for (var k in listeners) {
-    console.log("Called function")
+    //console.log("Called function")
     listeners[k](obj)
   }
 })

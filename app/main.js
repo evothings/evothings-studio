@@ -355,6 +355,22 @@ main.addMenu = function() {
   Menu.setApplicationMenu(menu);
 }
 
+//
+//  TODO: Create a generic way to hold app state
+//
+main.setCurrentViewers = function(data)
+{
+  main.currentViewers = data
+}
+
+main.getCurrentViewers = function()
+{
+  return main.currentViewers
+}
+//
+//
+//
+
 main.getRootDir = function() {
   return __dirname
 }
@@ -363,12 +379,14 @@ main.createWorkbenchWindow = function() {
   main.workbenchWindow = new BrowserWindow({
     title: 'Evothings Workbench ' + VERSION,
     icon: 'hyper/ui/images/app-icon.png',
-    width: 800, height: 600, webSecurity: false
+    width: 800, height: 720, webSecurity: false
   });
 
   main.workbenchWindow.on('closed', function() {
     main.workbenchWindow = null;
   });
+
+
   
   main.workbenchWindow.loadURL('file://' + __dirname + '/hyper/ui/index.html');
   main.addMenu();
