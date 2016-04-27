@@ -287,7 +287,7 @@ function onMessageWorkbenchClientInfo(socket, message)
 	console.log('=======================================  '+mFoo+'  ================SERVER clientinfo')
 	console.dir(exports.mClientInfo)
 	MAIN.setCurrentViewers(message.data)
-	exports.mClientInfoCallback && mClientInfoCallback(message)
+	mClientInfoCallback && mClientInfoCallback(message)
 }
 
 function onMessageWorkbenchClientInstrumentation(socket, message)

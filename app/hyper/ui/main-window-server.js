@@ -142,6 +142,7 @@ exports.defineServerFunctions = function(hyper)
 
 	function clientInfoCallback(message)
 	{
+		LOGGER.log('[main-window-server.js] clientInfoCallback called')
 		hyper.UI.mNumberOfConnectedClients = parseInt(message.data.numberOfConnectedClients, 10)
 		hyper.UI.setConnectedCounter(hyper.UI.mNumberOfConnectedClients)
 	}
@@ -149,7 +150,7 @@ exports.defineServerFunctions = function(hyper)
 	// Called when a connect key is sent from the server.
 	function requestConnectKeyCallback(message)
 	{
-		//LOGGER.log('[main-window-server.js] requestConnectKeyCallback called for message')
+		LOGGER.log('[main-window-server.js] requestConnectKeyCallback called for message')
 		//console.dir(message)
 		hyper.UI.setConnectKeyTimeout(message.data.timeout)
 		hyper.UI.displayConnectKey(message.data.connectKey)
