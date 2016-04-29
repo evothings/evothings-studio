@@ -1,6 +1,11 @@
 'use strict';
 
-const VERSION = '2.1.0-alpha6'
+// A global object makes it easy to reach windows and functions
+// from BrowserWindows via Electron remote
+global.main = {}
+main.VERSION = '2.1.0'
+main.FULLVERSION = main.VERSION + '-alpha6'
+main.BASE = 'https://evothings.com/' + main.VERSION
 
 const electron = require('electron')
 const app = electron.app
@@ -82,10 +87,6 @@ const dialog = electron.dialog
 const ipcMain = electron.ipcMain
 const BrowserWindow = electron.BrowserWindow
 
-
-// A global object makes it easy to reach windows and functions
-// from BrowserWindows via Electron remote
-global.main = {}
 
 // Keeping track of Windows (windowID) listening to each channel
 main.listeners = new Map()
@@ -273,9 +274,9 @@ main.addMenu = function() {
           label: 'About Evothings Studio',
           click: function() { dialog.showMessageBox({
             type: "info",
-            title: "Evothings Studio " + VERSION,
+            title: "Evothings Studio " + main.FULLVERSION,
             buttons: ["Close"],
-            message: "Evothings Studio " + VERSION,
+            message: "Evothings Studio " + main.FULLVERSION,
             detail: "Evothings Studio is a development environment tailored for making hybrid mobile apps in the IoT domain.\n" +
               "\nElectron: " + process.versions['electron'] +
               "\nChrome: " + process.versions['chrome'] +
@@ -377,7 +378,7 @@ main.getRootDir = function() {
 
 main.createWorkbenchWindow = function() {
   main.workbenchWindow = new BrowserWindow({
-    title: 'Evothings Workbench ' + VERSION,
+    title: 'Evothings Studio ' + main.FULLVERSION,
     icon: 'hyper/ui/images/app-icon.png',
     width: 800, height: 720, webSecurity: false
   });
@@ -385,8 +386,6 @@ main.createWorkbenchWindow = function() {
   main.workbenchWindow.on('closed', function() {
     main.workbenchWindow = null;
   });
-
-
   
   main.workbenchWindow.loadURL('file://' + __dirname + '/hyper/ui/index.html');
   main.addMenu();

@@ -28,6 +28,7 @@ var MAIN = require('electron').remote.getGlobal('main');
 var PATH = require('path')
 var OS = require('os')
 var PATH = require('path')
+var FS = require('fs')
 var FSEXTRA = require('fs-extra')
 var FILEUTIL = require('../server/file-util.js')
 var EVENTS = require('../server/system-events.js')
@@ -38,6 +39,8 @@ var SETTINGS = require('../settings/settings.js')
 var LOGGER = require('../server/log.js')
 var SERVER = require('../server/file-server.js')
 var MONITOR = require('../server/file-monitor.js')
+var UTIL = require('../util/util.js')
+var TEMP = require('temp').track()
 var BABEL = require('babel-core')
 var GLOB = require('glob')
 
@@ -50,7 +53,6 @@ exports.defineUIFunctions = function(hyper)
 	var mViewersWindow = null
 	var mConnectKeyTimer
 	var mProjectList = []
-	var mExampleList = []
 	var mWorkbenchPath = MAIN.getRootDir() //process.cwd()
 
 	hyper.UI.setupUI = function()
@@ -68,7 +70,6 @@ exports.defineUIFunctions = function(hyper)
 
 	function initAppLists()
 	{
-		readExampleList()
 		readProjectList()
 		hyper.UI.displayAppLists()
 		hyper.UI.setServerMessageFun()
@@ -292,59 +293,66 @@ exports.defineUIFunctions = function(hyper)
 
     function pathIsValidAppPath(path)
     {
-        // Is it an existing HTML file?
-		if (FILEUTIL.fileIsHTML(path) && FILEUTIL.statSync(path))
-		{
-			return true
-		}
+      // Is it an existing HTML file?
+		  if (FILEUTIL.fileIsHTML(path) && FILEUTIL.statSync(path))
+		  {
+			  return true
+		  }
 
-		// Directory containing evothings.json file.
-		var dirPath = null
+		  // Directory containing evothings.json file.
+		  var dirPath = null
 
-		// If path points to evothings.json file, get the directory
-		if (FILEUTIL.fileIsEvothingsSettings(path))
-		{
-			dirPath = PATH.dirname(path)
-		}
-		else if (FILEUTIL.fileIsDirectory(path))
-		{
-			// Dropped file is a directory.
-			dirPath = path
-		}
+		  // If path points to evothings.json file, get the directory
+		  if (FILEUTIL.fileIsEvothingsSettings(path))
+		  {
+			  dirPath = PATH.dirname(path)
+		  }
+		  else if (FILEUTIL.fileIsDirectory(path))
+		  {
+			  // Dropped file is a directory.
+			  dirPath = path
+		  }
 
-		// Must have directory to continue.
-		if (!dirPath)
-		{
-			return false
-		}
+		  // Must have directory to continue.
+		  if (!dirPath)
+		  {
+			  return false
+		  }
 
-        // Does the directory have an evothings.json file pointing to existing index file?
-        var indexPath = APP_SETTINGS.getIndexFileFullPath(dirPath)
-		if (FILEUTIL.statSync(indexPath))
-		{
-			return true
-		}
+      // Does the directory have an evothings.json file pointing to existing index file?
+      var indexPath = APP_SETTINGS.getIndexFileFullPath(dirPath)
+		  if (FILEUTIL.statSync(indexPath))
+		  {
+			  return true
+		  }
 
-		return false
+		  return false
     }
 
 	/**
 	 * Possible options include:
+	 *   options.path
+	 *   options.title
+	 *   options.description
+	 *   options.imagePath
+	 *   options.docURL
+	 *   options.active
 	 *	 options.screen
 	 *	 options.docButton
 	 *	 options.copyButton
 	 *	 options.openButton
 	 *	 options.deleteButton
 	 */
-	function createProjectEntry(path, options)
+	function createProjectEntry(isLocal, base, options)
 	{
 		options = options || {}
+		base = base || 'file://'
 
 		// Create div tag for app items.
 		var html = '<div class="project-entry ui-state-default ui-corner-all"'
 
 		// Set background color of active app entry.
-		if (path == hyper.UI.activeAppPath)
+		if (options.active)
 		{
 			html += ' style="background-color:#EAFFEA;"'
 		}
@@ -352,34 +360,41 @@ exports.defineUIFunctions = function(hyper)
 		// Close opening div tag.
 		html += '>'
 
-		// Show app image icon
-		var appPath = hyper.UI.getAppFullPath(path)
-		var imagePath = APP_SETTINGS.getAppImage(appPath)
-		var docURL = APP_SETTINGS.getDocURL(appPath)
-
-		if (imagePath)
-		{
-			var fullImagePath = PATH.join(appPath, imagePath)
-			fullImagePath = fullImagePath.replace(/\\/g, '/')
-			html += '<div class="app-icon" style="background-image: url(\'file://' +
-				fullImagePath + '\');"></div>'
-		}
-		else
-		{
+		// Full URL to application
+		var appURL = base + options.path
+    var imagePath = options.imagePath
+    var docURL = options.docURL
+    
+    if (isLocal) {
+		  var imagePath = imagePath || APP_SETTINGS.getAppImage(options.path)
+		  var docURL = docURL || APP_SETTINGS.getDocURL(options.path)
+    }
+    
+		if (imagePath) {
+			var fullImageURL = appURL + '/' + imagePath
+			html += '<div class="app-icon" style="background-image: url(\'' +
+				fullImageURL + '\');"></div>'
+		} else {
 			// Show a default icon if no image file is provided.
 			html += '<div class="app-icon" style="background-image: url(\'images/app-icon.png\');"></div>'
 		}
 
-		// Get name of app, uses title tag as first choise.
-		// Returns null if HTML file not found.
-		var appName = hyper.UI.getProjectNameFromFile(appPath)
-		var appHasValidHTMLFile = !!appName
-		if (!appHasValidHTMLFile)
-		{
-			// If app name was not found, index.html does not exist.
-			appName = 'Warning: HTML file does not exist'
-		}
-
+		// Get name of app, either given in options or extracted from project.
+		// Uses title tag as first choice.
+    var appName = options.title
+		var appHasValidHTMLFile = true
+    if (isLocal) {
+      if (!appName) {
+        // Returns null if HTML file not found.
+		    appName = hyper.UI.getProjectNameFromFile(options.path)
+		    appHasValidHTMLFile = !!appName
+		    if (!appHasValidHTMLFile) {
+			    // If app name was not found, index.html does not exist.
+			    appName = 'Warning: HTML file does not exist'
+		    }
+      }
+    }
+    
 		if (docURL && options.docButton)
 		{
 			html +=
@@ -414,15 +429,15 @@ exports.defineUIFunctions = function(hyper)
 		}
 
 		// Add Run button only if app has an HTML file.
+		// We use different run functions depending on if it isLocal
 		if (appHasValidHTMLFile)
 		{
-			html +=
-				'<button '
-				+	'type="button" '
-				+	'class="button-run btn et-btn-green" '
-				+	'onclick="window.hyper.UI.runApp(\'__PATH3__\')">'
-				+	'Run'
-				+ '</button>'
+			html += '<button type="button" class="button-run btn et-btn-green" '
+      if (isLocal)
+        html += 'onclick="window.hyper.UI.runApp(\'__PATH3__\')">'
+      else 
+        html += 'onclick="window.hyper.UI.runExampleApp(\'__PATH3__\')">'
+      html +=	'Run</button>'
 		}
 
 		if (options.deleteButton)
@@ -447,15 +462,15 @@ exports.defineUIFunctions = function(hyper)
 
 
 		// Escape any backslashes in the path (needed on Windows).
-		var escapedPath = path.replace(/[\\]/g,'\\\\')
+		var escapedPath = options.path.replace(/[\\]/g,'\\\\')
 
 		// Replace fields in template.
 		html = html.replace('__DOCURL__', docURL)
 		html = html.replace('__PATH1__', escapedPath)
 		html = html.replace('__PATH2__', escapedPath)
 		html = html.replace('__PATH3__', escapedPath)
-		html = html.replace('__PATH4__', getShortPathFromPath(path))
-		html = html.replace('__PATH5__', path)
+		html = html.replace('__PATH4__', getShortPathFromPath(options.path))
+		html = html.replace('__PATH5__', options.path)
 		html = html.replace('__NAME__', appName)
 
 		// Create element.
@@ -586,15 +601,6 @@ exports.defineUIFunctions = function(hyper)
 		return JSON.parse(json)
 	}
 
-	function readExampleList()
-	{
-		var list = SETTINGS.getExampleList()
-		if (list)
-		{
-			mExampleList = list
-		}
-	}
-
 	function readProjectList()
 	{
 		var list = SETTINGS.getProjectList()
@@ -643,10 +649,6 @@ exports.defineUIFunctions = function(hyper)
 		return mProjectList
 	}
 
-	hyper.UI.getExampleList = function()
-	{
-		return mExampleList
-	}
 	/**
 	 * If path is not a full path, make it so. This is
 	 * used to make relative example paths full paths.
@@ -719,6 +721,7 @@ exports.defineUIFunctions = function(hyper)
 
 	hyper.UI.displayAppLists = function()
 	{
+	  console.log("DISPLAYING EXAMPLE LIST")
 		hyper.UI.displayExampleList()
 		hyper.UI.displayProjectList()
 	}
@@ -737,8 +740,11 @@ exports.defineUIFunctions = function(hyper)
 			{
 				var path = projectList[i]
 				createProjectEntry(
-					path,
+				  true,
+					'file://',
 					{
+					  path: path,
+					  active: (path == hyper.UI.activeAppPath),
 						screen: '#screen-projects',
 						openButton: true,
 						docButton: true,
@@ -767,19 +773,30 @@ exports.defineUIFunctions = function(hyper)
 		hyper.UI.$('#screen-examples').empty()
 
 		// Create new list.
-		var list = hyper.UI.getExampleList()
-		for (var i = 0; i < list.length; ++i)
-		{
-			var entry = list[i]
-			createProjectEntry(
-				entry.path,
-				{
-					screen: '#screen-examples',
-					docButton: true,
-					copyButton: true,
-					imagePath: entry.image
-				})
-		}
+		SETTINGS.getExampleList().then(list => {
+		  var baseDoc = MAIN.BASE + "/doc/examples/"
+		  var baseExamples = MAIN.BASE + '/examples/'
+		  for (var i = 0; i < list.length; ++i)
+		  {
+			  var entry = list[i]
+			  createProjectEntry(
+			    false,
+				  baseExamples,
+				  {
+				    path: entry.path,
+				    title: entry.title,
+				    description: entry.description,
+				    docURL: baseDoc + entry.path + '.html',
+				    imagePath: entry.icon,
+				    active: false,
+					  screen: '#screen-examples',
+					  docButton: true,
+					  copyButton: true,
+				  })
+		  }
+		}, status => {
+	    window.alert('Something went wrong downloading examples list from evothings.com');
+    })
 	}
 
 	hyper.UI.setServerMessageFun = function()
@@ -862,10 +879,6 @@ exports.defineUIFunctions = function(hyper)
 
 	hyper.UI.openFileFolder = function(path)
 	{
-		// Prepend application path if this is not an absolute path.
-		path = hyper.UI.getAppFullPath(path)
-
-		// Show the file in the folder.
 		hyper.UI.openFolder(path)
 	}
 
@@ -876,12 +889,9 @@ exports.defineUIFunctions = function(hyper)
 
 	hyper.UI.openCopyAppDialog = function(path)
 	{
-		// Prepend application path if this is not an absolute path.
-		path = hyper.UI.getAppFullPath(path)
-
-		// Set source and folder name of app to copy.
-		var sourceDir = path
-		var appFolderName = PATH.basename(sourceDir)
+		// Set sourcePath and folder name of app to copy.
+		var sourcePath = path
+		var appFolderName = PATH.basename(sourcePath)
 		var myAppsDir = SETTINGS.getMyAppsPath()
 
 		// Set dialog box fields.
@@ -896,7 +906,7 @@ exports.defineUIFunctions = function(hyper)
 	hyper.UI.saveCopyApp = function()
 	{
 		// Set up source and target paths.
-		var sourceDir = hyper.UI.$('#input-copy-app-source-path').val()
+		var sourcePath = hyper.UI.$('#input-copy-app-source-path').val()
 		var targetAppFolder = hyper.UI.$('#input-copy-app-target-folder').val()
 		var targetParentDir = hyper.UI.$('#input-copy-app-target-parent-folder').val()
 		var targetDir = PATH.join(targetParentDir, targetAppFolder)
@@ -909,38 +919,90 @@ exports.defineUIFunctions = function(hyper)
 			return // Abort (dialog is still visible)
 		}
 
-		// Copy the app.
-		copyApp(sourceDir, targetDir)
+		// Copy the app, if sourcePath is relative it will copy from Evothings website
+		copyApp(sourcePath, targetDir, function() {
+		  // Hide dialog.
+		  hyper.UI.$('#dialog-copy-app').modal('hide')
 
-		// Hide dialog.
-		hyper.UI.$('#dialog-copy-app').modal('hide')
-
-		// Show the "My Apps" screen.
-		showMyApps()
+		  // Show the "My Apps" screen.
+		  showMyApps()
+		})
 	}
 
-	// sourcePath points to a directory.
-	function copyApp(sourceDir, targetDir)
+	// SourcePath is either an absolut path to a directory or a relative path
+	// to an example app hosted at evothings.com.
+	function copyApp(sourcePath, targetDir, cb)
 	{
-		try
-		{
-			var appFolderName = PATH.basename(sourceDir)
+	  // If it's not absolute we copy from Evothings.com
+	  if (!FILEUTIL.isPathAbsolute(sourcePath)) {
+			copyAppFromURL(MAIN.BASE + '/examples/' + sourcePath, targetDir, cb)
+		} else {
+		  try {
+			  var appFolderName = PATH.basename(sourcePath)
 
-			// Copy files.
-			FSEXTRA.copySync(sourceDir, targetDir)
+			  // Copy files.
+			  FSEXTRA.copySync(sourcePath, targetDir)
 
-			// Remove any app-uuid entry from evothings.json in the copied app.
-			// This is done to prevent duplicated app uuids.
-			APP_SETTINGS.generateNewAppUUID(targetDir)
+			  // Remove any app-uuid entry from evothings.json in the copied app.
+			  // This is done to prevent duplicated app uuids.
+			  APP_SETTINGS.generateNewAppUUID(targetDir)
 
-			// Add path to "My Apps".
-			hyper.UI.addProject(targetDir)
+			  // Add path to "My Apps".
+			  hyper.UI.addProject(targetDir)
+			  
+			  // Callback
+			  cb()
+		  } catch (error) {
+			  window.alert('Something went wrong, could not save app.')
+			  LOGGER.log('[main-window-func.js] Error in copyApp: ' + error)
+		  }
 		}
-		catch (error)
-		{
-			window.alert('Something went wrong, could not save app.')
-			LOGGER.log('[main-window-func.js] Error in copyApp: ' + error)
-		}
+	}
+
+	hyper.UI.runExampleApp = function (path) {
+	  TEMP.mkdir('evorunexample', function(err, dirPath) {
+      var tempDir = PATH.join(dirPath, PATH.basename(path))
+      copyAppFromURL(MAIN.BASE + '/examples/' + path, tempDir, function() {
+        hyper.UI.runApp(tempDir)
+      })
+    })
+  }
+      
+
+	function copyAppFromURL(sourceURL, targetDir, cb) {
+	  try {
+		  // Download zip to temp
+		  sourceURL = sourceURL + '.zip'
+		  UTIL.download(sourceURL, (zipFile, err) => {
+		    if (err) {
+    		  window.alert('Something went wrong, could not download app.')
+    		  LOGGER.log('[main-window-func.js] Error in copyAppFromURL: ' + err)
+    		} else {		    
+    		  // Extract into targetDir
+    		  FS.mkdirSync(targetDir)
+	    	  UTIL.unzip(zipFile, targetDir, function(err) {
+	  		    if (err) {
+	  		      // TODO: This doesn't seem to work
+	  		      FSEXTRA.removeSync(targetDir)
+        		  window.alert('Something went wrong with unzipping app.')
+        		  LOGGER.log('[main-window-func.js] Error in copyAppFromURL: ' + err)
+        		} else {		    
+		          // Make a new app-uuid in evothings.json in the copied app.
+		          // This is done to prevent duplicated app uuids.
+		          APP_SETTINGS.generateNewAppUUID(targetDir)
+		          // Add path to "My Apps".
+		          hyper.UI.addProject(targetDir)
+		          
+		          //Callback
+		          cb()
+		        }
+		      })
+		    }
+	  	})
+	  } catch (error) {
+		  window.alert('Something went wrong, could not download and unzip app.')
+		  LOGGER.log('[main-window-func.js] Error in copyAppFromURL: ' + error)
+	  }
 	}
 
 	function showMyApps()
@@ -961,7 +1023,7 @@ exports.defineUIFunctions = function(hyper)
 
 	hyper.UI.saveNewApp = function()
 	{
-		var sourcePath = hyper.UI.getAppFullPath('examples/template-basic-app')
+		var sourcePath = 'template-basic-app'
 		var parentFolder = hyper.UI.$('#input-new-app-parent-folder').val()
 		var appFolder = hyper.UI.$('#input-new-app-folder').val()
 		var targetDir = PATH.join(parentFolder, appFolder)
@@ -975,12 +1037,13 @@ exports.defineUIFunctions = function(hyper)
 		}
 
 		// Copy files.
-		copyApp(sourcePath, targetDir)
+		copyApp(sourcePath, targetDir, function() {
+		  // Hide dialog.
+		  hyper.UI.$('#dialog-new-app').modal('hide')
 
-		// Hide dialog.
-		hyper.UI.$('#dialog-new-app').modal('hide')
-
-		showMyApps()
+		  // Show the "My Apps" screen.
+		  showMyApps()
+		})
 	}
 
 	hyper.UI.openRemoveAppDialog = function(obj)
