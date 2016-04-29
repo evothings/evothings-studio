@@ -24,6 +24,7 @@ var FILEUTIL = require('../server/file-util.js')
 var PATH = require('path')
 var UUID = require('../server/uuid.js')
 var MAIN = require('electron').remote.getGlobal('main')
+var UTIL = require('../util/util.js')
 
 exports.set = function(key, value)
 {
@@ -225,19 +226,9 @@ exports.getProjectList = function(list)
 	}
 }
 
-exports.getExampleList = function(list)
+exports.getExampleList = function()
 {
-  var path = MAIN.getRootDir()
-  var fullPath = PATH.join(path, 'hyper/settings/example-list.json')
-	var json = FILEUTIL.readFileSync(fullPath)
-	if (json)
-	{
-		return JSON.parse(fixWin32PathDelimiters(json))
-	}
-	else
-	{
-	    return null
-	}
+  return UTIL.getJSON('http://evothings.com/' + MAIN.VERSION + '/examples/examples-list.json')
 }
 
 // What a hack. Replaces forward slashes with two
