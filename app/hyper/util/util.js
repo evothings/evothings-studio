@@ -1,0 +1,78 @@
+/*
+File: util.js
+Description: Module with useful stuff.
+Author: Göran Krampe
+
+License:
+
+Copyright (c) 2013-2015 Evothings AB
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+var FS = require('fs')
+// track will make sure things are removed when we exit Evothings
+var TEMP = require('temp').track()
+var HTTPS = require('https')
+var PATH = require('path')
+var UNZIP = require('unzip2')
+
+exports.getJSON = function(url) {
+	return new Promise(function(resolve, reject) {
+		var xhr = new XMLHttpRequest();
+		xhr.open('get', url, true);
+		xhr.responseType = 'json';
+		xhr.onload = function() {
+			var status = xhr.status;
+			if (status == 200) {
+				resolve(xhr.response);
+			} else {
+				reject(status);
+			}
+		};
+		xhr.send();
+	});
+};
+
+exports.unzip = function(zipfile, path, cb) {
+  var extractor = UNZIP.Extract({ path: path })
+  extractor.on("close", cb);
+  extractor.on("error", cb);
+  FS.createReadStream(zipfile).pipe(extractor)
+}
+
+function download(url, dest, cb) {
+  var file = FS.createWriteStream(dest);
+  var request = HTTPS.get(url, function(response) {
+    response.pipe(file);
+    file.on('finish', function() {
+      file.close(cb);  // close() is async, call cb after close completes.
+    });
+  }).on('error', function(err) { // Handle errors
+    FS.unlink(dest); // Delete the file async. (But we don't check the result)
+    if (cb) cb(err.message);
+  });
+}
+
+exports.download = function(url, cb) {
+  // Download a file to a temp directory and call callback with full path
+  TEMP.mkdir('evodownloads', function(err, dirPath) {
+    var filePath = PATH.join(dirPath, PATH.basename(url))
+    download(url, filePath, function(err) {
+      if (err) {
+        cb(null, err)
+      }
+      cb(filePath)
+    })
+  })
+}
