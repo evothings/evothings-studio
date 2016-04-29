@@ -938,10 +938,10 @@ exports.defineUIFunctions = function(hyper)
 			copyAppFromURL(MAIN.BASE + '/examples/' + sourcePath, targetDir, cb)
 		} else {
 		  try {
-			  var appFolderName = PATH.basename(sourceDir)
+			  var appFolderName = PATH.basename(sourcePath)
 
 			  // Copy files.
-			  FSEXTRA.copySync(sourceDir, targetDir)
+			  FSEXTRA.copySync(sourcePath, targetDir)
 
 			  // Remove any app-uuid entry from evothings.json in the copied app.
 			  // This is done to prevent duplicated app uuids.
@@ -1023,7 +1023,7 @@ exports.defineUIFunctions = function(hyper)
 
 	hyper.UI.saveNewApp = function()
 	{
-		var sourcePath = hyper.UI.getAppFullPath('examples/template-basic-app')
+		var sourcePath = 'template-basic-app'
 		var parentFolder = hyper.UI.$('#input-new-app-parent-folder').val()
 		var appFolder = hyper.UI.$('#input-new-app-folder').val()
 		var targetDir = PATH.join(parentFolder, appFolder)
@@ -1037,12 +1037,13 @@ exports.defineUIFunctions = function(hyper)
 		}
 
 		// Copy files.
-		copyApp(sourcePath, targetDir)
+		copyApp(sourcePath, targetDir, function() {
+		  // Hide dialog.
+		  hyper.UI.$('#dialog-new-app').modal('hide')
 
-		// Hide dialog.
-		hyper.UI.$('#dialog-new-app').modal('hide')
-
-		showMyApps()
+		  // Show the "My Apps" screen.
+		  showMyApps()
+		})
 	}
 
 	hyper.UI.openRemoveAppDialog = function(obj)
