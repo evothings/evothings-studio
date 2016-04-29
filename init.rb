@@ -58,4 +58,4 @@ end
 
 ### Run all steps.
 downloadJavaScriptLibraries
-copyExamples
+#copyExamples
