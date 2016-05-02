@@ -442,9 +442,6 @@ exports.defineUIEvents = function(hyper)
 		hyper.UI.$('#connect-screen-login').show()
 		//hyper.UI.$('#connect-screen-login-loading-message').show()
 		//hyper.UI.$('#connect-screen-login-iframe').attr('src', loginURL)
-		//
-		// TODO: The below actually works fins, we just need to polish the post-login experience
-		//
 		hyper.UI.openInBrowser(loginURL)
 	}
 

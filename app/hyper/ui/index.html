@@ -9,14 +9,14 @@ Copyright (c) 2013-2015 Evothings AB
 <!-- HTML 5 differences from HTML 4: http://www.w3.org/TR/2008/WD-html5-diff-20080122/ -->
 <head>
 	<meta charset="utf-8">
-	<link rel="stylesheet" href="../../node_modules/material-design-lite/material.min.css">
+	<link rel="stylesheet" href="../../../node_modules/material-design-lite/material.min.css">
 	<link href="../libs/bootstrap-3.3.5-dist/css/bootstrap.min.css" rel="stylesheet">
 	<script>window.$ = window.jQuery = require('../libs/jquery/jquery-2.1.4.min.js');</script>
 	<script src="../libs/jquery/jquery-ui.min.js"></script>
 	<script src="../libs/bootstrap-3.3.5-dist/js/bootstrap.min.js"></script>
 
 
-	<script src="../../node_modules/material-design-lite/material.min.js"></script>
+	<script src="../../../node_modules/material-design-lite/material.min.js"></script>
 
 	<link href="css/hyper-common.css" rel="stylesheet" />
 	<link href="css/hyper-ui.css" rel="stylesheet" />
@@ -547,6 +547,17 @@ Copyright (c) 2013-2015 Evothings AB
 
 						</div>
 
+						<div id="havenotoken" >
+							<label for="tokeninput">Cloud Token</label>
+							<input class="mdl-textfield__input" type="text" id="tokeninput" name="tokeninput" style="margin:10px"/>
+							<div class="mdl-dialog__actions">
+								<button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="tokenbutton">Save</button>
+							</div>
+						</div>
+						<div id="havetoken" style="display:none"">
+
+						</div>
+
 						<div class="screen-start-help framed-box style-big-para">
 							<p><strong>Click the Get Key button to obtain a connect key.</strong> Use this key to connect from the Evothings Viewer app. Click "Get Key" again if the key times out. Once connected, your session has no time limit.</p>
 							<p>Click the <strong>Run</strong> buttons on the Examples screen to run an app in the Viewer.</p>
@@ -636,16 +647,14 @@ Copyright (c) 2013-2015 Evothings AB
 		<div class="mdl-dialog__content">
 			<div id="tokentext"></div>
 			<div>
-				<label for="tokeninput">Please Enter Your Token</label>
-				<input class="mdl-textfield__input" type="text" id="tokeninput" name="tokeninput" style="margin:10px"/>
 				<div>
-					If you don't have any token, you can get one for free at https://evothings.com/download-evothings-studio-21
+					<p>Please input your cloud token in the Connect tab to use Evothings Studio.</p>
+					<p>You can get your cloud token at the download page https://evothings.com/download-evothings-studio-21</p>
 				</div>
 			</div>
 		</div>
 
 		<div class="mdl-dialog__actions">
-			<button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="tokenbutton">Save</button>
 			<button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="tclose">Close</button>
 		</div>
 	</dialog>
