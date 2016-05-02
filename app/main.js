@@ -6,6 +6,8 @@ global.main = {}
 main.VERSION = '2.1.0'
 main.FULLVERSION = main.VERSION + '-alpha6'
 main.BASE = 'https://evothings.com/' + main.VERSION
+main.DOC = main.BASE + "/doc"
+main.EXAMPLES = main.BASE + "/examples"
 
 const electron = require('electron')
 const app = electron.app
@@ -215,19 +217,19 @@ main.addMenu = function() {
       submenu: [
         {
           label: 'Index',
-          click: function() { Shell.openExternal('https://evothings.com/doc/') }
+          click: function() { Shell.openExternal(main.DOC) }
         },
         {
           label: 'Examples',
-          click: function() { Shell.openExternal('https://evothings.com/doc/examples/examples.html') }
+          click: function() { Shell.openExternal(main.DOC + '/examples/examples.html') }
         },
         {
           label: 'ECMAScript 6',
-          click: function() { Shell.openExternal('https://evothings.com/doc/tutorials/ecmascript6.html') }
+          click: function() { Shell.openExternal(main.DOC + '/tutorials/ecmascript6.html') }
         },
         {
           label: 'Frequently Asked Questions',
-          click: function() { Shell.openExternal('https://evothings.com/doc/faq/faq.html') }
+          click: function() { Shell.openExternal(main.DOC + '/faq/faq.html') }
         }
       ]
     },
@@ -249,7 +251,7 @@ main.addMenu = function() {
         },
         {
           label: 'Release Notes',
-          click: function() { Shell.openExternal('https://evothings.com/doc/studio/release-notes.html') }
+          click: function() { Shell.openExternal(main.DOC + '/studio/release-notes.html') }
         },
         {
           type: 'separator'
