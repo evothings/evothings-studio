@@ -90,48 +90,6 @@ exports.defineUIEvents = function(hyper)
 			'https://itunes.apple.com/nz/app/evothings-viewer/id1029452707?mt=8')
 	})
 
-	// ************** Documentation Button **************
-
-	hyper.UI.$('.button-documentation').click(function()
-	{
-		hyper.UI.openInBrowser('https://evothings.com/doc/')
-	})
-	
-  // ************** FAQ Button **************
-
-	hyper.UI.$('.button-faq').click(function()
-	{
-		hyper.UI.openInBrowser('https://evothings.com/doc/faq/faq.html')
-	})
-
-	// ************** Release Notes Button **************
-
-	hyper.UI.$('.button-release-notes').click(function()
-	{
-		hyper.UI.openInBrowser('https://evothings.com/doc/studio/release-notes.html')
-	})
-
-	// ************** Examples Documentation Button **************
-
-	hyper.UI.$('.button-examples-documentation').click(function()
-	{
-		hyper.UI.openInBrowser('https://evothings.com/doc/examples/examples.html')
-	})
-
-	// ************** ECMAScript 6 Documentation Button **************
-
-	hyper.UI.$('.button-ecmascript6-documentation').click(function()
-	{
-		hyper.UI.openInBrowser('https://evothings.com/doc/tutorials/ecmascript6.html')
-	})
-	
-	// ************** Instrumentation Documentation Button **************
-
-	hyper.UI.$('.button-instrumentation-documentation').click(function()
-	{
-		hyper.UI.openInBrowser('https://evothings.com/doc/tutorials/instrumentation.html')
-	})
-
 	// ************** Connect Screen Button **************
 
 	hyper.UI.$('#button-connect, .button-open-connect-screen').click(function()
