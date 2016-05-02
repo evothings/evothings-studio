@@ -41,14 +41,6 @@ def downloadJavaScriptLibraries
 		'jquery-ui-1.11.4/jquery-ui.min.js')
 end
 
-# Copy Evothings examples folder to make it possible to
-# test examples without building the Workbench.
-def copyExamples
-	FileUtils.copy_entry(
-		"../evothings-examples/generated/examples",
-		"./app/examples")
-end
-
 ### Load custom settings from localConfig.rb
 #puts "looking for localConfig..."
 # allow override of defined functions
@@ -58,4 +50,3 @@ end
 
 ### Run all steps.
 downloadJavaScriptLibraries
-#copyExamples
