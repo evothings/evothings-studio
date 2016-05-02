@@ -909,21 +909,25 @@ exports.defineUIFunctions = function(hyper)
 	{
 	  // If it's not absolute we copy from Evothings.com
 	  if (!FILEUTIL.isPathAbsolute(sourcePath)) {
-			copyAppFromURL(MAIN.BASE + '/examples/' + sourcePath, targetDir, cb)
+			copyAppFromURL(MAIN.BASE + '/examples/' + sourcePath, targetDir, function() {
+        // Make a new app-uuid in evothings.json in the copied app.
+        // This is done to prevent duplicated app uuids.
+        APP_SETTINGS.generateNewAppUUID(targetDir)
+        // Add path to "My Apps".
+        hyper.UI.addProject(targetDir)
+        // Callback
+		    cb()
+      })
 		} else {
 		  try {
 			  var appFolderName = PATH.basename(sourcePath)
-
 			  // Copy files.
 			  FSEXTRA.copySync(sourcePath, targetDir)
-
-			  // Remove any app-uuid entry from evothings.json in the copied app.
+			  // Make a new app-uuid in evothings.json in the copied app.
 			  // This is done to prevent duplicated app uuids.
 			  APP_SETTINGS.generateNewAppUUID(targetDir)
-
 			  // Add path to "My Apps".
 			  hyper.UI.addProject(targetDir)
-			  
 			  // Callback
 			  cb()
 		  } catch (error) {
@@ -960,13 +964,7 @@ exports.defineUIFunctions = function(hyper)
 	  		      FSEXTRA.removeSync(targetDir)
         		  window.alert('Something went wrong with unzipping app.')
         		  LOGGER.log('[main-window-func.js] Error in copyAppFromURL: ' + err)
-        		} else {		    
-		          // Make a new app-uuid in evothings.json in the copied app.
-		          // This is done to prevent duplicated app uuids.
-		          APP_SETTINGS.generateNewAppUUID(targetDir)
-		          // Add path to "My Apps".
-		          hyper.UI.addProject(targetDir)
-		          
+        		} else {       
 		          //Callback
 		          cb()
 		        }
