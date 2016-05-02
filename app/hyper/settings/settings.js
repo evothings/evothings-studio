@@ -83,19 +83,6 @@ function defineSettingFuns(name, defaultValue)
 systemSetting('NumberOfDirecoryLevelsToTraverse', 5)
 
 /**
- * If this setting is true, the Hyper server will
- * serve Cordova JS files for the correct platform,
- * based on user-agent information in the request.
- * Files are fetched from in the Cordova project folder,
- * or if not found from folder application/libs-cordova.
- * Supported platforms are Android and iOS.
- * Set to false to turn this feature off. You then
- * must ensure you include the correct Cordova JS
- * files in your project.
- */
-systemSetting('ServeCordovaJsFiles', true)
-
-/**
  * Project window settings.
  */
 systemSetting('ProjectWindowGeometry')
