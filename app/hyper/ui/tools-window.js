@@ -237,17 +237,12 @@ $(function()
 		// On Windows an icon has x,y coords -32000 when
 		// window is minimized. On Linux and OS X the window
 		// coordinates and size are intact when minimized.
-		if (win.x < -1000)
+		if (geometry.x < -1000)
 		{
 			return;
 		}
 
-		SETTINGS.setWorkbenchWindowGeometry({
-			x: geometry.x,
-			y: geometry.y,
-			width: geometry.width,
-			height: geometry.height
-		})
+		SETTINGS.setWorkbenchWindowGeometry(geometry)
 
 		var layout = $('body').layout()
 		SETTINGS.setWorkbenchWindowDividerPosition(layout.state.south.size)
@@ -325,6 +320,8 @@ $(function()
 
 	// Set the save state since last session.
 	restoreSavedUIState()
+	// And now we can show it 
+	MAIN.showConsoleWindow()
 
 	setTimeout(
 		function()

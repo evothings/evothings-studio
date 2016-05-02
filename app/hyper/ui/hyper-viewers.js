@@ -107,7 +107,7 @@ $(function()
 		// On Windows an icon has x,y coords -32000 when
 		// window is minimized. On Linux and OS X the window
 		// coordinates and size are intact when minimized.
-		if (win.x < -1000)
+		if (geometry.x < -1000)
 		{
 			return;
 		}
@@ -1257,6 +1257,7 @@ $(function()
 	var win = MAIN.viewersWindow
 	win.on('close', function()
 	{
+		saveUIState()
 		releaseSubscriptions()
 		releaseEventHandlers()
 		this.close(true)
@@ -1266,7 +1267,10 @@ $(function()
 	setLayoutProperties()
 
 	// Set the save state since last session.
-	//restoreSavedUIState()
+	restoreSavedUIState()
+	// And now we can show it 
+	MAIN.showViewersWindow()
+	
 	setupEventListeners()
 
 })

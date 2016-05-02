@@ -380,7 +380,7 @@ main.createWorkbenchWindow = function() {
   main.workbenchWindow = new BrowserWindow({
     title: 'Evothings Studio ' + main.FULLVERSION,
     icon: 'hyper/ui/images/app-icon.png',
-    width: 800, height: 720, webSecurity: false
+    width: 850, height: 720, webSecurity: false, show: false
   });
 
   main.workbenchWindow.on('closed', function() {
@@ -390,7 +390,9 @@ main.createWorkbenchWindow = function() {
   main.workbenchWindow.loadURL('file://' + __dirname + '/hyper/ui/index.html');
   main.addMenu();
   main.workbenchWindow.center()
-  main.workbenchWindow.show()
+}
+main.showWorkbenchWindow = function() {
+    main.workbenchWindow.show()
 }
 
 main.openConsoleWindow = function() {
@@ -410,8 +412,10 @@ main.openConsoleWindow = function() {
 
     main.consoleWindow.loadURL('file://' + __dirname + '/hyper/ui/tools-window.html')
     main.consoleWindow.center()
-    main.consoleWindow.show()
   }
+}
+main.showConsoleWindow = function() {
+  main.consoleWindow.show()
 }
 
 main.openViewersWindow = function() {
@@ -431,10 +435,12 @@ main.openViewersWindow = function() {
 
     main.viewersWindow.loadURL('file://' + __dirname + '/hyper/ui/hyper-viewers.html')
     main.viewersWindow.center()
-    main.viewersWindow.show()
+
   }
 }
-
+main.showViewersWindow = function() {
+  main.viewersWindow.show()
+}
 
 // Work as relay between our BrowserWindows since they can not talk to
 // each other directly. We simply have one relay handler per window.
