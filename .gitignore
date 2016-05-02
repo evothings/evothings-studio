@@ -6,3 +6,4 @@
 /app/node_modules
 /node_modules
 /app/examples
+/app/npm-debug.log
