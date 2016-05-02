@@ -162,7 +162,7 @@ function sendConnectMessage()
 		ostype: OS.type()
 	}
 	var uuid = SETTINGS.getEvoGUID()
-	//LOGGER.log('[file-server.js] ------ uuid = '+uuid)
+	LOGGER.log('[file-server.js] sendConnectMessage called. ------ uuid = '+uuid)
 	mDeviceInfo = info
 	sendMessageToServer(mSocket, 'workbench.connected', { sessionID: mSessionID, uuid: uuid, info: info })
 	mHeartbeatTimer = setInterval(heartbeat, mHeartbeatInterval)
@@ -179,7 +179,7 @@ function sendResetMessage()
 		ostype: OS.type()
 	}
 	var uuid = SETTINGS.getEvoGUID()
-	//LOGGER.log('[file-server.js] ------ uuid = '+uuid)
+	LOGGER.log('[file-server.js] ------ Sending factory reset')
 	mDeviceInfo = info
 	sendMessageToServer(mSocket, 'workbench.factory-reset', { sessionID: mSessionID, uuid: uuid, info: info })
 	mHeartbeatTimer = setInterval(heartbeat, mHeartbeatInterval)
