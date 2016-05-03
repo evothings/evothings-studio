@@ -251,6 +251,13 @@ exports.defineUIEvents = function(hyper)
 	{
 		hyper.UI.saveCopyApp()
 	})
+	
+	// ************** Copy App Dialog Change Button **************
+
+	hyper.UI.$('#button-change-copy-app').click(function()
+	{
+		hyper.UI.changeCopyApp()
+	})
 
 	// ************** Console Button **************
 

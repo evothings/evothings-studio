@@ -877,6 +877,14 @@ exports.defineUIFunctions = function(hyper)
 		hyper.UI.$('#dialog-copy-app').modal('show')
 	}
 
+  hyper.UI.changeCopyApp = function()
+	{
+		var defaultDir = hyper.UI.$('#input-copy-app-target-parent-folder').val()
+    var dir = MAIN.selectOrCreateFolder('Please select or create a folder', defaultDir)
+    hyper.UI.$('#input-copy-app-target-parent-folder').val(dir)
+    return
+  }
+	
 	hyper.UI.saveCopyApp = function()
 	{
 		// Set up source and target paths.
@@ -884,6 +892,14 @@ exports.defineUIFunctions = function(hyper)
 		var targetAppFolder = hyper.UI.$('#input-copy-app-target-folder').val()
 		var targetParentDir = hyper.UI.$('#input-copy-app-target-parent-folder').val()
 		var targetDir = PATH.join(targetParentDir, targetAppFolder)
+
+		// If target parent folder does not exist, display an alert dialog and abort.
+		var exists = FILEUTIL.statSync(targetParentDir)
+		if (!exists)
+		{
+			window.alert('The parent folder does not exist, please type a new folder name.')
+			return // Abort (dialog is still visible)
+		}
 
 		// If target folder exists, display an alert dialog and abort.
 		var exists = FILEUTIL.statSync(targetDir)

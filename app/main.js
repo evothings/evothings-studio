@@ -11,6 +11,7 @@ main.EXAMPLES = main.BASE + "/examples"
 
 const electron = require('electron')
 const app = electron.app
+const DIALOG = require('electron').dialog;
 
 // First we need to handle Squirrel installer events and exit fast.
 if (handleSquirrelEvent()) {
@@ -442,6 +443,11 @@ main.openViewersWindow = function() {
 }
 main.showViewersWindow = function() {
   main.viewersWindow.show()
+}
+
+main.selectOrCreateFolder = function(title, defaultDir) {
+  return DIALOG.showOpenDialog({ title: title,
+        defaultPath: defaultDir, properties: [ 'openDirectory', 'createDirectory']})
 }
 
 // Work as relay between our BrowserWindows since they can not talk to
