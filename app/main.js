@@ -381,7 +381,7 @@ main.getRootDir = function() {
 
 main.createWorkbenchWindow = function() {
   main.workbenchWindow = new BrowserWindow({
-    title: 'Evothings Studio ' + main.FULLVERSION,
+    title: 'Evothings Studio ' + main.FULLVERSION + ' - Workbench',
     icon: 'hyper/ui/images/app-icon.png',
     width: 850, height: 720, webSecurity: false, show: false
   });
