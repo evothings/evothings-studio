@@ -260,7 +260,7 @@ TODO: Remove, use automatic width for all buttons.
 	vertical-align: middle;
 }
 
-#connect-key
+.connect-key
 {
 	font-weight: bold;
 	font-size: 28px;

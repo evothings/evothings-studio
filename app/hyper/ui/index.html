@@ -547,12 +547,15 @@ Copyright (c) 2013-2015 Evothings AB
 
 						</div>
 
-						<div id="havenotoken" >
+						<div id="havenotoken" class="framed-box" style="margin-bottom:5px">
 							<label for="tokeninput">Cloud Token</label>
-							<input class="mdl-textfield__input" type="text" id="tokeninput" name="tokeninput" style="margin:10px"/>
-							<div class="mdl-dialog__actions">
-								<button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="tokenbutton">Save</button>
+							<div style="display:flex; flex-direction: row">
+								<input class="mdl-textfield__input connect-key connect-key-item" type="text" id="tokeninput" name="tokeninput" style="margin:10px"/>
+								<div class="mdl-dialog__actions">
+									<button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="tokenbutton">Save</button>
+								</div>
 							</div>
+							<p>You can get your cloud token at the download page <a onclick="hyper.UI.openInBrowser('https://evothings.com/download-evothings-studio-21')" href="#">https://evothings.com/download-evothings-studio-21</a></p>
 						</div>
 						<div id="havetoken" style="display:none">
 
