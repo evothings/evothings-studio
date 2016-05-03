@@ -1,27 +1,12 @@
 #!/usr/bin/ruby
 
-# This script will make sure that the folders 'app/hyper/libs' and
-# It may fetch files from the Internet.
+# This script will make sure that the folders 'app/hyper/libs' has
+# the js libraries we are using.
 
 require 'fileutils'
 require './helpers.rb'
-require './sibling-repos.rb'
 
 include FileUtils::Verbose
-
-### Clone Git repos required for the build, if they do not exist.
-siblingRepos.each do |sr|
-	clone(sr.name, sr.url)
-end
-
-### Load EvoThingsStudio settings into a namespace where they won't conflict with our globals.
-module ETS
-	module Foo
-		eval(File.read('./buildPlugin.rb'))
-	end
-	extend Foo
-	#p ETS.methods
-end
 
 ### Download JavaScript libraries.
 def downloadJavaScriptLibraries
@@ -41,12 +26,4 @@ def downloadJavaScriptLibraries
 		'jquery-ui-1.11.4/jquery-ui.min.js')
 end
 
-### Load custom settings from localConfig.rb
-#puts "looking for localConfig..."
-# allow override of defined functions
-if(File.exist?('./localConfig.rb'))
-	load './localConfig.rb'
-end
-
-### Run all steps.
 downloadJavaScriptLibraries
