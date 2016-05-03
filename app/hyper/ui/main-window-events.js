@@ -237,6 +237,13 @@ exports.defineUIEvents = function(hyper)
 	{
 		hyper.UI.openNewAppDialog()
 	})
+	
+	// ************** New App Dialog Change Button **************
+
+	hyper.UI.$('#button-change-new-app').click(function()
+	{
+		hyper.UI.changeNewApp()
+	})
 
 	// ************** New App Dialog Save Button **************
 

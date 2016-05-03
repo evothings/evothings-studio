@@ -897,7 +897,7 @@ exports.defineUIFunctions = function(hyper)
 		var exists = FILEUTIL.statSync(targetParentDir)
 		if (!exists)
 		{
-			window.alert('The parent folder does not exist, please type a new folder name.')
+			window.alert('The parent folder does not exist, please change folder.')
 			return // Abort (dialog is still visible)
 		}
 
@@ -1008,6 +1008,14 @@ exports.defineUIFunctions = function(hyper)
 		// Show dialog.
 		hyper.UI.$('#dialog-new-app').modal('show')
 	}
+	
+  hyper.UI.changeNewApp = function()
+	{
+		var defaultDir = hyper.UI.$('#input-new-app-parent-folder').val()
+    var dir = MAIN.selectOrCreateFolder('Please select or create a folder', defaultDir)
+    hyper.UI.$('#input-new-app-parent-folder').val(dir)
+    return
+  }
 
 	hyper.UI.saveNewApp = function()
 	{
@@ -1015,6 +1023,14 @@ exports.defineUIFunctions = function(hyper)
 		var parentFolder = hyper.UI.$('#input-new-app-parent-folder').val()
 		var appFolder = hyper.UI.$('#input-new-app-folder').val()
 		var targetDir = PATH.join(parentFolder, appFolder)
+
+		// If target parent folder does not exist, display an alert dialog and abort.
+		var exists = FILEUTIL.statSync(parentFolder)
+		if (!exists)
+		{
+			window.alert('The parent folder does not exist, please change folder.')
+			return // Abort (dialog is still visible)
+		}
 
 		// If target folder exists, display an alert dialog and abort.
 		var exists = FILEUTIL.statSync(targetDir)
