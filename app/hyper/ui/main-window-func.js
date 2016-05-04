@@ -58,14 +58,13 @@ exports.defineUIFunctions = function(hyper)
 	hyper.UI.setupUI = function()
 	{
 		ensureCloudApiTokenExists()
-		createSystemMenuForOSX()
 		styleUI()
 		setUIActions()
 		setWindowActions()
 		setUpFileDrop()
 		restoreSavedUIState()
+		MAIN.showWorkbenchWindow()
 		initAppLists()
-
 	}
 
 	function initAppLists()
@@ -103,27 +102,6 @@ exports.defineUIFunctions = function(hyper)
 		})
 	}
 
-	// System menus must be explicitly created on OS X,
-	// see node-webkit documentation:
-	// https://github.com/rogerwang/node-webkit/wiki/Menu#menucreatemacbuiltinappname
-	function createSystemMenuForOSX()
-	{
-		/*if ('darwin' == OS.platform())
-		{
-			try
-			{
-				var appName = getApplicationName()
-				var win = hyper.UI.GUI.Window.get()
-				var nativeMenuBar = new hyper.UI.GUI.Menu({ type: 'menubar' })
-				nativeMenuBar.createMacBuiltin(appName)
-				win.menu = nativeMenuBar;
-			}
-			catch (ex)
-			{
-				LOGGER.log('[main-window-func.js] Error creating OS X menubar: ' + ex.message);
-			}
-		}*/
-	}
 
 	// Helper function that returns the application name
 	// specified in package.json.
@@ -187,16 +165,14 @@ exports.defineUIFunctions = function(hyper)
 	function saveUIState()
 	{
 		var geometry = MAIN.workbenchWindow.getBounds()
-
 		// Do not save if window is minimized on Windows.
 		// On Windows an icon has x,y coords -32000 when
 		// window is minimized. On Linux and OS X the window
 		// coordinates and size are intact when minimized.
-		if (win.x < -1000)
+		if (geometry.x < -1000)
 		{
 			return;
 		}
-
 		SETTINGS.setProjectWindowGeometry(geometry)
 	}
 
@@ -205,8 +181,6 @@ exports.defineUIFunctions = function(hyper)
 		var geometry = SETTINGS.getProjectWindowGeometry()
 		if (geometry)
 		{
-			var win = MAIN.workbenchWindow
-
 			// Make sure top-left corner is visible.
 			var offsetY = 0
 			if ('darwin' == OS.platform())
@@ -219,7 +193,7 @@ exports.defineUIFunctions = function(hyper)
 			geometry.y = Math.min(geometry.y, hyper.UI.DOM.screen.height - 200)
 
 			// Set window size.
-			win.setBounds(geometry)
+			MAIN.workbenchWindow.setBounds(geometry)
 		}
 		// Restore remember me state for logout action
 		var checked = SETTINGS.getRememberMe()
@@ -935,21 +909,25 @@ exports.defineUIFunctions = function(hyper)
 	{
 	  // If it's not absolute we copy from Evothings.com
 	  if (!FILEUTIL.isPathAbsolute(sourcePath)) {
-			copyAppFromURL(MAIN.BASE + '/examples/' + sourcePath, targetDir, cb)
+			copyAppFromURL(MAIN.BASE + '/examples/' + sourcePath, targetDir, function() {
+        // Make a new app-uuid in evothings.json in the copied app.
+        // This is done to prevent duplicated app uuids.
+        APP_SETTINGS.generateNewAppUUID(targetDir)
+        // Add path to "My Apps".
+        hyper.UI.addProject(targetDir)
+        // Callback
+		    cb()
+      })
 		} else {
 		  try {
 			  var appFolderName = PATH.basename(sourcePath)
-
 			  // Copy files.
 			  FSEXTRA.copySync(sourcePath, targetDir)
-
-			  // Remove any app-uuid entry from evothings.json in the copied app.
+			  // Make a new app-uuid in evothings.json in the copied app.
 			  // This is done to prevent duplicated app uuids.
 			  APP_SETTINGS.generateNewAppUUID(targetDir)
-
 			  // Add path to "My Apps".
 			  hyper.UI.addProject(targetDir)
-			  
 			  // Callback
 			  cb()
 		  } catch (error) {
@@ -986,13 +964,7 @@ exports.defineUIFunctions = function(hyper)
 	  		      FSEXTRA.removeSync(targetDir)
         		  window.alert('Something went wrong with unzipping app.')
         		  LOGGER.log('[main-window-func.js] Error in copyAppFromURL: ' + err)
-        		} else {		    
-		          // Make a new app-uuid in evothings.json in the copied app.
-		          // This is done to prevent duplicated app uuids.
-		          APP_SETTINGS.generateNewAppUUID(targetDir)
-		          // Add path to "My Apps".
-		          hyper.UI.addProject(targetDir)
-		          
+        		} else {       
 		          //Callback
 		          cb()
 		        }

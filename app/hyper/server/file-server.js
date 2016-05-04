@@ -428,13 +428,6 @@ function serveResource(platform, path, ifModifiedSince)
 		// Handle this case in the server?
 		LOADER.createResponse404(path)
 	}
-	else if (SETTINGS.getServeCordovaJsFiles() &&
-		(path == '/cordova.js' ||
-		path == '/cordova_plugins.js' ||
-		path.indexOf('/plugins/') == 0))
-	{
-		return serveCordovaFile(platform, path, ifModifiedSince)
-	}
 	else if (mBasePath)
 	{
 		return LOADER.response(
@@ -463,82 +456,6 @@ function serveFileOrNull(path)
 	{
 		return null
 	}
-}
-
-/**
- * Internal.
- *
- * Serve Cordova JavaScript file for the platform making the request.
- */
-function serveCordovaFile(platform, path)
-{
-	// Two methods are used to find cordova files for the
-	// platform making the request.
-
-	// Method 1:
-	// If we are inside a cordova project, we use the
-	// files in that project.
-	// Folder structure:
-	//	 www <-- mBasePath (root of running app)
-	//	   index.html
-	//	 platforms
-	//	   android
-	//		 assets
-	//		   www
-	//			 cordova.js
-	//			 cordova_plugins.js
-	//			 plugins
-	//	   ios
-	//		 www
-	//		   cordova.js
-	//		   cordova_plugins.js
-	//		   plugins
-	//
-	// Set path to Cordova files in current project.
-	// Note that mBasePath ends with path separator.
-	var androidCordovaAppPath =
-		mBasePath +
-		'../platforms/android/assets/' +
-		'www' + path
-	var iosCordovaAppPath =
-		mBasePath +
-		'../platforms/ios/' +
-		'www' + path
-	var wpCordovaAppPath =
-		mBasePath +
-		'../platforms/wp8/' +
-		'www' + path
-
-	// Method 2:
-	// Paths to Cordova files in the HyperReload library.
-	// This is used if the application is not a Cordova project.
-	var androidCordovaLibPath = './hyper/libs-cordova/android' + path
-	var iosCordovaLibPath = './hyper/libs-cordova/ios' + path
-	var wpCordovaLibPath = './hyper/libs-cordova/wp' + path
-
-	// Get the file, first try the path for a Cordova project, next
-	// get the file from the HyperReload Cordova library folder.
-	var cordovaJsFile = null
-	if ('android' == platform)
-	{
-		cordovaJsFile =
-			serveFileOrNull(androidCordovaAppPath) ||
-			serveFileOrNull(androidCordovaLibPath)
-	}
-	else if ('ios' == platform)
-	{
-		cordovaJsFile =
-			serveFileOrNull(iosCordovaAppPath) ||
-			serveFileOrNull(iosCordovaLibPath)
-	}
-	else if ('wp' == platform)
-	{
-		cordovaJsFile =
-			serveFileOrNull(wpCordovaAppPath) ||
-			serveFileOrNull(wpCordovaLibPath)
-	}
-
-	return cordovaJsFile || LOADER.createResponse404(path)
 }
 
 /**

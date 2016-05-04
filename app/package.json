@@ -4,13 +4,14 @@
   "description": "HTML/JS IoT mobile app development tool",
   "version": "2.1.0-alpha6",
   "author": "Evothings <info@evothings.com>",
+  "homepage": "https://evothings.com",
+  "license": "Apache-2.0",
   "main": "main.js",
   "keywords": [
     "Evothings",
     "mobile",
     "JavaScript"
   ],
-  "homepage": "https://evothings.com",
   "bugs": {
     "url": "https://github.com/evothings/evothings-studio/issues",
     "email": "info@evothings.com"
@@ -19,7 +20,6 @@
     "type": "git",
     "url": "https://github.com/evothings/evothings-studio.git"
   },
-  "license": "Apache-2.0",
   "dependencies": {
     "babel-core": "^6.5.2",
     "babel-preset-es2015": "^6.5.0",

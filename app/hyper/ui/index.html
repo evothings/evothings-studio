@@ -9,93 +9,21 @@ Copyright (c) 2013-2015 Evothings AB
 <!-- HTML 5 differences from HTML 4: http://www.w3.org/TR/2008/WD-html5-diff-20080122/ -->
 <head>
 	<meta charset="utf-8">
-	<link rel="stylesheet" href="../../node_modules/material-design-lite/material.min.css">
+	<link rel="stylesheet" href="../../../node_modules/material-design-lite/material.min.css">
 	<link href="../libs/bootstrap-3.3.5-dist/css/bootstrap.min.css" rel="stylesheet">
 	<script>window.$ = window.jQuery = require('../libs/jquery/jquery-2.1.4.min.js');</script>
 	<script src="../libs/jquery/jquery-ui.min.js"></script>
 	<script src="../libs/bootstrap-3.3.5-dist/js/bootstrap.min.js"></script>
 
 
-	<script src="../../node_modules/material-design-lite/material.min.js"></script>
+	<script src="../../../node_modules/material-design-lite/material.min.js"></script>
 
 	<link href="css/hyper-common.css" rel="stylesheet" />
 	<link href="css/hyper-ui.css" rel="stylesheet" />
 </head>
 <body>
 	<div id="panel-page">
-
 		<div id="panel-top">
-
-			<!-- Menu button - unused version with icon -->
-			<!--
-			<div id="panel-tool-menu">
-				<div class="btn-group btn-group-justified">
-					<button id="button-tool-menu" class="btn btn-primary dropdown-toggle btn-hyper-toolbar et-btn-charcoal"
-						data-toggle="dropdown">
-						<span class="glyphicon glyphicon-align-justify"></span>
-					</button>
-					<ul class="dropdown-menu">
-						<li><a id="button-open-settings-dialog" href="javascript:void(0)">Settings</a></li>
-						<li><a class="button-release-notes" href="javascript:void(0)">Release Notes</a></li>
-					</ul>
-				</div>
-			</div>
-			-->
-
-			<!-- Menu button - version with text 
-			<div id="panel-tool-menu">
-				<div class="btn-group btn-group-justified">
-					<!--
-					<button id="button-tool-menu" role="button"
-						class="btn btn-primary dropdown-toggle btn-hyper-toolbar et-btn-charcoal"
-						data-toggle="dropdown"
-						aria-haspopup="true" aria-expanded="false">
-						More <span class="caret"></span>
-					</button>
-
-					<button type="button" class="btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="button-tool-menu" data-toggle="dropdown"
-							aria-haspopup="true" aria-expanded="false">More</button>
-					<ul class="dropdown-menu">
-						<li><a class="button-getting-started"
-							role="button" href="javascript:void(0)">
-							Getting Started</a></li>
-						<li><a class="button-documentation"
-							role="button" href="javascript:void(0)">
-							Documentation</a></li>
-						<li><a class="button-faq"
-							role="button" href="javascript:void(0)">
-							FAQ</a></li>
-						<li><a class="button-examples-documentation"
-							role="button" href="javascript:void(0)">
-							Examples Documentation</a></li>
-						<li><a class="button-ecmascript6-documentation"
-							role="button" href="javascript:void(0)">
-							Documentation for ECMAScript 6</a></li>
-						<li><a class="button-release-notes"
-							role="button" href="javascript:void(0)">
-							Release Notes</a></li>
-						<li style="background-color:springgreen"><a id="button-chat"
-							role="button" href="javascript:void(0)">
-							Chat on Gitter</a></li>
-						<li><a id="button-forum"
-							role="button" href="javascript:void(0)">
-							Forum</a></li>
-						<li><a id="button-feedback"
-							role="button" href="javascript:void(0)">
-							Feedback</a></li>
-						<li><a id="button-share-social"
-							role="button" href="javascript:void(0)">
-							Share in Social Media</a></li>
-						<li><a id="button-disconnect-all-viewers"
-							role="button" href="javascript:void(0)">
-							Disconnect all Viewers</a></li>
-						<li><a id="button-open-settings-dialog"
-							role="button" href="javascript:void(0)">
-							Settings</a></li>
-					</ul>
-				</div>
-			</div>-->
-
 			<div id="panel-tool-buttons">
 				<!-- <div class="btn-group btn-group-justified" role="group"> -->
 				<div style="display: flex; flex-direction: row; ">
@@ -596,14 +524,6 @@ Copyright (c) 2013-2015 Evothings AB
 							<p>For further details, please <a class="button-documentation" href="javascript:void(0)">visit the online documentation</a>.</p>
 							<p><strong>Happy coding!</strong></p>
 						</div>
-
-						<!-- TODO: Show in iframe served from web server -->
-						<!--
-						<iframe id="getting-started-screen-iframe"
-							style="display:none;"
-							src="" nwdisable nwfaketop>
-						</iframe>
-						-->
 					</div>
 				</div>
 			</div>
@@ -624,6 +544,20 @@ Copyright (c) 2013-2015 Evothings AB
 							<p>New in this release is support for <strong>ECMAScript 6</strong> and <strong>Instrumentation</strong> mechanisms for interacting with the connected Viewers. <ul><li>Visit the <a class="button-ecmascript6-documentation" href="javascript:void(0)">ECMAScript 6 documentation page</a> to learn about the new project file structure and the new settings in evothings.json. Use the example app "Hello ECMAScript 6" as a starting point for your projects.</li><li>Visit the <a class="button-instrumentation-documentation" href="javascript:void(0)">Instrumentation documentation page</a> to learn more about this new group of features of the Workbench.</li></ul></p>
 
 							<p>Read the <a class="button-getting-started" href="javascript:void(0)">Getting Started Guide</a> for detailed first-time instructions. Evothings Studio consists of Evothings Workbench and the Evothings Viewer mobile app (get it from <a class="button-evothings-viewer-on-google-play" href="javascript:void(0)">Google Play</a> or <a class="button-evothings-viewer-on-itunes" href="javascript:void(0)">Apple App Store</a>). To run apps in Evothings Viewer, you need Internet access and a connect key that you get below.</p>
+
+						</div>
+
+						<div id="havenotoken" class="framed-box" style="margin-bottom:5px">
+							<label for="tokeninput">Cloud Token</label>
+							<div style="display:flex; flex-direction: row">
+								<input class="mdl-textfield__input connect-key connect-key-item" type="text" id="tokeninput" name="tokeninput" style="margin:10px"/>
+								<div class="mdl-dialog__actions">
+									<button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="tokenbutton">Save</button>
+								</div>
+							</div>
+							<p>You can get your cloud token at the download page <a onclick="hyper.UI.openInBrowser('https://evothings.com/download-evothings-studio-21')" href="#">https://evothings.com/download-evothings-studio-21</a></p>
+						</div>
+						<div id="havetoken" style="display:none">
 
 						</div>
 
@@ -720,17 +654,14 @@ Copyright (c) 2013-2015 Evothings AB
 		<div class="mdl-dialog__content">
 			<div id="tokentext"></div>
 			<div>
-				<label for="tokeninput">Please Enter Your Token</label>
-				<input class="mdl-textfield__input" type="text" id="tokeninput" name="tokeninput" style="margin:10px"/>
 				<div>
-					If you don't have any token, you can get one for free at
-					<a href="https://evothings.com/download-evothings-studio-21">https://evothings.com/download-evothings-studio-21</a>
+					<p>Please input your cloud token in the Connect tab to use Evothings Studio.</p>
+					<p>You can get your cloud token at the download page https://evothings.com/download-evothings-studio-21</p>
 				</div>
 			</div>
 		</div>
 
 		<div class="mdl-dialog__actions">
-			<button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="tokenbutton">Save</button>
 			<button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="tclose">Close</button>
 		</div>
 	</dialog>
