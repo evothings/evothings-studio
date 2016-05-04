@@ -130,8 +130,8 @@ Copyright (c) 2013-2015 Evothings AB
 
 						<span>
 						<div class="form-group">
-								<label>	Factory Reset:</label>
-								<button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="resetbutton">Can't be undone</button>
+								<label>	Reset Cloud Token:</label>
+								<button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="resetbutton">Reset</button>
 							</div>
 						</span>
 
@@ -557,7 +557,7 @@ Copyright (c) 2013-2015 Evothings AB
 							</div>
 							<p>You can get your cloud token at the download page <a onclick="hyper.UI.openInBrowser('https://evothings.com/download-evothings-studio-21')" href="#">https://evothings.com/download-evothings-studio-21</a></p>
 						</div>
-						<div id="havetoken" style="display:none">
+						<div id="havetoken" class="framed-box" style="margin-bottom:5px;display:none">
 
 						</div>
 
@@ -665,6 +665,23 @@ Copyright (c) 2013-2015 Evothings AB
 			<button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="tclose">Close</button>
 		</div>
 	</dialog>
+
+	<dialog class="mdl-dialog" id="rdialog" style="width:480px">
+		<h4 class="mdl-dialog__title">Reset your Cloud API Token</h4>
+		<div class="mdl-dialog__content">
+			<div>
+				<div>
+					<p>This will delete your cloud token (and any associated identities). Cannot be undone!</p>
+				</div>
+			</div>
+		</div>
+
+		<div class="mdl-dialog__actions">
+			<button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="rclose">Cancel</button>
+			<button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" style="background-color:red" id="rreset">reset</button>
+		</div>
+	</dialog>
+
 	<script src="main-window.js"></script>
 
 

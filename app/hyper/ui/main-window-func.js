@@ -86,6 +86,7 @@ exports.defineUIFunctions = function(hyper)
 		else
 		{
 			console.log('existing cloud api token found: '+token)
+			hyper.UI.showToken(token)
 		}
 		console.log('------------------ setting up open token dialog listener...')
 		EVENTS.subscribe(EVENTS.OPENTOKENDIALOG, function(message)
@@ -102,6 +103,25 @@ exports.defineUIFunctions = function(hyper)
 		})
 	}
 
+	hyper.UI.showToken = function(token)
+	{
+		var havetoken = hyper.UI.$('#havetoken')[0]
+		var havenotoken = hyper.UI.$('#havenotoken')[0]
+		var tokeninput = hyper.UI.$('#tokeninput')[0]
+		havetoken.style.display = 'block'
+		havenotoken.style.display = 'none'
+		havetoken.innerHTML = '<b>Cloud Token: </b>'+token
+		tokeninput.value = ''
+	}
+
+	hyper.UI.hideToken = function()
+	{
+		var havetoken = hyper.UI.$('#havetoken')[0]
+		var havenotoken = hyper.UI.$('#havenotoken')[0]
+		havetoken.style.display = 'none'
+		havenotoken.style.display = 'block'
+		havetoken.innerHTML = ''
+	}
 
 	// Helper function that returns the application name
 	// specified in package.json.

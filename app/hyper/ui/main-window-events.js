@@ -300,25 +300,38 @@ exports.defineUIEvents = function(hyper)
 	hyper.UI.$('#tokenbutton').click(function()
 	{
 		console.log('--------------- token button clicked-------------')
-		var dialog = hyper.UI.$('#tdialog')[0]
-		dialog.close()
+
 		var token = hyper.UI.$('#tokeninput')[0].value
+		//console.dir(hyper.UI.$('#tokeninput')[0])
+		//console.dir(token)
 		console.log('token is '+token)
 		SETTINGS.setEvoCloudToken(token)
-		hyper.UI.$('#tokentext')[0].innerHTML = ""
+		//hyper.UI.$('#tokentext')[0].innerHTML = ""
+		hyper.UI.showToken(token)
 		SERVER.sendConnectMessage()
 	});
 	hyper.UI.$('#tclose').click(function()
 	{
-		hyper.UI.$('#tokentext')[0].innerHTML = ""
+		//hyper.UI.$('#tokentext')[0].innerHTML = ""
 		hyper.UI.$('#tdialog')[0].close()
 	});
 	hyper.UI.$('#resetbutton').click(function()
 	{
+		hyper.UI.$('#rdialog')[0].showModal()
+	})
+	hyper.UI.$('#rcancel').click(function()
+	{
+		hyper.UI.$('#rdialog')[0].close()
+	})
+	hyper.UI.$('#rreset').click(function()
+	{
 		console.log('factory reset clicked')
+		hyper.UI.$('#rdialog')[0].close()
 		SERVER.sendResetMessage()
 		SETTINGS.setEvoCloudToken('')
 		SETTINGS.setSessionID('')
+		hyper.UI.hideToken()
+		hideLoginButton()
 	})
 
 	// ************** Login Events **************
