@@ -3,8 +3,16 @@
 // A global object makes it easy to reach windows and functions
 // from BrowserWindows via Electron remote
 global.main = {}
-main.VERSION = '2.1.0'
-main.FULLVERSION = main.VERSION + '-alpha6'
+
+// Versions and URLs associated with them
+main.MAJOR = 2
+main.MINOR = 1
+main.PATCH = 0
+main.BUILD = 'alpha6'
+
+// Don't edit below
+main.VERSION = main.MAJOR + '.' + main.MINOR
+main.FULLVERSION = main.VERSION + '.' + main.PATCH + '-' + main.BUILD
 main.BASE = 'https://evothings.com/' + main.VERSION
 main.DOC = main.BASE + "/doc"
 main.EXAMPLES = main.BASE + "/examples"
