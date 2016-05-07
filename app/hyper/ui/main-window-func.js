@@ -335,7 +335,7 @@ exports.defineUIFunctions = function(hyper)
 		html += '>'
 
 		// Full URL to application
-		var appURL = base + options.path
+		var appURL = base + '/' + options.path
     var imagePath = options.imagePath
     var docURL = options.docURL
     
@@ -748,8 +748,8 @@ exports.defineUIFunctions = function(hyper)
 
 		// Create new list.
 		SETTINGS.getExampleList().then(list => {
-		  var baseDoc = MAIN.BASE + "/doc/examples/"
-		  var baseExamples = MAIN.BASE + '/examples/'
+		  var baseDoc = MAIN.DOC + "/examples/"
+		  var baseExamples = MAIN.EXAMPLES
 		  for (var i = 0; i < list.length; ++i)
 		  {
 			  var entry = list[i]
