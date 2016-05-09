@@ -322,7 +322,8 @@ exports.defineUIEvents = function(hyper)
 		SETTINGS.setEvoCloudToken(token)
 		//hyper.UI.$('#tokentext')[0].innerHTML = ""
 		hyper.UI.showToken(token)
-		SERVER.sendConnectMessage()
+		SERVER.disconnectFromRemoteServer()
+		SERVER.connectToRemoteServer()
 	});
 	hyper.UI.$('#tclose').click(function()
 	{
@@ -403,7 +404,7 @@ exports.defineUIEvents = function(hyper)
 		LOGGER.log('[main-window-events.js] socket.io disconnect')
 		mDisconnectTimer = setTimeout(function()
 		{
-			logoutUser()
+			//logoutUser()
 		}, DISCONNECT_DELAY)
 	})
 
@@ -460,7 +461,7 @@ exports.defineUIEvents = function(hyper)
 	function displayLoginButton()
 	{
 		hyper.UI.$('#button-login').html('Personalize')
-		hyper.UI.$('#login-info').html('Not Logged In')
+		hyper.UI.$('#login-info').html('')
 		hyper.UI.$('#connect-screen-login').hide()
 	}
 

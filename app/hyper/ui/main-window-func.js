@@ -98,6 +98,7 @@ exports.defineUIFunctions = function(hyper)
 			}
 			if(!dialog.open)
 			{
+				hyper.UI.$('#connect-spinner').removeClass('icon-spin-animate')
 				dialog.showModal()
 			}
 		})
@@ -110,7 +111,7 @@ exports.defineUIFunctions = function(hyper)
 		var tokeninput = hyper.UI.$('#tokeninput')[0]
 		havetoken.style.display = 'block'
 		havenotoken.style.display = 'none'
-		havetoken.innerHTML = '<b>Cloud Token: </b>'+token
+		havetoken.innerHTML = '<b>Cloud Token: </b><span class="token-key">'+token+'</span>'
 		tokeninput.value = ''
 	}
 

@@ -188,8 +188,16 @@ function sendResetMessage()
 
 function heartbeat()
 {
-	var uuid = SETTINGS.getEvoGUID()
-	sendMessageToServer(mSocket, 'workbench.heartbeat', { sessionID: mSessionID, uuid: uuid, info: mDeviceInfo })
+	var cloudToken = SETTINGS.getEvoCloudToken()
+	if(cloudToken)
+	{
+		var uuid = SETTINGS.getEvoGUID()
+		sendMessageToServer(mSocket, 'workbench.heartbeat', {sessionID: mSessionID, uuid: uuid, info: mDeviceInfo})
+	}
+	else
+	{
+		console.log('skipping heartbeat due to missing cloud token')
+	}
 }
 
 function onMessageWorkbenchUserLogin(socket, message)
@@ -392,7 +400,7 @@ exports.sendDisconnectAllViewersToServer = function()
 exports.disconnectFromRemoteServer = function()
 {
 	LOGGER.log('[file-server.js] Disconnecting from remote server')
-
+	clearTimeout(mHeartbeatTimer)
 	if (mSocket)
 	{
 		mSocket.close()
