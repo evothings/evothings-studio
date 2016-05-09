@@ -215,7 +215,7 @@ exports.getProjectList = function(list)
 
 exports.getExampleList = function()
 {
-  return UTIL.getJSON('http://evothings.com/' + MAIN.VERSION + '/examples/examples-list.json')
+  return UTIL.getJSON(MAIN.EXAMPLES + '/examples-list.json')
 }
 
 // What a hack. Replaces forward slashes with two

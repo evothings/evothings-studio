@@ -3,14 +3,23 @@
 // A global object makes it easy to reach windows and functions
 // from BrowserWindows via Electron remote
 global.main = {}
-main.VERSION = '2.1.0'
-main.FULLVERSION = main.VERSION + '-alpha6'
+
+// Versions and URLs associated with them
+main.MAJOR = 2
+main.MINOR = 1
+main.PATCH = 0
+main.BUILD = 'alpha6'
+
+// Don't edit below
+main.VERSION = main.MAJOR + '.' + main.MINOR
+main.FULLVERSION = main.VERSION + '.' + main.PATCH + '-' + main.BUILD
 main.BASE = 'https://evothings.com/' + main.VERSION
 main.DOC = main.BASE + "/doc"
 main.EXAMPLES = main.BASE + "/examples"
 
 const electron = require('electron')
 const app = electron.app
+const DIALOG = require('electron').dialog;
 
 // First we need to handle Squirrel installer events and exit fast.
 if (handleSquirrelEvent()) {
@@ -380,7 +389,7 @@ main.getRootDir = function() {
 
 main.createWorkbenchWindow = function() {
   main.workbenchWindow = new BrowserWindow({
-    title: 'Evothings Studio ' + main.FULLVERSION,
+    title: 'Evothings Studio ' + main.FULLVERSION + ' - Workbench',
     icon: 'hyper/ui/images/app-icon.png',
     width: 850, height: 720, webSecurity: false, show: false
   });
@@ -442,6 +451,11 @@ main.openViewersWindow = function() {
 }
 main.showViewersWindow = function() {
   main.viewersWindow.show()
+}
+
+main.selectOrCreateFolder = function(title, defaultDir) {
+  return DIALOG.showOpenDialog({ title: title,
+        defaultPath: defaultDir, properties: [ 'openDirectory', 'createDirectory']})
 }
 
 // Work as relay between our BrowserWindows since they can not talk to

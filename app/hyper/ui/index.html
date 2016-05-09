@@ -186,6 +186,11 @@ Copyright (c) 2013-2015 Evothings AB
 								<input type="text"
 									id="input-new-app-parent-folder"
 									class="form-control"/>
+								<button id="button-change-new-app"
+								  type="button"
+								  class="btn btn-default">
+								  Change
+  							</button>
 							</div>
 							<div class="form-group">
 								<p>Remember to click <strong>RUN</strong> on the new app, this enables live reload on file save.</p>
@@ -241,6 +246,11 @@ Copyright (c) 2013-2015 Evothings AB
 								<input type="text"
 									id="input-copy-app-target-parent-folder"
 									class="form-control"/>
+								<button id="button-change-copy-app"
+								  type="button"
+								  class="btn btn-default">
+								  Change
+  							</button>
 							</div>
 							<div class="form-group">
 								<p>Remember to click <strong>RUN</strong> on the copied app, this enables live reload on file save.</p>
@@ -488,38 +498,34 @@ Copyright (c) 2013-2015 Evothings AB
 						<div class="style-big-para style-small-h2">
 							<h1>Getting Started</h1>
 
-							<p>You can view this screen at any time by selecting "Getting Started" in the "File" menu.</p>
+							<img src="images/getting-started-mobile-app.jpg" style="float:right;width:300px;height:auto;margin-left:20px;margin:bottom:20px;"/><p>Evothings Studio consists of two connected parts, the Workbench application you are currently running and the Evothings Viewer app running on your mobile device(s). You need both parts.</p>
 
-							<h2>Introduction</h2>
-
-							<img src="images/getting-started-mobile-app.jpg" style="float:right;width:300px;height:auto;margin-left:20px;margin:bottom:20px;"/><p>Evothings Studio consists of two connected parts, Evothings Workbench (the application you are currently running) and the Evothings Viewer app running on your mobile device(s). You need both parts to be able to use Evothings Studio.</p>
-
-							<p>Run apps on connected Viewers by clicking <button type="button" class="btn et-btn-green-no-highlight style-small-button">Run</button> on the apps listed under <strong>Examples</strong> and <strong>My Apps</strong>. The currently running app will be automatically reloaded when saving edited code files.</p>
+							<p>Run apps on connected Viewers by clicking <button type="button" class="btn et-btn-green-no-highlight style-small-button">Run</button> on the apps listed under <strong>Examples</strong> and <strong>My Apps</strong>. The currently running app will be automatically reloaded when you edit and save any of the the source code files.</p>
 
 							<h2>Step 1: Install Evothings Viewer</h2>
 
-							<p>Install the Evothings Viewer application on your mobile device(s), get the app from <a class="button-evothings-viewer-on-google-play" href="javascript:void(0)">Google Play</a> or <a class="button-evothings-viewer-on-itunes" href="javascript:void(0)">Apple App Store</a>.
+							<p>Install the Evothings Viewer on your mobile device(s), get it from <a class="button-evothings-viewer-on-google-play" href="javascript:void(0)">Google Play</a> or <a class="button-evothings-viewer-on-itunes" href="javascript:void(0)">Apple App Store</a>.
 
 							<h2>Step 2: Connect to the Workbench from the Viewer</h2>
 
-							<p>To connect the Evothings Viewer app to the Workbench, you need Internet access and a connect key.</p>
+							<p>To connect the Evothings Viewer to the Workbench, you need Internet access and a connect key.</p>
 
-							<p>Go to the <button type="button" class="btn et-btn-stone-no-highlight style-small-button" style="border-radius:0;padding-left:8px;padding-right:8px;">Connect</button> screen and click the <button type="button" class="btn et-btn-green-no-highlight style-small-button">Get Key</button> button to obtain a connect key. Use this key when connecting from the Viewer. Once connected, your session has no time limit. Click the "Get Key" button again if the connect key times out.</p>
+							<p>Go to the <button type="button" class="btn et-btn-stone-no-highlight style-small-button" >Connect</button> screen and click the <button type="button" class="btn et-btn-green-no-highlight style-small-button">Get Key</button> button to obtain a connect key. Use this key when connecting from the Viewer. Once connected, your session has no time limit. Click the "Get Key" button again if the connect key times out.</p>
 
 							<p>Click <button type="button" class="btn et-btn-blue-no-highlight style-small-button">Personalize</button> on the Connect screen to get a Quick-Connect button in the Evothings Viewer app. This button is displayed when you restart the Viewer and allows you to reconnect to the Workbench where you are logged in, without entering a connect key again. This makes it much quicker to connect to the same Workbench.</p>
 
 							<h2>Step 3: How to create a new app</h2>
 
-							<p>To create your own apps you have three options. Copy one of the Evothings example apps by clicking the <button type="button" class="btn et-btn-indigo-no-highlight style-small-button">Copy</button> button, and modify it for your own purposes, or click the <button type="button" class="btn et-btn-indigo-no-highlight style-small-button">New</button> button to create a basic app template.</p>
+							<p>To create your own apps you have three options. Copy one of the Evothings example apps by clicking the <button type="button" class="btn et-btn-indigo-no-highlight style-small-button">Copy</button> button, and modify it for your own purposes, or click the <button type="button" class="btn et-btn-indigo-no-highlight style-small-button">New</button> button to create a basic app from a template. </p>
 							<p>You can also drag and drop any .html file (typically index.html) to the Workbench window to add an existing app under <strong>My Apps</strong>.</p>
-							<p>To add project with ECMAScript 6 support, drag the project folder or the evothings.json file into the Workbench window. Learn more in the <a class="button-ecmascript6-documentation" href="javascript:void(0)">ECMAScript documentation for Evothings Studio</a>.</p>
+							<p>To add a project with ECMAScript 6 support, drag the project folder or the evothings.json file into the Workbench window. Learn more in the <a class="button-ecmascript6-documentation" href="javascript:void(0)">ECMAScript documentation for Evothings Studio</a>.</p>
 
-							<p>Arrange apps using drag and drop (the list of Evothings example apps cannot be rearranged though). Click the close icon (x) to delete an app entry. This will NOT delete the application files.</p>
+							<p>Arrange apps using drag and drop (the example apps cannot be rearranged though). Click the close icon (x) to delete an app entry. This will NOT delete the application files.</p>
 
 							<h2>Step 4: Code in your favourite editor end enjoy live reload</h2>
 
 							<p>Launch the app you wish to work on in connected Viewers using the <button type="button" class="btn et-btn-green-no-highlight style-small-button">Run</button> button. This makes it the active app. When you save any code file for the active app, it will automatically get reloaded on all connected mobile devices.</p>
-							<p>To edit the code of an app, click the <button type="button" class="btn et-btn-blue-no-highlight style-small-button">Code</button> button on the app under <strong>My Apps</strong>. This will open a system file browser for your app. (Note that you cannot edit Evothings example apps directly, you need to make a copy first.)</p>
+							<p>To edit the code of an app, click the <button type="button" class="btn et-btn-blue-no-highlight style-small-button">Code</button> button on the app under <strong>My Apps</strong>. This will open a system file browser for your app. Note that you cannot edit the examples directly, you need to make a copy first.</p>
 							<p>From the system file browser, open the files you wish to edit in your editor of choice. Edit the file and press save in the editor to reload the app.</p>
 							<p>For further details, please <a class="button-documentation" href="javascript:void(0)">visit the online documentation</a>.</p>
 							<p><strong>Happy coding!</strong></p>
