@@ -211,7 +211,7 @@ function onMessageWorkbenchUserLogin(socket, message)
 function onMessageWorkbenchTokenRejected(socket, message)
 {
 	console.log('++++++++++++++++++ Cloud Token Rejected by Proxy !!!!!  ++++++++++++++++++++')
-	EVENTS.publish(EVENTS.OPENTOKENDIALOG, message.reason || "We couldn't find the token you provided")
+	EVENTS.publish(EVENTS.OPENTOKENDIALOG, message.reason || "We couldn't find the token you provided. Please use another token.")
 }
 
 function onMessageWorkbenchUserLogout(socket, message)

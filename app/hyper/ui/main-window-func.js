@@ -96,11 +96,9 @@ exports.defineUIFunctions = function(hyper)
 			{
 				hyper.UI.$('#tokentext')[0].innerHTML = message
 			}
-			if(!dialog.open)
-			{
-				hyper.UI.$('#connect-spinner').removeClass('icon-spin-animate')
-				dialog.showModal()
-			}
+			hyper.UI.$('#connect-spinner').removeClass('icon-spin-animate')
+			dialog.showModal()
+			hyper.UI.hideToken()
 		})
 	}
 
