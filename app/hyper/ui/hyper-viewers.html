@@ -24,6 +24,7 @@ jQuery Layout: http://layout.jquery-dev.net/
 	<script src="../../node_modules/material-design-lite/material.min.js"></script>
 	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
+	<link rel="stylesheet" href="css/hyper-ui.css" />
 	<link rel="stylesheet" href="css/tools-window.css" />
 
 </head>
@@ -37,6 +38,22 @@ jQuery Layout: http://layout.jquery-dev.net/
 
 	<div class="ui-layout-center" style="padding:10px">
 		<div id="code-area" class="xui-layout-content">
+			<div class="screen-start-help style-big-para">
+				<p>
+					To inject instrumentation debugging capabilities into a viewer, click the <strong>Start Instrumentation</strong> button for that viewer. You will then see a list of instrumentation plugins that has been loaded on the viewer.
+					Instrumentation plugins are small JavaScript objects that enable the workbench to drill down into a hierarchy and subscribe to live data feeds from objects in that heirarchy. An example is the sample cordova plugin, which exposes a shallow heirarchy of just two objects - compass and accellerometer.
+				</p>
+				<p>
+					To explore the data of an instrumentation plugin, just click on each level until you get to a data object, when you click on that you will start subscribing to its data feed.
+				</p>
+				<p>
+					<strong>Inject Files</strong> let you upload files directly to your app running in the viewer without reloading it. <strong>Please note</strong> that you need to code a little bit yourself to take care of the file after it is uploaded, if you're using Base64 transfer.
+				</p>
+			</div>
+			<button id="button-toogle-help" type="button"
+					class="btn et-btn-charcoal connect-screen-element">
+				Hide Help
+			</button>
 			<h4>Viewers</h4>
 			<div style="padding:10px;display: flex; flex-direction: row; font-size:15px" id="viewer-list">
 

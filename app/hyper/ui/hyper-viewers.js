@@ -1153,6 +1153,22 @@ $(function()
 			mOldClientList = info.clients
 		}
 
+		var thelp = document.getElementById('button-toogle-help')
+		thelp.ishidden = false
+		$('.screen-start-help').show()
+		thelp.addEventListener('click', function()
+		{
+			thelp.innerHTML = thelp.ishidden ? 'Hide Help' : 'Show Help'
+			if(thelp.ishidden)
+			{
+				$('.screen-start-help').show()
+			}
+			else
+			{
+				$('.screen-start-help').hide()
+			}
+			thelp.ishidden = !thelp.ishidden
+		})
 
 		var uploadFiles = []
 		var state = 'off'

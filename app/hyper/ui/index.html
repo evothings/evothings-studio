@@ -498,7 +498,9 @@ Copyright (c) 2013-2015 Evothings AB
 						<div class="style-big-para style-small-h2">
 							<h1>Getting Started</h1>
 
-							<img src="images/getting-started-mobile-app.jpg" style="float:right;width:300px;height:auto;margin-left:20px;margin:bottom:20px;"/><p>Evothings Studio consists of two connected parts, the Workbench application you are currently running and the Evothings Viewer app running on your mobile device(s). You need both parts.</p>
+							<img src="images/getting-started-mobile-app.jpg" style="float:right;width:300px;height:auto;margin-left:20px;margin:bottom:20px;"/>
+							<p>Evothings Studio consists of three connected parts, Evothings Workbench (the application you are currently running), the Evothings Viewer app running on your mobile device(s) and a cloud service to connect the Workbench and the Viewer applications. You need all three parts to be able to use Evothings Studio.
+							</p>
 
 							<p>Run apps on connected Viewers by clicking <button type="button" class="btn et-btn-green-no-highlight style-small-button">Run</button> on the apps listed under <strong>Examples</strong> and <strong>My Apps</strong>. The currently running app will be automatically reloaded when you edit and save any of the the source code files.</p>
 
@@ -506,11 +508,14 @@ Copyright (c) 2013-2015 Evothings AB
 
 							<p>Install the Evothings Viewer on your mobile device(s), get it from <a class="button-evothings-viewer-on-google-play" href="javascript:void(0)">Google Play</a> or <a class="button-evothings-viewer-on-itunes" href="javascript:void(0)">Apple App Store</a>.
 
-							<h2>Step 2: Connect to the Workbench from the Viewer</h2>
+							<h2>	Step 2: Input Cloud Token</h2>
+							<p>	Input the cloud token at the Connect and Personalization page. You only need to do this once. The Cloud Token give you access to the cloud services needed to use Evothings Studio.</p>
+
+							<h2>Step 3: Connect to the Workbench from the Viewer</h2>
 
 							<p>To connect the Evothings Viewer to the Workbench, you need Internet access and a connect key.</p>
 
-							<p>Go to the <button type="button" class="btn et-btn-stone-no-highlight style-small-button" >Connect</button> screen and click the <button type="button" class="btn et-btn-green-no-highlight style-small-button">Get Key</button> button to obtain a connect key. Use this key when connecting from the Viewer. Once connected, your session has no time limit. Click the "Get Key" button again if the connect key times out.</p>
+							<p>Go to the <strong>Connect</strong> screen and click the <button type="button" class="btn et-btn-green-no-highlight style-small-button">Get Key</button> button to obtain a connect key. Use this key when connecting from the Viewer. Once connected, your session has no time limit. Click the "Get Key" button again if the connect key times out.</p>
 
 							<p>Click <button type="button" class="btn et-btn-blue-no-highlight style-small-button">Personalize</button> on the Connect screen to get a Quick-Connect button in the Evothings Viewer app. This button is displayed when you restart the Viewer and allows you to reconnect to the Workbench where you are logged in, without entering a connect key again. This makes it much quicker to connect to the same Workbench.</p>
 
@@ -547,12 +552,16 @@ Copyright (c) 2013-2015 Evothings AB
 
 						<div class="screen-start-help style-big-para">
 
-							<p>New in this release is support for <strong>ECMAScript 6</strong> and <strong>Instrumentation</strong> mechanisms for interacting with the connected Viewers. <ul><li>Visit the <a class="button-ecmascript6-documentation" href="javascript:void(0)">ECMAScript 6 documentation page</a> to learn about the new project file structure and the new settings in evothings.json. Use the example app "Hello ECMAScript 6" as a starting point for your projects.</li><li>Visit the <a class="button-instrumentation-documentation" href="javascript:void(0)">Instrumentation documentation page</a> to learn more about this new group of features of the Workbench.</li></ul></p>
+							<p>Evothings Studio consists of Evothings Workbench, the Evothings Viewer mobile app and a cloud solution enabling the fast workflow and other features.
+							</p>
 
 							<p>Read the <a class="button-getting-started" href="javascript:void(0)">Getting Started Guide</a> for detailed first-time instructions. Evothings Studio consists of Evothings Workbench and the Evothings Viewer mobile app (get it from <a class="button-evothings-viewer-on-google-play" href="javascript:void(0)">Google Play</a> or <a class="button-evothings-viewer-on-itunes" href="javascript:void(0)">Apple App Store</a>). To run apps in Evothings Viewer, you need Internet access and a connect key that you get below.</p>
-
+							<p>To run apps in the Evothings Viewer, you need Internet access, a Cloud Token to input once to get access to our cloud services and a connect key to connect the Viewer apps that you get below.</p>
 						</div>
-
+						<div class="screen-start-help framed-box style-big-para" style="margin-bottom:5px">
+							<p>Input your <strong>cloud token</strong> below and press save. You only need to do this once. The cloud token is generated at our download page and give users access to the cloud services. The cloud token is anonymous whereby you can use Evothings Studio without leaving your personal information.
+							</p>
+						</div>
 						<div id="havenotoken" class="framed-box" style="margin-bottom:5px">
 							<label for="tokeninput">Cloud Token</label>
 							<div style="display:flex; flex-direction: row">
@@ -582,15 +591,10 @@ Copyright (c) 2013-2015 Evothings AB
 
 						<div class="screen-start-help framed-box style-big-para">
 							<p>Personalize your workbench by using the login feature. This will give access to added features and services based on that the Viewer application can identify a unique Workbench.
-
 								Currently you get access to a convenient feature where Viewers can be reconnected to the a Workbench with one a one click option.
-
 								Viewers and users need to be able to know with Workbench to connect to when there are several possible ones. A common scenario when teams use Evothings and Viewers are connected to different workbenches for development and testing purposes.
-
 								We plan to add features and services going forward.</p>
 						</div>
-
-
 <!--
 						<div class="screen-start-help framed-box style-big-para">
 							<p><strong>Hide and show</strong> help the texts on this screen using this button.</p>
