@@ -71,6 +71,8 @@ exports.defineUIFunctions = function(hyper)
 	{
 		readProjectList()
 		hyper.UI.displayAppLists()
+		// Register a timer so that we update the example list every 30 min
+	  setInterval(function() { hyper.UI.displayExampleList() }, 30 * 60 * 1000);
 		hyper.UI.setServerMessageFun()
 	}
 
