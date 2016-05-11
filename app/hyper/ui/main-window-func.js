@@ -767,6 +767,16 @@ exports.defineUIFunctions = function(hyper)
 
 		// Create new list.
 		SETTINGS.getExampleList().then(list => {
+		  // Sort examples but place all "Hello*" apps first
+      list = list.sort(function(a, b) {
+        if (a.title.substring(0, 5) == "Hello") {
+          return -1
+        }
+        if (b.title.substring(0, 5) == "Hello") {
+          return 1
+        }        
+        return a.title.localeCompare(b.title);
+      })
 		  var baseDoc = MAIN.DOC + "/examples/"
 		  var baseExamples = MAIN.EXAMPLES
 		  for (var i = 0; i < list.length; ++i)
