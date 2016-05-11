@@ -900,7 +900,9 @@ exports.defineUIFunctions = function(hyper)
 	{
 		var defaultDir = hyper.UI.$('#input-copy-app-target-parent-folder').val()
     var dir = MAIN.selectOrCreateFolder('Please select or create a folder', defaultDir)
-    hyper.UI.$('#input-copy-app-target-parent-folder').val(dir)
+    if (dir) {
+      hyper.UI.$('#input-copy-app-target-parent-folder').val(dir)
+    }
     return
   }
 	
@@ -1032,7 +1034,9 @@ exports.defineUIFunctions = function(hyper)
 	{
 		var defaultDir = hyper.UI.$('#input-new-app-parent-folder').val()
     var dir = MAIN.selectOrCreateFolder('Please select or create a folder', defaultDir)
-    hyper.UI.$('#input-new-app-parent-folder').val(dir)
+    if (dir) {
+      hyper.UI.$('#input-new-app-parent-folder').val(dir)
+    }
     return
   }
 
