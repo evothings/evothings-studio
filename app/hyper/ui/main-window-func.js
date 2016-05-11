@@ -72,7 +72,7 @@ exports.defineUIFunctions = function(hyper)
 		readProjectList()
 		hyper.UI.displayAppLists()
 		// Register a timer so that we update the example list every 30 min
-	  setInterval(function() { hyper.UI.displayExampleList() }, 30 * 60 * 1000);
+	  setInterval(function() { hyper.UI.displayExampleList(true) }, 30 * 60 * 1000);
 		hyper.UI.setServerMessageFun()
 	}
 
@@ -717,7 +717,7 @@ exports.defineUIFunctions = function(hyper)
 	hyper.UI.displayAppLists = function()
 	{
 	  console.log("DISPLAYING EXAMPLE LIST")
-		hyper.UI.displayExampleList()
+		hyper.UI.displayExampleList(false)
 		hyper.UI.displayProjectList()
 	}
 
@@ -762,8 +762,9 @@ exports.defineUIFunctions = function(hyper)
 		}
 	}
 
-	hyper.UI.displayExampleList = function()
+	hyper.UI.displayExampleList = function(silent)
 	{
+	  console.log("YAHOO")
 		// Clear current list.
 		hyper.UI.$('#screen-examples').empty()
 
@@ -800,7 +801,9 @@ exports.defineUIFunctions = function(hyper)
 				  })
 		  }
 		}, status => {
-	    window.alert('Something went wrong downloading examples list from evothings.com. Do you have internet access?');
+		  if (!silent) {
+  	    window.alert('Something went wrong downloading examples list from evothings.com. Do you have internet access?');
+  	  }
     })
 	}
 
