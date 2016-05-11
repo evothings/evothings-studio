@@ -788,7 +788,7 @@ exports.defineUIFunctions = function(hyper)
 				  })
 		  }
 		}, status => {
-	    window.alert('Something went wrong downloading examples list from evothings.com');
+	    window.alert('Something went wrong downloading examples list from evothings.com. Do you have internet access?');
     })
 	}
 
@@ -988,7 +988,7 @@ exports.defineUIFunctions = function(hyper)
 		  sourceURL = sourceURL + '.zip'
 		  UTIL.download(sourceURL, (zipFile, err) => {
 		    if (err) {
-    		  window.alert('Something went wrong, could not download app.')
+    		  window.alert('Something went wrong, could not download app. Do you have internet access?')
     		  LOGGER.log('[main-window-func.js] Error in copyAppFromURL: ' + err)
     		} else {		    
     		  // Extract into targetDir
@@ -997,7 +997,7 @@ exports.defineUIFunctions = function(hyper)
 	  		    if (err) {
 	  		      // TODO: This doesn't seem to work
 	  		      FSEXTRA.removeSync(targetDir)
-        		  window.alert('Something went wrong with unzipping app.')
+        		  window.alert('Something went wrong when unzipping app.')
         		  LOGGER.log('[main-window-func.js] Error in copyAppFromURL: ' + err)
         		} else {       
 		          //Callback
