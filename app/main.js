@@ -8,7 +8,7 @@ global.main = {}
 main.MAJOR = 2
 main.MINOR = 1
 main.PATCH = 0
-main.BUILD = 'alpha7'
+main.BUILD = 'beta1'
 
 // Don't edit below
 main.VERSION = main.MAJOR + '.' + main.MINOR
@@ -480,7 +480,7 @@ ipcMain.on('viewers-window', function(event, arg) {
 // but using a publish subscribe model, this was the previous EVENTS module
 ipcMain.on('events-subscribe', function(event, channel, windowID) {
   var listeners = main.listeners[channel] || new Set()
-  console.log("Subscribed window " + windowID + " to " + channel)
+  //console.log("Subscribed window " + windowID + " to " + channel)
   listeners.add(windowID) 
   main.listeners[channel] = listeners
 });
@@ -494,12 +494,12 @@ ipcMain.on('events-unsubscribe', function(event, channel, windowID) {
 // Forward the event to all registered windows for this channel
 ipcMain.on('events-publish', function(event, channel, obj) {
   var listeners = main.listeners[channel]
-  console.log("Published "+ JSON.stringify(obj) + " to " + JSON.stringify(channel))
+  //console.log("Published "+ JSON.stringify(obj) + " to " + JSON.stringify(channel))
   if (listeners) {
     for (let windowID of listeners) {
       var window = BrowserWindow.fromId(windowID)
       if (window) {
-        console.log("Sending " + JSON.stringify(obj) + " to " + channel + " in window " + windowID)
+        //console.log("Sending " + JSON.stringify(obj) + " to " + channel + " in window " + windowID)
         window.webContents.send('events-event', channel, obj);
       }
     }

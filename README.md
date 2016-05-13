@@ -2,7 +2,7 @@
 Evothings Studio is a tool for development of IoT enabled mobile apps in HTML5/JavaScript.
 
 ## Download
-You are most welcome to visit [Evothings.com](https://evothings.com) to learn more and to [download](https://evothings.com/download) the latest stable version, or one of our [alpha-versions](https://evothings.com/download/#alpha). You will find tutorials, videos, documentation and a forum to help you develop mobile applications for IoT in JavaScript. It is easy to get started!
+You are most welcome to visit [Evothings.com](https://evothings.com) to learn more and to [download](https://evothings.com/download) the latest stable version, or our [beta-version](https://evothings.com/download/#beta) of the upcoming release, or perhaps even a [helmet-on-alpha-version](https://evothings.com/download/#alpha). You will find tutorials, videos, documentation and a forum to help you develop mobile applications for IoT in JavaScript. It is easy to get started!
 
 ## Running from source
 It's easy, get all dependencies first with `npm run install` and then start it with `npm start`.
