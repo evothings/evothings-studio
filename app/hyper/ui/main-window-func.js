@@ -929,6 +929,18 @@ exports.defineUIFunctions = function(hyper)
 		var targetParentDir = hyper.UI.$('#input-copy-app-target-parent-folder').val()
 		var targetDir = PATH.join(targetParentDir, targetAppFolder)
 
+    // App folder is empty
+    if (!targetAppFolder) {
+      window.alert('You need to enter a name for the destination folder.')
+			return // Abort (dialog is still visible)
+    }
+    
+    // Parent folder is empty
+    if (!targetParentDir) {
+      window.alert('You need to enter or select a parent folder.')
+			return // Abort (dialog is still visible)
+    }
+
 		// If target parent folder does not exist, display an alert dialog and abort.
 		var exists = FILEUTIL.statSync(targetParentDir)
 		if (!exists)
@@ -1063,7 +1075,7 @@ exports.defineUIFunctions = function(hyper)
 		var appFolder = hyper.UI.$('#input-new-app-folder').val()
 		var targetDir = PATH.join(parentFolder, appFolder)
 
-    // Parent folder is empty
+    // App folder is empty
     if (!appFolder) {
       window.alert('You need to enter a name for the app folder.')
 			return // Abort (dialog is still visible)
