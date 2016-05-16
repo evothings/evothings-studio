@@ -1040,6 +1040,7 @@ exports.defineUIFunctions = function(hyper)
 		// Populate input fields.
 		var path = PATH.join(SETTINGS.getMyAppsPath())
 		hyper.UI.$('#input-new-app-parent-folder').val(path)
+    hyper.UI.$('#input-new-app-folder').val('')
 
 		// Show dialog.
 		hyper.UI.$('#dialog-new-app').modal('show')
@@ -1061,6 +1062,18 @@ exports.defineUIFunctions = function(hyper)
 		var parentFolder = hyper.UI.$('#input-new-app-parent-folder').val()
 		var appFolder = hyper.UI.$('#input-new-app-folder').val()
 		var targetDir = PATH.join(parentFolder, appFolder)
+
+    // Parent folder is empty
+    if (!appFolder) {
+      window.alert('You need to enter a name for the app folder.')
+			return // Abort (dialog is still visible)
+    }
+    
+    // Parent folder is empty
+    if (!parentFolder) {
+      window.alert('You need to enter or select a parent folder.')
+			return // Abort (dialog is still visible)
+    }
 
 		// If target parent folder does not exist, display an alert dialog and abort.
 		var exists = FILEUTIL.statSync(parentFolder)
