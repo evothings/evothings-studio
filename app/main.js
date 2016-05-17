@@ -8,7 +8,7 @@ global.main = {}
 main.MAJOR = 2
 main.MINOR = 1
 main.PATCH = 0
-main.BUILD = 'beta1'
+main.BUILD = 'beta2'
 
 // Don't edit below
 main.VERSION = main.MAJOR + '.' + main.MINOR
