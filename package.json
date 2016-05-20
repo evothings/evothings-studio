@@ -32,6 +32,6 @@
     "dist:linux": "build --platform linux --arch x64",
     "dist:win64": "build --platform win32 --arch x64",
     "dist:win32": "build --platform win32 --arch ia32",
-    "start": "cd app && electron main.js"
+    "start": "cd app && electron --enable-logging --disable-http-cache main.js"
   }
 }
