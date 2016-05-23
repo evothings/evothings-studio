@@ -238,8 +238,8 @@ main.addMenu = function() {
           click: function() { Shell.openExternal(main.DOC + '/tutorials/ecmascript6.html') }
         },
         {
-          label: 'Frequently Asked Questions',
-          click: function() { Shell.openExternal(main.DOC + '/faq/faq.html') }
+          label: 'Release Notes',
+          click: function() { Shell.openExternal(main.DOC + '/studio/release-notes.html') }
         }
       ]
     },
@@ -252,16 +252,44 @@ main.addMenu = function() {
           click: function() { Shell.openExternal('https://gitter.im/evothings/evothings') }
         },
         {
-          label: 'Forum',
+          label: 'Support',
+          submenu: [
+            {
+              label: 'Discussions',
+              click: function() { Shell.openExternal('https://evothings.freshdesk.com/support/discussions') }
+            },
+            {
+              label: 'Private Feedback',
+              click: function() { Shell.openExternal('https://evothings.freshdesk.com/discussions/topics/new?forum_id=14000130317') }
+            },
+            {
+              label: 'Feature Request',
+              click: function() { Shell.openExternal('https://evothings.freshdesk.com/support/discussions/topics/new?forum_id=14000128400') }
+            },
+            {
+              type: 'separator'
+            },
+            {
+              label: 'Knowledge Base',
+              click: function() { Shell.openExternal('https://evothings.freshdesk.com/support/solutions') }
+            },
+            {
+              label: 'Frequently Asked Questions',
+              click: function() { Shell.openExternal('https://evothings.freshdesk.com/solution/folders/14000103190') }
+            },
+            {
+              label: 'New Support Ticket',
+              click: function() { Shell.openExternal('https://evothings.freshdesk.com/support/tickets/new') }
+            },
+            {
+              label: 'My Tickets',
+              click: function() { Shell.openExternal('https://evothings.freshdesk.com/support/tickets') }
+            },
+          ]
+        },
+        {
+          label: 'Old forum',
           click: function() { Shell.openExternal('https://evothings.com/forum/') }
-        },
-        {
-          label: 'Feedback',
-          click: function() { Shell.openExternal('https://evothings.com/feedback/') }
-        },
-        {
-          label: 'Release Notes',
-          click: function() { Shell.openExternal(main.DOC + '/studio/release-notes.html') }
         },
         {
           type: 'separator'
