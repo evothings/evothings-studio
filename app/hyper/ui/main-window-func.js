@@ -52,8 +52,11 @@ exports.defineUIFunctions = function(hyper)
 	var mWorkbenchWindow = null
 	var mViewersWindow = null
 	var mConnectKeyTimer
+	// The merged final array of metadata on Examples, Libraries and Projects
+	var mExampleList = []
+	var mLibraryList = []
 	var mProjectList = []
-	var mWorkbenchPath = MAIN.getRootDir() //process.cwd()
+	var mWorkbenchPath = MAIN.getRootDir()
 
 	hyper.UI.setupUI = function()
 	{
@@ -70,9 +73,16 @@ exports.defineUIFunctions = function(hyper)
 	function initAppLists()
 	{
 		readProjectList()
-		hyper.UI.displayAppLists()
+		hyper.UI.displayProjectList()
+
+		hyper.UI.updateExampleList(false)
+	  hyper.UI.updateLibraryList(false)
+
 		// Register a timer so that we update the example list every 30 min
-	  setInterval(function() { hyper.UI.displayExampleList(true) }, 30 * 60 * 1000);
+	  setInterval(function() {
+	    hyper.UI.updateExampleList(true)
+	    hyper.UI.updateLibraryList(true)
+	  }, 30 * 60 * 1000);
 		hyper.UI.setServerMessageFun()
 	}
 
@@ -329,6 +339,7 @@ exports.defineUIFunctions = function(hyper)
 	 *   options.path
 	 *   options.title
 	 *   options.description
+	 *   options.tags { label, type }
 	 *   options.imagePath
 	 *   options.docURL
 	 *   options.active
@@ -359,10 +370,12 @@ exports.defineUIFunctions = function(hyper)
 		var appURL = base + '/' + options.path
     var imagePath = options.imagePath
     var docURL = options.docURL
+    var appTags = options.tags || []
     
     if (isLocal) {
 		  var imagePath = imagePath || APP_SETTINGS.getAppImage(options.path)
 		  var docURL = docURL || APP_SETTINGS.getDocURL(options.path)
+		  var appTags = APP_SETTINGS.getTags(options.path) || []
     }
     
 		if (imagePath) {
@@ -377,6 +390,8 @@ exports.defineUIFunctions = function(hyper)
 		// Get name of app, either given in options or extracted from project.
 		// Uses title tag as first choice.
     var appName = options.title
+    var appDescription = options.description
+    
 		var appHasValidHTMLFile = true
     if (isLocal) {
       if (!appName) {
@@ -446,10 +461,16 @@ exports.defineUIFunctions = function(hyper)
 				+ '</button>'
 		}
 
+    // Tags HTML
+    var tagsHTML = ''
+    appTags.forEach(tag => {
+      tagsHTML += ' <span class="label label-' + tag.type + '">' + tag.label + '</span>'
+    })
+    
 		// App name and path.
-		html +=
+		html += '<div class="entry-content">' +
 			'<h4>__NAME__</h4>'
-			+ '<p>__PATH4__</p>'
+			+ '<p>__DESC__' + '<span style="float:right">' + tagsHTML + '</span></p></div>'
 
 		html +=
 			'<div class="project-list-entry-path" style="display:none;">__PATH5__</div>'
@@ -467,6 +488,7 @@ exports.defineUIFunctions = function(hyper)
 		html = html.replace('__PATH4__', getShortPathFromPath(options.path))
 		html = html.replace('__PATH5__', options.path)
 		html = html.replace('__NAME__', appName)
+		html = html.replace('__DESC__', appDescription)
 
 		// Create element.
 		var element = hyper.UI.$(html)
@@ -714,13 +736,6 @@ exports.defineUIFunctions = function(hyper)
 			hyper.MONITOR.getNumberOfMonitoredFiles()
 	}
 
-	hyper.UI.displayAppLists = function()
-	{
-	  console.log("DISPLAYING EXAMPLE LIST")
-		hyper.UI.displayExampleList(false)
-		hyper.UI.displayProjectList()
-	}
-
 	hyper.UI.displayProjectList = function()
 	{
 		// Clear current list.
@@ -762,16 +777,19 @@ exports.defineUIFunctions = function(hyper)
 		}
 	}
 
-	hyper.UI.displayExampleList = function(silent)
-	{
-	  console.log("YAHOO")
-		// Clear current list.
-		hyper.UI.$('#screen-examples').empty()
 
-		// Create new list.
-		SETTINGS.getExampleList().then(list => {
-		  // Sort examples but place all "Hello*" apps first
-      list = list.sort(function(a, b) {
+  hyper.UI.updateExampleList = function(silent)
+  {
+    // Get an array of promises for fetching the lists
+  	var promises = SETTINGS.getExampleLists().map(UTIL.getJSON)	
+  	// When all lists are fetched, we concatenate them
+    Promise.all(promises).then(function(lists) {
+      mExampleList = []
+      for (let list of lists) {
+  	    mExampleList = mExampleList.concat(list)
+  	  }
+  	  // Then we can sort them but place all "Hello*" apps first
+      mExampleList = mExampleList.sort(function(a, b) {
         if (a.title.substring(0, 5) == "Hello") {
           return -1
         }
@@ -780,31 +798,90 @@ exports.defineUIFunctions = function(hyper)
         }        
         return a.title.localeCompare(b.title);
       })
-		  var baseDoc = MAIN.DOC + "/examples/"
-		  var baseExamples = MAIN.EXAMPLES
-		  for (var i = 0; i < list.length; ++i)
-		  {
-			  var entry = list[i]
-			  createProjectEntry(
-			    false,
-				  baseExamples,
-				  {
-				    path: entry.path,
-				    title: entry.title,
-				    description: entry.description,
-				    docURL: baseDoc + entry.path + '.html',
-				    imagePath: entry.icon,
-				    active: false,
-					  screen: '#screen-examples',
-					  docButton: true,
-					  copyButton: true,
-				  })
-		  }
-		}, status => {
-		  if (!silent) {
-  	    window.alert('Something went wrong downloading examples list from evothings.com. Do you have internet access?');
+      // And finally show them too
+      hyper.UI.displayExampleList()
+  	}).catch(function(urls){
+      if (!silent) {
+  	    window.alert('Something went wrong downloading example lists. Do you have internet access?');
   	  }
     })
+  }
+
+	hyper.UI.displayExampleList = function()
+	{
+		// Clear current list.
+		hyper.UI.$('#screen-examples').empty()
+
+	  var baseDoc = MAIN.DOC + "/examples/"
+	  var baseExamples = MAIN.EXAMPLES
+	  for (let entry of mExampleList) {
+		  createProjectEntry(
+		    false,
+			  baseExamples,
+			  {
+			    path: entry.path,
+			    title: entry.title,
+			    description: entry.description,
+			    tags: entry.tags,
+			    docURL: baseDoc + entry.path + '.html',
+			    imagePath: entry.icon,
+			    active: false,
+				  screen: '#screen-examples',
+				  docButton: true,
+				  copyButton: true
+			  }
+			)
+	  }
+	}
+	
+	hyper.UI.updateLibraryList = function(silent)
+  {
+    // Get an array of promises for fetching the lists
+  	var promises = SETTINGS.getLibraryLists().map(UTIL.getJSON)	
+  	// When all lists are fetched, we concatenate them
+    Promise.all(promises).then(function(lists) {
+      mLibraryList = []
+      for (let list of lists) {
+  	    mLibraryList = mLibraryList.concat(list)
+  	  }
+  	  // Then we can sort them
+      mLibraryList = mLibraryList.sort(function(a, b) {     
+        return a.title.localeCompare(b.title);
+      })
+      // And finally show them too
+      hyper.UI.displayLibraryList()
+  	}).catch(function(urls){
+      if (!silent) {
+  	    window.alert('Something went wrong downloading library lists. Do you have internet access?');
+  	  }
+    })
+  }
+
+	hyper.UI.displayLibraryList = function()
+	{
+		// Clear current list.
+		hyper.UI.$('#screen-libraries').empty()
+
+	  var baseDoc = MAIN.DOC + "/libraries/"
+	  var baseLibraries = MAIN.LIBRARIES
+    for (let entry of mLibraryList) {
+		  createProjectEntry(
+		    false,
+			  baseLibraries,
+			  {
+			    path: entry.path,
+			    title: entry.title,
+			    description: entry.description,
+			    tags: entry.tags,
+			    docURL: baseDoc + entry.path + '.html',
+			    imagePath: entry.icon,
+			    active: false,
+				  screen: '#screen-libraries',
+				  docButton: true,
+				  copyButton: true,
+			  }
+			)
+	  }
 	}
 
 	hyper.UI.setServerMessageFun = function()
@@ -833,6 +910,8 @@ exports.defineUIFunctions = function(hyper)
 			SETTINGS.getMyAppsPath())
 		hyper.UI.$('#input-setting-reload-server-address').val(
 			SETTINGS.getReloadServerAddress())
+		hyper.UI.$('#input-setting-repository-urls').val(
+			SETTINGS.getRepositoryURLs())
 
 		// Show settings dialog.
 		hyper.UI.$('#dialog-settings').modal('show')

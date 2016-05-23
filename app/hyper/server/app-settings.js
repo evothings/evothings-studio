@@ -90,6 +90,23 @@ exports.getDocURL = function(appPath)
 }
 
 /**
+ * Return app-tags, or null if not set.
+ */
+exports.getTags = function(appPath)
+{
+	var settings = readAppSettings(appPath)
+	if (settings && settings['app-tags'])
+	{
+		return settings['app-tags']
+	}
+	else
+	{
+		return null
+	}
+}
+
+
+/**
  * Generate and save a new App UUID.
  */
 exports.generateNewAppUUID = function(appPath)

@@ -268,6 +268,13 @@ exports.defineUIEvents = function(hyper)
 		hyper.UI.showTab('examples')
 	})
 
+	// ************** Libraries Tab Button **************
+
+	hyper.UI.$('#button-libraries').click(function()
+	{
+		hyper.UI.showTab('libraries')
+	})
+
 	// ************** My Apps Tab Button **************
 
 	hyper.UI.$('#button-projects').click(function()
@@ -565,6 +572,7 @@ exports.defineUIEvents = function(hyper)
 		hyper.UI.$('#screen-getting-started').hide()
 		hyper.UI.$('#screen-connect').hide()
 		hyper.UI.$('#screen-examples').hide()
+		hyper.UI.$('#screen-libraries').hide()
 		hyper.UI.$('#screen-projects').hide()
 /*
 		hyper.UI.$('#button-connect, #button-getting-started, #button-examples, #button-projects')

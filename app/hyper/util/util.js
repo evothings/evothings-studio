@@ -33,10 +33,10 @@ exports.getJSON = function(url) {
 		xhr.open('get', url, true);
 		xhr.responseType = 'json';
 		xhr.onload = function() {
-			if (this.status == 200) {
-				resolve(this.response);
+			if (xhr.status == 200) {
+				resolve(xhr.response);
 			} else {
-				reject(this.statusText);
+				reject(xhr.statusText);
 			}
 		};
 		xhr.send();

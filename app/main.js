@@ -16,6 +16,7 @@ main.FULLVERSION = main.VERSION + '.' + main.PATCH + '-' + main.BUILD
 main.BASE = 'https://evothings.com/' + main.VERSION
 main.DOC = main.BASE + "/doc"
 main.EXAMPLES = main.BASE + "/examples"
+main.LIBRARIES = main.BASE + "/libraries"
 
 const electron = require('electron')
 const app = electron.app

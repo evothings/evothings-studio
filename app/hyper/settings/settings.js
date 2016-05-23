@@ -144,6 +144,18 @@ systemSetting('MyAppsPath', FILEUTIL.getEvothingsUserFolderPath())
 systemSetting('SessionID', null)
 
 /**
+ * List of URLs separated with ;
+ */
+systemSetting('RepositoryURLs')
+
+/**
+ * List of URLs as array
+ */
+exports.getRepositoryURLsArray = function() {
+  exports.getRepositoryURLs().split(";")
+}
+
+/**
  * Settings for user GUID are handled specially to preserve existing ids.
  */
 exports.getEvoGUID = function()
@@ -172,6 +184,27 @@ exports.setEvoCloudToken = function(value)
 	console.log('* setting evo-cloudtoken to '+value)
 	window.localStorage.setItem('evo-cloudtoken', value)
 }
+
+
+// hasXXXX are capabilities associated with the user account
+exports.hasEnterprise = function()
+{
+  // TODO: Peter fixes! :)
+  return false
+}
+
+exports.hasPro = function()
+{
+  // TODO: Peter fixes! :)
+  return false
+}
+
+// Means that the user ONLY has free features
+exports.hasFree = function()
+{
+  return !(exports.hasEnterprise() || exports.hasPro())
+}
+
 
 /**
  * Address of reload server.
@@ -213,10 +246,28 @@ exports.getProjectList = function(list)
 	}
 }
 
-exports.getExampleList = function()
+exports.getExampleLists = function()
 {
-  return UTIL.getJSON(MAIN.EXAMPLES + '/examples-list.json')
+  var lists = []
+  lists.push(MAIN.EXAMPLES + '/examples-list.json')
+  if (exports.hasEnterprise()) {
+    lists.push(MAIN.EXAMPLES + '/examples-list-enterprise.json')
+  }
+  // TODO: Add from repo URLs here
+  return lists
 }
+
+exports.getLibraryLists = function()
+{
+  var lists = []
+  lists.push(MAIN.LIBRARIES + '/library-list.json')
+  if (exports.hasEnterprise()) {
+   lists.push(MAIN.LIBRARIES + '/library-list-enterprise.json')
+  }
+  // TODO: Add from repo URLs here
+  return lists
+}
+
 
 // What a hack. Replaces forward slashes with two
 // backslashes, globally in all json data. '/' --> '\\'

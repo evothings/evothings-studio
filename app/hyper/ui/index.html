@@ -51,6 +51,7 @@ Copyright (c) 2013-2015 Evothings AB
 					<button type="button" class="btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="button-connect">Connect</button>
 					<button type="button" class="btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="button-getting-started">Getting Started</button>
 					<button type="button" class="btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="button-examples">Examples</button>
+					<button type="button" class="btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="button-libraries">Libraries</button>
 					<button type="button" class="btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="button-projects">My Apps</button>
 					<button type="button" class="btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="button-new-app">New</button>
 					<button type="button" class="btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="button-tools">Console</button>
@@ -125,6 +126,13 @@ Copyright (c) 2013-2015 Evothings AB
 									Address of Reload Server:</label>
 					 			<input type="text"
 									id="input-setting-reload-server-address"
+									class="form-control"/>
+							</div>
+							<div class="form-group">
+								<label for="input-setting-repositories">
+									Additional repository URLs separated by ; :</label>
+					 			<input type="text"
+									id="input-setting-repositories"
 									class="form-control"/>
 							</div>
 
@@ -625,6 +633,9 @@ Copyright (c) 2013-2015 Evothings AB
 
 			<!-- Example screen -->
 			<div id="screen-examples" class="hyper-screen project-list"></div>
+
+			<!-- Libraries screen -->
+			<div id="screen-libraries" class="hyper-screen project-list"></div>
 
 			<!-- My apps screen -->
 			<div id="screen-projects" class="hyper-screen project-list"></div>

@@ -126,6 +126,10 @@ html, body
 	overflow: hidden;
 }
 
+.entry-content {
+  padding-right: 250px;
+}
+
 .button-run
 {
 	position: absolute;
@@ -172,25 +176,6 @@ html, body
 	right: 4px;
 	top: 2px;
 }
-
-/*
-TODO: Remove, use automatic width for all buttons.
-
-#button-documentation
-{
-	width: 18%;
-}
-
-#button-login
-{
-	width: 15%;
-}
-
-#button-tools, #button-forum, #button-examples, #button-projects
-{
-	width: 18%;
-}
-*/
 
 #drag-overlay
 {
