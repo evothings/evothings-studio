@@ -190,7 +190,7 @@ exports.setEvoCloudToken = function(value)
 exports.hasEnterprise = function()
 {
   // TODO: Peter fixes! :)
-  return false
+  return true
 }
 
 exports.hasPro = function()
