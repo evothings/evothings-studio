@@ -58,6 +58,55 @@ exports.getAppID = function(appPath)
 }
 
 /**
+ * Return short name for app, or null if not set.
+ */
+exports.getName = function(appPath)
+{
+	var settings = readAppSettings(appPath)
+	if (settings && settings['name'])
+	{
+		return settings['name']
+	}
+	else
+	{
+		return null
+	}
+}
+
+/**
+ * Return oneline description for app, or null if not set.
+ */
+exports.getDescription = function(appPath)
+{
+	var settings = readAppSettings(appPath)
+	if (settings && settings['description'])
+	{
+		return settings['description']
+	}
+	else
+	{
+		return null
+	}
+}
+
+
+/**
+ * Return version string for app, or null if not set.
+ */
+exports.getVersion = function(appPath)
+{
+	var settings = readAppSettings(appPath)
+	if (settings && settings['version'])
+	{
+		return settings['version']
+	}
+	else
+	{
+		return null
+	}
+}
+
+/**
  * Return path to app image icon, or null if not set.
  */
 exports.getAppImage = function(appPath)
@@ -95,9 +144,9 @@ exports.getDocURL = function(appPath)
 exports.getTags = function(appPath)
 {
 	var settings = readAppSettings(appPath)
-	if (settings && settings['app-tags'])
+	if (settings && settings['tags'])
 	{
-		return settings['app-tags']
+		return settings['tags']
 	}
 	else
 	{
@@ -105,6 +154,22 @@ exports.getTags = function(appPath)
 	}
 }
 
+
+/**
+ * Return libraries, or null if not set.
+ */
+exports.getLibraries = function(appPath)
+{
+	var settings = readAppSettings(appPath)
+	if (settings && settings['libraries'])
+	{
+		return settings['libraries']
+	}
+	else
+	{
+		return null
+	}
+}
 
 /**
  * Generate and save a new App UUID.
