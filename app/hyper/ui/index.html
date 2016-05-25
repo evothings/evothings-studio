@@ -223,6 +223,60 @@ Copyright (c) 2013-2015 Evothings AB
 				</div>
 			</div>
 
+			<!-- Modal dialog: dialog-new-app -->
+			<div class="modal fade"
+				id="dialog-edit-app"
+				tabindex="-1"
+				role="dialog"
+				aria-labelledby="dialog-edit-app-label"
+				aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h4 class="modal-title" id="dialog-edit-app-label">
+								Edit App
+							</h4>
+						</div>
+
+						<div class="modal-body">
+						  <input id="input-edit-app-path" type="hidden" value="">
+							<div class="form-group">
+								<label for="input-edit-app-name">
+									Enter app name (short):</label>
+								<input type="text"
+									id="input-edit-app-name"
+									class="form-control"
+									value="my-new-app"
+									placeholder="App short name"/>
+							</div>
+							<div class="form-group">
+								<label for="input-edit-app-description">
+									One line description:</label>
+								<input type="text"
+									id="input-edit-app-description"
+									class="form-control"
+									placeholder="App oneline description"/>
+							</div>
+						</div>
+
+						<div class="modal-footer">
+							<button id="button-save-edit-app"
+								type="button"
+								class="btn btn-success">
+								Save
+							</button>
+							<button type="button"
+								class="btn btn-default"
+								data-dismiss="modal">
+								Dismiss
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+
 			<!-- Modal dialog: dialog-copy-app -->
 			<div class="modal fade"
 				id="dialog-copy-app"

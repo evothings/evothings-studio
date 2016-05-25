@@ -72,7 +72,19 @@ exports.getName = function(appPath)
 		return null
 	}
 }
-
+exports.setName = function(appPath, name)
+{
+	var settings = readAppSettings(appPath)
+	if (settings)
+	{
+		settings['name'] = name
+		writeAppSettings(settings, appPath)
+	}
+	else
+	{
+		return null
+	}
+}
 /**
  * Return oneline description for app, or null if not set.
  */
@@ -88,7 +100,19 @@ exports.getDescription = function(appPath)
 		return null
 	}
 }
-
+exports.setDescription = function(appPath, description)
+{
+	var settings = readAppSettings(appPath)
+	if (settings)
+	{
+		settings['description'] = description
+		writeAppSettings(settings, appPath)
+	}
+	else
+	{
+		return null
+	}
+}
 
 /**
  * Return version string for app, or null if not set.

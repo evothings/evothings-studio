@@ -303,6 +303,20 @@ exports.defineUIEvents = function(hyper)
 		hyper.UI.saveNewApp()
 	})
 
+	// ************** Edit App Button **************
+
+	hyper.UI.$('#button-edit-app').click(function()
+	{
+		hyper.UI.openEditAppDialog()
+	})
+	
+	// ************** Edit App Dialog Save Button **************
+
+	hyper.UI.$('#button-save-edit-app').click(function()
+	{
+		hyper.UI.saveEditApp()
+	})
+
 	// ************** Copy App Dialog Save Button **************
 
 	hyper.UI.$('#button-save-copy-app').click(function()

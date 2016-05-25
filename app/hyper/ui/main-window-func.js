@@ -424,7 +424,7 @@ exports.defineUIFunctions = function(hyper)
 				'<button '
 				+	'type="button" '
 				+	'class="button-config btn et-btn-red" '
-				+	`onclick="window.hyper.UI.openFolder('${escapedPath}')">`
+				+	`onclick="window.hyper.UI.openEditAppDialog('${escapedPath}')">`
 				+	'Config'
 				+ '</button>'
 		}
@@ -1202,7 +1202,7 @@ exports.defineUIFunctions = function(hyper)
 	hyper.UI.openNewAppDialog = function()
 	{
 		// Populate input fields.
-		var path = PATH.join(SETTINGS.getMyAppsPath())
+		var path = SETTINGS.getMyAppsPath()
 		hyper.UI.$('#input-new-app-parent-folder').val(path)
     hyper.UI.$('#input-new-app-folder').val('')
 
@@ -1264,6 +1264,40 @@ exports.defineUIFunctions = function(hyper)
 		  showMyApps()
 		})
 	}
+
+  hyper.UI.openEditAppDialog = function(path)
+	{
+		// Populate input fields.
+		hyper.UI.$('#input-edit-app-path').val(path) // Hidden field.
+    hyper.UI.$('#input-edit-app-name').val(APP_SETTINGS.getName(path))
+    hyper.UI.$('#input-edit-app-description').val(APP_SETTINGS.getDescription(path))
+
+		// Show dialog.
+		hyper.UI.$('#dialog-edit-app').modal('show')
+	}
+	
+	hyper.UI.saveEditApp = function()
+	{
+		var path = hyper.UI.$('#input-edit-app-path').val()
+		console.log("PATH: " + path)
+		var name = hyper.UI.$('#input-edit-app-name').val()
+		var description = hyper.UI.$('#input-edit-app-description').val()
+
+    // App folder is empty
+/*    if (!appFolder) {
+      window.alert('You need to enter a name for the app folder.')
+			return // Abort (dialog is still visible)
+    }
+  */
+  	// Hide dialog.
+		hyper.UI.$('#dialog-edit-app').modal('hide')
+
+    APP_SETTINGS.setName(path, name)
+    APP_SETTINGS.setDescription(path, description)
+
+    hyper.UI.displayProjectList()
+	}
+
 
 	hyper.UI.openRemoveAppDialog = function(obj)
 	{
