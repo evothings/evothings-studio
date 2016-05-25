@@ -338,8 +338,10 @@ exports.defineUIFunctions = function(hyper)
 	 * Possible options include:
 	 *   options.path
 	 *   options.title
+	 *   options.version
 	 *   options.description
 	 *   options.tags { label, type }
+	 *   options.libraries { name, version }
 	 *   options.imagePath
 	 *   options.docURL
 	 *   options.active
@@ -349,7 +351,7 @@ exports.defineUIFunctions = function(hyper)
 	 *	 options.openButton
 	 *	 options.deleteButton
 	 */
-	function createProjectEntry(isLocal, base, options)
+	function createProjectEntry(isLocal, isLibrary, base, options)
 	{
 		options = options || {}
 		base = base || 'file://'
@@ -371,11 +373,23 @@ exports.defineUIFunctions = function(hyper)
     var imagePath = options.imagePath
     var docURL = options.docURL
     var appTags = options.tags || []
+    var appLibraries = options.libraries || []
+		var appVersion = options.version || null
+		var shortName = options.name
+    var appName = options.title
+    var appDescription = options.description
+
+		// Escape any backslashes in the path (needed on Windows).
+		var escapedPath = options.path.replace(/[\\]/g,'\\\\')
     
     if (isLocal) {
 		  var imagePath = imagePath || APP_SETTINGS.getAppImage(options.path)
 		  var docURL = docURL || APP_SETTINGS.getDocURL(options.path)
 		  var appTags = APP_SETTINGS.getTags(options.path) || []
+		  var appLibraries = APP_SETTINGS.getLibraries(options.path) || []
+		  var appVersion = APP_SETTINGS.getVersion(options.path) || null
+		  var shortName = APP_SETTINGS.getName(options.path) || '&lt;no name entered&gt;'
+		  var appDescription = APP_SETTINGS.getDescription(options.path) || '&lt;no description entered&gt;'
     }
     
 		if (imagePath) {
@@ -387,13 +401,11 @@ exports.defineUIFunctions = function(hyper)
 			html += '<div class="app-icon" style="background-image: url(\'images/app-icon.png\');"></div>'
 		}
 
-		// Get name of app, either given in options or extracted from project.
-		// Uses title tag as first choice.
-    var appName = options.title
-    var appDescription = options.description
     
-		var appHasValidHTMLFile = true
+		var appHasValidHTMLFile = options.runButton
     if (isLocal) {
+		  // Get name of app, either given in options above or extracted from project.
+		  // Uses title tag as first choice.
       if (!appName) {
         // Returns null if HTML file not found.
 		    appName = hyper.UI.getProjectNameFromFile(options.path)
@@ -405,13 +417,28 @@ exports.defineUIFunctions = function(hyper)
       }
     }
     
-		if (docURL && options.docButton)
+    	
+		if (isLocal && !isLibrary)
 		{
 			html +=
 				'<button '
 				+	'type="button" '
-				+	'class="button-doc btn et-btn-yellow-dark" '
-				+	'onclick="window.hyper.UI.openDocURL(\'__DOCURL__\')">'
+				+	'class="button-config btn et-btn-red" '
+				+	`onclick="window.hyper.UI.openFolder('${escapedPath}')">`
+				+	'Config'
+				+ '</button>'
+		}
+    
+		if (docURL && options.docButton)
+		{
+			html += '<button type="button" '
+			if (isLibrary) {
+				html +=	'class="button-run'
+		  } else {
+		    html +=	'class="button-doc'
+		  }
+		  html += ' btn et-btn-yellow-dark" '
+				+	`onclick="window.hyper.UI.openDocURL('${docURL}')">`
 				+	'Doc'
 				+ '</button>'
 		}
@@ -422,7 +449,7 @@ exports.defineUIFunctions = function(hyper)
 				'<button '
 				+	'type="button" '
 				+	'class="button-open btn et-btn-indigo" '
-				+	'onclick="window.hyper.UI.openCopyAppDialog(\'__PATH1__\')">'
+				+	`onclick="window.hyper.UI.openCopyAppDialog('${escapedPath}')">`
 				+	'Copy'
 				+ '</button>'
 		}
@@ -433,22 +460,35 @@ exports.defineUIFunctions = function(hyper)
 				'<button '
 				+	'type="button" '
 				+	'class="button-open btn et-btn-blue" '
-				+	'onclick="window.hyper.UI.openFileFolder(\'__PATH2__\')">'
+				+	`onclick="window.hyper.UI.openFolder('${escapedPath}')">`
 				+	'Code'
 				+ '</button>'
 		}
 
+
 		// Add Run button only if app has an HTML file.
 		// We use different run functions depending on if it isLocal
-		if (appHasValidHTMLFile)
+		if (!isLibrary && appHasValidHTMLFile)
 		{
 			html += '<button type="button" class="button-run btn et-btn-green" '
       if (isLocal)
-        html += 'onclick="window.hyper.UI.runApp(\'__PATH3__\')">'
+        html += `onclick="window.hyper.UI.runApp('${escapedPath}')">`
       else 
-        html += 'onclick="window.hyper.UI.runExampleApp(\'__PATH3__\')">'
+        html += `onclick="window.hyper.UI.runExampleApp('${escapedPath}')">`
       html +=	'Run</button>'
 		}
+
+		/* We add a Config button to Apps instead
+		if (isLibrary)
+		{
+			html +=
+				'<button '
+				+	'type="button" '
+				+	'class="button-run btn et-btn-green" '
+				+	'onclick="window.hyper.UI.copytoApp(\'${escapedPath}\')">'
+				+	'Use'
+				+ '</button>'
+		}*/
 
 		if (options.deleteButton)
 		{
@@ -464,35 +504,53 @@ exports.defineUIFunctions = function(hyper)
     // Tags HTML
     var tagsHTML = ''
     appTags.forEach(tag => {
-      tagsHTML += ' <span class="label label-' + tag.type + '">' + tag.label + '</span>'
+      tagsHTML += ` <span class="label label-${tag.type}">${tag.label}</span>`
     })
     
-		// App name and path.
-		html += '<div class="entry-content">' +
-			'<h4>__NAME__</h4>'
-			+ '<p>__DESC__' + '<span style="float:right">' + tagsHTML + '</span></p></div>'
-
-		html +=
-			'<div class="project-list-entry-path" style="display:none;">__PATH5__</div>'
-			+ '</div>'
-
-
-		// Escape any backslashes in the path (needed on Windows).
-		var escapedPath = options.path.replace(/[\\]/g,'\\\\')
-
-		// Replace fields in template.
-		html = html.replace('__DOCURL__', docURL)
-		html = html.replace('__PATH1__', escapedPath)
-		html = html.replace('__PATH2__', escapedPath)
-		html = html.replace('__PATH3__', escapedPath)
-		html = html.replace('__PATH4__', getShortPathFromPath(options.path))
-		html = html.replace('__PATH5__', options.path)
-		html = html.replace('__NAME__', appName)
-		html = html.replace('__DESC__', appDescription)
+    // Meta data
+    var metaHTML = ''
+    if (shortName) {
+      metaHTML += '<strong>Name:</strong>&nbsp;' + shortName
+    }
+    if (appVersion) {
+      metaHTML += ' <strong>Version:</strong>&nbsp;' + appVersion
+    }
+    if (appLibraries.length > 0) {
+      metaHTML += ' <strong>Libraries:</strong>'
+      var first = true
+      appLibraries.forEach(lib => {
+        if (first) {
+          metaHTML += '&nbsp;'
+          first = false
+        } else {
+          metaHTML += ',&nbsp;'
+        }
+        metaHTML += lib.name + ' (' + lib.version + ')'
+      })
+    }
+    if (isLocal && options.path) {
+      metaHTML += ' <strong>Path:</strong>&nbsp;' + options.path
+    }
+    
+		// Different CSS classes for entry content
+		var entryContentClass = 'entry-content'
+		if (isLibrary) {
+		  entryContentClass += '-libraries'
+		} else if (!isLocal) {
+		  entryContentClass += '-examples'
+		}
+		
+		html += `<div class="${entryContentClass}"><h4>${appName}</h4>`
+		html += `<p>${appDescription}</p>`
+		html += '<p>'
+		if (metaHTML.length > 0) {
+		  html += metaHTML.trim()
+		}
+    html += `<span style="float:right">${tagsHTML}</span></p>`
+		html += '</div>'
 
 		// Create element.
 		var element = hyper.UI.$(html)
-		//LOGGER.log(html)
 
 		// Insert element first in list.
 		options.screen && hyper.UI.$(options.screen).append(element)
@@ -524,6 +582,7 @@ exports.defineUIFunctions = function(hyper)
 
 	// Get last part of path. Purpose is to make path fit
 	// inside a project list item.
+	// TODO: We don't use this anymore, but keeping it for later
 	function getShortPathFromPath(path)
 	{
 		var limit = 58
@@ -701,8 +760,16 @@ exports.defineUIFunctions = function(hyper)
 		// Debug logging.
 		LOGGER.log('[main-window-func.js] Open folder: ' + path)
 
-		//hyper.UI.GUI.Shell.showItemInFolder(path)
-		SHELL.showItemInFolder(path)
+		// We want to show the folder but need an item in it to show,
+		// we use either evothings.json or index.html
+		if (FILEUTIL.statSync(PATH.join(path, 'evothings.json'))) {
+			SHELL.showItemInFolder(PATH.join(path, 'evothings.json'))
+	  } else if (FILEUTIL.statSync(PATH.join(path, 'index.html'))) {
+	    SHELL.showItemInFolder(PATH.join(path, 'index.html'))
+	  } else {
+	    // This will show the parent folder, but so be it!
+	    SHELL.showItemInFolder(path)
+	  }
 	}
 
 	hyper.UI.setRemoteServerURL = function(url)
@@ -751,6 +818,7 @@ exports.defineUIFunctions = function(hyper)
 				var path = projectList[i]
 				createProjectEntry(
 				  true,
+				  false,
 					'file://',
 					{
 					  path: path,
@@ -758,7 +826,8 @@ exports.defineUIFunctions = function(hyper)
 						screen: '#screen-projects',
 						openButton: true,
 						docButton: true,
-						deleteButton: true
+						deleteButton: true,
+						runButton: true
 					})
 			}
 		}
@@ -817,18 +886,23 @@ exports.defineUIFunctions = function(hyper)
 	  for (let entry of mExampleList) {
 		  createProjectEntry(
 		    false,
+		    false,
 			  baseExamples,
 			  {
+			    name: entry.name,
 			    path: entry.path,
 			    title: entry.title,
+			    version: entry.version,
 			    description: entry.description,
 			    tags: entry.tags,
+			    libraries: entry.libraries,
 			    docURL: baseDoc + entry.path + '.html',
 			    imagePath: entry.icon,
 			    active: false,
 				  screen: '#screen-examples',
 				  docButton: true,
-				  copyButton: true
+				  copyButton: true,
+				  runButton: true
 			  }
 			)
 	  }
@@ -867,10 +941,13 @@ exports.defineUIFunctions = function(hyper)
     for (let entry of mLibraryList) {
 		  createProjectEntry(
 		    false,
+		    true,
 			  baseLibraries,
 			  {
+			    name: entry.name,
 			    path: entry.path,
 			    title: entry.title,
+			    version: entry.version,
 			    description: entry.description,
 			    tags: entry.tags,
 			    docURL: baseDoc + entry.path + '.html',
@@ -878,7 +955,8 @@ exports.defineUIFunctions = function(hyper)
 			    active: false,
 				  screen: '#screen-libraries',
 				  docButton: true,
-				  copyButton: true,
+				  copyButton: false,
+				  runButton: false
 			  }
 			)
 	  }
@@ -962,11 +1040,6 @@ exports.defineUIFunctions = function(hyper)
 		{
 			hyper.UI.$('#dialog-disconnect-all-viewers').modal('show')
 		}
-	}
-
-	hyper.UI.openFileFolder = function(path)
-	{
-		hyper.UI.openFolder(path)
 	}
 
 	hyper.UI.openDocURL = function(url)
