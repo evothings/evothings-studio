@@ -423,9 +423,9 @@ exports.defineUIFunctions = function(hyper)
 			html +=
 				'<button '
 				+	'type="button" '
-				+	'class="button-config btn et-btn-red" '
+				+	'class="button-edit btn et-btn-red" '
 				+	`onclick="window.hyper.UI.openEditAppDialog('${escapedPath}')">`
-				+	'Config'
+				+	'Edit'
 				+ '</button>'
 		}
     
@@ -1271,7 +1271,30 @@ exports.defineUIFunctions = function(hyper)
 		hyper.UI.$('#input-edit-app-path').val(path) // Hidden field.
     hyper.UI.$('#input-edit-app-name').val(APP_SETTINGS.getName(path))
     hyper.UI.$('#input-edit-app-description').val(APP_SETTINGS.getDescription(path))
+    hyper.UI.$('#input-edit-app-version').val(APP_SETTINGS.getVersion(path))
 
+    // Use jQuery to create library checkboxes
+    hyper.UI.$('#input-edit-app-libraries').empty()
+    var libs = APP_SETTINGS.getLibraries(path)
+    var html = ''
+    var count = 0
+    for (lib of mLibraryList) {
+      count++
+      var checked = ''
+      if (libs && libs.find(each => each.name == lib.name)) {
+        checked = `checked="checked"`
+      }
+      html += `<div class="checkbox">
+  <input type="checkbox" ${checked} id="input-edit-app-library-${count}"> 
+    <label for="input-edit-app-library-${count}">
+      ${lib.title} (${lib.version}) - ${lib.description}
+    </label>
+</div>`
+    }
+    // Create and insert HTML
+		var element = hyper.UI.$(html)
+		hyper.UI.$('#input-edit-app-libraries').append(element)
+		
 		// Show dialog.
 		hyper.UI.$('#dialog-edit-app').modal('show')
 	}
@@ -1279,9 +1302,9 @@ exports.defineUIFunctions = function(hyper)
 	hyper.UI.saveEditApp = function()
 	{
 		var path = hyper.UI.$('#input-edit-app-path').val()
-		console.log("PATH: " + path)
 		var name = hyper.UI.$('#input-edit-app-name').val()
 		var description = hyper.UI.$('#input-edit-app-description').val()
+		var version = hyper.UI.$('#input-edit-app-version').val()
 
     // App folder is empty
 /*    if (!appFolder) {
@@ -1294,6 +1317,7 @@ exports.defineUIFunctions = function(hyper)
 
     APP_SETTINGS.setName(path, name)
     APP_SETTINGS.setDescription(path, description)
+    APP_SETTINGS.setVersion(path, version)
 
     hyper.UI.displayProjectList()
 	}

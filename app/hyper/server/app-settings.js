@@ -129,6 +129,19 @@ exports.getVersion = function(appPath)
 		return null
 	}
 }
+exports.setVersion = function(appPath, version)
+{
+	var settings = readAppSettings(appPath)
+	if (settings)
+	{
+		settings['version'] = version
+		writeAppSettings(settings, appPath)
+	}
+	else
+	{
+		return null
+	}
+}
 
 /**
  * Return path to app image icon, or null if not set.

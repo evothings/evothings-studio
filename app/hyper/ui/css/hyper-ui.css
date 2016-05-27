@@ -138,6 +138,16 @@ html, body
   padding-right: 80px;
 }
 
+.h-scroll {
+  max-height: calc(100vh - 570px);
+  min-height: 100px;
+  overflow-y: auto;
+}
+
+.modal-body {
+  max-height: calc(100vh - 210px);
+  overflow-y: auto;
+}
 
 .button-run
 {
@@ -169,13 +179,13 @@ html, body
 	font-weight: bold;
 }
 
-.button-config
+.button-edit
 {
 	position: absolute;
 	right: 235px;
 	/*top: 10px;*/
 	bottom: 10px;
-	width: 80px;
+	width: 65px;
 	font-weight: bold;
 }
 
