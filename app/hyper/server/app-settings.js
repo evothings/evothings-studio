@@ -190,7 +190,19 @@ exports.getTags = function(appPath)
 		return null
 	}
 }
-
+exports.setTags = function(appPath, tags)
+{
+	var settings = readAppSettings(appPath)
+	if (settings)
+	{
+		settings['tags'] = tags
+		writeAppSettings(settings, appPath)
+	}
+	else
+	{
+		return null
+	}
+}
 
 /**
  * Return libraries, or null if not set.
@@ -201,6 +213,19 @@ exports.getLibraries = function(appPath)
 	if (settings && settings['libraries'])
 	{
 		return settings['libraries']
+	}
+	else
+	{
+		return null
+	}
+}
+exports.setLibraries = function(appPath, libraries)
+{
+	var settings = readAppSettings(appPath)
+	if (settings)
+	{
+		settings['libraries'] = libraries
+		writeAppSettings(settings, appPath)
 	}
 	else
 	{

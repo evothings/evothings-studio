@@ -1281,13 +1281,19 @@ exports.defineUIFunctions = function(hyper)
     for (lib of mLibraryList) {
       count++
       var checked = ''
-      if (libs && libs.find(each => each.name == lib.name)) {
-        checked = `checked="checked"`
+      var usedVersion = lib.version
+      if (libs) {
+        // Ok, the app has a list of libraries we can check against
+        var usedLib = libs.find(each => each.name == lib.name)
+        if (usedLib) {
+          checked = `checked="checked"`
+          usedVersion = usedLib.version
+        }
       }
       html += `<div class="checkbox">
-  <input type="checkbox" ${checked} id="input-edit-app-library-${count}"> 
+  <input type="checkbox" ${checked} id="input-edit-app-library-${count}" data-lib="${lib.name}" data-version="${usedVersion}"> 
     <label for="input-edit-app-library-${count}">
-      ${lib.title} (${lib.version}) - ${lib.description}
+      ${lib.title} (${usedVersion}) - ${lib.description}
     </label>
 </div>`
     }
@@ -1305,16 +1311,30 @@ exports.defineUIFunctions = function(hyper)
 		var name = hyper.UI.$('#input-edit-app-name').val()
 		var description = hyper.UI.$('#input-edit-app-description').val()
 		var version = hyper.UI.$('#input-edit-app-version').val()
+    
+    // Only allow names without spaces, all lower case
+    name = name.replace(/\s/g, '')
+    name = name.toLowerCase()
 
-    // App folder is empty
-/*    if (!appFolder) {
-      window.alert('You need to enter a name for the app folder.')
-			return // Abort (dialog is still visible)
-    }
-  */
+    // Collect checked libs
+    var checkboxes = hyper.UI.$('#input-edit-app-libraries').find('input')
+    var libs = []
+    checkboxes.each(function () {
+      var libname = this.getAttribute('data-lib')
+      var libversion = this.getAttribute('data-version')
+      if (this.checked) {
+        libs.push({ "name": libname, "version": libversion })
+      }
+    })
+
   	// Hide dialog.
 		hyper.UI.$('#dialog-edit-app').modal('hide')
 
+    // Apply new libraries to app
+    hyper.UI.applyLibraries(path, APP_SETTINGS.getLibraries(path), libs)
+
+    // Store all meta data
+    APP_SETTINGS.setLibraries(path, libs)
     APP_SETTINGS.setName(path, name)
     APP_SETTINGS.setDescription(path, description)
     APP_SETTINGS.setVersion(path, version)
@@ -1322,6 +1342,21 @@ exports.defineUIFunctions = function(hyper)
     hyper.UI.displayProjectList()
 	}
 
+  hyper.UI.applyLibraries = function(path, oldLibs, newLibs)
+	{
+	  // Find toRemove and toAdd
+	  
+	  // For all toRemove:
+	  // 1. Remove reference in index.html if there is one
+	  // 2. Remove directory libs/libname
+
+	  // For all toAdd:
+	  // 0. Download and unzip into libs/libname
+	  // 1. Verify that there is no reference in index.html
+	  // 2. Add reference in index.html right before </body>
+
+	
+	}
 
 	hyper.UI.openRemoveAppDialog = function(obj)
 	{
