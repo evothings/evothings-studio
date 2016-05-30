@@ -1399,8 +1399,9 @@ exports.defineUIFunctions = function(hyper)
         element.remove()
       }
 	    // 2. Add a reference in index.html right before </body>
-      $('body').append(`  <script src="${scriptPath}"></script>
-  `)
+      $('body').append(`
+  <script src="${scriptPath}"><!-- This script added by Evothings Studio --></script>
+`)
       FILEUTIL.writeFileSync(indexPath, $.html())
 	    console.log("Added " + lib + " to " + path)
     })
@@ -1421,7 +1422,7 @@ exports.defineUIFunctions = function(hyper)
 	  		    if (err) {
 	  		      // TODO: This doesn't seem to work
 	  		      FSEXTRA.removeSync(targetDir)
-        		  window.alert('Something went wrong when unzipping library.')
+        		  window.alert('Something went wrong when downloading/unzipping library.')
         		  LOGGER.log('[main-window-func.js] Error in copyLibraryFromURL: ' + err)
         		} else {       
 		          //Callback
