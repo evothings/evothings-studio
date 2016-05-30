@@ -300,6 +300,24 @@ exports.getAppDir = function(appPath)
 }
 
 /**
+ * Directory for app libraries.
+ */
+exports.getLibDir = function(appPath)
+{
+	var appDir = exports.getAppDir(appPath)
+	if (appDir) {
+	  return PATH.join(appDir, 'libs')
+	} else {
+	  return 'libs'
+	}
+}
+
+exports.getLibDirFullPath = function(appPath)
+{
+	return PATH.join(appPath, exports.getLibDir(appPath))
+}
+
+/**
  * Directory for built files.
  */
 exports.getWwwDir = function(appPath)

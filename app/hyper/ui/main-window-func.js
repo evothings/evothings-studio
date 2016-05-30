@@ -43,6 +43,7 @@ var UTIL = require('../util/util.js')
 var TEMP = require('temp').track()
 var BABEL = require('babel-core')
 var GLOB = require('glob')
+var CHEERIO = require('cheerio')
 
 /**
  * UI functions.
@@ -1345,18 +1346,96 @@ exports.defineUIFunctions = function(hyper)
   hyper.UI.applyLibraries = function(path, oldLibs, newLibs)
 	{
 	  // Find toRemove and toAdd
+	  var oldl = new Set(oldLibs.map(l => l.name))
+	  var newl = new Set(newLibs.map(l => l.name))
+	  // Remove old ones not in newLibs
+	  var toRemove = [...oldl].filter(x => !newl.has(x))
+	  // Add new ones not in oldLibs
+	  var toAdd = [...newl].filter(x => !oldl.has(x))
 	  
-	  // For all toRemove:
-	  // 1. Remove reference in index.html if there is one
-	  // 2. Remove directory libs/libname
+	  for (lib of toRemove) {
+	    hyper.UI.removeLibraryFromApp(path, lib)
+	  }
 
 	  // For all toAdd:
-	  // 0. Download and unzip into libs/libname
-	  // 1. Verify that there is no reference in index.html
-	  // 2. Add reference in index.html right before </body>
-
-	
+	  for (lib of toAdd) {
+	    hyper.UI.addLibraryToApp(path, lib)
+	  }
 	}
+	
+	hyper.UI.removeLibraryFromApp = function(path, lib) {
+	  // 1. Remove all references in index.html looking like:
+	  // <script src="libs/<lib>/<lib>.js"></script>
+	  var indexPath = APP_SETTINGS.getIndexFileFullPath(path)
+	  var html = FILEUTIL.readFileSync(indexPath)
+	  var scriptPath = `libs/${lib}/${lib}.js`
+	  $ = CHEERIO.load(html)
+	  var element = $('script').filter(function(i, el) {
+      return $(this).attr('src') === scriptPath
+    })
+    if (element.length > 0) {
+      element.remove()
+      FILEUTIL.writeFileSync(indexPath, $.html())
+      console.log("Removed " + lib + " from " + path)
+    }
+	  // 2. Remove directory libs/libname
+	  var libPath = PATH.join(APP_SETTINGS.getLibDirFullPath(path), lib)
+    FSEXTRA.removeSync(libPath)
+	}
+
+	hyper.UI.addLibraryToApp = function(path, lib) {
+	  // 0. Download and unzip into libs/libname
+	  var libPath = PATH.join(APP_SETTINGS.getLibDirFullPath(path), lib)
+	  copyLibraryFromURL(MAIN.BASE + '/libraries/' + lib, libPath, function() {
+      // 1. Remove any existing reference in index.html
+	    var indexPath = APP_SETTINGS.getIndexFileFullPath(path)
+	    var html = FILEUTIL.readFileSync(indexPath)
+	    var scriptPath = `libs/${lib}/${lib}.js`
+	    $ = CHEERIO.load(html)
+	    var element = $('script').filter(function(i, el) {
+        return $(this).attr('src') === scriptPath
+      })
+      if (element.length > 0) {
+        element.remove()
+      }
+	    // 2. Add a reference in index.html right before </body>
+      $('body').append(`  <script src="${scriptPath}"></script>
+  `)
+      FILEUTIL.writeFileSync(indexPath, $.html())
+	    console.log("Added " + lib + " to " + path)
+    })
+	}
+
+	function copyLibraryFromURL(sourceURL, targetDir, cb) {
+	  try {
+		  // Download zip to temp
+		  sourceURL = sourceURL + '.zip'
+		  UTIL.download(sourceURL, (zipFile, err) => {
+		    if (err) {
+    		  window.alert('Something went wrong, could not download library. Do you have internet access?')
+    		  LOGGER.log('[main-window-func.js] Error in copyLibraryFromURL: ' + err)
+    		} else {		    
+    		  // Extract into targetDir
+    		  FS.mkdirSync(targetDir)
+	    	  UTIL.unzip(zipFile, targetDir, function(err) {
+	  		    if (err) {
+	  		      // TODO: This doesn't seem to work
+	  		      FSEXTRA.removeSync(targetDir)
+        		  window.alert('Something went wrong when unzipping library.')
+        		  LOGGER.log('[main-window-func.js] Error in copyLibraryFromURL: ' + err)
+        		} else {       
+		          //Callback
+		          cb()
+		        }
+		      })
+		    }
+	  	})
+	  } catch (error) {
+		  window.alert('Something went wrong, could not download and unzip library.')
+		  LOGGER.log('[main-window-func.js] Error in copyLibraryFromURL: ' + error)
+	  }
+	}
+
 
 	hyper.UI.openRemoveAppDialog = function(obj)
 	{
