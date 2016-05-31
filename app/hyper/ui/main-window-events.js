@@ -598,6 +598,14 @@ exports.defineUIEvents = function(hyper)
 		var buttonId = '#button-' + tabname
 		hyper.UI.$(screenId).show()
 		hyper.UI.$(buttonId).removeClass('et-btn-stone').addClass('et-btn-et-btn-white-only')
+		
+		// If we show Examples or Libraries and they are empty - we try to update them silently
+		if (tabname == 'examples' && hyper.UI.mExampleList.length == 0) {
+		  hyper.UI.updateExampleList(true)
+		}
+		if (tabname == 'libraries' && hyper.UI.mLibraryList.length == 0) {
+		  hyper.UI.updateLibraryList(true)
+		}
 	}
 
 	// ************** No Client Connected Event **************

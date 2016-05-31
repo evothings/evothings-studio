@@ -50,12 +50,11 @@ var CHEERIO = require('cheerio')
  */
 exports.defineUIFunctions = function(hyper)
 {
-	var mWorkbenchWindow = null
-	var mViewersWindow = null
 	var mConnectKeyTimer
 	// The merged final array of metadata on Examples, Libraries and Projects
-	var mExampleList = []
-	var mLibraryList = []
+	hyper.UI.mExampleList = []
+	hyper.UI.mLibraryList = []
+
 	var mProjectList = []
 	var mWorkbenchPath = MAIN.getRootDir()
 
@@ -77,12 +76,12 @@ exports.defineUIFunctions = function(hyper)
 		hyper.UI.displayProjectList()
 
 		hyper.UI.updateExampleList(false)
-	  hyper.UI.updateLibraryList(false)
+	  hyper.UI.updateLibraryList(true) // We do this one silent, complaining once is enough
 
-		// Register a timer so that we update the example list every 30 min
+		// Register a timer so that we update the lists every 30 min
 	  setInterval(function() {
-	    hyper.UI.updateExampleList(true)
-	    hyper.UI.updateLibraryList(true)
+	    hyper.UI.updateExampleList(true) // Silent
+	    hyper.UI.updateLibraryList(true) // Silent
 	  }, 30 * 60 * 1000);
 		hyper.UI.setServerMessageFun()
 	}
@@ -389,7 +388,7 @@ exports.defineUIFunctions = function(hyper)
 		  var appTags = APP_SETTINGS.getTags(options.path) || []
 		  var appLibraries = APP_SETTINGS.getLibraries(options.path) || []
 		  var appVersion = APP_SETTINGS.getVersion(options.path) || null
-		  var shortName = APP_SETTINGS.getName(options.path) || '&lt;no name entered&gt;'
+		  var shortName = APP_SETTINGS.getName(options.path)
 		  var appDescription = APP_SETTINGS.getDescription(options.path) || '&lt;no description entered&gt;'
     }
     
@@ -851,15 +850,16 @@ exports.defineUIFunctions = function(hyper)
   hyper.UI.updateExampleList = function(silent)
   {
     // Get an array of promises for fetching the lists
-  	var promises = SETTINGS.getExampleLists().map(UTIL.getJSON)	
+   	var promises = SETTINGS.getExampleLists().map(UTIL.getJSON)
+
   	// When all lists are fetched, we concatenate them
     Promise.all(promises).then(function(lists) {
-      mExampleList = []
+      hyper.UI.mExampleList = []
       for (let list of lists) {
-  	    mExampleList = mExampleList.concat(list)
+  	    hyper.UI.mExampleList = hyper.UI.mExampleList.concat(list)
   	  }
   	  // Then we can sort them but place all "Hello*" apps first
-      mExampleList = mExampleList.sort(function(a, b) {
+      hyper.UI.mExampleList = hyper.UI.mExampleList.sort(function(a, b) {
         if (a.title.substring(0, 5) == "Hello") {
           return -1
         }
@@ -873,6 +873,7 @@ exports.defineUIFunctions = function(hyper)
   	}).catch(function(urls){
       if (!silent) {
   	    window.alert('Something went wrong downloading example lists. Do you have internet access?');
+  	    LOGGER.log('[main-window-func.js] Error in updateExampleList: ' + urls)
   	  }
     })
   }
@@ -884,7 +885,7 @@ exports.defineUIFunctions = function(hyper)
 
 	  var baseDoc = MAIN.DOC + "/examples/"
 	  var baseExamples = MAIN.EXAMPLES
-	  for (let entry of mExampleList) {
+	  for (let entry of hyper.UI.mExampleList) {
 		  createProjectEntry(
 		    false,
 		    false,
@@ -915,12 +916,12 @@ exports.defineUIFunctions = function(hyper)
   	var promises = SETTINGS.getLibraryLists().map(UTIL.getJSON)	
   	// When all lists are fetched, we concatenate them
     Promise.all(promises).then(function(lists) {
-      mLibraryList = []
+      hyper.UI.mLibraryList = []
       for (let list of lists) {
-  	    mLibraryList = mLibraryList.concat(list)
+  	    hyper.UI.mLibraryList = hyper.UI.mLibraryList.concat(list)
   	  }
   	  // Then we can sort them
-      mLibraryList = mLibraryList.sort(function(a, b) {     
+      hyper.UI.mLibraryList = hyper.UI.mLibraryList.sort(function(a, b) {     
         return a.title.localeCompare(b.title);
       })
       // And finally show them too
@@ -928,6 +929,7 @@ exports.defineUIFunctions = function(hyper)
   	}).catch(function(urls){
       if (!silent) {
   	    window.alert('Something went wrong downloading library lists. Do you have internet access?');
+  	    LOGGER.log('[main-window-func.js] Error in updateLibraryList: ' + urls)
   	  }
     })
   }
@@ -939,7 +941,7 @@ exports.defineUIFunctions = function(hyper)
 
 	  var baseDoc = MAIN.DOC + "/libraries/"
 	  var baseLibraries = MAIN.LIBRARIES
-    for (let entry of mLibraryList) {
+    for (let entry of hyper.UI.mLibraryList) {
 		  createProjectEntry(
 		    false,
 		    true,
@@ -1279,7 +1281,7 @@ exports.defineUIFunctions = function(hyper)
     var libs = APP_SETTINGS.getLibraries(path)
     var html = ''
     var count = 0
-    for (lib of mLibraryList) {
+    for (lib of hyper.UI.mLibraryList) {
       count++
       var checked = ''
       var usedVersion = lib.version
@@ -1313,9 +1315,14 @@ exports.defineUIFunctions = function(hyper)
 		var description = hyper.UI.$('#input-edit-app-description').val()
 		var version = hyper.UI.$('#input-edit-app-version').val()
     
-    // Only allow names without spaces, all lower case
-    name = name.replace(/\s/g, '')
-    name = name.toLowerCase()
+    if (/[^a-z0-9\_\-]/.test(name)) {
+      window.alert('The app short name should only consist of lower case letters, digits, underscores and dashes.')
+      // This is just to try to make it match the regexp test
+      var newName = name.replace(/\s/g, '-')
+      newName = newName.toLowerCase()
+      hyper.UI.$('#input-edit-app-name').val(newName)
+			return // Abort (dialog is still visible)
+    }
 
     // Collect checked libs
     var checkboxes = hyper.UI.$('#input-edit-app-libraries').find('input')
@@ -1332,7 +1339,7 @@ exports.defineUIFunctions = function(hyper)
 		hyper.UI.$('#dialog-edit-app').modal('hide')
 
     // Apply new libraries to app
-    hyper.UI.applyLibraries(path, APP_SETTINGS.getLibraries(path), libs)
+    hyper.UI.applyLibraries(path, APP_SETTINGS.getLibraries(path) || [], libs)
 
     // Store all meta data
     APP_SETTINGS.setLibraries(path, libs)
