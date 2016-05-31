@@ -30,16 +30,20 @@ var UNZIP = require('unzip2')
 exports.getJSON = function(url) {
 	return new Promise(function(resolve, reject) {
 		var xhr = new XMLHttpRequest();
+
+		xhr.onreadystatechange = function() {
+      if (xhr.readyState === 4) {   //if complete
+          if (xhr.status === 200){  //check if "OK" (200)
+             resolve(xhr.response);
+          } else {
+             reject(xhr.statusText); //otherwise, some other code was returned
+          }
+      }
+    }
+		
 		xhr.open('get', url, true);
 		xhr.responseType = 'json';
-		xhr.onload = function() {
-			if (xhr.status == 200) {
-				resolve(xhr.response);
-			} else {
-				reject(xhr.statusText);
-			}
-		};
-		xhr.send();
+ 		xhr.send();
 	});
 };
 
