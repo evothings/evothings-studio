@@ -424,14 +424,15 @@ html, body
 
 
 /* Labels for tags */
-.label-company {
+/* dialog, mediatek, nordic, etc */
+.label-hwpartner {
   background-color: #f0ad4e;
 }
-.label-company[href]:hover,
-.label-company[href]:focus {
+.label-hwpartner[href]:hover,
+.label-hwpartner[href]:focus {
   background-color: #ec971f;
 }
-/* mbed, arduino etc */
+/* mbedos, mbed, arduino etc */
 .label-platform {
   background-color: #5bc0de;
 }
@@ -439,7 +440,7 @@ html, body
 .label-platform[href]:focus {
   background-color: #31b0d5;
 }
-/* pro, enterprise */
+/* enterprise */
 .label-license {
   background-color: #5cb85c;
 }
@@ -447,7 +448,22 @@ html, body
 .label-license[href]:focus {
   background-color: #449d44;
 }
-
+/* wifi, bluetooth, ble, nfc etc */
+.label-comm {
+  background-color: #ff4d4d;
+}
+.label-comm[href]:hover,
+.label-comm[href]:focus {
+  background-color: #ff1a1a;
+}
+/* mqtt, xmpp etc */
+.label-protocol {
+  background-color: #bf8040;
+}
+.label-protocol[href]:hover,
+.label-protocol[href]:focus {
+  background-color: #734d26;
+}
 
 .floating-alert-box
 {
