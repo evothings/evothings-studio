@@ -1323,6 +1323,15 @@ exports.defineUIFunctions = function(hyper)
       hyper.UI.$('#input-edit-app-name').val(newName)
 			return // Abort (dialog is still visible)
     }
+    
+    if (/[^a-z0-9\.\-]/.test(version)) {
+      window.alert('The version should only consist of lower case letters, digits, dots and dashes.')
+      // This is just to try to make it match the regexp test
+      var newVersion = version.replace(/\s/g, '-')
+      newVersion = newVersion.toLowerCase()
+      hyper.UI.$('#input-edit-app-version').val(newVersion)
+			return // Abort (dialog is still visible)
+    }
 
     // Collect checked libs
     var checkboxes = hyper.UI.$('#input-edit-app-libraries').find('input')
