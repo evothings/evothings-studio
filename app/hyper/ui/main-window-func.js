@@ -351,11 +351,14 @@ exports.defineUIFunctions = function(hyper)
 	 *	 options.openButton
 	 *	 options.deleteButton
 	 */
-	function createProjectEntry(isLocal, isLibrary, base, options)
+	function createProjectEntry(isLocal, isLibrary, options)
 	{
 		options = options || {}
-		base = base || 'file://'
-
+    var base = 'file://'
+    // Set base to where we loaded the metadata from
+		if (options.url) {
+  		base = PATH.dirname(options.url)
+    }
 		// Create div tag for app items.
 		var html = '<div class="project-entry ui-state-default ui-corner-all"'
 
@@ -368,10 +371,11 @@ exports.defineUIFunctions = function(hyper)
 		// Close opening div tag.
 		html += '>'
 
-		// Full URL to application
-		var appURL = base + '/' + options.path
+		// Full URL to application, local or online
+		var appURL = PATH.join(base, options.path)
     var imagePath = options.imagePath
-    var docURL = options.docURL
+    // Fallback on missing doc-url is locally inside the app/library
+    var docURL = options.docURL || PATH.join(appURL, 'doc', 'index.html')
     var appTags = options.tags || []
     var appLibraries = options.libraries || []
 		var appVersion = options.version || null
@@ -819,7 +823,7 @@ exports.defineUIFunctions = function(hyper)
 				createProjectEntry(
 				  true,
 				  false,
-					'file://',
+//					'file://',
 					{
 					  path: path,
 					  active: (path == hyper.UI.activeAppPath),
@@ -853,9 +857,15 @@ exports.defineUIFunctions = function(hyper)
    	var promises = SETTINGS.getExampleLists().map(UTIL.getJSON)
 
   	// When all lists are fetched, we concatenate them
-    Promise.all(promises).then(function(lists) {
+    Promise.all(promises).then(function(listsAndUrls) {
       hyper.UI.mExampleList = []
-      for (let list of lists) {
+      for (let listAndUrl of listsAndUrls) {
+        var list = listAndUrl[0]
+        var url = listAndUrl[1]
+        // Embed the URL we got them from
+        for (entry of list) {
+          entry.url = url
+        }
   	    hyper.UI.mExampleList = hyper.UI.mExampleList.concat(list)
   	  }
   	  // Then we can sort them but place all "Hello*" apps first
@@ -870,10 +880,10 @@ exports.defineUIFunctions = function(hyper)
       })
       // And finally show them too
       hyper.UI.displayExampleList()
-  	}).catch(function(urls){
+  	}).catch(function(urls) {
+  	  LOGGER.log('[main-window-func.js] Error in updateExampleList: ' + urls)
       if (!silent) {
-  	    window.alert('Something went wrong downloading example lists. Do you have internet access?');
-  	    LOGGER.log('[main-window-func.js] Error in updateExampleList: ' + urls)
+  	    window.alert('Something went wrong downloading example list:\n\n' + urls[1] + '\n\n"' + urls[0] + '"\n\nDo you have internet access?');
   	  }
     })
   }
@@ -883,22 +893,23 @@ exports.defineUIFunctions = function(hyper)
 		// Clear current list.
 		hyper.UI.$('#screen-examples').empty()
 
-	  var baseDoc = MAIN.DOC + "/examples/"
-	  var baseExamples = MAIN.EXAMPLES
+    // Fallback base if example doesn't have doc-url
+    // We do not use this now, it needs to be in evothings.json
+	  //var baseDoc = MAIN.DOC + "/examples/"
 	  for (let entry of hyper.UI.mExampleList) {
 		  createProjectEntry(
 		    false,
 		    false,
-			  baseExamples,
 			  {
 			    name: entry.name,
-			    path: entry.path,
+			    path: entry.name, // Note that we only have name here
+			    url: entry.url,   // This is the base URL where we loaded it from
 			    title: entry.title,
 			    version: entry.version,
 			    description: entry.description,
 			    tags: entry.tags,
 			    libraries: entry.libraries,
-			    docURL: baseDoc + entry.path + '.html',
+			    docURL: entry['doc-url'], // || baseDoc + entry.name + '.html',
 			    imagePath: entry.icon,
 			    active: false,
 				  screen: '#screen-examples',
@@ -915,10 +926,16 @@ exports.defineUIFunctions = function(hyper)
     // Get an array of promises for fetching the lists
   	var promises = SETTINGS.getLibraryLists().map(UTIL.getJSON)	
   	// When all lists are fetched, we concatenate them
-    Promise.all(promises).then(function(lists) {
+    Promise.all(promises).then(function(listsAndUrls) {
       hyper.UI.mLibraryList = []
-      for (let list of lists) {
-  	    hyper.UI.mLibraryList = hyper.UI.mLibraryList.concat(list)
+      for (let listAndUrl of listsAndUrls) {
+        var list = listAndUrl[0]
+        var url = listAndUrl[1]
+        // Embed the URL we got them from
+        for (entry of list) {
+          entry.url = url
+        }
+        hyper.UI.mLibraryList = hyper.UI.mLibraryList.concat(list)
   	  }
   	  // Then we can sort them
       hyper.UI.mLibraryList = hyper.UI.mLibraryList.sort(function(a, b) {     
@@ -926,10 +943,10 @@ exports.defineUIFunctions = function(hyper)
       })
       // And finally show them too
       hyper.UI.displayLibraryList()
-  	}).catch(function(urls){
+  	}).catch(function(urls) {
+	    LOGGER.log('[main-window-func.js] Error in updateLibraryList: ' + urls)
       if (!silent) {
-  	    window.alert('Something went wrong downloading library lists. Do you have internet access?');
-  	    LOGGER.log('[main-window-func.js] Error in updateLibraryList: ' + urls)
+  	    window.alert('Something went wrong downloading library list:\n\n' + urls[1] + '\n\n"' + urls[0] + '"\n\nDo you have internet access?');
   	  }
     })
   }
@@ -939,21 +956,22 @@ exports.defineUIFunctions = function(hyper)
 		// Clear current list.
 		hyper.UI.$('#screen-libraries').empty()
 
-	  var baseDoc = MAIN.DOC + "/libraries/"
-	  var baseLibraries = MAIN.LIBRARIES
+    // Fallback base if library doesn't have doc-url
+    // We do not use this now, it needs to be in evothings.json
+	  //var baseDoc = MAIN.DOC + "/libraries/"
     for (let entry of hyper.UI.mLibraryList) {
 		  createProjectEntry(
 		    false,
 		    true,
-			  baseLibraries,
 			  {
 			    name: entry.name,
-			    path: entry.path,
+			    path: entry.name,  // Note that we only have name here
+			    url: entry.url,   // This is the base URL where we loaded it from
 			    title: entry.title,
 			    version: entry.version,
 			    description: entry.description,
 			    tags: entry.tags,
-			    docURL: baseDoc + entry.path + '.html',
+			    docURL: entry['doc-url'], //|| baseDoc + entry.name + '.html',
 			    imagePath: entry.icon,
 			    active: false,
 				  screen: '#screen-libraries',
@@ -1013,6 +1031,9 @@ exports.defineUIFunctions = function(hyper)
 
 		SETTINGS.setMyAppsPath(
 			hyper.UI.$('#input-setting-my-apps-path').val())
+		
+		SETTINGS.setRepositoryURLs(
+			hyper.UI.$('#input-setting-repository-urls').val())
 
 		// Check if server address has been changed.
 		var updatedServerAddress = hyper.UI.$('#input-setting-reload-server-address').val()
