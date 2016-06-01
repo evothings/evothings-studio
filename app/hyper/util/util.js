@@ -34,9 +34,9 @@ exports.getJSON = function(url) {
 		xhr.onreadystatechange = function() {
       if (xhr.readyState === 4) {   //if complete
           if (xhr.status === 200){  //check if "OK" (200)
-             resolve(xhr.response);
+             resolve([xhr.response, url]);
           } else {
-             reject(xhr.statusText); //otherwise, some other code was returned
+             reject([xhr.statusText, url]);
           }
       }
     }
