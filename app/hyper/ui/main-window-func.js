@@ -1129,7 +1129,7 @@ exports.defineUIFunctions = function(hyper)
 	  // If it's not absolute we copy from Evothings.com
 	  if (!FILEUTIL.isPathAbsolute(sourcePath)) {
 			copyAppFromURL(MAIN.BASE + '/examples/' + sourcePath, targetDir, function() {
-        // Make a new app-uuid in evothings.json in the copied app.
+        // Make a new uuid in evothings.json in the copied app.
         // This is done to prevent duplicated app uuids.
         APP_SETTINGS.generateNewAppUUID(targetDir)
         // Add path to "My Apps".
@@ -1142,7 +1142,7 @@ exports.defineUIFunctions = function(hyper)
 			  var appFolderName = PATH.basename(sourcePath)
 			  // Copy files.
 			  FSEXTRA.copySync(sourcePath, targetDir)
-			  // Make a new app-uuid in evothings.json in the copied app.
+			  // Make a new uuid in evothings.json in the copied app.
 			  // This is done to prevent duplicated app uuids.
 			  APP_SETTINGS.generateNewAppUUID(targetDir)
 			  // Add path to "My Apps".
