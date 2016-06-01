@@ -209,7 +209,12 @@ exports.hasFree = function()
  * List of URLs as array
  */
 exports.getRepositoryURLsArray = function() {
-  return exports.getRepositoryURLs().split(";")
+  var urls = exports.getRepositoryURLs()
+  if (urls.length > 0) {
+    return urls.split(";")
+  } else {
+    return []
+  }
 }
 
 /**
