@@ -210,7 +210,7 @@ exports.hasFree = function()
  */
 exports.getRepositoryURLsArray = function() {
   var urls = exports.getRepositoryURLs()
-  if (urls.length > 0) {
+  if (urls && urls.length > 0) {
     return urls.split(";")
   } else {
     return []
