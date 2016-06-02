@@ -1406,7 +1406,7 @@ exports.defineUIFunctions = function(hyper)
 	  var indexPath = APP_SETTINGS.getIndexFileFullPath(path)
 	  var html = FILEUTIL.readFileSync(indexPath)
 	  var scriptPath = `libs/${lib}/${lib}.js`
-	  $ = CHEERIO.load(html)
+	  $ = CHEERIO.load(html, { xmlMode: true })
 	  var element = $('script').filter(function(i, el) {
       return $(this).attr('src') === scriptPath
     })
@@ -1428,7 +1428,7 @@ exports.defineUIFunctions = function(hyper)
 	    var indexPath = APP_SETTINGS.getIndexFileFullPath(path)
 	    var html = FILEUTIL.readFileSync(indexPath)
 	    var scriptPath = `libs/${lib}/${lib}.js`
-	    $ = CHEERIO.load(html)
+	    $ = CHEERIO.load(html, { xmlMode: true })
 	    var element = $('script').filter(function(i, el) {
         return $(this).attr('src') === scriptPath
       })
