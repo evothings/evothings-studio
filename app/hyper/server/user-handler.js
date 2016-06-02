@@ -56,6 +56,11 @@ exports.setUser = function(uobj)
 	mUser = uobj
 }
 
+exports.isEnterprise = function()
+{
+	return uobj && uobj.limits.enterprise == true
+}
+
 exports.clearUser = function()
 {
 	LOGGER.log('[user-handler.js] LOGIN:clearing user')

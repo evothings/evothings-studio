@@ -442,6 +442,7 @@ exports.defineUIEvents = function(hyper)
 		{
 			showLoginButton()
 		}
+		showLicensesInSettings(user)
 	})
 
 	EVENTS.subscribe(EVENTS.LOGOUT, function()
@@ -472,6 +473,22 @@ exports.defineUIEvents = function(hyper)
 			//logoutUser()
 		}, DISCONNECT_DELAY)
 	})
+
+	function showLicensesInSettings(user)
+	{
+		var licenses = document.getElementById('licenselimits')
+		var list = '<ul>'
+		for(var k in user.limits)
+		{
+			var v = user.limits[k]
+			if(k != 'free')
+			{
+				list += '<li>'+k+': '+v
+			}
+		}
+		list += '</ul>'
+		licenses.innerHTML = list
+	}
 
 	function loginUser()
 	{
