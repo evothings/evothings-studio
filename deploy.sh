@@ -3,7 +3,7 @@
 # installed and configured with access keys.
  
 NAME=evothings-studio
-VER=2.1.0-beta2
+VER=2.1.0-beta3
 
 # Nuke old builds
 rm -rf dist/*
