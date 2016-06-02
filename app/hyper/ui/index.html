@@ -20,6 +20,7 @@ Copyright (c) 2013-2015 Evothings AB
 
 	<link href="css/hyper-common.css" rel="stylesheet" />
 	<link href="css/hyper-ui.css" rel="stylesheet" />
+	<link href="css/awesome-bootstrap-checkbox.css" rel="stylesheet" />
 </head>
 <body>
 	<div id="panel-page">
@@ -129,10 +130,10 @@ Copyright (c) 2013-2015 Evothings AB
 									class="form-control"/>
 							</div>
 							<div class="form-group">
-								<label for="input-setting-repositories">
+								<label for="input-setting-repository-urls">
 									Additional repository URLs separated by ; :</label>
 					 			<input type="text"
-									id="input-setting-repositories"
+									id="input-setting-repository-urls"
 									class="form-control"/>
 							</div>
 
@@ -222,6 +223,75 @@ Copyright (c) 2013-2015 Evothings AB
 					</div>
 				</div>
 			</div>
+
+			<!-- Modal dialog: dialog-new-app -->
+			<div class="modal fade"
+				id="dialog-edit-app"
+				tabindex="-1"
+				role="dialog"
+				aria-labelledby="dialog-edit-app-label"
+				aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h4 class="modal-title" id="dialog-edit-app-label">
+								Edit App
+							</h4>
+						</div>
+
+						<div class="modal-body">
+						  <input id="input-edit-app-path" type="hidden" value="">
+							<div class="form-group">
+								<label for="input-edit-app-name">
+									Enter app short name (lower case, no whitespace):</label>
+								<input type="text"
+									id="input-edit-app-name"
+									class="form-control"
+									value="my-new-app"
+									placeholder="App short name"/>
+							</div>
+							<div class="form-group">
+								<label for="input-edit-app-description">
+									One line description:</label>
+								<input type="text"
+									id="input-edit-app-description"
+									class="form-control"
+									placeholder="App oneline description"/>
+							</div>
+							<div class="form-group">
+								<label for="input-edit-app-version">
+									Version:</label>
+								<input type="text"
+									id="input-edit-app-version"
+									class="form-control"
+									placeholder="App version"/>
+							</div>
+							<div class="form-group">
+								<label for="input-edit-app-libraries">
+									Libraries:</label>
+									<div id="input-edit-app-libraries" class="h-scroll">
+                  </div>                   
+							</div>
+							
+						</div>
+
+						<div class="modal-footer">
+							<button id="button-save-edit-app"
+								type="button"
+								class="btn btn-success">
+								Save
+							</button>
+							<button type="button"
+								class="btn btn-default"
+								data-dismiss="modal">
+								Dismiss
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
 
 			<!-- Modal dialog: dialog-copy-app -->
 			<div class="modal fade"
@@ -632,10 +702,10 @@ Copyright (c) 2013-2015 Evothings AB
 			<!-- End of Connect screen -->
 
 			<!-- Example screen -->
-			<div id="screen-examples" class="hyper-screen project-list"></div>
+			<div id="screen-examples" class="hyper-screen project-list">Something went wrong downloading example lists. Do you have internet access?</div>
 
 			<!-- Libraries screen -->
-			<div id="screen-libraries" class="hyper-screen project-list"></div>
+			<div id="screen-libraries" class="hyper-screen project-list">Something went wrong downloading library lists. Do you have internet access?</div>
 
 			<!-- My apps screen -->
 			<div id="screen-projects" class="hyper-screen project-list"></div>

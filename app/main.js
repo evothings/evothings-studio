@@ -4,11 +4,14 @@
 // from BrowserWindows via Electron remote
 global.main = {}
 
-// Versions and URLs associated with them
+// Version
 main.MAJOR = 2
 main.MINOR = 1
 main.PATCH = 0
 main.BUILD = 'beta3'
+
+// This one is burned in by scripts
+main.TIMESTAMP = '<timestamp>'
 
 // Don't edit below
 main.VERSION = main.MAJOR + '.' + main.MINOR
@@ -318,6 +321,7 @@ main.addMenu = function() {
             buttons: ["Close"],
             message: "Evothings Studio " + main.FULLVERSION,
             detail: "Evothings Studio is a development environment tailored for making hybrid mobile apps in the IoT domain.\n" +
+              "\nBuilt: " + main.TIMESTAMP +
               "\nElectron: " + process.versions['electron'] +
               "\nChrome: " + process.versions['chrome'] +
               "\nNode: " + process.versions['node'] +

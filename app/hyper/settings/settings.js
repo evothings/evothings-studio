@@ -36,7 +36,14 @@ exports.get = function(key)
 	var data = window.localStorage.getItem(key)
 	if (data)
 	{
-		return JSON.parse(data)
+		try {
+		  return JSON.parse(data)
+		} catch (e) {
+      // Some crap entered localStorage, remove it
+      console.log("Removed erroneous value '" + data + "' for  key " + key + " from localstorage")
+      window.localStorage.removeItem(key)
+      return null
+    }
 	}
 	else
 	{
@@ -146,14 +153,7 @@ systemSetting('SessionID', null)
 /**
  * List of URLs separated with ;
  */
-systemSetting('RepositoryURLs')
-
-/**
- * List of URLs as array
- */
-exports.getRepositoryURLsArray = function() {
-  exports.getRepositoryURLs().split(";")
-}
+systemSetting('RepositoryURLs', '')
 
 /**
  * Settings for user GUID are handled specially to preserve existing ids.
@@ -190,7 +190,7 @@ exports.setEvoCloudToken = function(value)
 exports.hasEnterprise = function()
 {
   // TODO: Peter fixes! :)
-  return false
+  return true
 }
 
 exports.hasPro = function()
@@ -205,6 +205,17 @@ exports.hasFree = function()
   return !(exports.hasEnterprise() || exports.hasPro())
 }
 
+/**
+ * List of URLs as array
+ */
+exports.getRepositoryURLsArray = function() {
+  var urls = exports.getRepositoryURLs()
+  if (urls.length > 0) {
+    return urls.split(";")
+  } else {
+    return []
+  }
+}
 
 /**
  * Address of reload server.
@@ -253,7 +264,10 @@ exports.getExampleLists = function()
   if (exports.hasEnterprise()) {
     lists.push(MAIN.EXAMPLES + '/examples-list-enterprise.json')
   }
-  // TODO: Add from repo URLs here
+  var urls = exports.getRepositoryURLsArray()
+  for (url of urls) {
+    lists.push(url + '/examples/examples-list.json')
+  }    
   return lists
 }
 
@@ -264,7 +278,10 @@ exports.getLibraryLists = function()
   if (exports.hasEnterprise()) {
    lists.push(MAIN.LIBRARIES + '/library-list-enterprise.json')
   }
-  // TODO: Add from repo URLs here
+  var urls = exports.getRepositoryURLsArray()
+  for (url of urls) {
+    lists.push(url + '/libraries/library-list.json')
+  }    
   return lists
 }
 

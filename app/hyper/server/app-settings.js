@@ -42,19 +42,104 @@ exports.getAppID = function(appPath)
 {
 	var settings = readAppSettings(appPath)
 
-	if (!settings)
-	{
+	if (!settings) {
 		settings = {}
 	}
 
-	if (!(settings['app-uuid']))
+	if (!(settings['uuid']))
 	{
-		settings['app-uuid'] = UUID.generateUUID()
+		settings['uuid'] = UUID.generateUUID()
 		writeAppSettings(settings, appPath)
-		return settings['app-uuid']
+		return settings['uuid']
 	}
 
-	return settings['app-uuid']
+	return settings['uuid']
+}
+
+/**
+ * Return short name for app, or null if not set.
+ */
+exports.getName = function(appPath)
+{
+	var settings = readAppSettings(appPath)
+	if (settings && settings['name'])
+	{
+		return settings['name']
+	}
+	else
+	{
+		return null
+	}
+}
+exports.setName = function(appPath, name)
+{
+	var settings = readAppSettings(appPath)
+	if (settings)
+	{
+		settings['name'] = name
+		writeAppSettings(settings, appPath)
+	}
+	else
+	{
+		return null
+	}
+}
+/**
+ * Return oneline description for app, or null if not set.
+ */
+exports.getDescription = function(appPath)
+{
+	var settings = readAppSettings(appPath)
+	if (settings && settings['description'])
+	{
+		return settings['description']
+	}
+	else
+	{
+		return null
+	}
+}
+exports.setDescription = function(appPath, description)
+{
+	var settings = readAppSettings(appPath)
+	if (settings)
+	{
+		settings['description'] = description
+		writeAppSettings(settings, appPath)
+	}
+	else
+	{
+		return null
+	}
+}
+
+/**
+ * Return version string for app, or null if not set.
+ */
+exports.getVersion = function(appPath)
+{
+	var settings = readAppSettings(appPath)
+	if (settings && settings['version'])
+	{
+		return settings['version']
+	}
+	else
+	{
+		return null
+	}
+}
+exports.setVersion = function(appPath, version)
+{
+	var settings = readAppSettings(appPath)
+	if (settings)
+	{
+		settings['version'] = version
+		writeAppSettings(settings, appPath)
+	}
+	else
+	{
+		return null
+	}
 }
 
 /**
@@ -63,12 +148,10 @@ exports.getAppID = function(appPath)
 exports.getAppImage = function(appPath)
 {
 	var settings = readAppSettings(appPath)
-	if (settings && settings['app-icon'])
-	{
-		return settings['app-icon']
-	}
-	else
-	{
+
+	if (settings && settings['icon']) {
+		return settings['icon']
+	} else {
 		return null
 	}
 }
@@ -79,32 +162,65 @@ exports.getAppImage = function(appPath)
 exports.getDocURL = function(appPath)
 {
 	var settings = readAppSettings(appPath)
-	if (settings && settings['app-doc-url'])
-	{
-		return settings['app-doc-url']
-	}
-	else
-	{
+
+	if (settings && settings['doc-url']) {
+		return settings['doc-url']
+	} else {
 		return null
 	}
 }
 
 /**
- * Return app-tags, or null if not set.
+ * Return tags, or null if not set.
  */
 exports.getTags = function(appPath)
 {
 	var settings = readAppSettings(appPath)
-	if (settings && settings['app-tags'])
+	if (settings && settings['tags']) {
+		return settings['tags']
+	} else {
+		return null
+	}
+}
+exports.setTags = function(appPath, tags)
+{
+	var settings = readAppSettings(appPath)
+	if (settings) {
+		settings['tags'] = tags
+		writeAppSettings(settings, appPath)
+	} else {
+		return null
+	}
+}
+
+/**
+ * Return libraries, or null if not set.
+ */
+exports.getLibraries = function(appPath)
+{
+	var settings = readAppSettings(appPath)
+	if (settings && settings['libraries'])
 	{
-		return settings['app-tags']
+		return settings['libraries']
 	}
 	else
 	{
 		return null
 	}
 }
-
+exports.setLibraries = function(appPath, libraries)
+{
+	var settings = readAppSettings(appPath)
+	if (settings)
+	{
+		settings['libraries'] = libraries
+		writeAppSettings(settings, appPath)
+	}
+	else
+	{
+		return null
+	}
+}
 
 /**
  * Generate and save a new App UUID.
@@ -114,7 +230,7 @@ exports.generateNewAppUUID = function(appPath)
 	var settings = readAppSettings(appPath)
 	if (settings)
 	{
-		settings['app-uuid'] = UUID.generateUUID()
+		settings['uuid'] = UUID.generateUUID()
 		writeAppSettings(settings, appPath)
 	}
 	else
@@ -173,6 +289,24 @@ exports.getAppDir = function(appPath)
 }
 
 /**
+ * Directory for app libraries.
+ */
+exports.getLibDir = function(appPath)
+{
+	var appDir = exports.getAppDir(appPath)
+	if (appDir) {
+	  return PATH.join(appDir, 'libs')
+	} else {
+	  return 'libs'
+	}
+}
+
+exports.getLibDirFullPath = function(appPath)
+{
+	return PATH.join(appPath, exports.getLibDir(appPath))
+}
+
+/**
  * Directory for built files.
  */
 exports.getWwwDir = function(appPath)
@@ -228,8 +362,7 @@ exports.getIndexFileShortPath = function(appPath)
 /**
  * Get the full HTML file path for the app.
  */
-exports.getIndexFileFullPath = function(appPath)
-{
+exports.getIndexFileFullPath = function(appPath) {
 	var indexShortPath = exports.getIndexFileShortPath(appPath)
 	if (indexShortPath)
 	{
@@ -244,26 +377,42 @@ exports.getIndexFileFullPath = function(appPath)
 /**
  * Read settings file and return data object, or null if settings file is missing.
  */
-function readAppSettings(appPath)
-{
+function readAppSettings(appPath) {
 	var path = PATH.join(appPath, 'evothings.json')
-	if (FS.existsSync(path))
-	{
+	if (FS.existsSync(path)) {
 		var json = FILEUTIL.readFileSync(path)
 		var settings = JSON.parse(json)
+		migrateSettings(settings, appPath)
 		return settings
-	}
-	else
-	{
+	} else {
 		return null
 	}
 }
 
+function migrateSettings(settings, appPath) {
+  // Migrate to new names
+  if (settings['app-uuid']) {
+  	settings['uuid'] = settings['app-uuid']
+  	delete settings['app-uuid']
+		writeAppSettings(settings, appPath)
+  }	
+  if (settings['app-icon']) {
+  	settings['icon'] = settings['app-icon']
+  	delete settings['app-icon']
+		writeAppSettings(settings, appPath)
+  }
+  if (settings['app-doc-url']) {
+  	settings['doc-url'] = settings['app-doc-url']
+  	delete settings['app-doc-url']
+		writeAppSettings(settings, appPath)
+  }
+}
+
+
 /**
  * Write settings file in JSON format.
  */
-function writeAppSettings(settings, appPath)
-{
+function writeAppSettings(settings, appPath) {
 	var path = PATH.join(appPath, 'evothings.json')
 	var data = JSON.stringify(settings, null, 2)
 	FS.writeFileSync(path, data, {encoding: 'utf8'})

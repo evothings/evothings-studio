@@ -1,5 +1,7 @@
-# Simple shell script to build and upload installers.
-# This can only be used if you are on OSX and have s3cmd
+# Evothings specific shell script to build and upload installers.
+# NOTE: This can only be used by us at Evothings!
+#
+# You need to be on OSX and have s3cmd
 # installed and configured with access keys.
  
 NAME=evothings-studio

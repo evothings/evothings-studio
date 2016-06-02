@@ -43,18 +43,18 @@ var UTIL = require('../util/util.js')
 var TEMP = require('temp').track()
 var BABEL = require('babel-core')
 var GLOB = require('glob')
+var CHEERIO = require('cheerio')
 
 /**
  * UI functions.
  */
 exports.defineUIFunctions = function(hyper)
 {
-	var mWorkbenchWindow = null
-	var mViewersWindow = null
 	var mConnectKeyTimer
 	// The merged final array of metadata on Examples, Libraries and Projects
-	var mExampleList = []
-	var mLibraryList = []
+	hyper.UI.mExampleList = []
+	hyper.UI.mLibraryList = []
+
 	var mProjectList = []
 	var mWorkbenchPath = MAIN.getRootDir()
 
@@ -76,12 +76,12 @@ exports.defineUIFunctions = function(hyper)
 		hyper.UI.displayProjectList()
 
 		hyper.UI.updateExampleList(false)
-	  hyper.UI.updateLibraryList(false)
+	  hyper.UI.updateLibraryList(true) // We do this one silent, complaining once is enough
 
-		// Register a timer so that we update the example list every 30 min
+		// Register a timer so that we update the lists every 30 min
 	  setInterval(function() {
-	    hyper.UI.updateExampleList(true)
-	    hyper.UI.updateLibraryList(true)
+	    hyper.UI.updateExampleList(true) // Silent
+	    hyper.UI.updateLibraryList(true) // Silent
 	  }, 30 * 60 * 1000);
 		hyper.UI.setServerMessageFun()
 	}
@@ -338,8 +338,10 @@ exports.defineUIFunctions = function(hyper)
 	 * Possible options include:
 	 *   options.path
 	 *   options.title
+	 *   options.version
 	 *   options.description
 	 *   options.tags { label, type }
+	 *   options.libraries { name, version }
 	 *   options.imagePath
 	 *   options.docURL
 	 *   options.active
@@ -349,11 +351,14 @@ exports.defineUIFunctions = function(hyper)
 	 *	 options.openButton
 	 *	 options.deleteButton
 	 */
-	function createProjectEntry(isLocal, base, options)
+	function createProjectEntry(isLocal, isLibrary, options)
 	{
 		options = options || {}
-		base = base || 'file://'
-
+    var base = 'file://'
+    // Set base to where we loaded the metadata from
+		if (options.url) {
+  		base = PATH.dirname(options.url)
+    }
 		// Create div tag for app items.
 		var html = '<div class="project-entry ui-state-default ui-corner-all"'
 
@@ -366,16 +371,29 @@ exports.defineUIFunctions = function(hyper)
 		// Close opening div tag.
 		html += '>'
 
-		// Full URL to application
-		var appURL = base + '/' + options.path
+		// Full URL to application, local or online
+		var appURL = PATH.join(base, options.path)
     var imagePath = options.imagePath
-    var docURL = options.docURL
+    // Fallback on missing doc-url is locally inside the app/library
+    var docURL = options.docURL || PATH.join(appURL, 'doc', 'index.html')
     var appTags = options.tags || []
+    var appLibraries = options.libraries || []
+		var appVersion = options.version || null
+		var shortName = options.name
+    var appName = options.title
+    var appDescription = options.description
+
+		// Escape any backslashes in the path (needed on Windows).
+		var escapedPath = options.path.replace(/[\\]/g,'\\\\')
     
     if (isLocal) {
 		  var imagePath = imagePath || APP_SETTINGS.getAppImage(options.path)
 		  var docURL = docURL || APP_SETTINGS.getDocURL(options.path)
 		  var appTags = APP_SETTINGS.getTags(options.path) || []
+		  var appLibraries = APP_SETTINGS.getLibraries(options.path) || []
+		  var appVersion = APP_SETTINGS.getVersion(options.path) || null
+		  var shortName = APP_SETTINGS.getName(options.path)
+		  var appDescription = APP_SETTINGS.getDescription(options.path) || '&lt;no description entered&gt;'
     }
     
 		if (imagePath) {
@@ -387,13 +405,11 @@ exports.defineUIFunctions = function(hyper)
 			html += '<div class="app-icon" style="background-image: url(\'images/app-icon.png\');"></div>'
 		}
 
-		// Get name of app, either given in options or extracted from project.
-		// Uses title tag as first choice.
-    var appName = options.title
-    var appDescription = options.description
     
-		var appHasValidHTMLFile = true
+		var appHasValidHTMLFile = options.runButton
     if (isLocal) {
+		  // Get name of app, either given in options above or extracted from project.
+		  // Uses title tag as first choice.
       if (!appName) {
         // Returns null if HTML file not found.
 		    appName = hyper.UI.getProjectNameFromFile(options.path)
@@ -405,13 +421,28 @@ exports.defineUIFunctions = function(hyper)
       }
     }
     
-		if (docURL && options.docButton)
+    	
+		if (isLocal && !isLibrary)
 		{
 			html +=
 				'<button '
 				+	'type="button" '
-				+	'class="button-doc btn et-btn-yellow-dark" '
-				+	'onclick="window.hyper.UI.openDocURL(\'__DOCURL__\')">'
+				+	'class="button-edit btn et-btn-red" '
+				+	`onclick="window.hyper.UI.openEditAppDialog('${escapedPath}')">`
+				+	'Edit'
+				+ '</button>'
+		}
+    
+		if (docURL && options.docButton)
+		{
+			html += '<button type="button" '
+			if (isLibrary) {
+				html +=	'class="button-run'
+		  } else {
+		    html +=	'class="button-doc'
+		  }
+		  html += ' btn et-btn-yellow-dark" '
+				+	`onclick="window.hyper.UI.openDocURL('${docURL}')">`
 				+	'Doc'
 				+ '</button>'
 		}
@@ -422,7 +453,7 @@ exports.defineUIFunctions = function(hyper)
 				'<button '
 				+	'type="button" '
 				+	'class="button-open btn et-btn-indigo" '
-				+	'onclick="window.hyper.UI.openCopyAppDialog(\'__PATH1__\')">'
+				+	`onclick="window.hyper.UI.openCopyAppDialog('${escapedPath}')">`
 				+	'Copy'
 				+ '</button>'
 		}
@@ -433,22 +464,35 @@ exports.defineUIFunctions = function(hyper)
 				'<button '
 				+	'type="button" '
 				+	'class="button-open btn et-btn-blue" '
-				+	'onclick="window.hyper.UI.openFileFolder(\'__PATH2__\')">'
+				+	`onclick="window.hyper.UI.openFolder('${escapedPath}')">`
 				+	'Code'
 				+ '</button>'
 		}
 
+
 		// Add Run button only if app has an HTML file.
 		// We use different run functions depending on if it isLocal
-		if (appHasValidHTMLFile)
+		if (!isLibrary && appHasValidHTMLFile)
 		{
 			html += '<button type="button" class="button-run btn et-btn-green" '
       if (isLocal)
-        html += 'onclick="window.hyper.UI.runApp(\'__PATH3__\')">'
+        html += `onclick="window.hyper.UI.runApp('${escapedPath}')">`
       else 
-        html += 'onclick="window.hyper.UI.runExampleApp(\'__PATH3__\')">'
+        html += `onclick="window.hyper.UI.runExampleApp('${escapedPath}')">`
       html +=	'Run</button>'
 		}
+
+		/* We add a Config button to Apps instead
+		if (isLibrary)
+		{
+			html +=
+				'<button '
+				+	'type="button" '
+				+	'class="button-run btn et-btn-green" '
+				+	'onclick="window.hyper.UI.copytoApp(\'${escapedPath}\')">'
+				+	'Use'
+				+ '</button>'
+		}*/
 
 		if (options.deleteButton)
 		{
@@ -464,35 +508,53 @@ exports.defineUIFunctions = function(hyper)
     // Tags HTML
     var tagsHTML = ''
     appTags.forEach(tag => {
-      tagsHTML += ' <span class="label label-' + tag.type + '">' + tag.label + '</span>'
+      tagsHTML += ` <span class="label label-${tag.type}">${tag.label}</span>`
     })
     
-		// App name and path.
-		html += '<div class="entry-content">' +
-			'<h4>__NAME__</h4>'
-			+ '<p>__DESC__' + '<span style="float:right">' + tagsHTML + '</span></p></div>'
-
-		html +=
-			'<div class="project-list-entry-path" style="display:none;">__PATH5__</div>'
-			+ '</div>'
-
-
-		// Escape any backslashes in the path (needed on Windows).
-		var escapedPath = options.path.replace(/[\\]/g,'\\\\')
-
-		// Replace fields in template.
-		html = html.replace('__DOCURL__', docURL)
-		html = html.replace('__PATH1__', escapedPath)
-		html = html.replace('__PATH2__', escapedPath)
-		html = html.replace('__PATH3__', escapedPath)
-		html = html.replace('__PATH4__', getShortPathFromPath(options.path))
-		html = html.replace('__PATH5__', options.path)
-		html = html.replace('__NAME__', appName)
-		html = html.replace('__DESC__', appDescription)
+    // Meta data
+    var metaHTML = ''
+    if (shortName) {
+      metaHTML += '<strong>Name:</strong>&nbsp;' + shortName
+    }
+    if (appVersion) {
+      metaHTML += ' <strong>Version:</strong>&nbsp;' + appVersion
+    }
+    if (appLibraries.length > 0) {
+      metaHTML += ' <strong>Libraries:</strong>'
+      var first = true
+      appLibraries.forEach(lib => {
+        if (first) {
+          metaHTML += '&nbsp;'
+          first = false
+        } else {
+          metaHTML += ',&nbsp;'
+        }
+        metaHTML += lib.name + ' (' + lib.version + ')'
+      })
+    }
+    if (isLocal && options.path) {
+      metaHTML += ' <strong>Path:</strong>&nbsp;' + options.path
+    }
+    
+		// Different CSS classes for entry content
+		var entryContentClass = 'entry-content'
+		if (isLibrary) {
+		  entryContentClass += '-libraries'
+		} else if (!isLocal) {
+		  entryContentClass += '-examples'
+		}
+		
+		html += `<div class="${entryContentClass}"><h4>${appName}</h4>`
+		html += `<p>${appDescription}</p>`
+		html += '<p>'
+		if (metaHTML.length > 0) {
+		  html += metaHTML.trim()
+		}
+    html += `<span style="float:right">${tagsHTML}</span></p>`
+		html += '</div>'
 
 		// Create element.
 		var element = hyper.UI.$(html)
-		//LOGGER.log(html)
 
 		// Insert element first in list.
 		options.screen && hyper.UI.$(options.screen).append(element)
@@ -524,6 +586,7 @@ exports.defineUIFunctions = function(hyper)
 
 	// Get last part of path. Purpose is to make path fit
 	// inside a project list item.
+	// TODO: We don't use this anymore, but keeping it for later
 	function getShortPathFromPath(path)
 	{
 		var limit = 58
@@ -701,8 +764,16 @@ exports.defineUIFunctions = function(hyper)
 		// Debug logging.
 		LOGGER.log('[main-window-func.js] Open folder: ' + path)
 
-		//hyper.UI.GUI.Shell.showItemInFolder(path)
-		SHELL.showItemInFolder(path)
+		// We want to show the folder but need an item in it to show,
+		// we use either evothings.json or index.html
+		if (FILEUTIL.statSync(PATH.join(path, 'evothings.json'))) {
+			SHELL.showItemInFolder(PATH.join(path, 'evothings.json'))
+	  } else if (FILEUTIL.statSync(PATH.join(path, 'index.html'))) {
+	    SHELL.showItemInFolder(PATH.join(path, 'index.html'))
+	  } else {
+	    // This will show the parent folder, but so be it!
+	    SHELL.showItemInFolder(path)
+	  }
 	}
 
 	hyper.UI.setRemoteServerURL = function(url)
@@ -751,14 +822,16 @@ exports.defineUIFunctions = function(hyper)
 				var path = projectList[i]
 				createProjectEntry(
 				  true,
-					'file://',
+				  false,
+//					'file://',
 					{
 					  path: path,
 					  active: (path == hyper.UI.activeAppPath),
 						screen: '#screen-projects',
 						openButton: true,
 						docButton: true,
-						deleteButton: true
+						deleteButton: true,
+						runButton: true
 					})
 			}
 		}
@@ -781,15 +854,22 @@ exports.defineUIFunctions = function(hyper)
   hyper.UI.updateExampleList = function(silent)
   {
     // Get an array of promises for fetching the lists
-  	var promises = SETTINGS.getExampleLists().map(UTIL.getJSON)	
+   	var promises = SETTINGS.getExampleLists().map(UTIL.getJSON)
+
   	// When all lists are fetched, we concatenate them
-    Promise.all(promises).then(function(lists) {
-      mExampleList = []
-      for (let list of lists) {
-  	    mExampleList = mExampleList.concat(list)
+    Promise.all(promises).then(function(listsAndUrls) {
+      hyper.UI.mExampleList = []
+      for (let listAndUrl of listsAndUrls) {
+        var list = listAndUrl[0]
+        var url = listAndUrl[1]
+        // Embed the URL we got them from
+        for (entry of list) {
+          entry.url = url
+        }
+  	    hyper.UI.mExampleList = hyper.UI.mExampleList.concat(list)
   	  }
   	  // Then we can sort them but place all "Hello*" apps first
-      mExampleList = mExampleList.sort(function(a, b) {
+      hyper.UI.mExampleList = hyper.UI.mExampleList.sort(function(a, b) {
         if (a.title.substring(0, 5) == "Hello") {
           return -1
         }
@@ -800,9 +880,10 @@ exports.defineUIFunctions = function(hyper)
       })
       // And finally show them too
       hyper.UI.displayExampleList()
-  	}).catch(function(urls){
+  	}).catch(function(urls) {
+  	  LOGGER.log('[main-window-func.js] Error in updateExampleList: ' + urls)
       if (!silent) {
-  	    window.alert('Something went wrong downloading example lists. Do you have internet access?');
+  	    window.alert('Something went wrong downloading example list:\n\n' + urls[1] + '\n\n"' + urls[0] + '"\n\nDo you have internet access?');
   	  }
     })
   }
@@ -812,23 +893,29 @@ exports.defineUIFunctions = function(hyper)
 		// Clear current list.
 		hyper.UI.$('#screen-examples').empty()
 
-	  var baseDoc = MAIN.DOC + "/examples/"
-	  var baseExamples = MAIN.EXAMPLES
-	  for (let entry of mExampleList) {
+    // Fallback base if example doesn't have doc-url
+    // We do not use this now, it needs to be in evothings.json
+	  //var baseDoc = MAIN.DOC + "/examples/"
+	  for (let entry of hyper.UI.mExampleList) {
 		  createProjectEntry(
 		    false,
-			  baseExamples,
+		    false,
 			  {
-			    path: entry.path,
+			    name: entry.name,
+			    path: entry.name, // Note that we only have name here
+			    url: entry.url,   // This is the base URL where we loaded it from
 			    title: entry.title,
+			    version: entry.version,
 			    description: entry.description,
 			    tags: entry.tags,
-			    docURL: baseDoc + entry.path + '.html',
+			    libraries: entry.libraries,
+			    docURL: entry['doc-url'], // || baseDoc + entry.name + '.html',
 			    imagePath: entry.icon,
 			    active: false,
 				  screen: '#screen-examples',
 				  docButton: true,
-				  copyButton: true
+				  copyButton: true,
+				  runButton: true
 			  }
 			)
 	  }
@@ -839,20 +926,27 @@ exports.defineUIFunctions = function(hyper)
     // Get an array of promises for fetching the lists
   	var promises = SETTINGS.getLibraryLists().map(UTIL.getJSON)	
   	// When all lists are fetched, we concatenate them
-    Promise.all(promises).then(function(lists) {
-      mLibraryList = []
-      for (let list of lists) {
-  	    mLibraryList = mLibraryList.concat(list)
+    Promise.all(promises).then(function(listsAndUrls) {
+      hyper.UI.mLibraryList = []
+      for (let listAndUrl of listsAndUrls) {
+        var list = listAndUrl[0]
+        var url = listAndUrl[1]
+        // Embed the URL we got them from
+        for (entry of list) {
+          entry.url = url
+        }
+        hyper.UI.mLibraryList = hyper.UI.mLibraryList.concat(list)
   	  }
   	  // Then we can sort them
-      mLibraryList = mLibraryList.sort(function(a, b) {     
+      hyper.UI.mLibraryList = hyper.UI.mLibraryList.sort(function(a, b) {     
         return a.title.localeCompare(b.title);
       })
       // And finally show them too
       hyper.UI.displayLibraryList()
-  	}).catch(function(urls){
+  	}).catch(function(urls) {
+	    LOGGER.log('[main-window-func.js] Error in updateLibraryList: ' + urls)
       if (!silent) {
-  	    window.alert('Something went wrong downloading library lists. Do you have internet access?');
+  	    window.alert('Something went wrong downloading library list:\n\n' + urls[1] + '\n\n"' + urls[0] + '"\n\nDo you have internet access?');
   	  }
     })
   }
@@ -862,23 +956,28 @@ exports.defineUIFunctions = function(hyper)
 		// Clear current list.
 		hyper.UI.$('#screen-libraries').empty()
 
-	  var baseDoc = MAIN.DOC + "/libraries/"
-	  var baseLibraries = MAIN.LIBRARIES
-    for (let entry of mLibraryList) {
+    // Fallback base if library doesn't have doc-url
+    // We do not use this now, it needs to be in evothings.json
+	  //var baseDoc = MAIN.DOC + "/libraries/"
+    for (let entry of hyper.UI.mLibraryList) {
 		  createProjectEntry(
 		    false,
-			  baseLibraries,
+		    true,
 			  {
-			    path: entry.path,
+			    name: entry.name,
+			    path: entry.name,  // Note that we only have name here
+			    url: entry.url,   // This is the base URL where we loaded it from
 			    title: entry.title,
+			    version: entry.version,
 			    description: entry.description,
 			    tags: entry.tags,
-			    docURL: baseDoc + entry.path + '.html',
+			    docURL: entry['doc-url'], //|| baseDoc + entry.name + '.html',
 			    imagePath: entry.icon,
 			    active: false,
 				  screen: '#screen-libraries',
 				  docButton: true,
-				  copyButton: true,
+				  copyButton: false,
+				  runButton: false
 			  }
 			)
 	  }
@@ -932,6 +1031,9 @@ exports.defineUIFunctions = function(hyper)
 
 		SETTINGS.setMyAppsPath(
 			hyper.UI.$('#input-setting-my-apps-path').val())
+		
+		SETTINGS.setRepositoryURLs(
+			hyper.UI.$('#input-setting-repository-urls').val())
 
 		// Check if server address has been changed.
 		var updatedServerAddress = hyper.UI.$('#input-setting-reload-server-address').val()
@@ -962,11 +1064,6 @@ exports.defineUIFunctions = function(hyper)
 		{
 			hyper.UI.$('#dialog-disconnect-all-viewers').modal('show')
 		}
-	}
-
-	hyper.UI.openFileFolder = function(path)
-	{
-		hyper.UI.openFolder(path)
 	}
 
 	hyper.UI.openDocURL = function(url)
@@ -1053,7 +1150,7 @@ exports.defineUIFunctions = function(hyper)
 	  // If it's not absolute we copy from Evothings.com
 	  if (!FILEUTIL.isPathAbsolute(sourcePath)) {
 			copyAppFromURL(MAIN.BASE + '/examples/' + sourcePath, targetDir, function() {
-        // Make a new app-uuid in evothings.json in the copied app.
+        // Make a new uuid in evothings.json in the copied app.
         // This is done to prevent duplicated app uuids.
         APP_SETTINGS.generateNewAppUUID(targetDir)
         // Add path to "My Apps".
@@ -1066,7 +1163,7 @@ exports.defineUIFunctions = function(hyper)
 			  var appFolderName = PATH.basename(sourcePath)
 			  // Copy files.
 			  FSEXTRA.copySync(sourcePath, targetDir)
-			  // Make a new app-uuid in evothings.json in the copied app.
+			  // Make a new uuid in evothings.json in the copied app.
 			  // This is done to prevent duplicated app uuids.
 			  APP_SETTINGS.generateNewAppUUID(targetDir)
 			  // Add path to "My Apps".
@@ -1129,7 +1226,7 @@ exports.defineUIFunctions = function(hyper)
 	hyper.UI.openNewAppDialog = function()
 	{
 		// Populate input fields.
-		var path = PATH.join(SETTINGS.getMyAppsPath())
+		var path = SETTINGS.getMyAppsPath()
 		hyper.UI.$('#input-new-app-parent-folder').val(path)
     hyper.UI.$('#input-new-app-folder').val('')
 
@@ -1191,6 +1288,192 @@ exports.defineUIFunctions = function(hyper)
 		  showMyApps()
 		})
 	}
+
+  hyper.UI.openEditAppDialog = function(path)
+	{
+		// Populate input fields.
+		hyper.UI.$('#input-edit-app-path').val(path) // Hidden field.
+    hyper.UI.$('#input-edit-app-name').val(APP_SETTINGS.getName(path))
+    hyper.UI.$('#input-edit-app-description').val(APP_SETTINGS.getDescription(path))
+    hyper.UI.$('#input-edit-app-version').val(APP_SETTINGS.getVersion(path))
+
+    // Use jQuery to create library checkboxes
+    hyper.UI.$('#input-edit-app-libraries').empty()
+    var libs = APP_SETTINGS.getLibraries(path)
+    var html = ''
+    var count = 0
+    for (lib of hyper.UI.mLibraryList) {
+      count++
+      var checked = ''
+      var usedVersion = lib.version
+      if (libs) {
+        // Ok, the app has a list of libraries we can check against
+        var usedLib = libs.find(each => each.name == lib.name)
+        if (usedLib) {
+          checked = `checked="checked"`
+          usedVersion = usedLib.version
+        }
+      }
+      html += `<div class="checkbox">
+  <input type="checkbox" ${checked} id="input-edit-app-library-${count}" data-lib="${lib.name}" data-version="${usedVersion}"> 
+    <label for="input-edit-app-library-${count}">
+      ${lib.title} (${usedVersion}) - ${lib.description}
+    </label>
+</div>`
+    }
+    // Create and insert HTML
+		var element = hyper.UI.$(html)
+		hyper.UI.$('#input-edit-app-libraries').append(element)
+		
+		// Show dialog.
+		hyper.UI.$('#dialog-edit-app').modal('show')
+	}
+	
+	hyper.UI.saveEditApp = function()
+	{
+		var path = hyper.UI.$('#input-edit-app-path').val()
+		var name = hyper.UI.$('#input-edit-app-name').val()
+		var description = hyper.UI.$('#input-edit-app-description').val()
+		var version = hyper.UI.$('#input-edit-app-version').val()
+    
+    if (/[^a-z0-9\_\-]/.test(name)) {
+      window.alert('The app short name should only consist of lower case letters, digits, underscores and dashes.')
+      // This is just to try to make it match the regexp test
+      var newName = name.replace(/\s/g, '-')
+      newName = newName.toLowerCase()
+      hyper.UI.$('#input-edit-app-name').val(newName)
+			return // Abort (dialog is still visible)
+    }
+    
+    if (/[^a-z0-9\.\-]/.test(version)) {
+      window.alert('The version should only consist of lower case letters, digits, dots and dashes.')
+      // This is just to try to make it match the regexp test
+      var newVersion = version.replace(/\s/g, '-')
+      newVersion = newVersion.toLowerCase()
+      hyper.UI.$('#input-edit-app-version').val(newVersion)
+			return // Abort (dialog is still visible)
+    }
+
+    // Collect checked libs
+    var checkboxes = hyper.UI.$('#input-edit-app-libraries').find('input')
+    var libs = []
+    checkboxes.each(function () {
+      var libname = this.getAttribute('data-lib')
+      var libversion = this.getAttribute('data-version')
+      if (this.checked) {
+        libs.push({ "name": libname, "version": libversion })
+      }
+    })
+
+  	// Hide dialog.
+		hyper.UI.$('#dialog-edit-app').modal('hide')
+
+    // Apply new libraries to app
+    hyper.UI.applyLibraries(path, APP_SETTINGS.getLibraries(path) || [], libs)
+
+    // Store all meta data
+    APP_SETTINGS.setLibraries(path, libs)
+    APP_SETTINGS.setName(path, name)
+    APP_SETTINGS.setDescription(path, description)
+    APP_SETTINGS.setVersion(path, version)
+
+    hyper.UI.displayProjectList()
+	}
+
+  hyper.UI.applyLibraries = function(path, oldLibs, newLibs)
+	{
+	  // Find toRemove and toAdd
+	  var oldl = new Set(oldLibs.map(l => l.name))
+	  var newl = new Set(newLibs.map(l => l.name))
+	  // Remove old ones not in newLibs
+	  var toRemove = [...oldl].filter(x => !newl.has(x))
+	  // Add new ones not in oldLibs
+	  var toAdd = [...newl].filter(x => !oldl.has(x))
+	  
+	  for (lib of toRemove) {
+	    hyper.UI.removeLibraryFromApp(path, lib)
+	  }
+
+	  // For all toAdd:
+	  for (lib of toAdd) {
+	    hyper.UI.addLibraryToApp(path, lib)
+	  }
+	}
+	
+	hyper.UI.removeLibraryFromApp = function(path, lib) {
+	  // 1. Remove all references in index.html looking like:
+	  // <script src="libs/<lib>/<lib>.js"></script>
+	  var indexPath = APP_SETTINGS.getIndexFileFullPath(path)
+	  var html = FILEUTIL.readFileSync(indexPath)
+	  var scriptPath = `libs/${lib}/${lib}.js`
+	  $ = CHEERIO.load(html)
+	  var element = $('script').filter(function(i, el) {
+      return $(this).attr('src') === scriptPath
+    })
+    if (element.length > 0) {
+      element.remove()
+      FILEUTIL.writeFileSync(indexPath, $.html())
+      console.log("Removed " + lib + " from " + path)
+    }
+	  // 2. Remove directory libs/libname
+	  var libPath = PATH.join(APP_SETTINGS.getLibDirFullPath(path), lib)
+    FSEXTRA.removeSync(libPath)
+	}
+
+	hyper.UI.addLibraryToApp = function(path, lib) {
+	  // 0. Download and unzip into libs/libname
+	  var libPath = PATH.join(APP_SETTINGS.getLibDirFullPath(path), lib)
+	  copyLibraryFromURL(MAIN.BASE + '/libraries/' + lib, libPath, function() {
+      // 1. Remove any existing reference in index.html
+	    var indexPath = APP_SETTINGS.getIndexFileFullPath(path)
+	    var html = FILEUTIL.readFileSync(indexPath)
+	    var scriptPath = `libs/${lib}/${lib}.js`
+	    $ = CHEERIO.load(html)
+	    var element = $('script').filter(function(i, el) {
+        return $(this).attr('src') === scriptPath
+      })
+      if (element.length > 0) {
+        element.remove()
+      }
+	    // 2. Add a reference in index.html right before </body>
+      $('body').append(`
+  <script src="${scriptPath}"><!-- This script added by Evothings Studio --></script>
+`)
+      FILEUTIL.writeFileSync(indexPath, $.html())
+	    console.log("Added " + lib + " to " + path)
+    })
+	}
+
+	function copyLibraryFromURL(sourceURL, targetDir, cb) {
+	  try {
+		  // Download zip to temp
+		  sourceURL = sourceURL + '.zip'
+		  UTIL.download(sourceURL, (zipFile, err) => {
+		    if (err) {
+    		  window.alert('Something went wrong, could not download library. Do you have internet access?')
+    		  LOGGER.log('[main-window-func.js] Error in copyLibraryFromURL: ' + err)
+    		} else {		    
+    		  // Extract into targetDir
+    		  FS.mkdirSync(targetDir)
+	    	  UTIL.unzip(zipFile, targetDir, function(err) {
+	  		    if (err) {
+	  		      // TODO: This doesn't seem to work
+	  		      FSEXTRA.removeSync(targetDir)
+        		  window.alert('Something went wrong when downloading/unzipping library.')
+        		  LOGGER.log('[main-window-func.js] Error in copyLibraryFromURL: ' + err)
+        		} else {       
+		          //Callback
+		          cb()
+		        }
+		      })
+		    }
+	  	})
+	  } catch (error) {
+		  window.alert('Something went wrong, could not download and unzip library.')
+		  LOGGER.log('[main-window-func.js] Error in copyLibraryFromURL: ' + error)
+	  }
+	}
+
 
 	hyper.UI.openRemoveAppDialog = function(obj)
 	{

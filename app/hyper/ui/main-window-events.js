@@ -303,6 +303,20 @@ exports.defineUIEvents = function(hyper)
 		hyper.UI.saveNewApp()
 	})
 
+	// ************** Edit App Button **************
+
+	hyper.UI.$('#button-edit-app').click(function()
+	{
+		hyper.UI.openEditAppDialog()
+	})
+	
+	// ************** Edit App Dialog Save Button **************
+
+	hyper.UI.$('#button-save-edit-app').click(function()
+	{
+		hyper.UI.saveEditApp()
+	})
+
 	// ************** Copy App Dialog Save Button **************
 
 	hyper.UI.$('#button-save-copy-app').click(function()
@@ -584,6 +598,14 @@ exports.defineUIEvents = function(hyper)
 		var buttonId = '#button-' + tabname
 		hyper.UI.$(screenId).show()
 		hyper.UI.$(buttonId).removeClass('et-btn-stone').addClass('et-btn-et-btn-white-only')
+		
+		// If we show Examples or Libraries and they are empty - we try to update them silently
+		if (tabname == 'examples' && hyper.UI.mExampleList.length == 0) {
+		  hyper.UI.updateExampleList(true)
+		}
+		if (tabname == 'libraries' && hyper.UI.mLibraryList.length == 0) {
+		  hyper.UI.updateLibraryList(true)
+		}
 	}
 
 	// ************** No Client Connected Event **************
