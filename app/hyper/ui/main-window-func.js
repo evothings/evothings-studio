@@ -853,39 +853,43 @@ exports.defineUIFunctions = function(hyper)
 
   hyper.UI.updateExampleList = function(silent)
   {
-    // Get an array of promises for fetching the lists
-   	var promises = SETTINGS.getExampleLists().map(UTIL.getJSON)
+    // Clear out
+    hyper.UI.mExampleList = []
 
-  	// When all lists are fetched, we concatenate them
-    Promise.all(promises).then(function(listsAndUrls) {
-      hyper.UI.mExampleList = []
-      for (let listAndUrl of listsAndUrls) {
+    // Get an array of promises for fetching the lists
+   	var urls = SETTINGS.getExampleLists()
+   	
+   	for (url of urls) {
+   	  UTIL.getJSON(url).then(listAndUrl => {
         var list = listAndUrl[0]
         var url = listAndUrl[1]
         // Embed the URL we got them from
         for (entry of list) {
           entry.url = url
         }
+        
+        // Concatenate with full list
   	    hyper.UI.mExampleList = hyper.UI.mExampleList.concat(list)
-  	  }
-  	  // Then we can sort them but place all "Hello*" apps first
-      hyper.UI.mExampleList = hyper.UI.mExampleList.sort(function(a, b) {
-        if (a.title.substring(0, 5) == "Hello") {
-          return -1
-        }
-        if (b.title.substring(0, 5) == "Hello") {
-          return 1
-        }        
-        return a.title.localeCompare(b.title);
+  	    
+    	  // Then we can sort them but place all "Hello*" apps first
+        hyper.UI.mExampleList = hyper.UI.mExampleList.sort(function(a, b) {
+          if (a.title.substring(0, 5) == "Hello") {
+            return -1
+          }
+          if (b.title.substring(0, 5) == "Hello") {
+            return 1
+          }        
+          return a.title.localeCompare(b.title);
+        })
+        // And finally show them too
+        hyper.UI.displayExampleList()
+   	  }, statusAndUrl => {
+    	  LOGGER.log('[main-window-func.js] Error in updateExampleList: ' + statusAndUrl[0] + ' downloading: ' + statusAndUrl[1])
+        if (!silent) {
+    	    window.alert('Something went wrong downloading example list:\n\n' + statusAndUrl[1] + '\n\n"' + statusAndUrl[0] + '"\n\nDo you have internet access?');
+    	  }
       })
-      // And finally show them too
-      hyper.UI.displayExampleList()
-  	}).catch(function(urls) {
-  	  LOGGER.log('[main-window-func.js] Error in updateExampleList: ' + urls)
-      if (!silent) {
-  	    window.alert('Something went wrong downloading example list:\n\n' + urls[1] + '\n\n"' + urls[0] + '"\n\nDo you have internet access?');
-  	  }
-    })
+   	}
   }
 
 	hyper.UI.displayExampleList = function()
@@ -923,32 +927,37 @@ exports.defineUIFunctions = function(hyper)
 	
 	hyper.UI.updateLibraryList = function(silent)
   {
+    // Clear out
+    hyper.UI.mLibraryList = []
+
     // Get an array of promises for fetching the lists
-  	var promises = SETTINGS.getLibraryLists().map(UTIL.getJSON)	
-  	// When all lists are fetched, we concatenate them
-    Promise.all(promises).then(function(listsAndUrls) {
-      hyper.UI.mLibraryList = []
-      for (let listAndUrl of listsAndUrls) {
+   	var urls = SETTINGS.getLibraryLists()
+   	
+   	for (url of urls) {
+   	  UTIL.getJSON(url).then(listAndUrl => {
         var list = listAndUrl[0]
         var url = listAndUrl[1]
         // Embed the URL we got them from
         for (entry of list) {
           entry.url = url
         }
-        hyper.UI.mLibraryList = hyper.UI.mLibraryList.concat(list)
-  	  }
-  	  // Then we can sort them
-      hyper.UI.mLibraryList = hyper.UI.mLibraryList.sort(function(a, b) {     
-        return a.title.localeCompare(b.title);
+        
+        // Concatenate with full list
+  	    hyper.UI.mLibraryList = hyper.UI.mLibraryList.concat(list)
+  	    
+    	  // Then we can sort them
+        hyper.UI.mLibraryList = hyper.UI.mLibraryList.sort(function(a, b) {
+          return a.title.localeCompare(b.title);
+        })
+        // And finally show them too
+        hyper.UI.displayLibraryList()
+   	  }, statusAndUrl => {
+    	  LOGGER.log('[main-window-func.js] Error in updateLibraryList: ' + statusAndUrl[0] + ' downloading: ' + statusAndUrl[1])
+        if (!silent) {
+    	    window.alert('Something went wrong downloading library list:\n\n' + statusAndUrl[1] + '\n\n"' + statusAndUrl[0] + '"\n\nDo you have internet access?');
+    	  }
       })
-      // And finally show them too
-      hyper.UI.displayLibraryList()
-  	}).catch(function(urls) {
-	    LOGGER.log('[main-window-func.js] Error in updateLibraryList: ' + urls)
-      if (!silent) {
-  	    window.alert('Something went wrong downloading library list:\n\n' + urls[1] + '\n\n"' + urls[0] + '"\n\nDo you have internet access?');
-  	  }
-    })
+   	}
   }
 
 	hyper.UI.displayLibraryList = function()
