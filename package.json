@@ -9,9 +9,9 @@
     "url": "https://github.com/evothings/evothings-studio.git"
   },
   "devDependencies": {
-    "electron-builder": "^3.21.0",
-    "electron-packager": "^7.0.1",
-    "electron-prebuilt": "^1.0.2"
+    "electron-builder": "^4.2.1",
+    "electron-packager": "^7.0.3",
+    "electron-prebuilt": "^1.2.1"
   },
   "build": {
     "linux": {
@@ -27,11 +27,10 @@
     "devdeps": "npm install",
     "deps": "npm install app",
     "pack": "build",
-    "dist": "build --platform linux --platform win32 --platform darwin --arch all",
-    "dist:darwin": "build --platform darwin --arch x64",
-    "dist:linux": "build --platform linux --arch x64",
-    "dist:win64": "build --platform win32 --arch x64",
-    "dist:win32": "build --platform win32 --arch ia32",
+    "dist": "build --linux --win --osx --x64",
+    "dist:osx": "build --osx --x64",
+    "dist:linux": "build --linux --x64",
+    "dist:win": "build --win --x64",
     "start": "cd app && electron --enable-logging --disable-http-cache main.js"
   }
 }
