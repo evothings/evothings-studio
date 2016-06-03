@@ -374,8 +374,7 @@ exports.defineUIFunctions = function(hyper)
 		// Full URL to application, local or online
 		var appURL = PATH.join(base, options.path)
     var imagePath = options.imagePath
-    // Fallback on missing doc-url is locally inside the app/library
-    var docURL = options.docURL || PATH.join(appURL, 'doc', 'index.html')
+    var docURL = options.docURL
     var appTags = options.tags || []
     var appLibraries = options.libraries || []
 		var appVersion = options.version || null
@@ -394,6 +393,11 @@ exports.defineUIFunctions = function(hyper)
 		  var appVersion = APP_SETTINGS.getVersion(options.path) || null
 		  var shortName = APP_SETTINGS.getName(options.path)
 		  var appDescription = APP_SETTINGS.getDescription(options.path) || '&lt;no description entered&gt;'
+    }
+    
+    // Fallback on missing doc-url is locally inside the app/library
+    if (!docURL) {
+      docURL = PATH.join(appURL, 'doc', 'index.html')
     }
     
 		if (imagePath) {
@@ -551,8 +555,8 @@ exports.defineUIFunctions = function(hyper)
 		  html += metaHTML.trim()
 		}
     html += `<span style="float:right">${tagsHTML}</span></p>`
+    html += '<div class="project-list-entry-path" style="display:none;">' + options.path + '</div>'
 		html += '</div>'
-
 		// Create element.
 		var element = hyper.UI.$(html)
 
