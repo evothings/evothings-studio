@@ -1378,10 +1378,12 @@ exports.defineUIFunctions = function(hyper)
 		hyper.UI.$('#dialog-edit-app').modal('hide')
 
     // Apply new libraries to app
-    hyper.UI.applyLibraries(path, APP_SETTINGS.getLibraries(path) || [], libs)
+    if (hyper.UI.applyLibraries(path, APP_SETTINGS.getLibraries(path) || [], libs)) {
+      // Only store metadata changes to libraries if we could apply them
+      APP_SETTINGS.setLibraries(path, libs)
+    }
 
     // Store all meta data
-    APP_SETTINGS.setLibraries(path, libs)
     APP_SETTINGS.setName(path, name)
     APP_SETTINGS.setDescription(path, description)
     APP_SETTINGS.setVersion(path, version)
@@ -1389,8 +1391,9 @@ exports.defineUIFunctions = function(hyper)
     hyper.UI.displayProjectList()
 	}
 
-  hyper.UI.applyLibraries = function(path, oldLibs, newLibs)
-	{
+  hyper.UI.applyLibraries = function(path, oldLibs, newLibs) {
+    // Apply changes to libraries and return true if all went well, otherwise false.
+    
 	  // Find toRemove and toAdd
 	  var oldl = new Set(oldLibs.map(l => l.name))
 	  var newl = new Set(newLibs.map(l => l.name))
@@ -1398,15 +1401,28 @@ exports.defineUIFunctions = function(hyper)
 	  var toRemove = [...oldl].filter(x => !newl.has(x))
 	  // Add new ones not in oldLibs
 	  var toAdd = [...newl].filter(x => !oldl.has(x))
-	  
-	  for (lib of toRemove) {
-	    hyper.UI.removeLibraryFromApp(path, lib)
-	  }
-
-	  // For all toAdd:
-	  for (lib of toAdd) {
-	    hyper.UI.addLibraryToApp(path, lib)
-	  }
+	 
+	 	// Make adjustments to libraries
+	 	if (toRemove.length > 0 || toAdd.length > 0) {
+	   	var libsPath = APP_SETTINGS.getLibDirFullPath(path)
+	    if (!FS.existsSync(libsPath)) {
+	      window.alert(`The library directory "${libsPath}" does not exist, perhaps you need to add "app-dir": "app", or similar to evothings.json?`)
+	      LOGGER.log("Directory does not exist: " + libsPath)
+	      return false
+	    }
+	    //try {
+	      for (lib of toRemove) {
+	        hyper.UI.removeLibraryFromApp(path, lib)
+	      }
+	      for (lib of toAdd) {
+	        hyper.UI.addLibraryToApp(path, lib)
+	      }
+	    //} catch(error) {
+	    //  LOGGER.log('[main-window-func.js] Error in applyLibraries: ' + error)
+	    //  return false
+	    //}
+    }
+    return true
 	}
 	
 	hyper.UI.removeLibraryFromApp = function(path, lib) {
@@ -1422,7 +1438,7 @@ exports.defineUIFunctions = function(hyper)
     if (element.length > 0) {
       element.remove()
       FILEUTIL.writeFileSync(indexPath, $.html())
-      console.log("Removed " + lib + " from " + path)
+      LOGGER.log("Removed " + lib + " from " + path)
     }
 	  // 2. Remove directory libs/libname
 	  var libPath = PATH.join(APP_SETTINGS.getLibDirFullPath(path), lib)
@@ -1431,7 +1447,8 @@ exports.defineUIFunctions = function(hyper)
 
 	hyper.UI.addLibraryToApp = function(path, lib) {
 	  // 0. Download and unzip into libs/libname
-	  var libPath = PATH.join(APP_SETTINGS.getLibDirFullPath(path), lib)
+	  var libsPath = APP_SETTINGS.getLibDirFullPath(path)
+	  var libPath = PATH.join(libsPath, lib)
 	  copyLibraryFromURL(MAIN.BASE + '/libraries/' + lib, libPath, function() {
       // 1. Remove any existing reference in index.html
 	    var indexPath = APP_SETTINGS.getIndexFileFullPath(path)
@@ -1449,7 +1466,7 @@ exports.defineUIFunctions = function(hyper)
   <script src="${scriptPath}"><!-- This script added by Evothings Studio --></script>
 `)
       FILEUTIL.writeFileSync(indexPath, $.html())
-	    console.log("Added " + lib + " to " + path)
+	    LOGGER.log("Added " + lib + " to " + path)
     })
 	}
 
