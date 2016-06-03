@@ -1431,7 +1431,7 @@ exports.defineUIFunctions = function(hyper)
 	  var indexPath = APP_SETTINGS.getIndexFileFullPath(path)
 	  var html = FILEUTIL.readFileSync(indexPath)
 	  var scriptPath = `libs/${lib}/${lib}.js`
-	  $ = CHEERIO.load(html, { xmlMode: true })
+	  $ = CHEERIO.load(html, { xmlMode: false })
 	  var element = $('script').filter(function(i, el) {
       return $(this).attr('src') === scriptPath
     })
@@ -1454,7 +1454,7 @@ exports.defineUIFunctions = function(hyper)
 	    var indexPath = APP_SETTINGS.getIndexFileFullPath(path)
 	    var html = FILEUTIL.readFileSync(indexPath)
 	    var scriptPath = `libs/${lib}/${lib}.js`
-	    $ = CHEERIO.load(html, { xmlMode: true })
+	    $ = CHEERIO.load(html, { xmlMode: false })
 	    var element = $('script').filter(function(i, el) {
         return $(this).attr('src') === scriptPath
       })
@@ -1462,8 +1462,9 @@ exports.defineUIFunctions = function(hyper)
         element.remove()
       }
 	    // 2. Add a reference in index.html right before </body>
+	    // Note that we can't use <script blabla /> - it will fail
       $('body').append(`
-  <script src="${scriptPath}"><!-- This script added by Evothings Studio --></script>
+  <script src="${scriptPath}"></script>
 `)
       FILEUTIL.writeFileSync(indexPath, $.html())
 	    LOGGER.log("Added " + lib + " to " + path)
