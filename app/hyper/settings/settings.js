@@ -25,6 +25,7 @@ var PATH = require('path')
 var UUID = require('../server/uuid.js')
 var MAIN = require('electron').remote.getGlobal('main')
 var UTIL = require('../util/util.js')
+var USER_HANDLER = require('../server/user-handler.js')
 
 exports.set = function(key, value)
 {
@@ -34,19 +35,9 @@ exports.set = function(key, value)
 exports.get = function(key)
 {
 	var data = window.localStorage.getItem(key)
-	if (data)
-	{
-		try {
-		  return JSON.parse(data)
-		} catch (e) {
-      // Some crap entered localStorage, remove it
-      console.log("Removed erroneous value '" + data + "' for  key " + key + " from localstorage")
-      window.localStorage.removeItem(key)
-      return null
-    }
-	}
-	else
-	{
+	if (data) {
+	  return JSON.parse(data)
+	} else {
 		return null
 	}
 }
@@ -61,20 +52,22 @@ function defineSettingFuns(name, defaultValue)
 	var getter = 'get' + name
 	var setter = 'set' + name
 
-	exports[getter] = function()
-	{
-		if (name in window.localStorage)
-		{
-			return exports.get(name)
-		}
-		else
-		{
+	exports[getter] = function() {
+		if (name in window.localStorage) {
+  		try {
+  			return exports.get(name)
+		  } catch (e) {
+        // Some crap entered localStorage, remove it
+        window.localStorage.removeItem(name)
+        console.log("Removed erroneous value for key " + name + " from localstorage")
+        return defaultValue
+      }
+		}	else {
 			return defaultValue
 		}
 	}
 
-	exports[setter] = function(value)
-	{
+	exports[setter] = function(value) {
 		exports.set(name, value)
 	}
 }
@@ -189,8 +182,7 @@ exports.setEvoCloudToken = function(value)
 // hasXXXX are capabilities associated with the user account
 exports.hasEnterprise = function()
 {
-  // TODO: Peter fixes! :)
-  return true
+  return USER_HANDLER.isEnterprise()
 }
 
 exports.hasPro = function()
