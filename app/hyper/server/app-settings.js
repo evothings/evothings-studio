@@ -381,7 +381,12 @@ function readAppSettings(appPath) {
 	var path = PATH.join(appPath, 'evothings.json')
 	if (FS.existsSync(path)) {
 		var json = FILEUTIL.readFileSync(path)
-		var settings = JSON.parse(json)
+		try {
+  		var settings = JSON.parse(json)
+  	} catch(error) {
+  	  window.alert(`The file "${path}" does not parse correctly, check it with a JSON linter: ${error}`)
+  	  return null
+  	}
 		migrateSettings(settings, appPath)
 		return settings
 	} else {
