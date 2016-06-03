@@ -58,7 +58,7 @@ exports.setUser = function(uobj)
 
 exports.isEnterprise = function()
 {
-	return mUser && mUser.limits.enterprise == true
+	return mUser && mUser.limits && mUser.limits.enterprise == true
 }
 
 exports.clearUser = function()
