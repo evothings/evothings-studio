@@ -34,26 +34,31 @@ html, body
 	left: 0px;
 }
 
-#button-tool-menu
+#panel-tool-tabs
 {
-	/*width: 50px;*/
-	width: 100px;
-	text-transform: none !important;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	right: 0px;
 }
 
 #panel-tool-buttons
 {
 	position: absolute;
-	right: 0px;
-	top: 0px;
-	/*left: 50px;*/
-	left: 0px;
+	right: 4px;
+	top: 3px;
 }
 
-#panel-tool-buttons .btn
+#panel-tool-buttons a
 {
-	text-transform: none !important;
-	flex:1
+	text-transform: none;
+}
+
+.nav-tabs a
+{
+	color: #111111;
+	font-size: 16px;
+	font-weight: bold;
 }
 
 .btn-hyper-toolbar
@@ -71,7 +76,7 @@ html, body
 {
 	position: absolute;
 	left: 0;
-	top: 42px;
+	top: 50px;
 	bottom: 0px;
 	width: 100%;
 	overflow: auto;
@@ -262,18 +267,18 @@ html, body
 	margin-right: 10px;
 }
 
-.connect-key-table
+.layout-table
 {
 	display: table;
 }
 
-.connect-key-item
+.layout-item
 {
 	display: table-cell;
 	vertical-align: middle;
 }
 
-.connect-key
+.connect-key-item
 {
 	font-weight: bold;
 	font-size: 28px;
@@ -286,6 +291,24 @@ html, body
 	margin-top: 0px;
 	margin-bottom: 0px;
 	min-width: 230px;
+	border: 1px solid #888888;
+	-webkit-border-radius: 4px;
+}
+
+.token-input-item
+{
+	font-weight: bold;
+	font-size: 18px;
+	letter-spacing: 1px;
+	font-kerning: none;
+	color: black;
+	background: rgb(245,245,245);
+	padding: 7px 10px;
+	margin-left: 10px;
+	margin-top: 0px;
+	margin-bottom: 0px;
+	margin-right:10px;
+	min-width: 385px;
 	border: 1px solid #888888;
 	-webkit-border-radius: 4px;
 }
@@ -303,7 +326,6 @@ html, body
 	min-width: 230px;
 	-webkit-border-radius: 4px;
 }
-
 
 #connect-spinner
 {
