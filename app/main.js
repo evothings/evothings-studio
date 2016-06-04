@@ -116,6 +116,16 @@ main.addMenu = function() {
           click: function() { main.workbenchWindow.webContents.send('command', {message: 'newApp'}) }
         },
         {
+          type: 'separator'
+        },
+        {
+          label: 'Settings...',
+          click: function() { main.workbenchWindow.webContents.send('command', {message: 'openSettingsDialog'}) }
+        },
+        {
+          type: 'separator'
+        },
+        {
           label: 'Getting Started',
           click: function() { main.workbenchWindow.webContents.send('command', {message: 'gettingStarted'}) }
         },
@@ -160,13 +170,6 @@ main.addMenu = function() {
           label: 'Select All',
           accelerator: 'CmdOrCtrl+A',
           role: 'selectall'
-        },
-        {
-          type: 'separator'
-        },
-        {
-          label: 'Settings',
-          click: function() { main.workbenchWindow.webContents.send('command', {message: 'openSettingsDialog'}) }
         }
       ]
     },
