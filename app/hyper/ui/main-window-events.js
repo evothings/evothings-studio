@@ -376,12 +376,12 @@ exports.defineUIEvents = function(hyper)
 	})
 	*/
 
-	hyper.UI.$('#tokenbutton').click(function()
+	hyper.UI.$('#button-save-token').click(function()
 	{
 		console.log('--------------- token button clicked-------------')
 
-		var token = hyper.UI.$('#tokeninput')[0].value
-		//console.dir(hyper.UI.$('#tokeninput')[0])
+		var token = hyper.UI.$('.token-input-field')[0].value
+		//console.dir(hyper.UI.$('.token-input-field')[0])
 		//console.dir(token)
 		console.log('token is '+token)
 		SETTINGS.setEvoCloudToken(token)
@@ -390,23 +390,23 @@ exports.defineUIEvents = function(hyper)
 		SERVER.disconnectFromRemoteServer()
 		SERVER.connectToRemoteServer()
 	});
-	hyper.UI.$('#tclose').click(function()
+	hyper.UI.$('#button-close-dialog-cloud-token-alert').click(function()
 	{
 		//hyper.UI.$('#tokentext')[0].innerHTML = ""
-		hyper.UI.$('#tdialog')[0].close()
+		hyper.UI.$('#dialog-cloud-token-alert')[0].close()
 	});
-	hyper.UI.$('#resetbutton').click(function()
+	hyper.UI.$('#button-open-cloud-token-reset-dialog').click(function()
 	{
-		hyper.UI.$('#rdialog')[0].showModal()
+		hyper.UI.$('#dialog-cloud-token-reset')[0].showModal()
 	})
-	hyper.UI.$('#rcancel').click(function()
+	hyper.UI.$('#button-cloud-token-reset-cancel').click(function()
 	{
-		hyper.UI.$('#rdialog')[0].close()
+		hyper.UI.$('#dialog-cloud-token-reset')[0].close()
 	})
-	hyper.UI.$('#rreset').click(function()
+	hyper.UI.$('#button-cloud-token-reset').click(function()
 	{
-		console.log('factory reset clicked')
-		hyper.UI.$('#rdialog')[0].close()
+		console.log('cloud token factory reset clicked')
+		hyper.UI.$('#dialog-cloud-token-reset')[0].close()
 		SERVER.sendResetMessage()
 		SETTINGS.setEvoCloudToken('')
 		SETTINGS.setSessionID('')

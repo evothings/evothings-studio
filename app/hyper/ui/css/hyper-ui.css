@@ -295,7 +295,19 @@ html, body
 	-webkit-border-radius: 4px;
 }
 
-.token-input-item
+#panel-have-no-token
+{
+	margin-bottom: 5px;
+}
+
+#panel-have-token
+{
+	margin-bottom: 5px;
+	padding-bottom: 0px;
+	display: none;
+}
+
+.token-input-field
 {
 	font-weight: bold;
 	font-size: 18px;
@@ -315,16 +327,19 @@ html, body
 
 .token-key
 {
+
 	font-weight: bold;
 	letter-spacing: 1px;
 	font-kerning: none;
 	color: black;
+/*
 	padding: 0px 15px;
 	margin-left: 10px;
 	margin-top: 0px;
 	margin-bottom: 0px;
 	min-width: 230px;
 	-webkit-border-radius: 4px;
+*/
 }
 
 #connect-spinner

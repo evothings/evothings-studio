@@ -89,7 +89,7 @@ exports.defineUIFunctions = function(hyper)
 	function ensureCloudApiTokenExists()
 	{
 		var token = SETTINGS.getEvoCloudToken()
-		var dialog = hyper.UI.$('#tdialog')[0]
+		var dialog = hyper.UI.$('#dialog-cloud-token-alert')[0]
 		if(!token)
 		{
 			console.dir(dialog)
@@ -116,22 +116,22 @@ exports.defineUIFunctions = function(hyper)
 
 	hyper.UI.showToken = function(token)
 	{
-		var havetoken = hyper.UI.$('#havetoken')[0]
-		var havenotoken = hyper.UI.$('#havenotoken')[0]
-		var tokeninput = hyper.UI.$('#tokeninput')[0]
-		havetoken.style.display = 'block'
-		havenotoken.style.display = 'none'
-		havetoken.innerHTML = '<b>Cloud Token: </b><span class="token-key">'+token+'</span>'
-		tokeninput.value = ''
+		var panelHaveToken = hyper.UI.$('#panel-have-token')[0]
+		var panelHaveNoToken = hyper.UI.$('#panel-have-no-token')[0]
+		var tokenInputField = hyper.UI.$('.token-input-field')[0]
+		panelHaveToken.style.display = 'block'
+		panelHaveNoToken.style.display = 'none'
+		tokenInputField.value = ''
+		hyper.UI.$('.token-key').html(token)
 	}
 
 	hyper.UI.hideToken = function()
 	{
-		var havetoken = hyper.UI.$('#havetoken')[0]
-		var havenotoken = hyper.UI.$('#havenotoken')[0]
-		havetoken.style.display = 'none'
-		havenotoken.style.display = 'block'
-		havetoken.innerHTML = ''
+		var panelHaveToken = hyper.UI.$('#panel-have-token')[0]
+		var panelHaveNoToken = hyper.UI.$('#panel-have-no-token')[0]
+		panelHaveToken.style.display = 'none'
+		panelHaveNoToken.style.display = 'block'
+		hyper.UI.$('.token-key').html('')
 	}
 
 	// Helper function that returns the application name
