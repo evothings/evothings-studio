@@ -376,12 +376,12 @@ exports.defineUIEvents = function(hyper)
 	})
 	*/
 
-	hyper.UI.$('#tokenbutton').click(function()
+	hyper.UI.$('#button-save-token').click(function()
 	{
 		console.log('--------------- token button clicked-------------')
 
-		var token = hyper.UI.$('#tokeninput')[0].value
-		//console.dir(hyper.UI.$('#tokeninput')[0])
+		var token = hyper.UI.$('.token-input-field')[0].value
+		//console.dir(hyper.UI.$('.token-input-field')[0])
 		//console.dir(token)
 		console.log('token is '+token)
 		SETTINGS.setEvoCloudToken(token)
@@ -390,23 +390,23 @@ exports.defineUIEvents = function(hyper)
 		SERVER.disconnectFromRemoteServer()
 		SERVER.connectToRemoteServer()
 	});
-	hyper.UI.$('#tclose').click(function()
+	hyper.UI.$('#button-close-dialog-cloud-token-alert').click(function()
 	{
 		//hyper.UI.$('#tokentext')[0].innerHTML = ""
-		hyper.UI.$('#tdialog')[0].close()
+		hyper.UI.$('#dialog-cloud-token-alert')[0].close()
 	});
-	hyper.UI.$('#resetbutton').click(function()
+	hyper.UI.$('#button-open-cloud-token-reset-dialog').click(function()
 	{
-		hyper.UI.$('#rdialog')[0].showModal()
+		hyper.UI.$('#dialog-cloud-token-reset')[0].showModal()
 	})
-	hyper.UI.$('#rcancel').click(function()
+	hyper.UI.$('#button-cloud-token-reset-cancel').click(function()
 	{
-		hyper.UI.$('#rdialog')[0].close()
+		hyper.UI.$('#dialog-cloud-token-reset')[0].close()
 	})
-	hyper.UI.$('#rreset').click(function()
+	hyper.UI.$('#button-cloud-token-reset').click(function()
 	{
-		console.log('factory reset clicked')
-		hyper.UI.$('#rdialog')[0].close()
+		console.log('cloud token factory reset clicked')
+		hyper.UI.$('#dialog-cloud-token-reset')[0].close()
 		SERVER.sendResetMessage()
 		SETTINGS.setEvoCloudToken('')
 		SETTINGS.setSessionID('')
@@ -599,22 +599,20 @@ exports.defineUIEvents = function(hyper)
 
 	hyper.UI.showTab = function(tabname)
 	{
-		// Hide all screens and set unselected colour for buttons.
+		// We manually show/hide screens for tabs.
+		
+		// Hide all screens.
 		hyper.UI.$('#screen-getting-started').hide()
 		hyper.UI.$('#screen-connect').hide()
 		hyper.UI.$('#screen-examples').hide()
 		hyper.UI.$('#screen-libraries').hide()
 		hyper.UI.$('#screen-projects').hide()
-/*
-		hyper.UI.$('#button-connect, #button-getting-started, #button-examples, #button-projects')
-			.removeClass('et-btn-et-btn-white-only')
-			.addClass('et-btn-stone')
-*/
-		// Show selected tab.
+
+		// Show selected tab and screen.
 		var screenId = '#screen-' + tabname
 		var buttonId = '#button-' + tabname
+		$(buttonId).tab('show')
 		hyper.UI.$(screenId).show()
-		hyper.UI.$(buttonId).removeClass('et-btn-stone').addClass('et-btn-et-btn-white-only')
 		
 		// If we show Examples or Libraries and they are empty - we try to update them silently
 		if (tabname == 'examples' && hyper.UI.mExampleList.length == 0) {

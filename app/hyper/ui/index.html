@@ -9,15 +9,12 @@ Copyright (c) 2013-2015 Evothings AB
 <!-- HTML 5 differences from HTML 4: http://www.w3.org/TR/2008/WD-html5-diff-20080122/ -->
 <head>
 	<meta charset="utf-8">
-	<link rel="stylesheet" href="../../node_modules/material-design-lite/material.min.css">
+	<link href="../../node_modules/material-design-lite/material.min.css" rel="stylesheet">
 	<link href="../libs/bootstrap-3.3.5-dist/css/bootstrap.min.css" rel="stylesheet">
 	<script>window.$ = window.jQuery = require('../libs/jquery/jquery-2.1.4.min.js');</script>
 	<script src="../libs/jquery/jquery-ui.min.js"></script>
 	<script src="../libs/bootstrap-3.3.5-dist/js/bootstrap.min.js"></script>
-
-
 	<script src="../../node_modules/material-design-lite/material.min.js"></script>
-
 	<link href="css/hyper-common.css" rel="stylesheet" />
 	<link href="css/hyper-ui.css" rel="stylesheet" />
 	<link href="css/font-awesome.min.css" rel="stylesheet" />
@@ -25,42 +22,40 @@ Copyright (c) 2013-2015 Evothings AB
 </head>
 <body>
 	<div id="panel-page">
+	
 		<div id="panel-top">
-			<div id="panel-tool-buttons">
-				<!-- <div class="btn-group btn-group-justified" role="group"> -->
-				<div style="display: flex; flex-direction: row; ">
-					<!--
-					<a id="button-connect"
-					   class="btn btn-hyper-toolbar et-btn-stone"
-					   href="javascript:void(0)">Connect</a>
-					<a id="button-getting-started"
-					   class="btn btn-hyper-toolbar et-btn-stone"
-					   href="javascript:void(0)">Getting Started</a>
-					<a id="button-examples" role="button"
-						class="btn btn-hyper-toolbar et-btn-stone"
-						href="javascript:void(0)">Examples</a>
-					<a id="button-projects" role="button"
-						class="btn btn-hyper-toolbar et-btn-stone"
-						href="javascript:void(0)">My Apps</a>
-					<a id="button-new-app" role="button"
-						class="btn btn-hyper-toolbar et-btn-indigo"
-						href="javascript:void(0)">New</a>
-					<a id="button-tools" role="button"
-						class="btn btn-hyper-toolbar btn-toolbar et-btn-blue"
-						href="javascript:void(0)" style="border-left">Tools</a>
-						-->
-
-					<button type="button" class="btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="button-connect">Connect</button>
-					<button type="button" class="btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="button-getting-started">Getting Started</button>
-					<button type="button" class="btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="button-examples">Examples</button>
-					<button type="button" class="btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="button-libraries">Libraries</button>
-					<button type="button" class="btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="button-projects">My Apps</button>
-					<button type="button" class="btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="button-new-app">New</button>
-					<button type="button" class="btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="button-tools">Console</button>
-					<button type="button" class="btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="button-viewers">Viewers</button>
-				</div>
+			<div id="panel-tool-tabs">
+				<ul class="nav nav-tabs">
+					<li role="presentation" class="active">
+						<a id="button-connect"
+							href="javascript:void(0)">Connect</a>
+					</li>
+					<li role="presentation">
+						<a id="button-getting-started"
+							href="javascript:void(0)">Getting Started</a>
+					</li>
+					<li role="presentation">
+						<a id="button-examples"
+							href="javascript:void(0)">Examples</a>
+					</li>
+					<li role="presentation">
+						<a id="button-libraries"
+							href="javascript:void(0)">Libraries</a>
+					</li>
+					<li role="presentation">
+						<a id="button-projects"
+							href="javascript:void(0)">My Apps</a>
+					</li>
+				</ul>
 			</div>
-
+			<div id="panel-tool-buttons">
+				<a id="button-new-app" class="btn btn-default" href="javascript:void(0)"
+					role="button">New App</a>
+				<a id="button-tools" class="btn btn-default" href="javascript:void(0)"
+					role="button">Console</a>
+				<a id="button-viewers" class="btn btn-default" href="javascript:void(0)"
+					role="button">Viewers</a>
+			</div>
 		</div>
 
 		<div id="panel-middle">
@@ -145,7 +140,7 @@ Copyright (c) 2013-2015 Evothings AB
 						<span>
 							<div class="form-group">
 								<label>	Reset Cloud Token:</label>
-								<button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="resetbutton">Reset</button>
+								<button type="button" class="btn btn-default" id="button-open-cloud-token-reset-dialog">Reset</button>
 							</div>
 						</span>
 
@@ -643,21 +638,21 @@ Copyright (c) 2013-2015 Evothings AB
 							<p>Read the <a class="button-getting-started" href="javascript:void(0)">Getting Started Guide</a> for detailed first-time instructions. You get the Evothings Viewer mobile app from <a class="button-evothings-viewer-on-google-play" href="javascript:void(0)">Google Play</a> or <a class="button-evothings-viewer-on-itunes" href="javascript:void(0)">Apple App Store</a>.</p>
 							<p>To run apps in the Evothings Viewer, you need Internet access, a cloud token that you enter once to get access to our cloud infrastructure, and a connect key to connect the Viewer.</p>
 						</div>
+						
 						<div class="screen-start-help framed-box style-big-para" style="margin-bottom:5px">
 							<p><strong>Input your cloud token below and press save.</strong> You only need to do this once. The cloud token is generated at our download page and gives you access to our cloud servers. The token is anonymous whereby you can use Evothings Studio without entering personal information.</p>
 						</div>
-						<div id="havenotoken" class="framed-box" style="margin-bottom:5px">
-							<label for="tokeninput">Cloud Token</label>
-							<div style="display:flex; flex-direction: row">
-								<input class="mdl-textfield__input connect-key connect-key-item" type="text" id="tokeninput" name="tokeninput" style="margin:10px"/>
-								<div class="mdl-dialog__actions">
-									<button type="button" class="btn et-btn-green mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="tokenbutton">Save</button>
-								</div>
+						
+						<div id="panel-have-no-token" class="framed-box style-big-para">
+							<p><strong>Enter Cloud Token.</strong> Get your cloud token at the download page: <a onclick="hyper.UI.openInBrowser('https://evothings.com/download-evothings-studio-beta/')" href="#">https://evothings.com/download-evothings-studio-beta</a></p>
+							<div class="layout-table" style="margin-bottom:10px;margin-left:-10px;">
+								<input class="layout-item token-input-field" type="text" />
+								<button type="button" class="btn et-btn-green layout-item" id="button-save-token">Save</button>
 							</div>
-							<p>You can get your cloud token at the download page: <a onclick="hyper.UI.openInBrowser('https://evothings.com/download-evothings-studio-beta/')" href="#">https://evothings.com/download-evothings-studio-beta</a></p>
 						</div>
-						<div id="havetoken" class="framed-box " style="margin-bottom:5px;display:none">
-
+						
+						<div id="panel-have-token" class="framed-box style-big-para">
+							<p><strong>Cloud Token:</strong> <span class="token-key"></span></p>
 						</div>
 
 						<div class="screen-start-help framed-box style-big-para">
@@ -665,12 +660,12 @@ Copyright (c) 2013-2015 Evothings AB
 							<p>Click the <strong>Run</strong> buttons on the Examples screen to run an app in the Viewer.</p>
 						</div>
 
-						<div class="connect-key-table connect-screen-element">
+						<div class="layout-table connect-screen-element">
 							<button id="button-get-connect-key"
 								type="button"
-								class="btn et-btn-green connect-key-item">
+								class="btn et-btn-green layout-item">
 								Get Key <span id="connect-spinner" class="glyphicon glyphicon-refresh"></button>
-							<div id="connect-key" class="connect-key connect-key-item"></div>
+							<div id="connect-key" class="connect-key-item layout-item"></div>
 						</div>
 
 						<div class="screen-start-help framed-box style-big-para">
@@ -727,7 +722,7 @@ Copyright (c) 2013-2015 Evothings AB
 				<button id="button-login"
 						type="button"
 						style="margin-top:-6px; margin-left:5px"
-						class="et-btn-blue mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+						class="et-btn-blue btn btn-default">
 					Personalize
 				</button>
 				<p style="float:right;">Viewers: <b><span id="connect-counter">0</span></b> Files: <b><span id="files-counter">0</span></b></p>
@@ -745,7 +740,7 @@ Copyright (c) 2013-2015 Evothings AB
 
 	</div> <!-- panel-page -->
 
-	<dialog class="mdl-dialog" id="tdialog" style="width:480px">
+	<dialog class="mdl-dialog" id="dialog-cloud-token-alert" style="width:480px">
 		<h4 class="mdl-dialog__title">Enter your Cloud Token</h4>
 		<div class="mdl-dialog__content">
 			<div id="tokentext"></div>
@@ -757,11 +752,11 @@ Copyright (c) 2013-2015 Evothings AB
 		</div>
 
 		<div class="mdl-dialog__actions">
-			<button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="tclose">Close</button>
+			<button type="button" class="btn btn-default" id="button-close-dialog-cloud-token-alert">Close</button>
 		</div>
 	</dialog>
 
-	<dialog class="mdl-dialog" id="rdialog" style="width:480px">
+	<dialog class="mdl-dialog" id="dialog-cloud-token-reset" style="width:480px">
 		<h4 class="mdl-dialog__title">Reset your Cloud Token</h4>
 		<div class="mdl-dialog__content">
 			<div>
@@ -772,13 +767,12 @@ Copyright (c) 2013-2015 Evothings AB
 		</div>
 
 		<div class="mdl-dialog__actions">
-			<button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="rclose">Cancel</button>
-			<button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" style="background-color:red" id="rreset">reset</button>
+			<button type="button" class="btn btn-default" id="button-cloud-token-reset-cancel">Cancel</button>
+			<button type="button" class="btn btn-danger" id="button-cloud-token-reset">Reset</button>
 		</div>
 	</dialog>
 
 	<script src="main-window.js"></script>
-
 
 </body>
 </html>
