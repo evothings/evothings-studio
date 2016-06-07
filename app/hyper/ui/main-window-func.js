@@ -1050,8 +1050,13 @@ exports.defineUIFunctions = function(hyper)
 		SETTINGS.setMyAppsPath(
 			hyper.UI.$('#input-setting-my-apps-path').val())
 		
-		SETTINGS.setRepositoryURLs(
-			hyper.UI.$('#input-setting-repository-urls').val())
+		var newUrls = hyper.UI.$('#input-setting-repository-urls').val()
+		var oldUrls = SETTINGS.getRepositoryURLs()
+		if (newUrls != oldUrls) {
+  		SETTINGS.setRepositoryURLs(newUrls)
+  		hyper.UI.updateExampleList(false)
+	    hyper.UI.updateLibraryList(false)
+	  }
 
 		// Check if server address has been changed.
 		var updatedServerAddress = hyper.UI.$('#input-setting-reload-server-address').val()
@@ -1440,13 +1445,13 @@ exports.defineUIFunctions = function(hyper)
 	  var indexPath = APP_SETTINGS.getIndexFileFullPath(path)
 	  var html = FILEUTIL.readFileSync(indexPath)
 	  var scriptPath = `libs/${lib}/${lib}.js`
-	  $ = CHEERIO.load(html, { xmlMode: false })
-	  var element = $('script').filter(function(i, el) {
-      return $(this).attr('src') === scriptPath
+	  var cher = CHEERIO.load(html, { xmlMode: false })
+	  var element = cher('script').filter(function(i, el) {
+      return cher(this).attr('src') === scriptPath
     })
     if (element.length > 0) {
       element.remove()
-      FILEUTIL.writeFileSync(indexPath, $.html())
+      FILEUTIL.writeFileSync(indexPath, cher.html())
       LOGGER.log("Removed " + lib + " from " + path)
     }
 	  // 2. Remove directory libs/libname
@@ -1463,19 +1468,19 @@ exports.defineUIFunctions = function(hyper)
 	    var indexPath = APP_SETTINGS.getIndexFileFullPath(path)
 	    var html = FILEUTIL.readFileSync(indexPath)
 	    var scriptPath = `libs/${lib}/${lib}.js`
-	    $ = CHEERIO.load(html, { xmlMode: false })
-	    var element = $('script').filter(function(i, el) {
-        return $(this).attr('src') === scriptPath
+	    cher = CHEERIO.load(html, { xmlMode: false })
+	    var element = cher('script').filter(function(i, el) {
+        return cher(this).attr('src') === scriptPath
       })
       if (element.length > 0) {
         element.remove()
       }
 	    // 2. Add a reference in index.html right before </body>
 	    // Note that we can't use <script blabla /> - it will fail
-      $('body').append(`
+      cher('body').append(`
   <script src="${scriptPath}"></script>
 `)
-      FILEUTIL.writeFileSync(indexPath, $.html())
+      FILEUTIL.writeFileSync(indexPath, cher.html())
 	    LOGGER.log("Added " + lib + " to " + path)
     })
 	}
