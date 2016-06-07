@@ -27,6 +27,10 @@ var HTTPS = require('https')
 var PATH = require('path')
 var UNZIP = require('unzip2')
 
+exports.alertDownloadError = function(msg, url, status) {
+  window.alert(`${msg}\n\nURL: ${url}\nSTATUS: ${status}\n\nDo you have internet access?`)
+}
+
 exports.getJSON = function(url) {
 	return new Promise(function(resolve, reject) {
 		var xhr = new XMLHttpRequest();
@@ -48,16 +52,18 @@ exports.getJSON = function(url) {
 };
 
 exports.checkInternet = function() {
-  exports.getJSON('http://evothings.com/pong.json').then(json => {
+  return exports.getJSON('http://evothings.com/pong.json').then(json => {
     // If there is an alert message, show it to the user
     if (json[0].alert) {
       window.alert(json[0].alert)
     }
     // Otherwise we just log that we are fine
     console.log(json[0].message)
+    return true
   }, error => {
     // Ok, couldn't reach pong.json, internet is probably down
     window.alert('You do not seem to have internet access?\n\nEvothings Studio requires access to the Internet.');
+    return false
   })
 }
 

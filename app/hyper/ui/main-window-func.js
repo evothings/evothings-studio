@@ -75,14 +75,18 @@ exports.defineUIFunctions = function(hyper)
 		readProjectList()
 		hyper.UI.displayProjectList()
 
-    UTIL.checkInternet()
-		hyper.UI.updateExampleList(true)
-	  hyper.UI.updateLibraryList(true) // We do this one silent, complaining once is enough
+    // If we have verified basic internet access - we load the lists.
+    UTIL.checkInternet().then(hasInternet => {
+      if (hasInternet) {
+    		hyper.UI.updateExampleList(false)
+	      hyper.UI.updateLibraryList(false)
+	    }
+    })
 
-		// Register a timer so that we update the lists every 30 min
+		// Register a timer so that we update the lists every 30 min, but silently.
 	  setInterval(function() {
-	    hyper.UI.updateExampleList(true) // Silent
-	    hyper.UI.updateLibraryList(true) // Silent
+      hyper.UI.updateExampleList(true) // Silent
+      hyper.UI.updateLibraryList(true) // Silent
 	  }, 30 * 60 * 1000);
 		hyper.UI.setServerMessageFun()
 	}
@@ -891,7 +895,7 @@ exports.defineUIFunctions = function(hyper)
    	  }, statusAndUrl => {
     	  LOGGER.log('[main-window-func.js] Error in updateExampleList: ' + statusAndUrl[0] + ' downloading: ' + statusAndUrl[1])
         if (!silent) {
-    	    window.alert('Something went wrong downloading example list:\n\n' + statusAndUrl[1] + '\n\n"' + statusAndUrl[0] + '"\n\nDo you have internet access?');
+          UTIL.alertDownloadError('Something went wrong downloading example list.', statusAndUrl[1], statusAndUrl[0])
     	  }
       })
    	}
@@ -959,7 +963,7 @@ exports.defineUIFunctions = function(hyper)
    	  }, statusAndUrl => {
     	  LOGGER.log('[main-window-func.js] Error in updateLibraryList: ' + statusAndUrl[0] + ' downloading: ' + statusAndUrl[1])
         if (!silent) {
-    	    window.alert('Something went wrong downloading library list:\n\n' + statusAndUrl[1] + '\n\n"' + statusAndUrl[0] + '"\n\nDo you have internet access?');
+          UTIL.alertDownloadError('Something went wrong downloading library list', statusAndUrl[1], statusAndUrl[0])
     	  }
       })
    	}
@@ -1207,7 +1211,7 @@ exports.defineUIFunctions = function(hyper)
 		  sourceURL = sourceURL + '.zip'
 		  UTIL.download(sourceURL, (zipFile, err) => {
 		    if (err) {
-    		  window.alert('Something went wrong, could not download app. Do you have internet access?')
+    		  UTIL.alertDownloadError('Something went wrong, could not download app.', sourceURL, err)
     		  LOGGER.log('[main-window-func.js] Error in copyAppFromURL: ' + err)
     		} else {		    
     		  // Extract into targetDir
@@ -1482,7 +1486,7 @@ exports.defineUIFunctions = function(hyper)
 		  sourceURL = sourceURL + '.zip'
 		  UTIL.download(sourceURL, (zipFile, err) => {
 		    if (err) {
-    		  window.alert('Something went wrong, could not download library. Do you have internet access?')
+  		    UTIL.alertDownloadError('Something went wrong, could not download library.', sourceURL, err)
     		  LOGGER.log('[main-window-func.js] Error in copyLibraryFromURL: ' + err)
     		} else {		    
     		  // Extract into targetDir

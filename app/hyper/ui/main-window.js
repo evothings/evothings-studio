@@ -129,7 +129,10 @@ hyper.UI.main = function()
 }
 
 // Call main function to setup UI and server.
-hyper.UI.main()
-module.exports.hyper = hyper
+$(document).ready(function(){
+  console.log('DOM Ready fired');
+  hyper.UI.main()
+  module.exports.hyper = hyper
+});
 
 })() // End of closure wrapper.
