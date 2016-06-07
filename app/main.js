@@ -23,6 +23,7 @@ main.LIBRARIES = main.BASE + "/libraries"
 
 main.limits = {}
 
+
 const electron = require('electron')
 const app = electron.app
 const DIALOG = require('electron').dialog;
@@ -523,12 +524,15 @@ ipcMain.on('viewers-window', function(event, arg) {
 ipcMain.on('events-subscribe', function(event, channel, windowID) {
   var listeners = main.listeners[channel] || new Set()
   //console.log("Subscribed window " + windowID + " to " + channel)
-  listeners.add(windowID) 
+  // We don't want to add null as windowID...
+  if (windowID) {
+    listeners.add(windowID)
+  }
   main.listeners[channel] = listeners
 });
 ipcMain.on('events-unsubscribe', function(event, channel, windowID) {
   var listeners = main.listeners[channel]
-  if (listeners) {
+  if (listeners && windowID) {
     listeners.delete(windowID)
     console.log("Unsubscribed window " + windowID + " from " + channel)
   }
@@ -539,10 +543,12 @@ ipcMain.on('events-publish', function(event, channel, obj) {
   //console.log("Published "+ JSON.stringify(obj) + " to " + JSON.stringify(channel))
   if (listeners) {
     for (let windowID of listeners) {
-      var window = BrowserWindow.fromId(windowID)
-      if (window) {
-        //console.log("Sending " + JSON.stringify(obj) + " to " + channel + " in window " + windowID)
-        window.webContents.send('events-event', channel, obj);
+      if (windowID) {
+        var window = BrowserWindow.fromId(windowID)
+        if (window) {
+          //console.log("Sending " + JSON.stringify(obj) + " to " + channel + " in window " + windowID)
+          window.webContents.send('events-event', channel, obj);
+        }
       }
     }
   }
