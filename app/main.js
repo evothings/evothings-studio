@@ -21,6 +21,8 @@ main.DOC = main.BASE + "/doc"
 main.EXAMPLES = main.BASE + "/examples"
 main.LIBRARIES = main.BASE + "/libraries"
 
+main.limits = {}
+
 const electron = require('electron')
 const app = electron.app
 const DIALOG = require('electron').dialog;
@@ -331,6 +333,7 @@ main.addMenu = function() {
               "\nElectron: " + process.versions['electron'] +
               "\nChrome: " + process.versions['chrome'] +
               "\nNode: " + process.versions['node'] +
+              "\n\nLimits: " + main.limits +
               "\nLicense: Apache License version 2.0" +
               "\n\nCopyright (c) 2016 Evothings AB"}) }
         }

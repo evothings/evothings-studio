@@ -442,7 +442,8 @@ exports.defineUIEvents = function(hyper)
 		{
 			showLoginButton()
 		}
-		showLicensesInSettings(user)
+		// Save globally so we can show it in the About dialog
+		saveLimits(user)
 	})
 
 	EVENTS.subscribe(EVENTS.LOGOUT, function()
@@ -474,20 +475,17 @@ exports.defineUIEvents = function(hyper)
 		}, DISCONNECT_DELAY)
 	})
 
-	function showLicensesInSettings(user)
+	function saveLimits(user)
 	{
-		var licenses = document.getElementById('licenselimits')
-		var list = '<ul>'
-		for(var k in user.limits)
-		{
+		var list = ''
+		for (var k in user.limits) {
 			var v = user.limits[k]
-			if(k != 'free')
-			{
-				list += '<li>'+k+': '+v
+			if (k != 'free') {
+				list += '\n  '+k+': '+v
 			}
 		}
-		list += '</ul>'
-		licenses.innerHTML = list
+		list += '\n'
+		MAIN.limits = list
 	}
 
 	function loginUser()
