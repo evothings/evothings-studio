@@ -31,6 +31,6 @@
     "dist:osx": "build --osx --x64",
     "dist:linux": "build --linux --x64",
     "dist:win": "build --win --x64",
-    "start": "cd app && electron --enable-logging --disable-http-cache main.js"
+    "start": "cd app && electron --enable-logging main.js"
   }
 }
