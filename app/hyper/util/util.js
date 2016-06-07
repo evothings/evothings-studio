@@ -47,6 +47,20 @@ exports.getJSON = function(url) {
 	});
 };
 
+exports.checkInternet = function() {
+  exports.getJSON('http://evothings.com/pong.json').then(json => {
+    // If there is an alert message, show it to the user
+    if (json[0].alert) {
+      window.alert(json[0].alert)
+    }
+    // Otherwise we just log that we are fine
+    console.log(json[0].message)
+  }, error => {
+    // Ok, couldn't reach pong.json, internet is probably down
+    window.alert('You do not seem to have internet access?\n\nEvothings Studio requires access to the Internet.');
+  })
+}
+
 exports.unzip = function(zipfile, path, cb) {
   var extractor = UNZIP.Extract({ path: path })
   extractor.on("close", cb);

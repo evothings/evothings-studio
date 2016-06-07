@@ -75,7 +75,8 @@ exports.defineUIFunctions = function(hyper)
 		readProjectList()
 		hyper.UI.displayProjectList()
 
-		hyper.UI.updateExampleList(false)
+    UTIL.checkInternet()
+		hyper.UI.updateExampleList(true)
 	  hyper.UI.updateLibraryList(true) // We do this one silent, complaining once is enough
 
 		// Register a timer so that we update the lists every 30 min
