@@ -8,7 +8,7 @@ global.main = {}
 main.MAJOR = 2
 main.MINOR = 1
 main.PATCH = 0
-main.BUILD = 'beta5'
+main.BUILD = 'beta6'
 
 // This one is burned in by scripts
 main.TIMESTAMP = '<timestamp>'
