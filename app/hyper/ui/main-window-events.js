@@ -575,7 +575,7 @@ exports.defineUIEvents = function(hyper)
 			}
 			else
 			{
-				picture = 'images/kitty.png'
+				picture = 'images/head.png'
 			}
 			// Show user picture on login button and change text to "Logout".
 			var imageHTML =
