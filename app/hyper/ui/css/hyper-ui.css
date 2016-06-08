@@ -462,11 +462,11 @@ html, body
 
 /* Labels for tags */
 /* dialog, mediatek, nordic, etc */
-.label-hwpartner {
+.label-vendor {
   background-color: #f0ad4e;
 }
-.label-hwpartner[href]:hover,
-.label-hwpartner[href]:focus {
+.label-vendor[href]:hover,
+.label-vendor[href]:focus {
   background-color: #ec971f;
 }
 /* mbedos, mbed, arduino etc */
