@@ -4,7 +4,7 @@
 # installed and configured with access keys.
  
 # Default if not given on command line
-VERSION=2.1.0-beta8
+VERSION=2.1.0-beta9
 
 export NAME=evothings-studio
 
