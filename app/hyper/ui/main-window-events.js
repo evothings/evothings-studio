@@ -480,9 +480,7 @@ exports.defineUIEvents = function(hyper)
 		var list = ''
 		for (var k in user.limits) {
 			var v = user.limits[k]
-			if (k != 'free') {
-				list += '\n  '+k+': '+v
-			}
+			list += '\n  '+k+': '+v
 		}
 		list += '\n'
 		MAIN.limits = list

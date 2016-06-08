@@ -21,7 +21,7 @@ main.DOC = main.BASE + "/doc"
 main.EXAMPLES = main.BASE + "/examples"
 main.LIBRARIES = main.BASE + "/libraries"
 
-main.limits = {}
+main.limits = 'Not yet available'
 
 
 const electron = require('electron')
