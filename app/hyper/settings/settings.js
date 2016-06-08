@@ -185,15 +185,10 @@ exports.hasEnterprise = function()
   return USER_HANDLER.isEnterprise()
 }
 
-exports.hasPro = function()
-{
-  return USER_HANDLER.isPro()
-}
-
 // Means that the user ONLY has free features
 exports.hasFree = function()
 {
-  return !(exports.hasEnterprise() || exports.hasPro())
+  return USER_HANDLER.isFree()
 }
 
 /**
