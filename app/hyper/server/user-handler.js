@@ -61,9 +61,9 @@ exports.isEnterprise = function()
 	return mUser && mUser.limits && mUser.limits.license === "enterprise"
 }
 
-exports.isPro = function()
+exports.isFree = function()
 {
-	return mUser && mUser.limits && mUser.limits.license === "pro"
+	return mUser && mUser.limits && mUser.limits.license === "free"
 }
 
 
