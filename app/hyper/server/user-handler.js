@@ -58,8 +58,14 @@ exports.setUser = function(uobj)
 
 exports.isEnterprise = function()
 {
-	return mUser && mUser.limits && mUser.limits.enterprise == true
+	return mUser && mUser.limits && mUser.limits.license === "enterprise"
 }
+
+exports.isPro = function()
+{
+	return mUser && mUser.limits && mUser.limits.license === "pro"
+}
+
 
 exports.clearUser = function()
 {

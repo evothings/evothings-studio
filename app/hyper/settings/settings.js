@@ -187,8 +187,7 @@ exports.hasEnterprise = function()
 
 exports.hasPro = function()
 {
-  // TODO: Peter fixes! :)
-  return false
+  return USER_HANDLER.isPro()
 }
 
 // Means that the user ONLY has free features
