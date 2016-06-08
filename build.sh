@@ -41,7 +41,7 @@ shift
 if [ ! -z "$DOBUILD" ] ; then
   # Burn in build timestamp
   NOW=$(date)
-  sed -i -e "s/main\.TIMESTAMP = '<timestamp>'/main\.TIMESTAMP = '$NOW'/g" ./app/main.js
+  sed -i '' -e "s/main\.TIMESTAMP = '<timestamp>'/main\.TIMESTAMP = '$NOW'/g" ./app/main.js
 
   # Nuke old builds
   rm -rf dist/*
@@ -49,7 +49,7 @@ if [ ! -z "$DOBUILD" ] ; then
   npm run dist
 
   # Remove burn
-  sed -i -e "s/main\.TIMESTAMP = '.*'/main\.TIMESTAMP = '<timestamp>'/g" ./app/main.js
+  sed -i '' -e "s/main\.TIMESTAMP = '.*'/main\.TIMESTAMP = '<timestamp>'/g" ./app/main.js
 fi
 
 if [ ! -z "$DOUPLOAD" ] ; then

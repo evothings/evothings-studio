@@ -9,7 +9,7 @@
     "url": "https://github.com/evothings/evothings-studio.git"
   },
   "devDependencies": {
-    "electron-builder": "^4.2.1",
+    "electron-builder": "^4.2.6",
     "electron-packager": "^7.0.3",
     "electron-prebuilt": "^1.2.1"
   },
