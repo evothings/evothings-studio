@@ -44,6 +44,7 @@ var TEMP = require('temp').track()
 var BABEL = require('babel-core')
 var GLOB = require('glob')
 var CHEERIO = require('cheerio')
+var URL = require('url')
 
 /**
  * UI functions.
@@ -359,11 +360,9 @@ exports.defineUIFunctions = function(hyper)
 	function createProjectEntry(isLocal, isLibrary, options)
 	{
 		options = options || {}
-    var base = 'file://'
     // Set base to where we loaded the metadata from
-		if (options.url) {
-  		base = PATH.dirname(options.url)
-    }
+    var base = options.url || 'file://' 
+
 		// Create div tag for app items.
 		var html = '<div class="project-entry ui-state-default ui-corner-all"'
 
@@ -377,7 +376,7 @@ exports.defineUIFunctions = function(hyper)
 		html += '>'
 
 		// Full URL to application, local or online
-		var appURL = PATH.join(base, options.path)
+		var appURL = URL.resolve(base, options.path)
     var imagePath = options.imagePath
     var docURL = options.docURL
     var appTags = options.tags || []
@@ -402,11 +401,11 @@ exports.defineUIFunctions = function(hyper)
     
     // Fallback on missing doc-url is locally inside the app/library
     if (!docURL) {
-      docURL = PATH.join(appURL, 'doc', 'index.html')
+      docURL = URL.resolve(appURL, 'doc', 'index.html')
     }
     
 		if (imagePath) {
-			var fullImageURL = appURL + '/' + imagePath
+			var fullImageURL = URL.resolve(appURL + '/', imagePath)
 			html += '<div class="app-icon" style="background-image: url(\'' +
 				fullImageURL + '\');"></div>'
 		} else {
@@ -1141,16 +1140,14 @@ exports.defineUIFunctions = function(hyper)
     }
 
 		// If target parent folder does not exist, display an alert dialog and abort.
-		var exists = FILEUTIL.statSync(targetParentDir)
-		if (!exists)
+		if (!FILEUTIL.pathExists(targetParentDir))
 		{
 			window.alert('The parent folder does not exist, please change folder.')
 			return // Abort (dialog is still visible)
 		}
 
 		// If target folder exists, display an alert dialog and abort.
-		var exists = FILEUTIL.statSync(targetDir)
-		if (exists)
+		if (FILEUTIL.pathExists(targetDir))
 		{
 			window.alert('An app with this folder name already exists, please type a new folder name.')
 			return // Abort (dialog is still visible)
@@ -1287,16 +1284,14 @@ exports.defineUIFunctions = function(hyper)
     }
 
 		// If target parent folder does not exist, display an alert dialog and abort.
-		var exists = FILEUTIL.statSync(parentFolder)
-		if (!exists)
+		if (!FILEUTIL.pathExists(parentFolder))
 		{
 			window.alert('The parent folder does not exist, please change folder.')
 			return // Abort (dialog is still visible)
 		}
 
 		// If target folder exists, display an alert dialog and abort.
-		var exists = FILEUTIL.statSync(targetDir)
-		if (exists)
+		if (FILEUTIL.pathExists(targetDir))
 		{
 			window.alert('An app with this folder name already exists, please type a new folder name.')
 			return // Abort (dialog is still visible)

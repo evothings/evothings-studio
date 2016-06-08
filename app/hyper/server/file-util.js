@@ -49,6 +49,14 @@ exports.writeFileSync = function(path, data, options)
 	}
 }
 
+exports.pathExists = function(path) {
+  try {
+    FS.accessSync(path, FS.F_OK);
+    return true
+  } catch (e) {
+    return null
+  }
+}
 
 exports.statSync = function(path)
 {
