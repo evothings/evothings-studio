@@ -50,6 +50,7 @@ exports.writeFileSync = function(path, data, options)
 }
 
 exports.pathExists = function(path) {
+  // This is the new style of checking if a path exists
   try {
     FS.accessSync(path, FS.F_OK);
     return true
@@ -58,15 +59,11 @@ exports.pathExists = function(path) {
   }
 }
 
-exports.statSync = function(path)
-{
-	try
-	{
+exports.statSync = function(path) {
+	// This is the older style of checking if a path exists
+	try {
 		return FS.statSync(path)
-	}
-	catch (err)
-	{
-		console.log('### exports.statSync err: ' + err)
+	} catch (err) {
 		return null
 	}
 }

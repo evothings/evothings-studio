@@ -305,7 +305,7 @@ exports.defineUIFunctions = function(hyper)
     function pathIsValidAppPath(path)
     {
       // Is it an existing HTML file?
-		  if (FILEUTIL.fileIsHTML(path) && FILEUTIL.statSync(path))
+		  if (FILEUTIL.fileIsHTML(path) && FILEUTIL.pathExists(path))
 		  {
 			  return true
 		  }
@@ -332,7 +332,7 @@ exports.defineUIFunctions = function(hyper)
 
       // Does the directory have an evothings.json file pointing to existing index file?
       var indexPath = APP_SETTINGS.getIndexFileFullPath(dirPath)
-		  if (FILEUTIL.statSync(indexPath))
+		  if (FILEUTIL.pathExists(indexPath))
 		  {
 			  return true
 		  }
@@ -774,9 +774,9 @@ exports.defineUIFunctions = function(hyper)
 
 		// We want to show the folder but need an item in it to show,
 		// we use either evothings.json or index.html
-		if (FILEUTIL.statSync(PATH.join(path, 'evothings.json'))) {
+		if (FILEUTIL.pathExists(PATH.join(path, 'evothings.json'))) {
 			SHELL.showItemInFolder(PATH.join(path, 'evothings.json'))
-	  } else if (FILEUTIL.statSync(PATH.join(path, 'index.html'))) {
+	  } else if (FILEUTIL.pathExists(PATH.join(path, 'index.html'))) {
 	    SHELL.showItemInFolder(PATH.join(path, 'index.html'))
 	  } else {
 	    // This will show the parent folder, but so be it!
