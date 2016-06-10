@@ -9,9 +9,9 @@ MINOR=$(sed -n '/^main\.MINOR.*=.*/p' app/main.js | cut -d' ' -f 3)
 PATCH=$(sed -n '/^main\.PATCH.*=.*/p' app/main.js | cut -d' ' -f 3)
 BUILD=$(sed -n '/^main\.BUILD.*=.*/p' app/main.js | cut -d"\"" -f 2)
 if [ ! -z "$BUILD" ] ; then
-  VERSION=$MAJOR.$MINOR.$PATCH-$BUILD
+  VER=$MAJOR.$MINOR.$PATCH-$BUILD
 else
-  VERSION=$MAJOR.$MINOR.$PATCH
+  VER=$MAJOR.$MINOR.$PATCH
 fi
 
 export NAME=evothings-studio
@@ -59,7 +59,7 @@ done
 #shift $(($OPTIND - 1))
 
 if [ ! -z "$DOBUILD" ] ; then
-  echo "Building version $VERSION ..."
+  echo "Building version $VER ..."
   # Burn in build timestamp
   NOW=$(date)
   sed -i '' -e "s/main\.TIMESTAMP = '<timestamp>'/main\.TIMESTAMP = '$NOW'/g" ./app/main.js
