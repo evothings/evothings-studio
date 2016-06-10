@@ -79,13 +79,11 @@ if [ ! -z "$DOBUILD" ] ; then
 fi
 
 if [ ! -z "$DOUPLOAD" ] ; then
-  echo PASTE INTO GITTER:
   if [ -z "$PLATFORM" ] || [ "$PLATFORM" == "linux" ] ; then
     # Upload debs
     s3cmd put dist/*.deb s3://evothings-download/
     s3cmd setacl --acl-public s3://evothings-download/$NAME-$VER.deb
     #s3cmd setacl --acl-public s3://evothings-download/$NAME-$VER-i386.deb
-    echo https://s3-eu-west-1.amazonaws.com/evothings-download/$NAME-$VER.deb
   fi
 
   if [ -z "$PLATFORM" ] || [ "$PLATFORM" == "win" ] ; then
@@ -94,7 +92,6 @@ if [ ! -z "$DOUPLOAD" ] ; then
     s3cmd put /tmp/$NAME-$VER.exe s3://evothings-download/
     s3cmd setacl --acl-public s3://evothings-download/$NAME-$VER.exe
     rm /tmp/$NAME-$VER.exe
-    echo https://s3-eu-west-1.amazonaws.com/evothings-download/$NAME-$VER.exe
   fi
 
   if [ -z "$PLATFORM" ] || [ "$PLATFORM" == "osx" ] ; then
@@ -103,8 +100,13 @@ if [ ! -z "$DOUPLOAD" ] ; then
     s3cmd put /tmp/$NAME-$VER.dmg s3://evothings-download/
     s3cmd setacl --acl-public s3://evothings-download/$NAME-$VER.dmg
     rm /tmp/$NAME-$VER.dmg
-    echo https://s3-eu-west-1.amazonaws.com/evothings-download/$NAME-$VER.dmg
   fi
+
+  echo PASTE INTO GITTER:
+  echo https://s3-eu-west-1.amazonaws.com/evothings-download/$NAME-$VER.deb
+  echo https://s3-eu-west-1.amazonaws.com/evothings-download/$NAME-$VER.dmg
+  echo https://s3-eu-west-1.amazonaws.com/evothings-download/$NAME-$VER.exe
+
 fi
 
 echo "DONE"
