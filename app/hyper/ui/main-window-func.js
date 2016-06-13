@@ -74,13 +74,14 @@ exports.defineUIFunctions = function(hyper)
 		initAppLists()
 	}
 
-  function updateListsSilently() {
+  function updateLists(silent) {
     if (!mUpdatingLists) {
       mUpdatingLists = true
-      hyper.UI.updateExampleList(true) // Silent
-      hyper.UI.updateLibraryList(true) // Silent
+      setTimeout(function() {mUpdatingLists = false}, 5000)
+      hyper.UI.updateExampleList(silent)
+      hyper.UI.updateLibraryList(silent)
     } else {
-      console.log("Already updating lists, ignore EVENTS.LOGIN")
+      console.log("Already updating lists, ignoring")
     }
   }
   
@@ -89,21 +90,20 @@ exports.defineUIFunctions = function(hyper)
 		readProjectList()
 		hyper.UI.displayProjectList()
 
-    // If we have verified basic internet access - we load the lists.
+    // If we have verified basic internet access - we load the lists but not silently.
     UTIL.checkInternet().then(hasInternet => {
       if (hasInternet) {
-    		hyper.UI.updateExampleList(false)
-	      hyper.UI.updateLibraryList(false)
+        updateLists(false)
 	    }
     })
 
 		// Register a timer so that we update the lists every 30 min, but silently.
 	  setInterval(function() {
-      updateListsSilently()
+      updateLists(true)
 	  }, 30 * 60 * 1000);
 	  
-	  // When user logs in we update
-	  EVENTS.subscribe(EVENTS.LOGIN, updateListsSilently)
+	  // When user logs in we update silently
+	  EVENTS.subscribe(EVENTS.LOGIN, function() {updateLists(true)})
 	  
 		hyper.UI.setServerMessageFun()
 	}
@@ -1074,8 +1074,7 @@ exports.defineUIFunctions = function(hyper)
 		var oldUrls = SETTINGS.getRepositoryURLs()
 		if (newUrls != oldUrls) {
   		SETTINGS.setRepositoryURLs(newUrls)
-  		hyper.UI.updateExampleList(false)
-	    hyper.UI.updateLibraryList(false)
+  		updateLists(false)
 	  }
 
 		// Check if server address has been changed.
