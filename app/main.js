@@ -8,14 +8,18 @@ global.main = {}
 main.MAJOR = 2
 main.MINOR = 1
 main.PATCH = 0
-main.BUILD = 'beta9'
+// Disabled for a real release:
+//main.BUILD = "alpha1"
 
 // This one is burned in by scripts
 main.TIMESTAMP = '<timestamp>'
 
 // Don't edit below
 main.VERSION = main.MAJOR + '.' + main.MINOR
-main.FULLVERSION = main.VERSION + '.' + main.PATCH + '-' + main.BUILD
+main.FULLVERSION = main.VERSION + '.' + main.PATCH
+if (main.BUILD) {
+  main.FULLVERSION = main.FULLVERSION + '-' + main.BUILD
+}
 main.BASE = 'https://evothings.com/' + main.VERSION
 main.DOC = main.BASE + "/doc"
 main.EXAMPLES = main.BASE + "/examples"
