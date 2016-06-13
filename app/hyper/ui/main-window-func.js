@@ -55,6 +55,9 @@ exports.defineUIFunctions = function(hyper)
 	// The merged final array of metadata on Examples, Libraries and Projects
 	hyper.UI.mExampleList = []
 	hyper.UI.mLibraryList = []
+	
+	// Ugly flag introduced because we can get a flurry of EVENTS.LOGIN
+	mUpdatingLists = false
 
 	var mProjectList = []
 	var mWorkbenchPath = MAIN.getRootDir()
@@ -71,6 +74,16 @@ exports.defineUIFunctions = function(hyper)
 		initAppLists()
 	}
 
+  function updateListsSilently() {
+    if (!mUpdatingLists) {
+      mUpdatingLists = true
+      hyper.UI.updateExampleList(true) // Silent
+      hyper.UI.updateLibraryList(true) // Silent
+    } else {
+      console.log("Already updating lists, ignore EVENTS.LOGIN")
+    }
+  }
+  
 	function initAppLists()
 	{
 		readProjectList()
@@ -86,9 +99,12 @@ exports.defineUIFunctions = function(hyper)
 
 		// Register a timer so that we update the lists every 30 min, but silently.
 	  setInterval(function() {
-      hyper.UI.updateExampleList(true) // Silent
-      hyper.UI.updateLibraryList(true) // Silent
+      updateListsSilently()
 	  }, 30 * 60 * 1000);
+	  
+	  // When user logs in we update
+	  EVENTS.subscribe(EVENTS.LOGIN, updateListsSilently)
+	  
 		hyper.UI.setServerMessageFun()
 	}
 
@@ -940,7 +956,7 @@ exports.defineUIFunctions = function(hyper)
 
     // Get an array of promises for fetching the lists
    	var urls = SETTINGS.getLibraryLists()
-   	
+   	var lastUrl = urls[urls.length - 1]
    	for (url of urls) {
    	  UTIL.getJSON(url).then(listAndUrl => {
         var list = listAndUrl[0]
@@ -959,6 +975,11 @@ exports.defineUIFunctions = function(hyper)
         })
         // And finally show them too
         hyper.UI.displayLibraryList()
+        
+        // Silly but it works, if this was the last url we clear the flag
+        if (url == lastUrl) {
+          mUpdatingLists = false
+        }
    	  }, statusAndUrl => {
     	  LOGGER.log('[main-window-func.js] Error in updateLibraryList: ' + statusAndUrl[0] + ' downloading: ' + statusAndUrl[1])
         if (!silent) {
