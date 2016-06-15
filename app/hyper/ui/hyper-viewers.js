@@ -199,7 +199,7 @@ $(function()
 		{
 			newlist.forEach(function(newClient)
 			{
-				console.log('checking if new client ' + newClient.clientID + ' == ' + oldClient.clientID)
+				//console.log('checking if new client ' + newClient.clientID + ' == ' + oldClient.clientID)
 				if (newClient.clientID == oldClient.clientID)
 				{
 					found = true
@@ -352,7 +352,7 @@ $(function()
 
 	function requestStatus(viewer)
 	{
-		console.log('....requesting status.....')
+		//console.log('....requesting status.....')
 		ipcRenderer.send('workbench-window', { message: 'eval', code: '(function(){ hyper.sendMessageToServer(window.hyper.IoSocket, "client.instrumentation", {clientID: window.hyper.clientID, serviceStatus: typeof window._instrumentation, startTime: '+Date.now()+' });return "_DONOT_"; })();', client: viewer })
 	}
 
@@ -506,8 +506,8 @@ $(function()
 
 	function setViewerServiceStatus(message)
 	{
-		console.log('-- got serviceStatus back: '+message.serviceStatus)
-		console.dir(message)
+		//console.log('-- got serviceStatus back: '+message.serviceStatus)
+		//console.dir(message)
 		var ball = document.getElementById(message.clientID+'_ball')
 		var sbutton = document.getElementById(message.clientID + '_sbutton')
 		var cdiv = document.getElementById(message.clientID + '.serviceroot')
@@ -595,6 +595,7 @@ $(function()
 				rv =true
 			}
 		}
+		console.log('isClientAlreadySubscribedToService clientID = '+clientID+', path = '+path+', rv = '+rv)
 		return rv
 	}
 
@@ -612,9 +613,6 @@ $(function()
 				if(!document.getElementById(id))
 				{
 					var sdiv = document.createElement('li')
-					//sdiv.style.display = 'flex';
-					//sdiv.style.flexDirection = 'row'
-					//sdiv.className = "mdl-list__item"
 					sdiv.style.backgroundColor = pathlevel.backgroundColor || '#fff'
 					sdiv.style.minHeight = '0'
 					sdiv.style.paddingLeft = "10px"
@@ -627,10 +625,6 @@ $(function()
 
 					ndiv.innerHTML = name
 					ndiv.id = ttid
-
-					//ndiv.style.width = "150px"
-					//ndiv.style.backgroundColor = '#eee'
-					//ndiv.style.border = '1px solid grey'
 					ndiv.style.fonFamily = 'Proxima Nova Regular'
 					ndiv.style.height = '30px'
 					if(pathlevel.label)
@@ -645,14 +639,12 @@ $(function()
 						ltext = ltext.substring(0, ltext.lenght-2)
 						ldiv.innerHTML = ltext
 					}
-
 					var tdiv = document.createElement('div')
 					tdiv.className = "mdl-tooltip mdl-tooltip--large"
 					tdiv.for = ndiv.id
 					tdiv.innerHTML = name
 					//tdiv.innerHTML = '<div class="mdl-tooltip mdl-tooltip--large" for="'+ndiv.id+'">'+name+'</div>'
 					parentnode.appendChild(tdiv)
-
 					var img = document.createElement('img')
 					if(pathlevel.icon)
 					{
@@ -662,8 +654,6 @@ $(function()
 						img.style.paddingLeft = "5px"
 					}
 					var cdiv = document.createElement('ul')
-					//cdiv.className = "mdl-list"
-					//cdiv.style.paddingLeft = "20px"
 					cdiv.style.paddingTop = "0"
 					cdiv.style.paddingBottom = "0"
 					cdiv.id = id
@@ -673,32 +663,32 @@ $(function()
 					//console.log('   adding childnode '+cdiv.id+' under parent node '+parentnode.id)
 					sdiv.addEventListener('mouseup', function(e)
 					{
-						console.log('user selected path '+pathlevel.name)
+						console.log('user selected id= '+ndiv.id+' path '+pathlevel.name+' selectable = '+pathlevel.selectable+' childCount = '+cdiv.childElementCount)
 						if(cdiv.__opened)
 						{
+							console.log('hide')
 							hideElement(cdiv)
 						}
 						else
 						{
+							console.log('show')
 							showElement(cdiv)
-							if(cdiv.childElementCount == 0)
+							if (pathlevel.selectable)
 							{
-								if(pathlevel.selectable)
+								console.log('selecting')
+								selectHierarchy(pathlevel.name, client)
+							}
+							else
+							{
+								if(!isClientAlreadySubscribedToService(clientID, pathlevel.name))
 								{
-									selectHierarchy(pathlevel.name, client)
+									console.log('subscribing to service '+pathlevel.name)
+									subscribeToService(pathlevel.name, client)
 								}
 								else
 								{
-									var provider = pathlevel.name.split('.')[0]
-									if(!isClientAlreadySubscribedToService(clientID, pathlevel.name))
-									{
-										subscribeToService(pathlevel.name, client)
-									}
-									else
-									{
-										console.log('unsubscribing to service '+pathlevel.name)
-										unsubscribeToService(pathlevel.name, clientID)
-									}
+									//console.log('unsubscribing to service '+pathlevel.name)
+									//unsubscribeToService(pathlevel.name, clientID)
 								}
 							}
 						}
@@ -777,7 +767,10 @@ $(function()
 
 	function subscribeToService(path, client)
 	{
-		console.log('subscribeToService called for path '+path)
+		var id = client.clientID + '.serviceroot.' + path + '_button'
+		var button = document.getElementById(id)
+		var text = button.textContent
+		button.innerHTML = '<b>'+text+'</b>'
 		waitForTimeout()
 		//subscribeToMqttChannel(client.clientID, path)
 		ipcRenderer.send('workbench-window', { message: 'eval', code: 'window.evo.instrumentation.subscribeToService("'+path+'",{}, '+SUBSCRIPTION_INTERVAL+', '+SUBSCRIPTION_TIMEOUT+')', client: client })
@@ -789,6 +782,10 @@ $(function()
 		var client = mCurrentClients[clientID]
 		var subscriptions = mServiceSubscriptions[clientID] || []
 		var sid = subscriptions[path]
+		var id = clientID + '.serviceroot.' + path + '_button'
+		var button = document.getElementById(id)
+		var text = button.textContent
+		button.innerHTML = text
 		//unSubscribeToMqttChannel(clientID, path)
 		console.log('unsubscribing to path '+path+' -> '+sid+' for clientID '+clientID)
 		var snackbarContainer = document.querySelector('#snackbar');
@@ -1236,7 +1233,7 @@ $(function()
 
 		mqtt_client.on('message', function(topic, _message)
 		{
-			console.log('==============================================================  mqtt message received on channel '+topic)
+			//console.log('==============================================================  mqtt message received on channel '+topic)
 			var msg = _message.toString()
 			console.dir(msg)
 			var message = JSON.parse(msg)

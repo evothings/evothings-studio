@@ -43,7 +43,7 @@ var EVENTS = require('./system-events.js')
 
 // Workbench version code should be incremented on each new release.
 // The version code can be used by the server to display info.
-var mWorkbenchVersionCode = 7
+var mWorkbenchVersionCode = 8
 
 // Version of the server message protocol implemented on top of socket.io.
 // Increment when the protocol has changed.
