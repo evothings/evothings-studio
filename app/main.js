@@ -275,8 +275,8 @@ main.addMenu = function() {
               click: function() { Shell.openExternal('https://evothings.freshdesk.com/support/discussions') }
             },
             {
-              label: 'Private Feedback',
-              click: function() { Shell.openExternal('https://evothings.freshdesk.com/discussions/topics/new?forum_id=14000130317') }
+              label: 'Feedback',
+              click: function() { Shell.openExternal('https://evothings.freshdesk.com/support/discussions/topics/new?forum_id=14000130317') }
             },
             {
               label: 'Feature Request',
