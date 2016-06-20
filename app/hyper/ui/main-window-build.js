@@ -167,15 +167,18 @@ exports.defineBuildFunctions = function(hyper)
 		hyper.UI.closeFloatingAlert()
 	}
 
-	function makeProjectCurrentWithoutBuildingIt(fullPath)
+	function makeProjectCurrentWithoutBuildingIt(fullPath, evothingsJsonPath)
 	{
 		// Set server paths using the location of the HTML file.
 		var appBasePath = PATH.dirname(fullPath)
 		var indexFile = PATH.basename(fullPath)
 		SERVER.setAppPath(appBasePath)
 		SERVER.setAppFileName(indexFile)
+
 		// Set app id, will create evothings.json with new id if not existing.
-		SERVER.setAppID(APP_SETTINGS.getAppID(appBasePath))
+		SERVER.setAppID(APP_SETTINGS.getAppID(evothingsJsonPath || appBasePath))
+
+		// Monitor files.
 		MONITOR.setBasePath(appBasePath)
 	}
 
@@ -188,7 +191,7 @@ exports.defineBuildFunctions = function(hyper)
 		if (FILEUTIL.fileIsHTML(fullPath))
 		{
 			// No build performed when running an HTML file project.
-			makeProjectCurrentWithoutBuildingIt(fullPath)
+			makeProjectCurrentWithoutBuildingIt(fullPath, null)
 			buildCallback(null)
 			return
 		}
@@ -196,6 +199,7 @@ exports.defineBuildFunctions = function(hyper)
 		else if (FILEUTIL.fileIsDirectory(fullPath))
 		{
 			// Get app to run from evothings.json.
+			var evothingsJsonPath = fullPath
 			var indexFile = APP_SETTINGS.getIndexFile(fullPath)
 			if (!indexFile)
 			{
@@ -212,7 +216,7 @@ exports.defineBuildFunctions = function(hyper)
 			{
 				// app dir is missing, run the HTML index file without building.
 				var indexFileFullPath = PATH.join(fullPath, indexFile)
-				makeProjectCurrentWithoutBuildingIt(indexFileFullPath)
+				makeProjectCurrentWithoutBuildingIt(indexFileFullPath, evothingsJsonPath)
 				buildCallback(null)
 				return
 			}
@@ -223,7 +227,7 @@ exports.defineBuildFunctions = function(hyper)
 			{
 				// www dir is missing, run the HTML index file without building.
 				var indexFileFullPath = PATH.join(fullPath, appDir, indexFile)
-				makeProjectCurrentWithoutBuildingIt(indexFileFullPath)
+				makeProjectCurrentWithoutBuildingIt(indexFileFullPath, evothingsJsonPath)
 				buildCallback(null)
 				return
 			}
