@@ -123,7 +123,7 @@ exports.clearUser = function()
 function getLoginServerAddress()
 {
 	var serverAddress = SETTINGS.getReloadServerAddress()
-	serverAddress = serverAddress + ':3003'
+	serverAddress = serverAddress + '/cloud'
 	return serverAddress
 }
 
