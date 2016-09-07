@@ -9,9 +9,11 @@
     "url": "https://github.com/evothings/evothings-studio.git"
   },
   "devDependencies": {
+    "chai": "^3.5.0",
     "electron-builder": "^4.2.6",
     "electron-packager": "^7.0.3",
-    "electron-prebuilt": "^1.2.1"
+    "electron-prebuilt": "^1.2.1",
+    "spectron": "^3.3.0"
   },
   "build": {
     "linux": {
@@ -23,6 +25,7 @@
     "iconUrl": "http://evothings.com/evothings-logo.ico"
   },
   "scripts": {
+    "test": "electron-mocha",
     "libs": "ruby init.rb",
     "devdeps": "npm install",
     "deps": "npm install app",
