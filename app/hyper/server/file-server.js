@@ -231,7 +231,7 @@ function sendMessageToServer(_socket, name, data)
 		if(!cloudToken)
 		{
 			console.log('trying to open token dialog....')
-			EVENTS.publish(EVENTS.OPENTOKENDIALOG, '')
+			EVENTS.publish(EVENTS.OPENTOKENDIALOG, 'Cloud Token Missing')
 		}
 	}
 	else
@@ -562,7 +562,8 @@ exports.runApp = function()
 			sessionID: mSessionID,
 			appID: mAppID,
 			appName: hyper.UI.getProjectNameFromFile(exports.getAppPath()),
-			url: getAppURL()
+			url: getAppURL(),
+			protocol: SETTINGS.getRunProtocol()
 		})
 }
 

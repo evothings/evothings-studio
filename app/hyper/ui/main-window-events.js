@@ -624,7 +624,29 @@ exports.defineUIEvents = function(hyper)
 	// Called when you press Run and no client is connected.
 	hyper.UI.noClientConnectedHander = function()
 	{
-		hyper.UI.$('#ModalDialog-NoClientConnected').modal('show')
+		/*
+		 <div class="modal fade" id="ModalDialog-NoClientConnected" tabindex="-1" role="dialog" aria-labelledby="ModalDialog-NoClientConnected-Label" aria-hidden="true">
+		 <div class="modal-dialog">
+		 <div class="modal-content">
+		 <div class="modal-header">
+		 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		 <h4 class="modal-title" id="ModalDialog-NoClientConnected-Label">No Evothings Viewer app connected</h4>
+		 </div>
+		 <div class="modal-body">
+		 Please connect from the Evothings Viewer</a> app on your mobile device(s). Learn more on the <a href="javascript:void(0)" id="ModalDialog-NoClientConnected-HelpLink">Getting Started screen</a>.
+		 </div>
+		 <div class="modal-footer">
+		 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		 </div>
+		 </div>
+		 </div>
+		 </div>
+		 */
+		//hyper.UI.$('#ModalDialog-NoClientConnected').modal('show')
+		MAIN.openDialog(
+			'No Evothings Viewer app connected',
+			'Please connect from the Evothings Viewer app on your mobile device(s). Learn more on the Getting Started screen.'
+		)
 	}
 
 	// Click handler for link in the ModalDialog-NoClientConnected dialog.
