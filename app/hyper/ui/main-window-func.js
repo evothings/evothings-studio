@@ -1462,7 +1462,32 @@ exports.defineUIFunctions = function(hyper)
 		var libsPath = APP_SETTINGS.getLibDirFullPath(path)
 		var libPath = PATH.join(libsPath, lib)
 		var uninstallScript = PATH.join(libPath, 'uninstall.js')
+		if (!FS.existsSync(uninstallScript)) {
+			// Uninstall library in application.
+			// see main-window-func.js, removeLibraryFromApp
+
+			// 1. Remove all references in index.html looking like:
+			// <script src="libs/<lib>/<lib>.js"></script>
+			var indexPath = APP_SETTINGS.getIndexFileFullPath(path)
+			var html = FILEUTIL.readFileSync(indexPath)
+			var scriptPath = `libs/${lib}/${lib}.js`
+
+			var cher = CHEERIO.load(html, { xmlMode: false })
+			var element = cher('script').filter(function(i, el) {
+				return cher(this).attr('src') === scriptPath
+			})
+			if (element.length > 0) {
+				element.remove()
+				FILEUTIL.writeFileSync(indexPath, cher.html())
+				LOGGER.log("Removed " + lib + " from " + path)
+			}
+
+			// 2. Remove directory libs/libname
+			var libPath = PATH.join(APP_SETTINGS.getLibDirFullPath(path), lib)
+			FSEXTRA.removeSync(libPath)
+		} else {
 		eval(FILEUTIL.readFileSync(uninstallScript))
+		}
 	}
 
 	hyper.UI.addLibraryToApp = function(path, lib) {
@@ -1470,7 +1495,33 @@ exports.defineUIFunctions = function(hyper)
 	  var libPath = PATH.join(libsPath, lib)
 	  copyLibraryFromURL(MAIN.BASE + '/libraries/' + lib, libPath, function() {
       var installScript = PATH.join(libPath, 'install.js')
+			if (!FS.existsSync(uninstallScript)) {
+				// 0. Read the index file to manipulate it
+				var indexPath = APP_SETTINGS.getIndexFileFullPath(path)
+				var html = FILEUTIL.readFileSync(indexPath)
+				var scriptPath = `libs/${lib}/${lib}.js`
+
+				// 1. Remove any existing reference in index.html
+				cher = CHEERIO.load(html, { xmlMode: false })
+				var element = cher('script').filter(function(i, el) {
+							return cher(this).attr('src') === scriptPath
+				})
+				if (element.length > 0) {
+					element.remove()
+				}
+
+				// 2. Add a reference in index.html right before </body>
+				// Note that we can't use <script blabla /> - it will fail
+				cher('body').append(`
+				<script src="${scriptPath}"></script>
+			`)
+
+				// 3. Write index.html file back to disk
+				FILEUTIL.writeFileSync(indexPath, cher.html())
+				LOGGER.log("Added " + lib + " to " + path)
+			} else {
 			eval(FILEUTIL.readFileSync(installScript))
+			}
     })
 	}
 
