@@ -114,6 +114,35 @@ exports.setDescription = function(appPath, description)
 }
 
 /**
+ * Return long description for app, or null if not set.
+ */
+exports.getLongDescription = function(appPath)
+{
+	var settings = readAppSettings(appPath)
+	if (settings && settings['long-description'])
+	{
+		return settings['long-description']
+	}
+	else
+	{
+		return null
+	}
+}
+exports.setLongDescription = function(appPath, description)
+{
+	var settings = readAppSettings(appPath)
+	if (settings)
+	{
+		settings['long-description'] = description
+		writeAppSettings(settings, appPath)
+	}
+	else
+	{
+		return null
+	}
+}
+
+/**
  * Return version string for app, or null if not set.
  */
 exports.getVersion = function(appPath)

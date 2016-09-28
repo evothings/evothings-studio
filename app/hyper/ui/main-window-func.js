@@ -452,8 +452,8 @@ exports.defineUIFunctions = function(hyper)
 				'<button '
 				+	'type="button" '
 				+	'class="button-edit btn et-btn-red" '
-				+	`onclick="window.hyper.UI.openEditAppDialog('${escapedPath}')">`
-				+	'Edit'
+				+	`onclick="window.hyper.UI.openConfigAppDialog('${escapedPath}')">`
+				+	'Config'
 				+ '</button>'
 		}
     
@@ -489,7 +489,7 @@ exports.defineUIFunctions = function(hyper)
 				+	'type="button" '
 				+	'class="button-open btn et-btn-blue" '
 				+	`onclick="window.hyper.UI.openFolder('${escapedPath}')">`
-				+	'Code'
+				+	'Files'
 				+ '</button>'
 		}
 
@@ -1327,16 +1327,17 @@ exports.defineUIFunctions = function(hyper)
 		})
 	}
 
-  hyper.UI.openEditAppDialog = function(path)
+  hyper.UI.openConfigAppDialog = function(path)
 	{
 		// Populate input fields.
-		hyper.UI.$('#input-edit-app-path').val(path) // Hidden field.
-    hyper.UI.$('#input-edit-app-name').val(APP_SETTINGS.getName(path))
-    hyper.UI.$('#input-edit-app-description').val(APP_SETTINGS.getDescription(path))
-    hyper.UI.$('#input-edit-app-version').val(APP_SETTINGS.getVersion(path))
+		hyper.UI.$('#input-config-app-path').val(path) // Hidden field.
+    hyper.UI.$('#input-config-app-name').val(APP_SETTINGS.getName(path))
+    hyper.UI.$('#input-config-app-description').val(APP_SETTINGS.getDescription(path))
+    hyper.UI.$('#input-config-app-long-description').val(APP_SETTINGS.getLongDescription(path))
+		hyper.UI.$('#input-config-app-version').val(APP_SETTINGS.getVersion(path))
 
     // Use jQuery to create library checkboxes
-    hyper.UI.$('#input-edit-app-libraries').empty()
+    hyper.UI.$('#input-config-app-libraries').empty()
     var libs = APP_SETTINGS.getLibraries(path)
     var html = ''
     var count = 0
@@ -1353,33 +1354,35 @@ exports.defineUIFunctions = function(hyper)
         }
       }
       html += `<div class="checkbox">
-  <input type="checkbox" ${checked} id="input-edit-app-library-${count}" data-lib="${lib.name}" data-version="${usedVersion}"> 
-    <label for="input-edit-app-library-${count}">
+  <input type="checkbox" ${checked} id="input-config-app-library-${count}" data-lib="${lib.name}" data-version="${usedVersion}"> 
+    <label for="input-config-app-library-${count}">
       ${lib.title} (${usedVersion}) - ${lib.description}
     </label>
 </div>`
     }
     // Create and insert HTML
 		var element = hyper.UI.$(html)
-		hyper.UI.$('#input-edit-app-libraries').append(element)
+		hyper.UI.$('#input-config-app-libraries').append(element)
 		
 		// Show dialog.
-		hyper.UI.$('#dialog-edit-app').modal('show')
+		hyper.UI.$('#dialog-config-app').modal('show')
+	}
 	}
 	
-	hyper.UI.saveEditApp = function()
+	hyper.UI.saveConfigApp = function()
 	{
-		var path = hyper.UI.$('#input-edit-app-path').val()
-		var name = hyper.UI.$('#input-edit-app-name').val()
-		var description = hyper.UI.$('#input-edit-app-description').val()
-		var version = hyper.UI.$('#input-edit-app-version').val()
+		var path = hyper.UI.$('#input-config-app-path').val()
+		var name = hyper.UI.$('#input-config-app-name').val()
+		var description = hyper.UI.$('#input-config-app-description').val()
+		var longDescription = hyper.UI.$('#input-config-app-long-description').val()
+		var version = hyper.UI.$('#input-config-app-version').val()
     
     if (/[^a-z0-9\_\-]/.test(name)) {
       window.alert('The app short name should only consist of lower case letters, digits, underscores and dashes.')
       // This is just to try to make it match the regexp test
       var newName = name.replace(/\s/g, '-')
       newName = newName.toLowerCase()
-      hyper.UI.$('#input-edit-app-name').val(newName)
+      hyper.UI.$('#input-config-app-name').val(newName)
 			return // Abort (dialog is still visible)
     }
     
@@ -1388,12 +1391,12 @@ exports.defineUIFunctions = function(hyper)
       // This is just to try to make it match the regexp test
       var newVersion = version.replace(/\s/g, '-')
       newVersion = newVersion.toLowerCase()
-      hyper.UI.$('#input-edit-app-version').val(newVersion)
+      hyper.UI.$('#input-config-app-version').val(newVersion)
 			return // Abort (dialog is still visible)
     }
 
     // Collect checked libs
-    var checkboxes = hyper.UI.$('#input-edit-app-libraries').find('input')
+    var checkboxes = hyper.UI.$('#input-config-app-libraries').find('input')
     var libs = []
     checkboxes.each(function () {
       var libname = this.getAttribute('data-lib')
@@ -1404,7 +1407,7 @@ exports.defineUIFunctions = function(hyper)
     })
 
   	// Hide dialog.
-		hyper.UI.$('#dialog-edit-app').modal('hide')
+		hyper.UI.$('#dialog-config-app').modal('hide')
 
     // Apply new libraries to app
     if (hyper.UI.applyLibraries(path, APP_SETTINGS.getLibraries(path) || [], libs)) {
@@ -1415,6 +1418,7 @@ exports.defineUIFunctions = function(hyper)
     // Store all meta data
     APP_SETTINGS.setName(path, name)
     APP_SETTINGS.setDescription(path, description)
+    APP_SETTINGS.setLongDescription(path, longDescription)
     APP_SETTINGS.setVersion(path, version)
 
     hyper.UI.displayProjectList()
@@ -1455,48 +1459,18 @@ exports.defineUIFunctions = function(hyper)
 	}
 	
 	hyper.UI.removeLibraryFromApp = function(path, lib) {
-	  // 1. Remove all references in index.html looking like:
-	  // <script src="libs/<lib>/<lib>.js"></script>
-	  var indexPath = APP_SETTINGS.getIndexFileFullPath(path)
-	  var html = FILEUTIL.readFileSync(indexPath)
-	  var scriptPath = `libs/${lib}/${lib}.js`
-	  var cher = CHEERIO.load(html, { xmlMode: false })
-	  var element = cher('script').filter(function(i, el) {
-      return cher(this).attr('src') === scriptPath
-    })
-    if (element.length > 0) {
-      element.remove()
-      FILEUTIL.writeFileSync(indexPath, cher.html())
-      LOGGER.log("Removed " + lib + " from " + path)
-    }
-	  // 2. Remove directory libs/libname
-	  var libPath = PATH.join(APP_SETTINGS.getLibDirFullPath(path), lib)
-    FSEXTRA.removeSync(libPath)
+		var libsPath = APP_SETTINGS.getLibDirFullPath(path)
+		var libPath = PATH.join(libsPath, lib)
+		var uninstallScript = PATH.join(libPath, 'uninstall.js')
+		eval(FILEUTIL.readFileSync(uninstallScript))
 	}
 
 	hyper.UI.addLibraryToApp = function(path, lib) {
-	  // 0. Download and unzip into libs/libname
 	  var libsPath = APP_SETTINGS.getLibDirFullPath(path)
 	  var libPath = PATH.join(libsPath, lib)
 	  copyLibraryFromURL(MAIN.BASE + '/libraries/' + lib, libPath, function() {
-      // 1. Remove any existing reference in index.html
-	    var indexPath = APP_SETTINGS.getIndexFileFullPath(path)
-	    var html = FILEUTIL.readFileSync(indexPath)
-	    var scriptPath = `libs/${lib}/${lib}.js`
-	    cher = CHEERIO.load(html, { xmlMode: false })
-	    var element = cher('script').filter(function(i, el) {
-        return cher(this).attr('src') === scriptPath
-      })
-      if (element.length > 0) {
-        element.remove()
-      }
-	    // 2. Add a reference in index.html right before </body>
-	    // Note that we can't use <script blabla /> - it will fail
-      cher('body').append(`
-  <script src="${scriptPath}"></script>
-`)
-      FILEUTIL.writeFileSync(indexPath, cher.html())
-	    LOGGER.log("Added " + lib + " to " + path)
+      var installScript = PATH.join(libPath, 'install.js')
+			eval(FILEUTIL.readFileSync(installScript))
     })
 	}
 

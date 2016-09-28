@@ -220,60 +220,68 @@ Copyright (c) 2013-2015 Evothings AB
 				</div>
 			</div>
 
-			<!-- Modal dialog: dialog-new-app -->
+			<!-- Modal dialog: dialog-config-app -->
 			<div class="modal fade"
-				id="dialog-edit-app"
+				id="dialog-config-app"
 				tabindex="-1"
 				role="dialog"
-				aria-labelledby="dialog-edit-app-label"
+				aria-labelledby="dialog-config-app-label"
 				aria-hidden="true">
 				<div class="modal-dialog">
 					<div class="modal-content">
 						<div class="modal-header">
 							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-							<h4 class="modal-title" id="dialog-edit-app-label">
-								Edit App
+							<h4 class="modal-title" id="dialog-config-app-label">
+								Configure App
 							</h4>
 						</div>
 
 						<div class="modal-body">
-						  <input id="input-edit-app-path" type="hidden" value="">
+						  <input id="input-config-app-path" type="hidden" value="">
 							<div class="form-group">
-								<label for="input-edit-app-name">
+								<label for="input-config-app-name">
 									Enter app short name (lower case, no whitespace):</label>
 								<input type="text"
-									id="input-edit-app-name"
+									id="input-config-app-name"
 									class="form-control"
 									value="my-new-app"
 									placeholder="App short name"/>
 							</div>
 							<div class="form-group">
-								<label for="input-edit-app-description">
+								<label for="input-config-app-description">
 									One line description:</label>
 								<input type="text"
-									id="input-edit-app-description"
+									id="input-config-app-description"
 									class="form-control"
 									placeholder="App oneline description"/>
 							</div>
 							<div class="form-group">
-								<label for="input-edit-app-version">
+								<label for="input-config-app-long-description">
+									Long description:</label>
+								<textarea
+									id="input-config-app-long-description"
+									class="form-control"
+									placeholder="App long description"></textarea>
+							</div>
+							<div class="form-group">
+								<label for="input-config-app-version">
 									Version:</label>
 								<input type="text"
-									id="input-edit-app-version"
+									id="input-config-app-version"
 									class="form-control"
 									placeholder="App version"/>
 							</div>
 							<div class="form-group">
-								<label for="input-edit-app-libraries">
+								<label for="input-config-app-libraries">
 									Libraries:</label>
-									<div id="input-edit-app-libraries" class="h-scroll">
+									<div id="input-config-app-libraries" class="h-scroll">
                   </div>                   
 							</div>
 							
 						</div>
 
 						<div class="modal-footer">
-							<button id="button-save-edit-app"
+							<button id="button-save-config-app"
 								type="button"
 								class="btn btn-success">
 								Save
