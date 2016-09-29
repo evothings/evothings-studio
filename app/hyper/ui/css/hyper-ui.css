@@ -132,7 +132,7 @@ html, body
 }
 
 .entry-content {
-  padding-right: 320px;
+  padding-right: 395px;
 }
 
 .entry-content-examples {
@@ -164,7 +164,7 @@ html, body
 	font-weight: bold;
 }
 
-.button-open
+.button-build
 {
 	position: absolute;
 	right: 85px;
@@ -174,7 +174,7 @@ html, body
 	font-weight: bold;
 }
 
-.button-doc
+.button-open
 {
 	position: absolute;
 	right: 160px;
@@ -184,10 +184,20 @@ html, body
 	font-weight: bold;
 }
 
-.button-edit
+.button-doc
 {
 	position: absolute;
 	right: 235px;
+	/*top: 10px;*/
+	bottom: 10px;
+	width: 65px;
+	font-weight: bold;
+}
+
+.button-edit
+{
+	position: absolute;
+	right: 310px;
 	/*top: 10px;*/
 	bottom: 10px;
 	width: 65px;

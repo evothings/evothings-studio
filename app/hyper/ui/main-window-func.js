@@ -455,6 +455,13 @@ exports.defineUIFunctions = function(hyper)
 				+	`onclick="window.hyper.UI.openConfigAppDialog('${escapedPath}')">`
 				+	'Config'
 				+ '</button>'
+		  html +=
+				'<button '
+				+	'type="button" '
+				+	'class="button-build btn et-btn-indigo" '
+				+	`onclick="window.hyper.UI.openBuildAppDialog('${escapedPath}')">`
+				+	'Build'
+				+ '</button>'
 		}
     
 		if (docURL && options.docButton)
@@ -476,7 +483,7 @@ exports.defineUIFunctions = function(hyper)
 			html +=
 				'<button '
 				+	'type="button" '
-				+	'class="button-open btn et-btn-indigo" '
+				+	'class="button-copy btn et-btn-indigo" '
 				+	`onclick="window.hyper.UI.openCopyAppDialog('${escapedPath}')">`
 				+	'Copy'
 				+ '</button>'
@@ -1367,8 +1374,88 @@ exports.defineUIFunctions = function(hyper)
 		// Show dialog.
 		hyper.UI.$('#dialog-config-app').modal('show')
 	}
+
+	hyper.UI.openBuildAppDialog = function(path)
+	{
+		// Populate input fields.
+		//hyper.UI.$('#input-config-app-path').val(path) // Hidden field.
+    //hyper.UI.$('#input-config-app-name').val(APP_SETTINGS.getName(path))
+    //hyper.UI.$('#input-config-app-description').val(APP_SETTINGS.getDescription(path))
+    //hyper.UI.$('#input-config-app-version').val(APP_SETTINGS.getVersion(path))
+		
+		// Show dialog.
+		hyper.UI.$('#dialog-build-app').modal('show')
 	}
-	
+
+	hyper.UI.saveBuildApp = function()
+	{
+		var path = hyper.UI.$('#input-config-app-path').val()
+		var name = hyper.UI.$('#input-config-app-name').val()
+		var description = hyper.UI.$('#input-config-app-description').val()
+		var version = hyper.UI.$('#input-config-app-version').val()
+    
+    if (/[^a-z0-9\_\-]/.test(name)) {
+      window.alert('The app short name should only consist of lower case letters, digits, underscores and dashes.')
+      // This is just to try to make it match the regexp test
+      var newName = name.replace(/\s/g, '-')
+      newName = newName.toLowerCase()
+      hyper.UI.$('#input-config-app-name').val(newName)
+			return // Abort (dialog is still visible)
+    }
+    
+    if (/[^a-z0-9\.\-]/.test(version)) {
+      window.alert('The version should only consist of lower case letters, digits, dots and dashes.')
+      // This is just to try to make it match the regexp test
+      var newVersion = version.replace(/\s/g, '-')
+      newVersion = newVersion.toLowerCase()
+      hyper.UI.$('#input-config-app-version').val(newVersion)
+			return // Abort (dialog is still visible)
+    }
+
+    // Collect checked libs
+    var checkboxes = hyper.UI.$('#input-config-app-libraries').find('input')
+    var libs = []
+    checkboxes.each(function () {
+      var libname = this.getAttribute('data-lib')
+      var libversion = this.getAttribute('data-version')
+      if (this.checked) {
+        libs.push({ "name": libname, "version": libversion })
+      }
+    })
+
+		// Build the app, show log 
+		hyper.UI.buildApp(name)
+
+  	// Hide dialog.
+		//hyper.UI.$('#dialog-config-app').modal('hide')
+	}
+
+	hyper.UI.buildApp = function(shortName)
+	{
+
+		const spawn = require('child_process').spawn;
+
+		// Copy app into build box directory 
+
+		// Perform the build
+		const build = spawn('vagrant', ['ssh', '-c ' + shortName], {
+  		cwd: undefined,
+  		env: process.env
+		});
+
+		build.stdout.on('data', (data) => {
+			console.log(`stdout: ${data}`);
+		});
+
+		build.stderr.on('data', (data) => {
+			console.log(`stderr: ${data}`);
+		});
+
+		build.on('close', (code) => {
+			console.log(`child process exited with code ${code}`);
+		});
+	}
+
 	hyper.UI.saveConfigApp = function()
 	{
 		var path = hyper.UI.$('#input-config-app-path').val()
@@ -1486,7 +1573,7 @@ exports.defineUIFunctions = function(hyper)
 			var libPath = PATH.join(APP_SETTINGS.getLibDirFullPath(path), lib)
 			FSEXTRA.removeSync(libPath)
 		} else {
-		eval(FILEUTIL.readFileSync(uninstallScript))
+			eval(FILEUTIL.readFileSync(uninstallScript))
 		}
 	}
 
@@ -1520,7 +1607,7 @@ exports.defineUIFunctions = function(hyper)
 				FILEUTIL.writeFileSync(indexPath, cher.html())
 				LOGGER.log("Added " + lib + " to " + path)
 			} else {
-			eval(FILEUTIL.readFileSync(installScript))
+				eval(FILEUTIL.readFileSync(installScript))
 			}
     })
 	}

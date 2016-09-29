@@ -54,6 +54,7 @@ exports.defineUIEvents = function(hyper)
 		hyper.UI.showTab('getting-started')
 	})
 
+
 	// ************** Open Settings Button **************
 
 	hyper.UI.$('#button-open-settings-dialog').click(function()
@@ -162,20 +163,6 @@ exports.defineUIEvents = function(hyper)
 		hyper.UI.openInBrowser('https://gitter.im/evothings/evothings')
 	})
 
-	// ************** Forum Button **************
-
-	hyper.UI.$('#button-forum').click(function()
-	{
-		hyper.UI.openInBrowser('https://evothings.com/forum/')
-	})
-
-	// ************** News Button **************
-
-	hyper.UI.$('#button-news').click(function()
-	{
-		hyper.UI.openInBrowser('https://evothings.com/news/')
-	})
-
 	// ************** Share in Social Media Button **************
 
 	hyper.UI.$('#button-share-social').click(function()
@@ -260,6 +247,14 @@ exports.defineUIEvents = function(hyper)
 	{
 		hyper.UI.showTab('getting-started')
 	})
+
+	// ************** News Tab Button **************
+
+	hyper.UI.$('#button-news').click(function()
+	{
+		hyper.UI.showTab('news')
+	})
+
 
 	// ************** Examples Tab Button **************
 
@@ -599,6 +594,7 @@ exports.defineUIEvents = function(hyper)
 		
 		// Hide all screens.
 		hyper.UI.$('#screen-getting-started').hide()
+		hyper.UI.$('#screen-news').hide()
 		hyper.UI.$('#screen-connect').hide()
 		hyper.UI.$('#screen-examples').hide()
 		hyper.UI.$('#screen-libraries').hide()

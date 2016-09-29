@@ -26,6 +26,10 @@ Copyright (c) 2013-2015 Evothings AB
 		<div id="panel-top">
 			<div id="panel-tool-tabs">
 				<ul class="nav nav-tabs">
+					<li role="presentation">
+						<a id="button-news"
+							href="javascript:void(0)">News</a>
+					</li>
 					<li role="presentation" class="active">
 						<a id="button-connect"
 							href="javascript:void(0)">Connect</a>
@@ -296,6 +300,50 @@ Copyright (c) 2013-2015 Evothings AB
 				</div>
 			</div>
 
+			<!-- Modal dialog: dialog-build-app -->
+			<div class="modal fade"
+				id="dialog-build-app"
+				tabindex="-1"
+				role="dialog"
+				aria-labelledby="dialog-build-app-label"
+				aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h4 class="modal-title" id="dialog-build-app-label">
+								Build App
+							</h4>
+						</div>
+
+						<div class="modal-body">
+						  <input id="input-build-app-path" type="hidden" value="">
+							<div class="form-group">
+								<label for="input-build-filename">
+									Target filename:</label>
+								<input type="text"
+									id="input-build-filename"
+									class="form-control"
+									value="some-filename"
+									placeholder="Target filename"/>
+							</div>
+						</div>
+
+						<div class="modal-footer">
+							<button id="button-save-build-app"
+								type="button"
+								class="btn btn-success">
+								Build
+							</button>
+							<button type="button"
+								class="btn btn-default"
+								data-dismiss="modal">
+								Dismiss
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
 
 			<!-- Modal dialog: dialog-copy-app -->
 			<div class="modal fade"
@@ -623,6 +671,26 @@ Copyright (c) 2013-2015 Evothings AB
 				</div>
 			</div>
 			<!-- End of Getting Started screen -->
+
+			<!-- News screen -->
+			<div id="screen-news" class="hyper-screen">
+				<div class="panel">
+					<div class="panel-body">
+
+						<img class="screen-start-logotype"
+							src="images/logo.svg" alt="Evothings" />
+
+						<div class="style-big-para style-small-h2">
+							<h1>News</h1>
+
+							<img src="images/getting-started-mobile-app.jpg" style="float:right;width:300px;height:auto;margin-left:20px;margin:bottom:20px;"/>
+							<p>News, news, news....
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- End of News screen -->
 
 			<!-- Connect screen -->
 			<div id="screen-connect" class="hyper-screen">
