@@ -1493,9 +1493,9 @@ exports.defineUIFunctions = function(hyper)
 	hyper.UI.addLibraryToApp = function(path, lib) {
 	  var libsPath = APP_SETTINGS.getLibDirFullPath(path)
 	  var libPath = PATH.join(libsPath, lib)
-	  copyLibraryFromURL(MAIN.BASE + '/libraries/' + lib, libPath, function() {
+	  copyLibraryFromURL(lib, libPath, function() {
       var installScript = PATH.join(libPath, 'install.js')
-			if (!FS.existsSync(uninstallScript)) {
+			if (!FS.existsSync(installScript)) {
 				// 0. Read the index file to manipulate it
 				var indexPath = APP_SETTINGS.getIndexFileFullPath(path)
 				var html = FILEUTIL.readFileSync(indexPath)
@@ -1525,7 +1525,10 @@ exports.defineUIFunctions = function(hyper)
     })
 	}
 
-	function copyLibraryFromURL(sourceURL, targetDir, cb) {
+	function copyLibraryFromURL(libname, targetDir, cb) {
+		library = hyper.UI.mLibraryList.find(each => each.name == lib)
+		// Either we use download-url property, or we go to MAIN.BASE
+		sourceURL = library["download-url"] || MAIN.BASE + '/libraries/' + lib
 	  try {
 		  // Download zip to temp
 		  sourceURL = sourceURL + '.zip'
