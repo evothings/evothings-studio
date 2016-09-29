@@ -1795,13 +1795,6 @@ exports.defineUIFunctions = function(hyper)
 
 	hyper.UI.displaySystemMessage = function(message)
 	{
-		/*
-		if (!hyper.UI.$('#dialog-system-message').is(':visible'))
-		{
-			hyper.UI.$('#dialog-system-message').modal('show')
-		}
-		hyper.UI.$('#system-message').text(message)
-		*/
 		MAIN.openDialog('System Message', message, 'info')
 	}
 
