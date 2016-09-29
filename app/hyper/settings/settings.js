@@ -156,7 +156,7 @@ systemSetting('RunProtocol', 'http')
 /**
  * URL for translation JSON
  */
-systemSetting('TranslationsURL', MAIN.TRANSLATIONS+'/translations.json')
+systemSetting('TranslationsURL', MAIN.TRANSLATIONS + '/translations.json')
 
 /**
  * Settings for user GUID are handled specially to preserve existing ids.

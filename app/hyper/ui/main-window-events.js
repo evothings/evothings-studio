@@ -618,7 +618,7 @@ exports.defineUIEvents = function(hyper)
 	// ************** No Client Connected Event **************
 
 	// Called when you press Run and no client is connected.
-	hyper.UI.noClientConnectedHander = function()
+	hyper.UI.noClientConnectedHandler = function()
 	{
 		/*
 		 <div class="modal fade" id="ModalDialog-NoClientConnected" tabindex="-1" role="dialog" aria-labelledby="ModalDialog-NoClientConnected-Label" aria-hidden="true">

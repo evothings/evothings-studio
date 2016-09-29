@@ -31,9 +31,8 @@ main.limits = 'Not yet available'
 
 const electron = require('electron')
 const app = electron.app
-const DIALOG = require('electron').dialog;
-console.dir(__dirname)
-const UTIL = require('/home/peter/projects/evothings-studio/app/hyper/util/util.js')
+const DIALOG = electron.dialog;
+const UTIL = require('./hyper/util/util.js')
 
 // We don't really want caching since it can serve stale examples and libraries
 app.commandLine.appendSwitch('disable-http-cache', 'true');

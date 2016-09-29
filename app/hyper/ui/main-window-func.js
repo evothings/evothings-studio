@@ -80,7 +80,7 @@ exports.defineUIFunctions = function(hyper)
       setTimeout(function() {mUpdatingLists = false}, 5000)
       hyper.UI.updateExampleList(silent)
       hyper.UI.updateLibraryList(silent)
-	  UTIL.updateTranslations(SETTINGS.getTranslationsURL())
+	  	UTIL.updateTranslations(SETTINGS.getTranslationsURL())
     } else {
       console.log("Already updating lists, ignoring")
     }

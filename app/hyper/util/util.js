@@ -128,26 +128,26 @@ exports.download = function(url, cb) {
 var translations =
 {
     // Strings internal to the workbench
-    'No Evothings Viewer app connected': '* No Evothings Viewer app connected',
+    'No Evothings Viewer app connected': 'No Evothings Viewer app connected',
     'Please connect from the Evothings Viewer app on your mobile device(s). Learn more on the Getting Started screen.':
-        '* Please connect from the Evothings Viewer app on your mobile device(s). Learn more on the Getting Started screen.',
-    'System Message': '* System Message',
+        'Please connect from the Evothings Viewer app on your mobile device(s). Learn more on the Getting Started screen.',
+    'System Message': 'System Message',
     // Strings coming from the proxy
-    'Could not find cloud API token': '* Could not find cloud API token',
-    'Cloud API token has already been used': '* Cloud API token has already been used',
+    'Could not find cloud API token': 'Could not find cloud API token',
+    'Cloud API token has already been used': 'Cloud API token has already been used',
     // Proxy names for limits
-    'Clients': '* Clients',
-    'InstrumentationDataStreams': '* InstrumentationDataStreams',
-    'exceeded (limit:': '* exceeded (limit:'
+    'Clients': 'Clients',
+    'InstrumentationDataStreams': 'InstrumentationDataStreams',
+    'exceeded (limit:': 'exceeded (limit:'
 }
 
 exports.translate = function(content)
 {
-    // TODO: actually translate :)
-    for( k in translations)
+    // This seems odd... we can't do ALL replacemenets
+    /*for( k in translations)
     {
         var v = translations[k]
         content = content.replace(k,v)
-    }
+    }*/
     return content
 }
