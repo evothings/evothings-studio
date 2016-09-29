@@ -24,6 +24,7 @@ main.BASE = 'https://evothings.com/' + main.VERSION
 main.DOC = main.BASE + "/doc"
 main.EXAMPLES = main.BASE + "/examples"
 main.LIBRARIES = main.BASE + "/libraries"
+main.TRANSLATIONS = main.BASE + '/translations'
 
 main.limits = 'Not yet available'
 
@@ -31,6 +32,8 @@ main.limits = 'Not yet available'
 const electron = require('electron')
 const app = electron.app
 const DIALOG = require('electron').dialog;
+console.dir(__dirname)
+const UTIL = require('/home/peter/projects/evothings-studio/app/hyper/util/util.js')
 
 // We don't really want caching since it can serve stale examples and libraries
 app.commandLine.appendSwitch('disable-http-cache', 'true');
@@ -503,6 +506,19 @@ main.showViewersWindow = function() {
 main.selectOrCreateFolder = function(title, defaultDir) {
   return DIALOG.showOpenDialog({ title: title,
         defaultPath: defaultDir, properties: [ 'openDirectory', 'createDirectory']})
+}
+
+main.openDialog = function(title, content, type) {
+
+  console.log('openDialog called title = '+title+', content = '+content)
+  DIALOG.showMessageBox(
+  {
+    type: type || "info",
+    title: title,
+    /*message:content,*/
+    buttons: ["Close"],
+    detail: UTIL.translate(content)
+  })
 }
 
 // Work as relay between our BrowserWindows since they can not talk to
