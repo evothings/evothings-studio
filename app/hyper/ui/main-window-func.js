@@ -46,6 +46,9 @@ var GLOB = require('glob')
 var CHEERIO = require('cheerio')
 var URL = require('url')
 
+// Counter for "popup" menus on an app entry in the My Apps list.
+var mEntryMenuIdCounter = 0
+
 /**
  * UI functions.
  */
@@ -420,6 +423,7 @@ exports.defineUIFunctions = function(hyper)
       docURL = URL.resolve(appURL, 'doc', 'index.html')
     }
     
+		// Show app icon.
 		if (imagePath) {
 			var fullImageURL = URL.resolve(appURL + '/', imagePath)
 			html += '<div class="app-icon" style="background-image: url(\'' +
@@ -429,7 +433,7 @@ exports.defineUIFunctions = function(hyper)
 			html += '<div class="app-icon" style="background-image: url(\'images/app-icon.png\');"></div>'
 		}
 
-    
+		// Get app name.
 		var appHasValidHTMLFile = options.runButton
     if (isLocal) {
 		  // Get name of app, either given in options above or extracted from project.
@@ -444,87 +448,114 @@ exports.defineUIFunctions = function(hyper)
 		    }
       }
     }
-    
-    	
-		if (isLocal && !isLibrary)
+	
+		// Run button for examples and apps.
+		// Add Run button only if app has an HTML file.
+		// We use different run functions depending on if it isLocal.
+		if (!isLibrary && appHasValidHTMLFile)
 		{
-			html +=
-				'<button '
-				+	'type="button" '
-				+	'class="button-edit btn et-btn-red" '
-				+	`onclick="window.hyper.UI.openConfigAppDialog('${escapedPath}')">`
-				+	'Config'
-				+ '</button>'
-		  html +=
-				'<button '
-				+	'type="button" '
-				+	'class="button-build btn et-btn-indigo" '
-				+	`onclick="window.hyper.UI.openBuildAppDialog('${escapedPath}')">`
-				+	'Build'
-				+ '</button>'
-		}
-    
-		if (docURL && options.docButton)
-		{
-			html += '<button type="button" '
-			if (isLibrary) {
-				html +=	'class="button-run'
-		  } else {
-		    html +=	'class="button-doc'
-		  }
-		  html += ' btn et-btn-yellow-dark" '
-				+	`onclick="window.hyper.UI.openDocURL('${docURL}')">`
-				+	'Doc'
-				+ '</button>'
+			html += '<button type="button" class="button-run btn et-btn-green entry-button" '
+			if (isLocal)
+				html += `onclick="window.hyper.UI.runApp('${escapedPath}')">`
+			else 
+				html += `onclick="window.hyper.UI.runExampleApp('${escapedPath}')">`
+			html +=	'Run</button>'
 		}
 
+		// Edit button for apps.
+		// Added if it is a locally stored app that can be edited.
+		if (isLocal && !isLibrary)
+		{
+			html += 
+				'<button type="button" '
+				+ 'class="button-edit btn et-btn-blue entry-button" '
+				+ `onclick="window.hyper.UI.editApp('${escapedPath}')">`
+				+	'Edit</button>'
+		}
+
+		// Doc button for libs.
+		if (isLibrary)
+		{
+			html +=
+				'<button type="button" '
+				+ 'class="button-doc-lib btn et-btn-yellow-dark entry-button" '
+				+ `onclick="window.hyper.UI.openDocURL('${docURL}')">`
+				+	'Doc</button>'
+		}
+
+		// Doc button for examples.
+		if (!isLocal && !isLibrary)
+		{
+			html +=
+				'<button type="button" '
+				+ 'class="button-doc-example btn et-btn-yellow-dark entry-button" '
+				+ `onclick="window.hyper.UI.openDocURL('${docURL}')">`
+				+	'Doc</button>'
+		}
+
+		// Copy button for examples.
 		if (options.copyButton)
 		{
 			html +=
-				'<button '
-				+	'type="button" '
-				+	'class="button-copy btn et-btn-indigo" '
+				'<button type="button" '
+				+	'class="button-copy-example btn et-btn-indigo entry-button" '
 				+	`onclick="window.hyper.UI.openCopyAppDialog('${escapedPath}')">`
 				+	'Copy'
 				+ '</button>'
 		}
 
-		if (options.openButton)
+		// Menu button for apps that shows more buttons.
+		if (isLocal && !isLibrary)
 		{
+			// Increment button menu counter.
+			++mEntryMenuIdCounter
+
+			// Id for dynamic button menu.
+			var entryMenuId = `entry-menu-id-${mEntryMenuIdCounter}`
+
+			html += 
+				'<button type="button" '
+				+ 'class="button-more btn et-btn-indigo entry-button" '
+				+ `onclick="window.hyper.UI.toggleEntryMenu('${entryMenuId}')">`
+				+	'More</button>'
+
+			// Build popup menu for app entry, shown on menu button.
+			++mEntryMenuIdCounter
+			html += `<div class="entry-menu" id="${entryMenuId}">`
+
+			// Open files button.
 			html +=
-				'<button '
-				+	'type="button" '
-				+	'class="button-open btn et-btn-blue" '
+				'<button type="button" '
+				+	'class="btn btn-default entry-menu-button" '
 				+	`onclick="window.hyper.UI.openFolder('${escapedPath}')">`
-				+	'Files'
-				+ '</button>'
-		}
+				+	'Files</button>'
 
-
-		// Add Run button only if app has an HTML file.
-		// We use different run functions depending on if it isLocal
-		if (!isLibrary && appHasValidHTMLFile)
-		{
-			html += '<button type="button" class="button-run btn et-btn-green" '
-      if (isLocal)
-        html += `onclick="window.hyper.UI.runApp('${escapedPath}')">`
-      else 
-        html += `onclick="window.hyper.UI.runExampleApp('${escapedPath}')">`
-      html +=	'Run</button>'
-		}
-
-		/* We add a Config button to Apps instead
-		if (isLibrary)
-		{
+			// Config button.
 			html +=
-				'<button '
-				+	'type="button" '
-				+	'class="button-run btn et-btn-green" '
-				+	'onclick="window.hyper.UI.copytoApp(\'${escapedPath}\')">'
-				+	'Use'
-				+ '</button>'
-		}*/
+				'<button type="button" '
+				+	'class="btn btn-default entry-menu-button" '
+				+	`onclick="window.hyper.UI.openConfigAppDialog('${escapedPath}')">`
+				+	'Config</button>'
 
+			// Build button.
+		  html +=
+				'<button type="button" '
+				+	'class="btn btn-default entry-menu-button" '
+				+	`onclick="window.hyper.UI.openBuildAppDialog('${escapedPath}')">`
+				+	'Build</button>'
+
+			// Doc button.
+		  html +=
+				'<button type="button" '
+				+	'class="btn btn-default entry-menu-button" '
+				+	`onclick="window.hyper.UI.openDocURL('${docURL}')">`
+				+	'Doc</button>'
+
+			// End of entry menu.
+			html += '</div>'
+		}
+
+		// Delete icon.
 		if (options.deleteButton)
 		{
 			html +=
@@ -782,6 +813,16 @@ exports.defineUIFunctions = function(hyper)
 	hyper.UI.getWorkbenchPath = function(path)
 	{
 		return mWorkbenchPath
+	}
+
+	hyper.UI.editApp = function(path)
+	{
+		alert('TODO: Open VS Code with files: ' + path)
+	}
+
+	hyper.UI.toggleEntryMenu = function(menuId)
+	{
+		$('#' + menuId).toggle()
 	}
 
 	hyper.UI.openFolder = function(path)

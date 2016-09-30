@@ -132,15 +132,15 @@ html, body
 }
 
 .entry-content {
-  padding-right: 395px;
+  padding-right: 245px;
 }
 
 .entry-content-examples {
-  padding-right: 230px;
+  padding-right: 245px;
 }
 
 .entry-content-libraries {
-  padding-right: 80px;
+  padding-right: 95px;
 }
 
 .h-scroll {
@@ -154,64 +154,63 @@ html, body
   overflow-y: auto;
 }
 
-.button-run
+/* Holds dynamically displayed buttons on an entry in the app list. */
+.entry-menu
 {
 	position: absolute;
 	right: 10px;
-	/*top: 10px;*/
-	bottom: 10px;
-	width: 65px;
-	font-weight: bold;
+	bottom: 53px;
+	display: none; /* Initially hidden */
 }
 
-.button-build
+.entry-button
 {
 	position: absolute;
-	right: 85px;
-	/*top: 10px;*/
-	bottom: 10px;
-	width: 65px;
 	font-weight: bold;
+	font-size: 14px;
+	padding: 4px 8px;
+	width: 70px;
+	bottom: 10px;
 }
 
-.button-open
+.entry-menu-button
 {
-	position: absolute;
-	right: 160px;
-	/*top: 10px;*/
-	bottom: 10px;
-	width: 65px;
+	position: relative;
 	font-weight: bold;
+	font-size: 14px;
+	padding: 4px 8px;
+	margin-left: 10px;
+	width: 70px;
 }
 
-.button-doc
+.button-run
 {
-	position: absolute;
-	right: 235px;
-	/*top: 10px;*/
-	bottom: 10px;
-	width: 65px;
-	font-weight: bold;
+	right: 10px;
 }
 
 .button-edit
 {
-	position: absolute;
-	right: 310px;
-	/*top: 10px;*/
-	bottom: 10px;
-	width: 65px;
-	font-weight: bold;
+	right: 90px;
 }
 
-.button-copy
+.button-more
 {
-	position: absolute;
-	right: 80px;
-	/*top: 10px;*/
-	bottom: 10px;
-	width: 80px;
-	font-weight: bold;
+	right: 170px;
+}
+
+.button-doc-lib
+{
+	right: 10px;
+}
+
+.button-doc-example
+{
+	right: 170px;
+}
+
+.button-copy-example
+{
+	right: 90px;
 }
 
 .button-delete
