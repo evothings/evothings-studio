@@ -45,6 +45,8 @@ var BABEL = require('babel-core')
 var GLOB = require('glob')
 var CHEERIO = require('cheerio')
 var URL = require('url')
+const CHILD_PROCESS = require('child_process')
+
 
 // Counter for "popup" menus on an app entry in the My Apps list.
 var mEntryMenuIdCounter = 0
@@ -824,9 +826,19 @@ exports.defineUIFunctions = function(hyper)
 		return mWorkbenchPath
 	}
 
+	/**
+	 * Edit app in VS Code.
+	 */
 	hyper.UI.editApp = function(path)
 	{
-		alert('TODO: Open VS Code with files: ' + path)
+		const build = CHILD_PROCESS.spawn('code', [path], {
+  		cwd: path,
+  		env: process.env
+		})
+
+		build.on('close', (code) => {
+			console.log(`Spawn of VSCode exited with code ${code}`);
+		})
 	}
 
 	hyper.UI.toggleEntryMenu = function(menuId)
@@ -1488,13 +1500,13 @@ exports.defineUIFunctions = function(hyper)
 
 	hyper.UI.buildApp = function(shortName)
 	{
+		// Copy app into build box directory
 
-		const spawn = require('child_process').spawn;
+		// Create <shortName>.rb
 
-		// Copy app into build box directory 
 
 		// Perform the build
-		const build = spawn('vagrant', ['ssh', '-c ' + shortName], {
+		const build = CHILD_PROCESS.spawn('vagrant', ['ssh', '-c ' + shortName], {
   		cwd: undefined,
   		env: process.env
 		});
@@ -1510,6 +1522,8 @@ exports.defineUIFunctions = function(hyper)
 		build.on('close', (code) => {
 			console.log(`child process exited with code ${code}`);
 		});
+
+		// Present result to user
 	}
 
 	hyper.UI.saveConfigApp = function()
