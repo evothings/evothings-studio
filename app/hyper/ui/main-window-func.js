@@ -83,6 +83,7 @@ exports.defineUIFunctions = function(hyper)
       setTimeout(function() {mUpdatingLists = false}, 5000)
       hyper.UI.updateExampleList(silent)
       hyper.UI.updateLibraryList(silent)
+	  	UTIL.updateTranslations(SETTINGS.getTranslationsURL())
     } else {
       console.log("Already updating lists, ignoring")
     }
@@ -128,13 +129,21 @@ exports.defineUIFunctions = function(hyper)
 		console.log('------------------ setting up open token dialog listener...')
 		EVENTS.subscribe(EVENTS.OPENTOKENDIALOG, function(message)
 		{
-			console.log('open cloud token dialog')
+			console.log('------------------ token dialog event. message = '+message)
+			if(message)
+			{
+				console.log('open cloud token dialog')
+				MAIN.openDialog('Cloud Token Message', message, 'info')
+			}
+
+			/*
 			if(message)
 			{
 				hyper.UI.$('#tokentext')[0].innerHTML = message
 			}
 			hyper.UI.$('#connect-spinner').removeClass('icon-spin-animate')
 			dialog.showModal()
+			*/
 			hyper.UI.hideToken()
 		})
 	}
@@ -1097,6 +1106,11 @@ exports.defineUIFunctions = function(hyper)
 			SETTINGS.getReloadServerAddress())
 		hyper.UI.$('#input-setting-repository-urls').val(
 			SETTINGS.getRepositoryURLs())
+		var $radios = $('input:radio[name=protocol]')
+		var checked = SETTINGS.getRunProtocol()
+		console.log('-- protocol setting is')
+		console.log(JSON.stringify(checked))
+		$radios.filter('[value='+checked+']').prop('checked', true)
 
 		// Show settings dialog.
 		hyper.UI.$('#dialog-settings').modal('show')
@@ -1142,6 +1156,7 @@ exports.defineUIFunctions = function(hyper)
 			hyper.UI.displayConnectKey(
 				'Server address has been changed. Click GET KEY to get a new connect key.')
 		}
+		SETTINGS.setRunProtocol($('input[name=protocol]:checked').val())
 	}
 
 	hyper.UI.disconnectAllViewers = function()
@@ -1821,11 +1836,7 @@ exports.defineUIFunctions = function(hyper)
 
 	hyper.UI.displaySystemMessage = function(message)
 	{
-		if (!hyper.UI.$('#dialog-system-message').is(':visible'))
-		{
-			hyper.UI.$('#dialog-system-message').modal('show')
-		}
-		hyper.UI.$('#system-message').text(message)
+		MAIN.openDialog('System Message', message, 'info')
 	}
 
 	hyper.UI.openBuildMessageDialog = function(message)

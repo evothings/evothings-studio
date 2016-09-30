@@ -148,6 +148,16 @@ systemSetting('SessionID', null)
  */
 systemSetting('RepositoryURLs', '')
 
+/*
+* Which protocol the viewer should run against
+*/
+systemSetting('RunProtocol', 'http')
+
+/**
+ * URL for translation JSON
+ */
+systemSetting('TranslationsURL', MAIN.TRANSLATIONS + '/translations.json')
+
 /**
  * Settings for user GUID are handled specially to preserve existing ids.
  */

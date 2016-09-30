@@ -88,7 +88,7 @@ exports.defineBuildFunctions = function(hyper)
 			if (hyper.UI.mNumberOfConnectedClients <= 0)
 			{
 				// This function is defined in hyper-ui.html.
-				hyper.UI.noClientConnectedHander()
+				hyper.UI.noClientConnectedHandler()
 			}
 			else
 			{

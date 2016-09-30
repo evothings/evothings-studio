@@ -31,40 +31,65 @@ exports.alertDownloadError = function(msg, url, status) {
   window.alert(`${msg}\n\nURL: ${url}\nSTATUS: ${status}\n\nDo you have internet access?`)
 }
 
-exports.getJSON = function(url) {
-	return new Promise(function(resolve, reject) {
-		var xhr = new XMLHttpRequest();
-
-		xhr.onreadystatechange = function() {
-      if (xhr.readyState === 4) {   //if complete
-          if (xhr.status === 200){  //check if "OK" (200)
-             resolve([xhr.response, url]);
-          } else {
-             reject([xhr.statusText, url]);
-          }
-      }
-    }
-		
-		xhr.open('get', url, true);
-		xhr.responseType = 'json';
- 		xhr.send();
-	});
+var getJSON = function(url)
+{
+    return new Promise(function(resolve, reject)
+    {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function()
+        {
+            if (xhr.readyState === 4)
+            {   //if complete
+                if (xhr.status === 200)
+                {  //check if "OK" (200)
+                    resolve([xhr.response, url]);
+                }
+                else
+                {
+                    reject([xhr.statusText, url]);
+                }
+            }
+        }
+        xhr.open('get', url, true);
+        xhr.responseType = 'json';
+        xhr.send();
+    });
 };
 
+exports.updateTranslations = function(url)
+{
+    console.log('UTIL.updateTranslations called')
+    getJSON(url).then(function(ttext)
+    {
+        console.log('UTIL.updateTranslations got new translations.')
+        console.dir(ttext)
+        translations = ttext
+    }, function(err)
+    {
+        console.log('unable to donwload translations :(')
+        console.dir(err)
+    })
+}
+
+
+exports.getJSON = getJSON
+
 exports.checkInternet = function() {
-  return exports.getJSON('http://evothings.com/pong.json').then(json => {
-    // If there is an alert message, show it to the user
-    if (json[0].alert) {
-      window.alert(json[0].alert)
-    }
-    // Otherwise we just log that we are fine
-    console.log(json[0].message)
-    return true
-  }, error => {
-    // Ok, couldn't reach pong.json, internet is probably down
-    window.alert('You do not seem to have internet access?\n\nEvothings Studio requires access to the Internet.');
-    return false
-  })
+  return exports.getJSON('http://evothings.com/pong.json').then(json =>
+      {
+        // If there is an alert message, show it to the user
+        if (json[0].alert) {
+          window.alert(json[0].alert)
+        }
+        // Otherwise we just log that we are fine
+        console.log(json[0].message)
+        return true
+      }, error =>
+      {
+        // Ok, couldn't reach pong.json, internet is probably down
+        window.alert('You do not seem to have internet access?\n\nEvothings Studio requires access to the Internet.');
+        return false
+      })
 }
 
 exports.unzip = function(zipfile, path, cb) {
@@ -98,4 +123,31 @@ exports.download = function(url, cb) {
       cb(filePath)
     })
   })
+}
+
+var translations =
+{
+    // Strings internal to the workbench
+    'No Evothings Viewer app connected': 'No Evothings Viewer app connected',
+    'Please connect from the Evothings Viewer app on your mobile device(s). Learn more on the Getting Started screen.':
+        'Please connect from the Evothings Viewer app on your mobile device(s). Learn more on the Getting Started screen.',
+    'System Message': 'System Message',
+    // Strings coming from the proxy
+    'Could not find cloud API token': 'Could not find cloud API token',
+    'Cloud API token has already been used': 'Cloud API token has already been used',
+    // Proxy names for limits
+    'Clients': 'Clients',
+    'InstrumentationDataStreams': 'InstrumentationDataStreams',
+    'exceeded (limit:': 'exceeded (limit:'
+}
+
+exports.translate = function(content)
+{
+    // This seems odd... we can't do ALL replacemenets
+    /*for( k in translations)
+    {
+        var v = translations[k]
+        content = content.replace(k,v)
+    }*/
+    return content
 }
