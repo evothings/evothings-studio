@@ -21,8 +21,9 @@ PLATFORM=
 
 function usage {
         cat <<ENDOFHELP
-Usage: $0 [-wolauh?]
+Usage: $0 [-wvolauh?]
   -w        Build Windows
+  -v        Build Windows32
   -o        Build OSX
   -l        Build Linux
   -a        Build all
@@ -39,14 +40,17 @@ if [ -z "$1" ] ; then
 fi
 
 # Read global options and shift them away
-while getopts "wolauh?" o; do
+while getopts "wvolauh?" o; do
 case "$o" in
    w)
     DOBUILD=true
     PLATFORM=win;;
+   v)
+    DOBUILD=true
+    PLATFORM=win32;;
    o)
     DOBUILD=true
-    PLATFORM=osx;;
+    PLATFORM=mac;;
    l)
     DOBUILD=true
     PLATFORM=linux;;
@@ -66,46 +70,62 @@ if [ ! -z "$DOBUILD" ] ; then
 
   # Nuke old builds
   rm -rf dist/*
-
-  # Build for one or all platforms
-  if [ -z "$PLATFORM" ] ; then
-    npm run dist
-  else
-    npm run dist:$PLATFORM
-  fi
-
-  # Remove burn
-  sed -i '' -e "s/main\.TIMESTAMP = '.*'/main\.TIMESTAMP = '<timestamp>'/g" ./app/main.js
 fi
 
 if [ ! -z "$DOUPLOAD" ] ; then
   if [ -z "$PLATFORM" ] || [ "$PLATFORM" == "linux" ] ; then
-    # Upload debs
+    npm run dist:linux
+    # Upload deb, rpm, AppImage
     s3cmd put dist/*.deb s3://evothings-download/
-    s3cmd setacl --acl-public s3://evothings-download/$NAME-$VER.deb
-    #s3cmd setacl --acl-public s3://evothings-download/$NAME-$VER-i386.deb
+    s3cmd put dist/*.rpm s3://evothings-download/
+    s3cmd put dist/*.AppImage s3://evothings-download/
+    s3cmd setacl --acl-public s3://evothings-download/$NAME-$VER-amd64.deb
+    s3cmd setacl --acl-public s3://evothings-download/$NAME-$VER.rpm
+    s3cmd setacl --acl-public s3://evothings-download/$NAME-$VER-x86_64.AppImage
   fi
 
   if [ -z "$PLATFORM" ] || [ "$PLATFORM" == "win" ] ; then
-    # Upload (rename) Windows installer
+    npm run dist:win
+    # Upload (rename) Windows Squirrel and NSIS installer
     cp dist/win/Evothings\ Studio\ Setup\ $VER.exe /tmp/$NAME-$VER.exe
     s3cmd put /tmp/$NAME-$VER.exe s3://evothings-download/
     s3cmd setacl --acl-public s3://evothings-download/$NAME-$VER.exe
     rm /tmp/$NAME-$VER.exe
+    cp dist/Evothings\ Studio\ Setup\ $VER.exe /tmp/$NAME-$VER-nsis.exe
+    s3cmd put /tmp/$NAME-$VER-nsis.exe s3://evothings-download/
+    s3cmd setacl --acl-public s3://evothings-download/$NAME-$VER-nsis.exe
+    rm /tmp/$NAME-$VER-nsis.exe
   fi
 
-  if [ -z "$PLATFORM" ] || [ "$PLATFORM" == "osx" ] ; then
+  if [ -z "$PLATFORM" ] || [ "$PLATFORM" == "win32" ] ; then
+    # Upload (rename) Windows installer
+    npm run dist:win32
+    cp dist/win-ia32/Evothings\ Studio\ Setup\ $VER-ia32.exe /tmp/$NAME-$VER-ia32.exe
+    s3cmd put /tmp/$NAME-$VER-ia32.exe s3://evothings-download/
+    s3cmd setacl --acl-public s3://evothings-download/$NAME-$VER-ia32.exe
+    rm /tmp/$NAME-$VER-ia32.exe
+  fi
+
+  if [ -z "$PLATFORM" ] || [ "$PLATFORM" == "mac" ] ; then
+    npm run dist:mac
     # Upload (rename) OSX installer
-    cp dist/osx/Evothings\ Studio-$VER.dmg /tmp/$NAME-$VER.dmg
+    cp dist/mac/Evothings\ Studio-$VER.dmg /tmp/$NAME-$VER.dmg
     s3cmd put /tmp/$NAME-$VER.dmg s3://evothings-download/
     s3cmd setacl --acl-public s3://evothings-download/$NAME-$VER.dmg
     rm /tmp/$NAME-$VER.dmg
   fi
 
+  # Remove burn
+  sed -i '' -e "s/main\.TIMESTAMP = '.*'/main\.TIMESTAMP = '<timestamp>'/g" ./app/main.js
+
   echo PASTE INTO GITTER:
-  echo https://s3-eu-west-1.amazonaws.com/evothings-download/$NAME-$VER.deb
+  echo https://s3-eu-west-1.amazonaws.com/evothings-download/$NAME-$VER-amd64.deb
+  echo https://s3-eu-west-1.amazonaws.com/evothings-download/$NAME-$VER.rpm
+  echo https://s3-eu-west-1.amazonaws.com/evothings-download/$NAME-$VER.AppImage
   echo https://s3-eu-west-1.amazonaws.com/evothings-download/$NAME-$VER.dmg
   echo https://s3-eu-west-1.amazonaws.com/evothings-download/$NAME-$VER.exe
+  echo https://s3-eu-west-1.amazonaws.com/evothings-download/$NAME-$VER-nsis.exe
+  echo https://s3-eu-west-1.amazonaws.com/evothings-download/$NAME-$VER-ia32.exe
 
 fi
 

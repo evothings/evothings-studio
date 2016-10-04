@@ -6,10 +6,10 @@ global.main = {}
 
 // Version
 main.MAJOR = 2
-main.MINOR = 1
+main.MINOR = 2
 main.PATCH = 0
 // Disabled for a real release:
-//main.BUILD = "alpha1"
+main.BUILD = "alpha1"
 
 // This one is burned in by scripts
 main.TIMESTAMP = '<timestamp>'

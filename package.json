@@ -10,20 +10,29 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
-    "electron-builder": "^4.2.6",
-    "electron-packager": "^7.0.3",
+    "electron-builder": "^7.9.0",
+    "electron-packager": "^8.0.0",
     "electron-prebuilt": "^1.2.1",
     "node-promise": "^0.5.12",
     "spectron": "^3.3.0"
   },
   "build": {
+    "appId": "com.evothings.studio",
     "linux": {
+      "category": "Development",
+      "target": ["deb", "rpm", "AppImage"],
       "synopsis": "IoT hybrid mobile app development tool",
       "vendor": "Evothings <info@evothings.com>"
     },
-    "app-bundle-id": "com.evothings.studio",
-    "app-category-type": "public.app-category.developer-tools",
-    "iconUrl": "http://evothings.com/evothings-logo.ico"
+    "mac": {
+      "category": "public.app-category.developer-tools"
+    },
+    "win": {
+      "target": ["nsis", "squirrel"]
+    },
+    "squirrelWindows": {
+      "iconUrl": "http://evothings.com/evothings-logo.ico"
+    }
   },
   "scripts": {
     "test": "electron-mocha",
@@ -31,10 +40,11 @@
     "devdeps": "npm install",
     "deps": "npm install app",
     "pack": "build",
-    "dist": "build --linux --win --osx --x64",
+    "dist": "build --linux deb rpm && build --osx && build --win && build --win --ia32",
     "dist:osx": "build --osx --x64",
     "dist:linux": "build --linux --x64",
     "dist:win": "build --win --x64",
+    "dist:win32": "build --win --ia32",
     "start": "cd app && electron --enable-logging main.js"
   }
 }
