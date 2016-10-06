@@ -22,6 +22,7 @@ if (main.BUILD) {
 }
 main.BASE = 'https://evothings.com/' + main.VERSION
 main.DOC = main.BASE + "/doc"
+main.NEWS = main.BASE + "/news"
 main.EXAMPLES = main.BASE + "/examples"
 main.LIBRARIES = main.BASE + "/libraries"
 main.TRANSLATIONS = main.BASE + '/translations'
@@ -508,7 +509,6 @@ main.selectOrCreateFolder = function(title, defaultDir) {
 }
 
 main.openDialog = function(title, content, type) {
-
   console.log('openDialog called title = '+title+', content = '+content)
   DIALOG.showMessageBox(
   {
@@ -518,6 +518,20 @@ main.openDialog = function(title, content, type) {
     buttons: ["Close"],
     detail: UTIL.translate(content)
   })
+}
+
+main.openWorkbenchDialog = function(title, message, details, type, butts) {
+  var buttons = butts || ["Close"]
+  var index = DIALOG.showMessageBox(
+    main.workbenchWindow,
+    {
+      type: type || "info",
+      title: title,
+      message: message,
+      buttons: buttons,
+      detail: UTIL.translate(details)
+    })
+  return buttons[index]
 }
 
 // Work as relay between our BrowserWindows since they can not talk to

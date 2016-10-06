@@ -58,6 +58,7 @@ exports.defineUIFunctions = function(hyper)
 {
 	var mConnectKeyTimer
 	// The merged final array of metadata on Examples, Libraries and Projects
+	hyper.UI.mNewsList = []
 	hyper.UI.mExampleList = []
 	hyper.UI.mLibraryList = []
 	
@@ -83,6 +84,7 @@ exports.defineUIFunctions = function(hyper)
     if (!mUpdatingLists) {
       mUpdatingLists = true
       setTimeout(function() {mUpdatingLists = false}, 5000)
+			hyper.UI.updateNewsList(silent)
       hyper.UI.updateExampleList(silent)
       hyper.UI.updateLibraryList(silent)
 	  	UTIL.updateTranslations(SETTINGS.getTranslationsURL())
@@ -943,6 +945,82 @@ exports.defineUIFunctions = function(hyper)
 		}
 	}
 
+  hyper.UI.updateNewsList = function(silent)
+  {
+    // Clear out
+    hyper.UI.mNewsList = []
+
+    // Get an array of promises for fetching the lists
+   	var urls = SETTINGS.getNewsLists()
+   	
+   	for (url of urls) {
+   	  UTIL.getJSON(url).then(listAndUrl => {
+        var list = listAndUrl[0]
+        var url = listAndUrl[1]
+        // Embed the URL we got them from
+        for (entry of list) {
+          entry.url = url
+        }
+        
+        // Concatenate with full list
+  	    hyper.UI.mNewsList = hyper.UI.mNewsList.concat(list)
+
+        // And finally show them too
+        hyper.UI.displayNewsList()
+   	  }, statusAndUrl => {
+    	  LOGGER.log('[main-window-func.js] Error in updateNewsList: ' + statusAndUrl[0] + ' downloading: ' + statusAndUrl[1])
+        if (!silent) {
+          UTIL.alertDownloadError('Something went wrong downloading news list.', statusAndUrl[1], statusAndUrl[0])
+    	  }
+      })
+   	}
+  }
+
+	hyper.UI.displayNewsList = function() {
+		// Repopulate screen
+		var screen = hyper.UI.$('#screen-news')
+		var entries = []
+
+		// Fetch content for each, put each in sorted list and display
+	  for (let entry of hyper.UI.mNewsList) {
+			UTIL.getJSON(entry.contentUrl, 'html').then(function(contentAndUrl) {
+				entry.content = contentAndUrl[0]
+
+    	  // Push and sort them on stamp (UTC seconds)
+				entries.push(entry)
+        entries.sort(function(a, b) { return a.stamp - b.stamp })
+
+				// And redisplay them all, yes we will do this a bunch of redundant times...
+				screen.empty()
+				for (let entry of entries) {
+					screen.append(createNewsEntry(entry))
+				}
+			}, function(err) {
+				console.log('unable to download news item content')
+			})
+	  }
+	}
+
+function createNewsEntry(item) {
+		// Create div tag for news items.
+		var now = new Date(item.stamp)
+
+		var html = '<div class="project-entry ui-state-default ui-corner-all">'
+		html += `<div class="app-icon" style="background-image: url(\'${item.iconUrl}\');"></div>`
+		html += `<div class="entry-content-examples"><h4>${item.title}</h4><h5>${now.toLocaleString()}</h5>`
+		html += `<p>${item.content}</p>`
+		html +=
+				'<button type="button" '
+				+ 'class="button-doc-lib btn et-btn-yellow-dark entry-button" '
+				+ `onclick="window.hyper.UI.openDocURL('${item.newsUrl}')">`
+				+	'More</button>'
+
+		html += '</div>'
+
+		// Create element.
+		return hyper.UI.$(html)
+	}
+
 
   hyper.UI.updateExampleList = function(silent)
   {
@@ -965,7 +1043,7 @@ exports.defineUIFunctions = function(hyper)
   	    hyper.UI.mExampleList = hyper.UI.mExampleList.concat(list)
   	    
     	  // Then we can sort them but place all "Hello*" apps first
-        hyper.UI.mExampleList = hyper.UI.mExampleList.sort(function(a, b) {
+        hyper.UI.mExampleList.sort(function(a, b) {
           if (a.title.substring(0, 5) == "Hello") {
             return -1
           }
@@ -1039,7 +1117,7 @@ exports.defineUIFunctions = function(hyper)
   	    hyper.UI.mLibraryList = hyper.UI.mLibraryList.concat(list)
   	    
     	  // Then we can sort them
-        hyper.UI.mLibraryList = hyper.UI.mLibraryList.sort(function(a, b) {
+        hyper.UI.mLibraryList.sort(function(a, b) {
           return a.title.localeCompare(b.title);
         })
         // And finally show them too
@@ -1445,14 +1523,60 @@ exports.defineUIFunctions = function(hyper)
 
 	hyper.UI.openBuildAppDialog = function(path)
 	{
-		// Populate input fields.
-		//hyper.UI.$('#input-config-app-path').val(path) // Hidden field.
-    //hyper.UI.$('#input-config-app-name').val(APP_SETTINGS.getName(path))
-    //hyper.UI.$('#input-config-app-description').val(APP_SETTINGS.getDescription(path))
-    //hyper.UI.$('#input-config-app-version').val(APP_SETTINGS.getVersion(path))
-		
-		// Show dialog.
-		hyper.UI.$('#dialog-build-app').modal('show')
+		// Verify we have virtualbox, vagrant and evobox ready to run.
+		if (hyper.UI.verifyBuildEnvironment()) {
+			// Populate input fields.
+			//hyper.UI.$('#input-config-app-path').val(path) // Hidden field.
+			//hyper.UI.$('#input-config-app-name').val(APP_SETTINGS.getName(path))
+			//hyper.UI.$('#input-config-app-description').val(APP_SETTINGS.getDescription(path))
+			//hyper.UI.$('#input-config-app-version').val(APP_SETTINGS.getVersion(path))
+			
+			// Show dialog.
+			hyper.UI.$('#dialog-build-app').modal('show')
+		}
+	}
+
+	hyper.UI.verifyBuildEnvironment = function(path)
+	{
+		var haveVirtualbox = UTIL.haveVirtualbox()
+		var haveVagrant = UTIL.haveVagrant()
+		console.log("HAVEVBOX:" + haveVirtualbox)
+		console.log("HAVEVAGRANT:" + haveVagrant)
+		var have = ""
+		var doit = "Ok, open download page(s)"
+		// Verify we have virtualbox and Vagrant
+		needVirtualboxOrVagrant = !haveVirtualbox || !haveVagrant
+		if (needVirtualboxOrVagrant) {
+			var title = 'Install VirtualBox and Vagrant?'
+			if (haveVirtualbox) {
+				have = '\n\nYou already have Virtualbox, but not Vagrant.'
+				title = 'Install Vagrant?'
+			}
+			if (haveVagrant) {
+				have = '\n\nYou already have Vagrant, but not Virtualbox.'
+				title = 'Install Virtualbox?'
+			}
+			var res = MAIN.openWorkbenchDialog('Build Tools',
+				title,
+				`Evothings can build your app for you but this requires Virtualbox and Vagrant.${have} \n\nInstallation is easy, just download and run appropriate installer.\n\nThen try building again!`, 'question', [doit, "Cancel"], 'question')
+			if (res == doit) {
+				if (!haveVirtualbox) {
+					hyper.UI.openInBrowser('https://www.virtualbox.org/wiki/Downloads')
+				}
+				if (!haveVagrant) {
+					hyper.UI.openInBrowser('https://www.vagrantup.com/downloads.html')
+				}
+				return
+			}
+		}
+
+		var haveEvobox = UTIL.haveEvobox()
+
+		//if (!haveEvobox) {
+		//	MAIN.openWorkbenchDialog('Build Tools', 'Evothings can use VirtualBox and Vagrant to build your app.', 'info')
+		//}
+		//if (!UTIL.haveVagrant()
+		//UTIL.haveEvobox()
 	}
 
 	hyper.UI.saveBuildApp = function()
@@ -1500,6 +1624,7 @@ exports.defineUIFunctions = function(hyper)
 
 	hyper.UI.buildApp = function(shortName)
 	{
+		
 		// Copy app into build box directory
 
 		// Create <shortName>.rb

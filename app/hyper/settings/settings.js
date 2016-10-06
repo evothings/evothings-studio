@@ -253,6 +253,20 @@ exports.getProjectList = function(list)
 	}
 }
 
+exports.getNewsLists = function()
+{
+  var lists = []
+  lists.push(MAIN.NEWS + '/news-list.json')
+  if (exports.hasEnterprise()) {
+    lists.push(MAIN.NEWS + '/news-list-enterprise.json')
+  }
+  var urls = exports.getRepositoryURLsArray()
+  for (url of urls) {
+    lists.push(url + '/news/news-list.json')
+  }    
+  return lists
+}
+
 exports.getExampleLists = function()
 {
   var lists = []

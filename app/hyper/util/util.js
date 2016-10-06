@@ -26,12 +26,13 @@ var TEMP = require('temp').track()
 var HTTPS = require('https')
 var PATH = require('path')
 var UNZIP = require('unzip2')
+const CHILD_PROCESS = require('child_process')
 
 exports.alertDownloadError = function(msg, url, status) {
   window.alert(`${msg}\n\nURL: ${url}\nSTATUS: ${status}\n\nDo you have internet access?`)
 }
 
-var getJSON = function(url)
+var getJSON = function(url, type)
 {
     return new Promise(function(resolve, reject)
     {
@@ -51,7 +52,7 @@ var getJSON = function(url)
             }
         }
         xhr.open('get', url, true);
-        xhr.responseType = 'json';
+        xhr.responseType = type || 'json';
         xhr.send();
     });
 };
@@ -90,6 +91,33 @@ exports.checkInternet = function() {
         window.alert('You do not seem to have internet access?\n\nEvothings Studio requires access to the Internet.');
         return false
       })
+}
+
+exports.haveVirtualbox = function() {
+  try {
+    var output = CHILD_PROCESS.execFileSync('VBoxManage', ['--version']).toString()
+    return output.startsWith("5.1.6r110634")
+  } catch (er) {
+    return false
+  }
+}
+
+exports.haveVagrant = function() {
+  try {
+    var output = CHILD_PROCESS.execFileSync('vagrant', ['-v']).toString()
+    return output.startsWith("Vagrant 1.8.5")
+  } catch (er) {
+    return false
+  }
+}
+
+exports.haveEvobox = function() {
+  try {
+    var output = CHILD_PROCESS.execFileSync('vagrant', ['-v']).toString()
+    return output.startsWith("Vagrant 1.8.5")
+  } catch (er) {
+    return false
+  }
 }
 
 exports.unzip = function(zipfile, path, cb) {

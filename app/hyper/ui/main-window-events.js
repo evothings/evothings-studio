@@ -606,9 +606,12 @@ exports.defineUIEvents = function(hyper)
 		$(buttonId).tab('show')
 		hyper.UI.$(screenId).show()
 		
-		// If we show Examples or Libraries and they are empty - we try to update them silently
+		// If we show Examples, News or Libraries and they are empty - we try to update them silently
 		if (tabname == 'examples' && hyper.UI.mExampleList.length == 0) {
 		  hyper.UI.updateExampleList(true)
+		}
+		if (tabname == 'news' && hyper.UI.mNews.length == 0) {
+		  hyper.UI.updateNews(true)
 		}
 		if (tabname == 'libraries' && hyper.UI.mLibraryList.length == 0) {
 		  hyper.UI.updateLibraryList(true)
