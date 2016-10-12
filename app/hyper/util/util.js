@@ -96,7 +96,7 @@ exports.checkInternet = function() {
 exports.haveVirtualbox = function() {
   try {
     var output = CHILD_PROCESS.execFileSync('VBoxManage', ['--version']).toString()
-    return output.startsWith("5.1.6r110634")
+    return output.startsWith("5.1.")
   } catch (er) {
     return false
   }
@@ -105,7 +105,7 @@ exports.haveVirtualbox = function() {
 exports.haveVagrant = function() {
   try {
     var output = CHILD_PROCESS.execFileSync('vagrant', ['-v']).toString()
-    return output.startsWith("Vagrant 1.8.5")
+    return output.startsWith("Vagrant 1.8.")
   } catch (er) {
     return false
   }

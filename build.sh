@@ -72,9 +72,10 @@ if [ ! -z "$DOBUILD" ] ; then
   rm -rf dist/*
 fi
 
-if [ ! -z "$DOUPLOAD" ] ; then
-  if [ -z "$PLATFORM" ] || [ "$PLATFORM" == "linux" ] ; then
-    npm run dist:linux
+
+if [ -z "$PLATFORM" ] || [ "$PLATFORM" == "linux" ] ; then
+  npm run dist:linux
+  if [ ! -z "$DOUPLOAD" ] ; then
     # Upload deb, rpm, AppImage
     s3cmd put dist/*.deb s3://evothings-download/
     s3cmd put dist/*.rpm s3://evothings-download/
@@ -83,9 +84,11 @@ if [ ! -z "$DOUPLOAD" ] ; then
     s3cmd setacl --acl-public s3://evothings-download/$NAME-$VER.rpm
     s3cmd setacl --acl-public s3://evothings-download/$NAME-$VER-x86_64.AppImage
   fi
+fi
 
-  if [ -z "$PLATFORM" ] || [ "$PLATFORM" == "win" ] ; then
-    npm run dist:win
+if [ -z "$PLATFORM" ] || [ "$PLATFORM" == "win" ] ; then
+  npm run dist:win
+  if [ ! -z "$DOUPLOAD" ] ; then
     # Upload (rename) Windows Squirrel and NSIS installer
     cp dist/win/Evothings\ Studio\ Setup\ $VER.exe /tmp/$NAME-$VER.exe
     s3cmd put /tmp/$NAME-$VER.exe s3://evothings-download/
@@ -96,37 +99,40 @@ if [ ! -z "$DOUPLOAD" ] ; then
     s3cmd setacl --acl-public s3://evothings-download/$NAME-$VER-nsis.exe
     rm /tmp/$NAME-$VER-nsis.exe
   fi
+fi
 
-  if [ -z "$PLATFORM" ] || [ "$PLATFORM" == "win32" ] ; then
+if [ -z "$PLATFORM" ] || [ "$PLATFORM" == "win32" ] ; then
+  npm run dist:win32
+  if [ ! -z "$DOUPLOAD" ] ; then
     # Upload (rename) Windows installer
-    npm run dist:win32
     cp dist/win-ia32/Evothings\ Studio\ Setup\ $VER-ia32.exe /tmp/$NAME-$VER-ia32.exe
     s3cmd put /tmp/$NAME-$VER-ia32.exe s3://evothings-download/
     s3cmd setacl --acl-public s3://evothings-download/$NAME-$VER-ia32.exe
     rm /tmp/$NAME-$VER-ia32.exe
   fi
+fi
 
-  if [ -z "$PLATFORM" ] || [ "$PLATFORM" == "mac" ] ; then
-    npm run dist:mac
+if [ -z "$PLATFORM" ] || [ "$PLATFORM" == "mac" ] ; then
+  npm run dist:mac
+  if [ ! -z "$DOUPLOAD" ] ; then
     # Upload (rename) OSX installer
     cp dist/mac/Evothings\ Studio-$VER.dmg /tmp/$NAME-$VER.dmg
     s3cmd put /tmp/$NAME-$VER.dmg s3://evothings-download/
     s3cmd setacl --acl-public s3://evothings-download/$NAME-$VER.dmg
     rm /tmp/$NAME-$VER.dmg
   fi
-
-  # Remove burn
-  sed -i '' -e "s/main\.TIMESTAMP = '.*'/main\.TIMESTAMP = '<timestamp>'/g" ./app/main.js
-
-  echo PASTE INTO GITTER:
-  echo https://s3-eu-west-1.amazonaws.com/evothings-download/$NAME-$VER-amd64.deb
-  echo https://s3-eu-west-1.amazonaws.com/evothings-download/$NAME-$VER.rpm
-  echo https://s3-eu-west-1.amazonaws.com/evothings-download/$NAME-$VER.AppImage
-  echo https://s3-eu-west-1.amazonaws.com/evothings-download/$NAME-$VER.dmg
-  echo https://s3-eu-west-1.amazonaws.com/evothings-download/$NAME-$VER.exe
-  echo https://s3-eu-west-1.amazonaws.com/evothings-download/$NAME-$VER-nsis.exe
-  echo https://s3-eu-west-1.amazonaws.com/evothings-download/$NAME-$VER-ia32.exe
-
 fi
+
+# Remove burn
+sed -i '' -e "s/main\.TIMESTAMP = '.*'/main\.TIMESTAMP = '<timestamp>'/g" ./app/main.js
+
+echo PASTE INTO GITTER:
+echo https://s3-eu-west-1.amazonaws.com/evothings-download/$NAME-$VER-amd64.deb
+echo https://s3-eu-west-1.amazonaws.com/evothings-download/$NAME-$VER.rpm
+echo https://s3-eu-west-1.amazonaws.com/evothings-download/$NAME-$VER.AppImage
+echo https://s3-eu-west-1.amazonaws.com/evothings-download/$NAME-$VER.dmg
+echo https://s3-eu-west-1.amazonaws.com/evothings-download/$NAME-$VER.exe
+echo https://s3-eu-west-1.amazonaws.com/evothings-download/$NAME-$VER-nsis.exe
+echo https://s3-eu-west-1.amazonaws.com/evothings-download/$NAME-$VER-ia32.exe
 
 echo "DONE"
