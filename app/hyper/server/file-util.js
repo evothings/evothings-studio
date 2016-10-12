@@ -143,19 +143,10 @@ exports.downloadAsString = function(url, userAgent, callbackFun)
 exports.getEvothingsUserFolderPath = function()
 {
 	var myAppsDir = 'EnterPathToMyAppsFolder'
-	try
-	{
-		// TODO: Consider using this module:
-		// https://github.com/sindresorhus/os-homedir
-		var userDir =
-			process.env.HOME ||
-			process.env.USERPROFILE ||
-			((process.env.HOMEDRIVE && process.env.HOMEPATH) ?
-				process.env.HOMEDRIVE + process.env.HOMEPATH :
-				null)
-		if (userDir)
-		{
-			myAppsDir =	 PATH.join(userDir, 'EvothingsStudio', 'MyApps')
+	try	{
+		var userDir = exports.getHomeDir()
+		if (userDir) {
+			myAppsDir =	PATH.join(userDir, 'EvothingsStudio', 'MyApps')
 		}
 	}
 	catch (error)
@@ -164,4 +155,21 @@ exports.getEvothingsUserFolderPath = function()
 	}
 
 	return myAppsDir
+}
+
+// Copied from https://github.com/sindresorhus/os-homedir
+exports.getHomeDir = function() {
+	var env = process.env;
+	var home = env.HOME;
+	var user = env.LOGNAME || env.USER || env.LNAME || env.USERNAME;
+	if (process.platform === 'win32') {
+		return env.USERPROFILE || env.HOMEDRIVE + env.HOMEPATH || home || null;
+	}
+	if (process.platform === 'darwin') {
+		return home || (user ? '/Users/' + user : null);
+	}
+	if (process.platform === 'linux') {
+		return home || (process.getuid() === 0 ? '/root' : (user ? '/home/' + user : null));
+	}
+	return home || null;
 }
