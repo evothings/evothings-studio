@@ -626,7 +626,7 @@ exports.defineUIEvents = function(hyper)
 		if (tabname == 'examples' && hyper.UI.mExampleList.length == 0) {
 		  hyper.UI.updateExampleList(true)
 		}
-		if (tabname == 'news' && hyper.UI.mNews.length == 0) {
+		if (tabname == 'news' && hyper.UI.mNewsList.length == 0) {
 		  hyper.UI.updateNews(true)
 		}
 		if (tabname == 'libraries' && hyper.UI.mLibraryList.length == 0) {
