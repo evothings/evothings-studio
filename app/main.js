@@ -25,6 +25,8 @@ main.DOC = main.BASE + "/doc"
 main.NEWS = main.BASE + "/news"
 main.EXAMPLES = main.BASE + "/examples"
 main.LIBRARIES = main.BASE + "/libraries"
+main.BUILDS = main.BASE + "/builds"
+main.PLUGINS = main.BASE + "/plugins"
 main.TRANSLATIONS = main.BASE + '/translations'
 
 main.limits = 'Not yet available'

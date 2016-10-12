@@ -111,10 +111,11 @@ exports.haveVagrant = function() {
   }
 }
 
-exports.haveEvobox = function() {
+exports.isVagrantUp = function(dir) {
   try {
-    var output = CHILD_PROCESS.execFileSync('vagrant', ['-v']).toString()
-    return output.startsWith("Vagrant 1.8.5")
+    var re = /\d+,default,state,running/;
+    var output = CHILD_PROCESS.execFileSync('vagrant', ['status', '--machine-readable'], {cwd: dir}).toString()
+    return re.test(output)
   } catch (er) {
     return false
   }

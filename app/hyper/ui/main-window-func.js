@@ -61,6 +61,9 @@ exports.defineUIFunctions = function(hyper)
 	hyper.UI.mNewsList = []
 	hyper.UI.mExampleList = []
 	hyper.UI.mLibraryList = []
+	hyper.UI.mBuildConfigList = []
+	hyper.UI.mBuildList = []
+	hyper.UI.mPluginList = []
 	
 	// Ugly flag introduced because we can get a flurry of EVENTS.LOGIN
 	mUpdatingLists = false
@@ -87,6 +90,8 @@ exports.defineUIFunctions = function(hyper)
 			hyper.UI.updateNewsList(silent)
       hyper.UI.updateExampleList(silent)
       hyper.UI.updateLibraryList(silent)
+			hyper.UI.updateBuildConfigList(silent)
+			hyper.UI.updatePluginList(silent)
 	  	UTIL.updateTranslations(SETTINGS.getTranslationsURL())
     } else {
       console.log("Already updating lists, ignoring")
@@ -512,7 +517,7 @@ exports.defineUIFunctions = function(hyper)
 			html +=
 				'<button type="button" '
 				+	'class="button-copy-example btn et-btn-indigo entry-button" '
-				+	`onclick="window.hyper.UI.openCopyAppDialog('${escapedPath}')">`
+				+	`onclick="window.hyper.UI.openCopyAppDialog('${escapedPath}', '${shortName}')">`
 				+	'Copy'
 				+ '</button>'
 		}
@@ -992,8 +997,8 @@ exports.defineUIFunctions = function(hyper)
 
 				// And redisplay them all, yes we will do this a bunch of redundant times...
 				screen.empty()
-				for (let entry of entries) {
-					screen.append(createNewsEntry(entry))
+				for (let en of entries) {
+					screen.append(createNewsEntry(en))
 				}
 			}, function(err) {
 				console.log('unable to download news item content')
@@ -1004,23 +1009,82 @@ exports.defineUIFunctions = function(hyper)
 function createNewsEntry(item) {
 		// Create div tag for news items.
 		var now = new Date(item.stamp)
-
 		var html = '<div class="project-entry ui-state-default ui-corner-all">'
 		html += `<div class="app-icon" style="background-image: url(\'${item.iconUrl}\');"></div>`
 		html += `<div class="entry-content-examples"><h4>${item.title}</h4><h5>${now.toLocaleString()}</h5>`
 		html += `<p>${item.content}</p>`
-		html +=
-				'<button type="button" '
-				+ 'class="button-doc-lib btn et-btn-yellow-dark entry-button" '
-				+ `onclick="window.hyper.UI.openDocURL('${item.newsUrl}')">`
-				+	'More</button>'
-
+		if (item.newsUrl) {
+			html +=
+					'<button type="button" '
+					+ 'class="button-doc-lib btn et-btn-yellow-dark entry-button" '
+					+ `onclick="window.hyper.UI.openDocURL('${item.newsUrl}')">`
+					+	'More</button>'
+		}
 		html += '</div>'
 
 		// Create element.
 		return hyper.UI.$(html)
 	}
 
+  hyper.UI.updatePluginList = function(silent) {
+    // Clear out
+    hyper.UI.mPluginList = []
+
+    // Get an array of promises for fetching the lists
+   	var urls = SETTINGS.getPluginLists()
+   	
+   	for (url of urls) {
+   	  UTIL.getJSON(url).then(listAndUrl => {
+        var list = listAndUrl[0]
+        var url = listAndUrl[1]
+        // Embed the URL we got them from
+        for (entry of list) {
+          entry.url = url
+        }
+        
+        // Concatenate with full list
+  	    hyper.UI.mPluginList = hyper.UI.mPluginList.concat(list)
+  	    
+    	  // Then we can sort them
+        hyper.UI.mPluginList.sort(function(a, b) { return a.name.localeCompare(b.name); })
+   	  }, statusAndUrl => {
+    	  LOGGER.log('[main-window-func.js] Error in updatePluginList: ' + statusAndUrl[0] + ' downloading: ' + statusAndUrl[1])
+        if (!silent) {
+          UTIL.alertDownloadError('Something went wrong downloading plugin list.', statusAndUrl[1], statusAndUrl[0])
+    	  }
+      })
+   	}
+  }
+
+  hyper.UI.updateBuildConfigList = function(silent) {
+    // Clear out
+    hyper.UI.mBuildConfigList = []
+
+    // Get an array of promises for fetching the lists
+   	var urls = SETTINGS.getBuildConfigLists()
+   	
+   	for (url of urls) {
+   	  UTIL.getJSON(url).then(listAndUrl => {
+        var list = listAndUrl[0]
+        var url = listAndUrl[1]
+        // Embed the URL we got them from
+        for (entry of list) {
+          entry.url = url
+        }
+        
+        // Concatenate with full list
+  	    hyper.UI.mBuildConfigList = hyper.UI.mBuildConfigList.concat(list)
+  	    
+    	  // Then we can sort them
+        hyper.UI.mBuildConfigList.sort(function(a, b) { return a.name.localeCompare(b.name); })
+   	  }, statusAndUrl => {
+    	  LOGGER.log('[main-window-func.js] Error in updateBuildConfigList: ' + statusAndUrl[0] + ' downloading: ' + statusAndUrl[1])
+        if (!silent) {
+          UTIL.alertDownloadError('Something went wrong downloading build config list.', statusAndUrl[1], statusAndUrl[0])
+    	  }
+      })
+   	}
+  }
 
   hyper.UI.updateExampleList = function(silent)
   {
@@ -1186,16 +1250,21 @@ function createNewsEntry(item) {
 	hyper.UI.openSettingsDialog = function()
 	{
 		// Populate input fields.
-		hyper.UI.$('#input-setting-javascript-workbench-font-size').val(
-			SETTINGS.getWorkbenchFontSize())
-		hyper.UI.$('#input-setting-number-of-directory-levels').val(
-			SETTINGS.getNumberOfDirecoryLevelsToTraverse())
-		hyper.UI.$('#input-setting-my-apps-path').val(
-			SETTINGS.getMyAppsPath())
-		hyper.UI.$('#input-setting-reload-server-address').val(
-			SETTINGS.getReloadServerAddress())
-		hyper.UI.$('#input-setting-repository-urls').val(
-			SETTINGS.getRepositoryURLs())
+		hyper.UI.$('#input-setting-author-name').val(SETTINGS.getAuthorName())
+		hyper.UI.$('#input-setting-author-email').val(SETTINGS.getAuthorEmail())
+		hyper.UI.$('#input-setting-author-url').val(SETTINGS.getAuthorURL())
+		hyper.UI.$('#input-setting-cordova-prefix').val(SETTINGS.getCordovaPrefix())
+
+		hyper.UI.$('#input-setting-keystore-filename').val(SETTINGS.getKeystoreFilename())
+		hyper.UI.$('#input-setting-keystore-create-command').val(SETTINGS.getKeystoreCreateCommand())
+		hyper.UI.$('#input-setting-keypassword').val(SETTINGS.getKeyPassword())
+		hyper.UI.$('#input-setting-storepassword').val(SETTINGS.getStorePassword())
+
+		hyper.UI.$('#input-setting-javascript-workbench-font-size').val(SETTINGS.getWorkbenchFontSize())
+		hyper.UI.$('#input-setting-number-of-directory-levels').val(SETTINGS.getNumberOfDirecoryLevelsToTraverse())
+		hyper.UI.$('#input-setting-my-apps-path').val(SETTINGS.getMyAppsPath())
+		hyper.UI.$('#input-setting-reload-server-address').val(SETTINGS.getReloadServerAddress())
+		hyper.UI.$('#input-setting-repository-urls').val(SETTINGS.getRepositoryURLs())
 		var $radios = $('input:radio[name=protocol]')
 		var checked = SETTINGS.getRunProtocol()
 		console.log('-- protocol setting is')
@@ -1211,16 +1280,22 @@ function createNewsEntry(item) {
 		// Hide settings dialog.
 		hyper.UI.$('#dialog-settings').modal('hide')
 
-		// TODO: Make this take effect instantly.
-		SETTINGS.setWorkbenchFontSize(
-			hyper.UI.$('#input-setting-javascript-workbench-font-size').val())
+		SETTINGS.setAuthorName(hyper.UI.$('#input-setting-author-name').val())
+		SETTINGS.setAuthorEmail(hyper.UI.$('#input-setting-author-email').val())
+		SETTINGS.setAuthorURL(hyper.UI.$('#input-setting-author-url').val())
+		SETTINGS.setCordovaPrefix(hyper.UI.$('#input-setting-cordova-prefix').val())
+		SETTINGS.setKeystoreFilename(hyper.UI.$('#input-setting-keystore-filename').val())
+		SETTINGS.setKeystoreCreateCommand(hyper.UI.$('#input-setting-keystore-create-command').val())
+		SETTINGS.setKeyPassword(hyper.UI.$('#input-setting-keypassword').val())
+		SETTINGS.setStorePassword(hyper.UI.$('#input-setting-storepassword').val())
 
 		// TODO: Make this take effect instantly.
-		SETTINGS.setNumberOfDirecoryLevelsToTraverse(
-			parseInt(hyper.UI.$('#input-setting-number-of-directory-levels').val()))
+		SETTINGS.setWorkbenchFontSize(hyper.UI.$('#input-setting-javascript-workbench-font-size').val())
 
-		SETTINGS.setMyAppsPath(
-			hyper.UI.$('#input-setting-my-apps-path').val())
+		// TODO: Make this take effect instantly.
+		SETTINGS.setNumberOfDirecoryLevelsToTraverse(parseInt(hyper.UI.$('#input-setting-number-of-directory-levels').val()))
+
+		SETTINGS.setMyAppsPath(hyper.UI.$('#input-setting-my-apps-path').val())
 		
 		var newUrls = hyper.UI.$('#input-setting-repository-urls').val()
 		var oldUrls = SETTINGS.getRepositoryURLs()
@@ -1266,7 +1341,7 @@ function createNewsEntry(item) {
 		hyper.UI.openInBrowser(url)
 	}
 
-	hyper.UI.openCopyAppDialog = function(path)
+	hyper.UI.openCopyAppDialog = function(path, shortName)
 	{
 		// Set sourcePath and folder name of app to copy.
 		var sourcePath = path
@@ -1275,6 +1350,7 @@ function createNewsEntry(item) {
 
 		// Set dialog box fields.
 		hyper.UI.$('#input-copy-app-source-path').val(path) // Hidden field.
+		hyper.UI.$('#input-copy-app-name').val(shortName)
 		hyper.UI.$('#input-copy-app-target-folder').val(appFolderName)
 		hyper.UI.$('#input-copy-app-target-parent-folder').val(myAppsDir)
 
@@ -1296,9 +1372,16 @@ function createNewsEntry(item) {
 	{
 		// Set up source and target paths.
 		var sourcePath = hyper.UI.$('#input-copy-app-source-path').val()
+		var targetShortName = hyper.UI.$('#input-copy-app-name').val()
 		var targetAppFolder = hyper.UI.$('#input-copy-app-target-folder').val()
 		var targetParentDir = hyper.UI.$('#input-copy-app-target-parent-folder').val()
 		var targetDir = PATH.join(targetParentDir, targetAppFolder)
+
+    // Name is empty
+    if (!targetShortName) {
+      window.alert('You need to enter a short name for the app.')
+			return // Abort (dialog is still visible)
+    }
 
     // App folder is empty
     if (!targetAppFolder) {
@@ -1328,6 +1411,9 @@ function createNewsEntry(item) {
 
 		// Copy the app, if sourcePath is relative it will copy from Evothings website
 		copyApp(sourcePath, targetDir, function() {
+			// Set new name
+			APP_SETTINGS.setName(targetDir, targetShortName)
+
 		  // Hide dialog.
 		  hyper.UI.$('#dialog-copy-app').modal('hide')
 
@@ -1420,8 +1506,16 @@ function createNewsEntry(item) {
 	{
 		// Populate input fields.
 		var path = SETTINGS.getMyAppsPath()
+		hyper.UI.$('#input-new-app-name').val(null)
+		hyper.UI.$('#input-new-app-folder').val(null)
 		hyper.UI.$('#input-new-app-parent-folder').val(path)
-    hyper.UI.$('#input-new-app-folder').val('')
+
+		// Copy over from name field if folder name field is empty				
+    hyper.UI.$('#input-new-app-name').on('change', function() {
+			if (!hyper.UI.$('#input-new-app-folder').val()) {
+				hyper.UI.$('#input-new-app-folder').val(hyper.UI.$('#input-new-app-name').val())
+			}
+		})
 
 		// Show dialog.
 		hyper.UI.$('#dialog-new-app').modal('show')
@@ -1440,9 +1534,17 @@ function createNewsEntry(item) {
 	hyper.UI.saveNewApp = function()
 	{
 		var sourcePath = 'template-basic-app'
-		var parentFolder = hyper.UI.$('#input-new-app-parent-folder').val()
+		var shortName = hyper.UI.$('#input-new-app-name').val()
 		var appFolder = hyper.UI.$('#input-new-app-folder').val()
+		var parentFolder = hyper.UI.$('#input-new-app-parent-folder').val()
+
 		var targetDir = PATH.join(parentFolder, appFolder)
+
+    // App name is empty
+    if (!shortName) {
+      window.alert('You need to enter a short name for the app.')
+			return // Abort (dialog is still visible)
+    }
 
     // App folder is empty
     if (!appFolder) {
@@ -1472,6 +1574,9 @@ function createNewsEntry(item) {
 
 		// Copy files.
 		copyApp(sourcePath, targetDir, function() {
+			// Set new name
+			APP_SETTINGS.setName(targetDir, shortName)
+
 		  // Hide dialog.
 		  hyper.UI.$('#dialog-new-app').modal('hide')
 
@@ -1480,14 +1585,62 @@ function createNewsEntry(item) {
 		})
 	}
 
+	hyper.UI.onlyLettersAndDots = function(str) {
+		var result = str.replace(/[^a-zA-Z0-9]/g, '.')
+		return result.replace(/\.+/g, '.')
+	}
+
   hyper.UI.openConfigAppDialog = function(path)
 	{
 		// Populate input fields.
 		hyper.UI.$('#input-config-app-path').val(path) // Hidden field.
     hyper.UI.$('#input-config-app-name').val(APP_SETTINGS.getName(path))
+		hyper.UI.$('#input-config-app-cordova-id').val(
+			APP_SETTINGS.getCordovaID(path) ||
+			SETTINGS.getCordovaPrefix() + hyper.UI.onlyLettersAndDots(APP_SETTINGS.getName(path)))
+
     hyper.UI.$('#input-config-app-description').val(APP_SETTINGS.getDescription(path))
     hyper.UI.$('#input-config-app-long-description').val(APP_SETTINGS.getLongDescription(path))
 		hyper.UI.$('#input-config-app-version').val(APP_SETTINGS.getVersion(path))
+
+    hyper.UI.$('#input-config-app-author-name').val(APP_SETTINGS.getAuthorName(path) || SETTINGS.getAuthorName())
+    hyper.UI.$('#input-config-app-author-email').val(APP_SETTINGS.getAuthorEmail(path) || SETTINGS.getAuthorEmail())
+		hyper.UI.$('#input-config-app-author-url').val(APP_SETTINGS.getAuthorURL(path) || SETTINGS.getAuthorURL())
+		
+    // Use jQuery to create plugins checkboxes
+    hyper.UI.$('#input-config-app-plugins').empty()
+    var plugins = APP_SETTINGS.getPlugins(path)
+    var html = ''
+    var count = 0
+    for (plugin of hyper.UI.mPluginList) {
+      count++
+      var checked = ''
+      var usedVersion = plugin.version
+      if (plugins) {
+        // Ok, the app has a list of plugins we can check against
+        var usedPlugin = plugins.find(each => each.name == plugin.name)
+        if (usedPlugin) {
+          checked = `checked="checked"`
+          usedVersion = usedPlugin.version
+        }
+      }
+      html += `<div class="checkbox">
+  <input type="checkbox" ${checked} id="input-config-app-plugin-${count}" data-plugin="${plugin.name}"`
+	    if (usedVersion) {
+				html += ` data-version="${usedVersion}"`
+			}
+			html += `><label for="input-config-app-plugin-${count}">
+      ${plugin.name}`
+			if (usedVersion) {
+				html += ` (${usedVersion})`
+			}
+			html += ` - ${plugin.description}
+    </label>
+</div>`
+    }
+    // Create and insert HTML
+		var element = hyper.UI.$(html)
+		hyper.UI.$('#input-config-app-plugins').append(element)
 
     // Use jQuery to create library checkboxes
     hyper.UI.$('#input-config-app-libraries').empty()
@@ -1503,7 +1656,9 @@ function createNewsEntry(item) {
         var usedLib = libs.find(each => each.name == lib.name)
         if (usedLib) {
           checked = `checked="checked"`
-          usedVersion = usedLib.version
+					if (usedLib.version) {
+	          usedVersion = usedLib.version
+					}
         }
       }
       html += `<div class="checkbox">
@@ -1521,27 +1676,137 @@ function createNewsEntry(item) {
 		hyper.UI.$('#dialog-config-app').modal('show')
 	}
 
-	hyper.UI.openBuildAppDialog = function(path)
-	{
-		// Verify we have virtualbox, vagrant and evobox ready to run.
-		if (hyper.UI.verifyBuildEnvironment()) {
-			// Populate input fields.
-			//hyper.UI.$('#input-config-app-path').val(path) // Hidden field.
-			//hyper.UI.$('#input-config-app-name').val(APP_SETTINGS.getName(path))
-			//hyper.UI.$('#input-config-app-description').val(APP_SETTINGS.getDescription(path))
-			//hyper.UI.$('#input-config-app-version').val(APP_SETTINGS.getVersion(path))
-			
-			// Show dialog.
-			hyper.UI.$('#dialog-build-app').modal('show')
+	hyper.UI.saveConfigApp = function() {
+		var path = hyper.UI.$('#input-config-app-path').val()
+		var name = hyper.UI.$('#input-config-app-name').val()
+		var description = hyper.UI.$('#input-config-app-description').val()
+		var longDescription = hyper.UI.$('#input-config-app-long-description').val()
+		var version = hyper.UI.$('#input-config-app-version').val()
+		var authorName = hyper.UI.$('#input-config-app-author-name').val()
+		var authorEmail = hyper.UI.$('#input-config-app-author-email').val()
+		var authorURL = hyper.UI.$('#input-config-app-author-url').val()
+    var cordovaID = hyper.UI.$('#input-config-app-cordova-id').val()
+
+		if (description.length < 10 || description.length > 80) {
+      window.alert('The one line description should be 10-80 characters long.')
+			return
 		}
+
+		if (longDescription.length < 10 || longDescription.length > 4000) {
+      window.alert('The long description should be 10-4000 characters long.')
+			return
+		}
+
+    if (/[^a-z0-9\_\-]/.test(name)) {
+      window.alert('The app short name should only consist of lower case letters, digits, underscores and dashes.')
+      // This is just to try to make it match the regexp test
+      var newName = name.replace(/\s/g, '-')
+      newName = newName.toLowerCase()
+      hyper.UI.$('#input-config-app-name').val(newName)
+			return // Abort (dialog is still visible)
+    }
+    
+    if (/[^a-z0-9\.\-]/.test(version)) {
+      window.alert('The version should only consist of lower case letters, digits, dots and dashes.')
+      // This is just to try to make it match the regexp test
+      var newVersion = version.replace(/\s/g, '-')
+      newVersion = newVersion.toLowerCase()
+      hyper.UI.$('#input-config-app-version').val(newVersion)
+			return // Abort (dialog is still visible)
+    }
+
+    // Collect checked plugins
+    var checkboxes = hyper.UI.$('#input-config-app-plugins').find('input')
+    var plugins = []
+    checkboxes.each(function () {
+      var pluginName = this.getAttribute('data-plugin')
+      var pluginVersion = this.getAttribute('data-version')
+      var pluginLocation = this.getAttribute('data-location')
+      if (this.checked) {
+				var p = {"name": pluginName}
+				if (pluginVersion) {
+					p["version"] = pluginVersion
+				}
+				if (pluginLocation) {
+					p["location"] = pluginLocation
+				}
+        plugins.push(p)
+      }
+    })
+
+    // Collect checked libs
+    var checkboxes = hyper.UI.$('#input-config-app-libraries').find('input')
+    var libs = []
+    checkboxes.each(function () {
+      var libname = this.getAttribute('data-lib')
+      var libversion = this.getAttribute('data-version')
+      if (this.checked) {
+        libs.push({ "name": libname, "version": libversion })
+      }
+    })
+
+  	// Hide dialog.
+		hyper.UI.$('#dialog-config-app').modal('hide')
+
+    // Apply new plugins to app
+    if (hyper.UI.applyPlugins(path, APP_SETTINGS.getPlugins(path) || [], plugins)) {
+      // Only store metadata changes to plugins if we could apply them
+      APP_SETTINGS.setPlugins(path, plugins)
+    }
+
+    // Apply new libraries to app
+    if (hyper.UI.applyLibraries(path, APP_SETTINGS.getLibraries(path) || [], libs)) {
+      // Only store metadata changes to libraries if we could apply them
+      APP_SETTINGS.setLibraries(path, libs)
+    }
+
+    // Store all meta data
+    APP_SETTINGS.setName(path, name)
+    APP_SETTINGS.setDescription(path, description)
+    APP_SETTINGS.setLongDescription(path, longDescription)
+    APP_SETTINGS.setVersion(path, version)
+    APP_SETTINGS.setAuthorName(path, authorName)
+    APP_SETTINGS.setAuthorEmail(path, authorEmail)
+    APP_SETTINGS.setAuthorURL(path, authorURL)
+    APP_SETTINGS.setCordovaID(path, cordovaID)
+
+    hyper.UI.displayProjectList()
 	}
 
-	hyper.UI.verifyBuildEnvironment = function(path)
-	{
+	hyper.UI.openBuildAppDialog = function(path) {
+		// Verify we have virtualbox, vagrant and evobox ready to run.
+		hyper.UI.verifyBuildEnvironment(path, function() {
+			// Evobox is up and running, now we can ask user for build details
+			// First we find any previous build to copy values from
+			var shortName = APP_SETTINGS.getName(path)
+			old = hyper.UI.findPreviousBuild(path) || {debug: true, filename: shortName}
+			hyper.UI.$('#input-build-app-path').val(path) // Hidden field.
+			hyper.UI.$('#input-build-app-name').val(shortName) // Hidden field
+			hyper.UI.$('#input-build-app-debug').prop('checked', old.debug)
+			hyper.UI.$('#input-build-app-filename').val(old.filename)
+			// Use stored passwords if we have them, and then hide fields
+			var storePassword = SETTINGS.getStorePassword()
+			var keyPassword = SETTINGS.getKeyPassword()
+			if (storePassword) {
+				hyper.UI.$('#input-build-app-storepassword').val(storePassword)
+				hyper.UI.$('#input-build-app-storepassword-div').hide()
+			}
+			if (keyPassword) {
+				hyper.UI.$('#input-build-app-keypassword').val(keyPassword)
+				hyper.UI.$('#input-build-app-keypassword-div').hide()
+			}
+			hyper.UI.$('#dialog-build-app').modal('show')
+		})
+	}
+
+	hyper.UI.findPreviousBuild = function(path) {
+		var reversed = hyper.UI.mBuildList.slice().reverse()
+		return reversed.find(each => each.path == path)
+	}
+
+	hyper.UI.verifyBuildEnvironment = function(path, cb) {
 		var haveVirtualbox = UTIL.haveVirtualbox()
 		var haveVagrant = UTIL.haveVagrant()
-		console.log("HAVEVBOX:" + haveVirtualbox)
-		console.log("HAVEVAGRANT:" + haveVagrant)
 		var have = ""
 		var doit = "Ok, open download page(s)"
 		// Verify we have virtualbox and Vagrant
@@ -1558,7 +1823,7 @@ function createNewsEntry(item) {
 			}
 			var res = MAIN.openWorkbenchDialog('Build Tools',
 				title,
-				`Evothings can build your app for you but this requires Virtualbox and Vagrant.${have} \n\nInstallation is easy, just download and run appropriate installer.\n\nThen try building again!`, 'question', [doit, "Cancel"], 'question')
+				`Evothings can build your app for you but this requires Virtualbox and Vagrant.${have} \n\nInstallation is easy, just download and run appropriate installer.\n\nThen try building again!`, 'question', [doit, "Cancel"])
 			if (res == doit) {
 				if (!haveVirtualbox) {
 					hyper.UI.openInBrowser('https://www.virtualbox.org/wiki/Downloads')
@@ -1569,141 +1834,257 @@ function createNewsEntry(item) {
 				return
 			}
 		}
-
-		var haveEvobox = UTIL.haveEvobox()
-
-		//if (!haveEvobox) {
-		//	MAIN.openWorkbenchDialog('Build Tools', 'Evothings can use VirtualBox and Vagrant to build your app.', 'info')
-		//}
-		//if (!UTIL.haveVagrant()
-		//UTIL.haveEvobox()
+		// Proceed with box
+		hyper.UI.startEvobox(path, cb)
 	}
 
-	hyper.UI.saveBuildApp = function()
-	{
-		var path = hyper.UI.$('#input-config-app-path').val()
-		var name = hyper.UI.$('#input-config-app-name').val()
-		var description = hyper.UI.$('#input-config-app-description').val()
-		var version = hyper.UI.$('#input-config-app-version').val()
-    
-    if (/[^a-z0-9\_\-]/.test(name)) {
-      window.alert('The app short name should only consist of lower case letters, digits, underscores and dashes.')
-      // This is just to try to make it match the regexp test
-      var newName = name.replace(/\s/g, '-')
-      newName = newName.toLowerCase()
-      hyper.UI.$('#input-config-app-name').val(newName)
-			return // Abort (dialog is still visible)
-    }
-    
-    if (/[^a-z0-9\.\-]/.test(version)) {
-      window.alert('The version should only consist of lower case letters, digits, dots and dashes.')
-      // This is just to try to make it match the regexp test
-      var newVersion = version.replace(/\s/g, '-')
-      newVersion = newVersion.toLowerCase()
-      hyper.UI.$('#input-config-app-version').val(newVersion)
-			return // Abort (dialog is still visible)
-    }
+	hyper.UI.startEvobox = function(path, cb) {
+		var config = hyper.UI.mBuildConfigList[0]
 
-    // Collect checked libs
-    var checkboxes = hyper.UI.$('#input-config-app-libraries').find('input')
-    var libs = []
-    checkboxes.each(function () {
-      var libname = this.getAttribute('data-lib')
-      var libversion = this.getAttribute('data-version')
-      if (this.checked) {
-        libs.push({ "name": libname, "version": libversion })
-      }
-    })
+		// Runs callback after Evobox is up, otherwise alerts
+		var myAppsDir = SETTINGS.getMyAppsPath()
+		var buildDir = PATH.join(myAppsDir, 'build')
+		var evoboxDir = PATH.join(buildDir, config.name)
+		var resultDir = PATH.join(evoboxDir, 'result')
+		// Make directories if missing
+		if (!FS.existsSync(evoboxDir)) {
+			try {
+				FS.mkdirSync(buildDir)
+				FS.mkdirSync(evoboxDir)
+				FS.mkdirSync(resultDir)
+			} catch (error) {
+				window.alert('Something went wrong creating directories for Evobox.')
+				LOGGER.log('[main-window-func.js] Error in startEvobox: ' + error)
+				return
+			}
+		}
 
-		// Build the app, show log 
-		hyper.UI.buildApp(name)
+		var vagrantFile = PATH.join(evoboxDir, 'Vagrantfile')
+		if (!FS.existsSync(vagrantFile)) {
+			// Explain that this will take some time...
+		  var doit = "Ok, go for it"
+			var res = MAIN.openWorkbenchDialog('Build Tools', 'Install Evobox?', 'Evothings runs the build in an isolated Virtualbox VM called Evobox. Proceed to download and then run the build in Evobox?', 'question', [doit, "Cancel"])
+			if (res == doit) {
+				// Run vagrant init to produce Vagrantfile
+				try {
+					CHILD_PROCESS.execFileSync('vagrant', ['init', 'evobox', config.boxUrl],  {cwd: evoboxDir})
+					UTIL.getJSON(config.scriptUrl, 'application/x-ruby').then(function(contentAndUrl) {
+						FS.writeFileSync(PATH.join(evoboxDir, 'build.rb'), contentAndUrl[0])
+					})
+				} catch (er) {
+					window.alert('Something went wrong setting up Evobox Vagrant machine:' + er.stdout) 
+					return
+				}
+			} else {
+				return
+			}
+		}
+
+		if (!UTIL.isVagrantUp(evoboxDir)) {
+			// Vagrant up will perform download of Evobox if not done already
+			const build = CHILD_PROCESS.spawn('vagrant', ['up', '--machine-readable'], {cwd: evoboxDir})
+			build.stdout.on('data', (data) => {
+				console.log(`stdout: ${data}`);
+			});
+			build.stderr.on('data', (data) => {
+				console.log(`stderr: ${data}`);
+			});
+			build.on('close', (code) => {
+				if (code != 0) {
+					console.log(`child process exited with code ${code}`);
+					window.alert('Something went wrong starting Evobox Vagrant machine')
+					LOGGER.log('[main-window-func.js] Error in startEvobox')
+					return
+				} else {
+					cb(path, evoboxDir)
+				}
+			});
+		} else {
+			cb(path, evoboxDir)
+		}
+	}
+
+	hyper.UI.saveBuildApp = function() {
+		var path = hyper.UI.$('#input-build-app-path').val()
+		var name = hyper.UI.$('#input-build-app-name').val()
+		var filename = hyper.UI.$('#input-build-app-filename').val()
+		var debug = hyper.UI.$('#input-build-app-debug').prop('checked')
+		var storePassword = hyper.UI.$('#input-build-app-storepassword').val()
+		var keyPassword = hyper.UI.$('#input-build-app-keypassword').val()
 
   	// Hide dialog.
-		//hyper.UI.$('#dialog-config-app').modal('hide')
+		hyper.UI.$('#dialog-build-app').modal('hide')
+
+		// Fire away build of the app in background
+		hyper.UI.buildApp(path, name, filename, debug, keyPassword, storePassword)
 	}
 
-	hyper.UI.buildApp = function(shortName)
-	{
-		
-		// Copy app into build box directory
-
-		// Create <shortName>.rb
-
-
-		// Perform the build
-		const build = CHILD_PROCESS.spawn('vagrant', ['ssh', '-c ' + shortName], {
-  		cwd: undefined,
-  		env: process.env
-		});
-
-		build.stdout.on('data', (data) => {
-			console.log(`stdout: ${data}`);
-		});
-
-		build.stderr.on('data', (data) => {
-			console.log(`stderr: ${data}`);
-		});
-
-		build.on('close', (code) => {
-			console.log(`child process exited with code ${code}`);
-		});
-
-		// Present result to user
+	hyper.UI.clearBuildLog = function(name) {
+		var div = hyper.UI.$('#build-screen-content')
+		div.empty()
+		div.append(hyper.UI.$(`<h2>Building ${name}</h2>`))
+		div.append(hyper.UI.$(`<h2>Status</h2><p id="build-status"</p>`))
+		div.append(hyper.UI.$(`<h2>Log</h2><pre id="build-log"></pre>`))
 	}
 
-	hyper.UI.saveConfigApp = function()
-	{
-		var path = hyper.UI.$('#input-config-app-path').val()
-		var name = hyper.UI.$('#input-config-app-name').val()
-		var description = hyper.UI.$('#input-config-app-description').val()
-		var longDescription = hyper.UI.$('#input-config-app-long-description').val()
-		var version = hyper.UI.$('#input-config-app-version').val()
+	hyper.UI.buildStatus = function(status) {
+		hyper.UI.$('#build-status').html(status)
+	}
+
+	hyper.UI.buildApp = function(path, name, filename, debug, keyPassword, storePassword) {
+		// Clear build log
+		hyper.UI.clearBuildLog(name)
+
+		// Start build log
+		hyper.UI.buildStatus("Starting Evobox for build...")
+
+		hyper.UI.startEvobox(path, function(path, evoboxDir) {
+			// Create a Build object
+			var build = {
+				start: Date.now(),
+				stop: null,
+				name: name,
+				filename: filename,
+				appID: APP_SETTINGS.getCordovaID(path),
+				shortDescription: APP_SETTINGS.getDescription(path),
+				longDescription: APP_SETTINGS.getLongDescription(path),
+				authorName: APP_SETTINGS.getAuthorName(path),
+				authorEmail: APP_SETTINGS.getAuthorEmail(path),
+				authorURL: APP_SETTINGS.getAuthorURL(path),
+				path: path,
+				plugins: JSON.parse(JSON.stringify(APP_SETTINGS.getPlugins(path))),
+				debug: debug,
+				log: []
+			}
+			hyper.UI.mBuildList.push(build)
+
+			// Copy app into build box directory
+			hyper.UI.buildStatus("Copying app source to build directory...")
+			FSEXTRA.copySync(path, PATH.join(evoboxDir, name))
+
+			// Purge any existing previous build
+			var resultDir = PATH.join(evoboxDir, 'result', name)
+			FSEXTRA.removeSync(resultDir)
+
+			// Create <name>.rb
+			hyper.UI.buildStatus("Creating build configuration...")
+			hyper.UI.createBuildConfig(evoboxDir, build, storePassword, keyPassword)
+
+			// Spawn the build, progress shown in Build tab
+			hyper.UI.buildStatus("Running build script...")
+			const proc = CHILD_PROCESS.spawn('vagrant', ['ssh', '-c', `'cd\ /vagrant\ &&\ ruby\ build.rb\ ${name}.rb'`], {cwd: evoboxDir, shell: true})
+			proc.stdout.on('data', (data) => {
+				var s = data.toString()
+				build.log.push(s)
+				hyper.UI.buildLog(s)
+			})
+			proc.stderr.on('data', (data) => {
+				var s = data.toString()
+				build.log.push('err:' + s)
+				hyper.UI.buildLog(s)
+			})
+			proc.on('close', (code) => {
+				build.exitCode = code
+				console.log(`Build process exited with code ${code}`);
+				console.dir(build)
+				// Present result to user
+				if (code == 0) {
+					hyper.UI.buildStatus("Build succeeded.")
+					window.alert("Success!!")
+				} else {
+					hyper.UI.buildStatus("Build failed.")
+					window.alert("Build failed")
+				}
+			})
+		})
+	}
+
+	hyper.UI.buildLog = function(s) {
+		hyper.UI.$('#build-log')[0].innerHTML += s
+		//hyper.UI.$('#build-log').append(hyper.UI.$("<p>" + s + "</p>"))
+	}
+
+	hyper.UI.createBuildConfig = function(evoboxDir, build, storePassword, keyPassword) {
+		var debugMode = build.debug ? "debug" : "release"
+		var keyStore = SETTINGS.getKeystoreFilename()
+		var keyCommand = SETTINGS.getKeystoreCreateCommand()
+		var signCommand = SETTINGS.getJarSignCommand()
+		var verifyCommand = SETTINGS.getJarVerifyCommand()
+		var distinguishedName = SETTINGS.getDistinguishedName()
+		// Compose a reasonable Ruby array
+		pluginArray = []
+		for (p of build.plugins) {
+			var fullPlugin = hyper.UI.mPluginList.find(each => each.name == p.name)
+			var s = fullPlugin.name
+			if (fullPlugin.location) {
+				s = fullPlugin.location
+				if (fullPlugin.version) {
+					s += "#" + fullPlugin.version
+				}
+			}
+			pluginArray.push('"'+s+'"')
+		}
+		// Ruby config template
+		config = `Title = "${build.name}"
+ShortDesc = "${build.shortDescription}"
+LongDesc = "${build.longDescription}"
+AuthorEmail = "${build.authorEmail}"
+AuthorHref = "${build.authorURL}"
+AuthorName = "${build.authorName}"
+SourceDirectory = "${build.name}"
+AppSource = "/."
+TargetFileName = '${build.filename}'
+AppId = '${build.appID}'
+Plugins = [${pluginArray.toString()}]
+Screenshots = [
+	SourceDirectory+'/res/screenshot1.png',
+	SourceDirectory+'/res/screenshot2.png',
+]
+HiResIcon = SourceDirectory + '/res/icon-512x512.png'
+FeatureGraphic = SourceDirectory + '/res/feature-graphic-1024x500.png'
+PromoGraphic = SourceDirectory + '/res/promo-graphic-180x120.png'
+Keystore = '${keyStore}'
+ReleaseOrDebug = "${debugMode}"
+StorePassword = "${storePassword}"
+KeyPassword = "${keyPassword}"
+DistinguishedName = "${distinguishedName}"
+KeytoolGenKey = "${keyCommand}"
+KeytoolList = "keytool -list -keystore #{Keystore} -storepass #{StorePassword} -v"
+Jarsigner = "${signCommand}"
+JarVerify = "${verifyCommand}"
+`
+		var file = PATH.join(evoboxDir, build.name + ".rb")
+		FS.writeFileSync(file, config)
+	}
+
+  hyper.UI.applyPlugins = function(path, oldPlugins, newPlugins) {
+    // Apply changes to libraries and return true if all went well, otherwise false.
     
-    if (/[^a-z0-9\_\-]/.test(name)) {
-      window.alert('The app short name should only consist of lower case letters, digits, underscores and dashes.')
-      // This is just to try to make it match the regexp test
-      var newName = name.replace(/\s/g, '-')
-      newName = newName.toLowerCase()
-      hyper.UI.$('#input-config-app-name').val(newName)
-			return // Abort (dialog is still visible)
+	  // Find toRemove and toAdd
+	  var oldp = new Set(oldPlugins.map(p => p.name))
+	  var newp = new Set(newPlugins.map(p => p.name))
+	  // Remove old ones not in newPlugins
+	  var toRemove = [...oldp].filter(x => !newp.has(x))
+	  // Add new ones not in oldPlugins
+	  var toAdd = [...newp].filter(x => !oldp.has(x))
+	 
+	 	// Make adjustments to plugins
+	 	if (toRemove.length > 0 || toAdd.length > 0) {
+	   	// We do not do anything yet depending on adding/removing a plugin
+			/*var libsPath = APP_SETTINGS.getLibDirFullPath(path)
+	    if (!FS.existsSync(libsPath)) {
+	      window.alert(`The library directory "${libsPath}" does not exist, perhaps you need to add "app-dir": "app", or similar to evothings.json?`)
+	      LOGGER.log("Directory does not exist: " + libsPath)
+	      return false
+	    }
+			for (lib of toRemove) {
+				hyper.UI.removeLibraryFromApp(path, lib)
+			}
+			for (lib of toAdd) {
+				hyper.UI.addLibraryToApp(path, lib)
+			}*/
     }
-    
-    if (/[^a-z0-9\.\-]/.test(version)) {
-      window.alert('The version should only consist of lower case letters, digits, dots and dashes.')
-      // This is just to try to make it match the regexp test
-      var newVersion = version.replace(/\s/g, '-')
-      newVersion = newVersion.toLowerCase()
-      hyper.UI.$('#input-config-app-version').val(newVersion)
-			return // Abort (dialog is still visible)
-    }
-
-    // Collect checked libs
-    var checkboxes = hyper.UI.$('#input-config-app-libraries').find('input')
-    var libs = []
-    checkboxes.each(function () {
-      var libname = this.getAttribute('data-lib')
-      var libversion = this.getAttribute('data-version')
-      if (this.checked) {
-        libs.push({ "name": libname, "version": libversion })
-      }
-    })
-
-  	// Hide dialog.
-		hyper.UI.$('#dialog-config-app').modal('hide')
-
-    // Apply new libraries to app
-    if (hyper.UI.applyLibraries(path, APP_SETTINGS.getLibraries(path) || [], libs)) {
-      // Only store metadata changes to libraries if we could apply them
-      APP_SETTINGS.setLibraries(path, libs)
-    }
-
-    // Store all meta data
-    APP_SETTINGS.setName(path, name)
-    APP_SETTINGS.setDescription(path, description)
-    APP_SETTINGS.setLongDescription(path, longDescription)
-    APP_SETTINGS.setVersion(path, version)
-
-    hyper.UI.displayProjectList()
+    return true
 	}
 
   hyper.UI.applyLibraries = function(path, oldLibs, newLibs) {
@@ -1725,17 +2106,12 @@ function createNewsEntry(item) {
 	      LOGGER.log("Directory does not exist: " + libsPath)
 	      return false
 	    }
-	    //try {
-	      for (lib of toRemove) {
-	        hyper.UI.removeLibraryFromApp(path, lib)
-	      }
-	      for (lib of toAdd) {
-	        hyper.UI.addLibraryToApp(path, lib)
-	      }
-	    //} catch(error) {
-	    //  LOGGER.log('[main-window-func.js] Error in applyLibraries: ' + error)
-	    //  return false
-	    //}
+			for (lib of toRemove) {
+				hyper.UI.removeLibraryFromApp(path, lib)
+			}
+			for (lib of toAdd) {
+				hyper.UI.addLibraryToApp(path, lib)
+			}
     }
     return true
 	}

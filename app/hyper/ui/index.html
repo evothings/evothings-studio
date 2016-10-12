@@ -47,6 +47,10 @@ Copyright (c) 2013-2015 Evothings AB
 							href="javascript:void(0)">Libraries</a>
 					</li>
 					<li role="presentation">
+						<a id="button-build"
+							href="javascript:void(0)">Build</a>
+					</li>
+					<li role="presentation">
 						<a id="button-projects"
 							href="javascript:void(0)">My Apps</a>
 					</li>
@@ -82,6 +86,54 @@ Copyright (c) 2013-2015 Evothings AB
 
 						<div class="modal-body">
 							<div class="form-group">
+								<label for="input-setting-author-name">
+									Author name:</label>
+								<input type="text"
+									id="input-setting-author-name"
+									class="form-control"
+									placeholder="Your name"/>
+							</div>
+							<div class="form-group">
+								<label for="input-setting-author-email">
+									Author email:</label>
+								<input type="text"
+									id="input-setting-author-email"
+									class="form-control"
+									placeholder="Your email"/>
+							</div>
+							<div class="form-group">
+								<label for="input-setting-author-url">
+									Author URL:</label>
+								<input type="text"
+									id="input-setting-author-url"
+									class="form-control"
+									placeholder="Your website"/>
+							</div>		
+							<div class="form-group">
+								<label for="input-setting-cordova-prefix">
+									Cordova prefix:</label>
+								<input type="text"
+									id="input-setting-cordova-prefix"
+									class="form-control"
+									placeholder="com.evothings.samples."/>
+							</div>													
+							<div class="form-group">
+								<label for="input-setting-storepassword">
+									Keystore password:</label>
+								<input type="password"
+									id="input-setting-storepassword"
+									class="form-control"
+									placeholder="Password"/>
+							</div>
+							<div class="form-group">
+								<label for="input-setting-keypassword">
+									Key password:</label>
+								<input type="password"
+									id="input-setting-keypassword"
+									class="form-control"
+									placeholder="Password"/>
+							</div>
+							<div class="form-group">
 								<label for="input-setting-javascript-workbench-font-size">
 									Tools window font size (text areas):</label>
 								<input type="text"
@@ -106,7 +158,7 @@ Copyright (c) 2013-2015 Evothings AB
 							</div>
 							<div class="form-group">
 								<label for="input-setting-reload-server-address">
-									Address of Reload Server:</label>
+									Address of reload server:</label>
 					 			<input type="text"
 									id="input-setting-reload-server-address"
 									class="form-control"/>
@@ -121,7 +173,7 @@ Copyright (c) 2013-2015 Evothings AB
 
 							<div class="form-group">
 								<label for="input-setting-repository-urls">
-									Protocol to use for loading webapps :</label>
+									Protocol to use for app reload:</label>
 								<label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="option-http">
 									<input type="radio" id="option-http" class="mdl-radio__button" name="protocol" value="http" checked>
 									<span class="mdl-radio__label">HTTP</span>
@@ -175,13 +227,22 @@ Copyright (c) 2013-2015 Evothings AB
 
 						<div class="modal-body">
 							<div class="form-group">
+								<label for="input-new-app-name">
+									App short name (lower case, no whitespace):</label>
+								<input type="text"
+									id="input-new-app-name"
+									class="form-control"
+									value="MyNewApp"
+									placeholder="App name"/>
+							</div>
+							<div class="form-group">
 								<label for="input-new-app-folder">
-									Enter app folder name:</label>
+									Folder name:</label>
 								<input type="text"
 									id="input-new-app-folder"
 									class="form-control"
 									value="MyNewApp"
-									placeholder="App folder name"/>
+									placeholder="Folder name"/>
 							</div>
 							<div class="form-group">
 								<label for="input-new-app-parent-folder">
@@ -238,12 +299,21 @@ Copyright (c) 2013-2015 Evothings AB
 						  <input id="input-config-app-path" type="hidden" value="">
 							<div class="form-group">
 								<label for="input-config-app-name">
-									Enter app short name (lower case, no whitespace):</label>
+									App short name (lower case, no whitespace):</label>
 								<input type="text"
 									id="input-config-app-name"
 									class="form-control"
 									value="my-new-app"
 									placeholder="App short name"/>
+							</div>
+							<div class="form-group">
+								<label for="input-config-app-cordova-id">
+									App Cordova id (reverse domain style, only letters and dots):</label>
+								<input type="text"
+									id="input-config-app-cordova-id"
+									class="form-control"
+									value="my-new-app"
+									placeholder="App Cordova id"/>
 							</div>
 							<div class="form-group">
 								<label for="input-config-app-description">
@@ -270,12 +340,41 @@ Copyright (c) 2013-2015 Evothings AB
 									placeholder="App version"/>
 							</div>
 							<div class="form-group">
+								<label for="input-config-app-author-name">
+									Author name:</label>
+								<input type="text"
+									id="input-config-app-author-name"
+									class="form-control"
+									placeholder="Author name"/>
+							</div>
+							<div class="form-group">
+								<label for="input-config-app-author-email">
+									Author email:</label>
+								<input type="text"
+									id="input-config-app-author-email"
+									class="form-control"
+									placeholder="Author email"/>
+							</div>
+							<div class="form-group">
+								<label for="input-config-app-author-url">
+									Author URL:</label>
+								<input type="text"
+									id="input-config-app-author-url"
+									class="form-control"
+									placeholder="Author URL"/>
+							</div>
+							<div class="form-group">
 								<label for="input-config-app-libraries">
 									Libraries:</label>
 									<div id="input-config-app-libraries" class="h-scroll">
-                  </div>                   
+                  					</div>                   
 							</div>
-							
+							<div class="form-group">
+								<label for="input-config-app-plugins">
+									Plugins:</label>
+									<div id="input-config-app-plugins" class="h-scroll">
+                  					</div>                   
+							</div>
 						</div>
 
 						<div class="modal-footer">
@@ -311,15 +410,45 @@ Copyright (c) 2013-2015 Evothings AB
 						</div>
 
 						<div class="modal-body">
-						  <input id="input-build-app-path" type="hidden" value="">
+							<input id="input-build-app-name" type="hidden" value="">
+							<input id="input-build-app-path" type="hidden" value="">
 							<div class="form-group">
-								<label for="input-build-filename">
-									Target filename:</label>
+								<label for="input-build-app-debug-div">
+									Build mode:</label>
+								<div id="input-build-app-debug-div">
+									<div class="checkbox">
+										<input type="checkbox"
+											id="input-build-app-debug"
+											checked="checked"/>
+										<label for="input-build-app-debug">
+											Debug (or release)</label>
+									</div>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="input-build-app-filename">
+									Target filename (without extension):</label>
 								<input type="text"
-									id="input-build-filename"
+									id="input-build-app-filename"
 									class="form-control"
 									value="some-filename"
 									placeholder="Target filename"/>
+							</div>
+							<div id="input-build-app-storepassword-div" class="form-group">
+								<label for="input-build-app-storepassword">
+									Keystore password:</label>
+								<input type="password"
+									id="input-build-app-storepassword"
+									class="form-control"
+									placeholder="Password"/>
+							</div>
+							<div id="input-build-app-keypassword-div" class="form-group">
+								<label for="input-build-app-keypassword">
+									Key password:</label>
+								<input type="password"
+									id="input-build-app-keypassword"
+									class="form-control"
+									placeholder="Password"/>
 							</div>
 						</div>
 
@@ -357,6 +486,15 @@ Copyright (c) 2013-2015 Evothings AB
 
 						<div class="modal-body">
 							<input id="input-copy-app-source-path" type="hidden" value="">
+							<div class="form-group">
+								<label for="input-copy-app-name">
+									New app short name (lower case, no whitespace):</label>
+								<input type="text"
+									id="input-copy-app-name"
+									class="form-control"
+									value=""
+									placeholder="App name"/>
+							</div>
 							<div class="form-group">
 								<label for="input-copy-app-target-folder">
 									Destination folder name:</label>
@@ -726,6 +864,10 @@ Copyright (c) 2013-2015 Evothings AB
 
 			<!-- My apps screen -->
 			<div id="screen-projects" class="hyper-screen project-list"></div>
+
+			<!-- Build screen -->
+			<div id="screen-build" class="hyper-screen project-list"><div class="panel"><div id="build-screen-content" class="panel-body"></div></div></div>
+			<!-- End of Build screen -->
 
 			<!-- Viewers screen -->
 			<div id="screen-viewers" class="hyper-screen viewers-list"></div>

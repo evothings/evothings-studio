@@ -172,6 +172,121 @@ exports.setVersion = function(appPath, version)
 }
 
 /**
+ * Return Cordova ID (reverse domain style) for app, or null if not set.
+ */
+exports.getCordovaID = function(appPath)
+{
+	var settings = readAppSettings(appPath)
+	if (settings && settings['cordova-id'])
+	{
+		return settings['cordova-id']
+	}
+	else
+	{
+		return null
+	}
+}
+exports.setCordovaID = function(appPath, version)
+{
+	var settings = readAppSettings(appPath)
+	if (settings)
+	{
+		settings['cordova-id'] = version
+		writeAppSettings(settings, appPath)
+	}
+	else
+	{
+		return null
+	}
+}
+
+/**
+ * Return Author name for app, or null if not set.
+ */
+exports.getAuthorName = function(appPath)
+{
+	var settings = readAppSettings(appPath)
+	if (settings && settings['author-name'])
+	{
+		return settings['author-name']
+	}
+	else
+	{
+		return null
+	}
+}
+exports.setAuthorName = function(appPath, version)
+{
+	var settings = readAppSettings(appPath)
+	if (settings)
+	{
+		settings['author-name'] = version
+		writeAppSettings(settings, appPath)
+	}
+	else
+	{
+		return null
+	}
+}
+/**
+ * Return Author email for app, or null if not set.
+ */
+exports.getAuthorEmail = function(appPath)
+{
+	var settings = readAppSettings(appPath)
+	if (settings && settings['author-email'])
+	{
+		return settings['author-email']
+	}
+	else
+	{
+		return null
+	}
+}
+exports.setAuthorEmail = function(appPath, version)
+{
+	var settings = readAppSettings(appPath)
+	if (settings)
+	{
+		settings['author-email'] = version
+		writeAppSettings(settings, appPath)
+	}
+	else
+	{
+		return null
+	}
+}
+
+/**
+ * Return Author URL for app, or null if not set.
+ */
+exports.getAuthorURL = function(appPath)
+{
+	var settings = readAppSettings(appPath)
+	if (settings && settings['author-url'])
+	{
+		return settings['author-url']
+	}
+	else
+	{
+		return null
+	}
+}
+exports.setAuthorURL = function(appPath, version)
+{
+	var settings = readAppSettings(appPath)
+	if (settings)
+	{
+		settings['author-url'] = version
+		writeAppSettings(settings, appPath)
+	}
+	else
+	{
+		return null
+	}
+}
+
+/**
  * Return path to app image icon, or null if not set.
  */
 exports.getAppImage = function(appPath)
@@ -243,6 +358,35 @@ exports.setLibraries = function(appPath, libraries)
 	if (settings)
 	{
 		settings['libraries'] = libraries
+		writeAppSettings(settings, appPath)
+	}
+	else
+	{
+		return null
+	}
+}
+
+/**
+ * Return plugins.
+ */
+exports.getPlugins = function(appPath)
+{
+	var settings = readAppSettings(appPath)
+	if (settings && settings['plugins'])
+	{
+		return settings['plugins']
+	}
+	else
+	{
+		return []
+	}
+}
+exports.setPlugins = function(appPath, plugins)
+{
+	var settings = readAppSettings(appPath)
+	if (settings)
+	{
+		settings['plugins'] = plugins
 		writeAppSettings(settings, appPath)
 	}
 	else

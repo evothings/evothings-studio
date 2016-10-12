@@ -277,6 +277,13 @@ exports.defineUIEvents = function(hyper)
 		hyper.UI.showTab('projects')
 	})
 
+	// ************** Build Tab Button **************
+
+	hyper.UI.$('#button-build').click(function()
+	{
+		hyper.UI.showTab('build')
+	})
+
 	// ************** New App Button **************
 
 	hyper.UI.$('#button-new-app').click(function()
@@ -325,6 +332,14 @@ exports.defineUIEvents = function(hyper)
 	{
 		hyper.UI.changeCopyApp()
 	})
+
+	// ************** Build App Dialog Save Button **************
+
+	hyper.UI.$('#button-save-build-app').click(function()
+	{
+		hyper.UI.saveBuildApp()
+	})
+	
 
 	// ************** Console Button **************
 
@@ -599,6 +614,7 @@ exports.defineUIEvents = function(hyper)
 		hyper.UI.$('#screen-examples').hide()
 		hyper.UI.$('#screen-libraries').hide()
 		hyper.UI.$('#screen-projects').hide()
+		hyper.UI.$('#screen-build').hide()
 
 		// Show selected tab and screen.
 		var screenId = '#screen-' + tabname
