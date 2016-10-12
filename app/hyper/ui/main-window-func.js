@@ -1842,6 +1842,8 @@ function createNewsEntry(item) {
 					hyper.UI.openInBrowser('https://www.vagrantup.com/downloads.html')
 				}
 				return
+			} else {
+				return // Cancel button
 			}
 		}
 		// Proceed with box
