@@ -1932,8 +1932,8 @@ function createNewsEntry(item) {
 	hyper.UI.clearBuildLog = function(name) {
 		var div = hyper.UI.$('#build-screen-content')
 		div.empty()
-		div.append(hyper.UI.$(`<h2>Building ${name}</h2>`))
-		div.append(hyper.UI.$(`<h2>Status</h2><p id="build-status"</p>`))
+		div.append(hyper.UI.$(`<h2>Building ${name}</h2><p id="build-result">No result yet ...</p>`))
+		div.append(hyper.UI.$(`<h2>Status</h2><p id="build-status"></p>`))
 		div.append(hyper.UI.$(`<h2>Log</h2><pre id="build-log"></pre>`))
 	}
 
@@ -1941,12 +1941,17 @@ function createNewsEntry(item) {
 		hyper.UI.$('#build-status').html(status)
 	}
 
+	hyper.UI.buildResult = function(pathAPK) {
+		var file = PATH.basename(pathAPK)
+		hyper.UI.$('#build-result').html(hyper.UI.$(`<a href="file://${pathAPK}">${file}</a>`))
+	}
+
 	hyper.UI.buildApp = function(path, name, filename, debug, keyPassword, storePassword) {
 		// Clear build log
 		hyper.UI.clearBuildLog(name)
 
 		// Start build log
-		hyper.UI.buildStatus("Starting Evobox for build...")
+		hyper.UI.buildStatus("Starting Evobox for build ...")
 
 		hyper.UI.startEvobox(path, function(path, evoboxDir) {
 			// Create a Build object
@@ -1969,7 +1974,7 @@ function createNewsEntry(item) {
 			hyper.UI.mBuildList.push(build)
 
 			// Copy app into build box directory
-			hyper.UI.buildStatus("Copying app source to build directory...")
+			hyper.UI.buildStatus("Copying app source to build directory ...")
 			FSEXTRA.copySync(path, PATH.join(evoboxDir, name))
 
 			// Purge any existing previous build
@@ -1977,11 +1982,11 @@ function createNewsEntry(item) {
 			FSEXTRA.removeSync(resultDir)
 
 			// Create <name>.rb
-			hyper.UI.buildStatus("Creating build configuration...")
+			hyper.UI.buildStatus("Creating build configuration ...")
 			hyper.UI.createBuildConfig(evoboxDir, build, storePassword, keyPassword)
 
 			// Spawn the build, progress shown in Build tab
-			hyper.UI.buildStatus("Running build script...")
+			hyper.UI.buildStatus("Running build script ...")
 			const proc = CHILD_PROCESS.spawn('vagrant', ['ssh', '-c', `'cd\ /vagrant\ &&\ ruby\ build.rb\ ${name}.rb'`], {cwd: evoboxDir, shell: true})
 			proc.stdout.on('data', (data) => {
 				var s = data.toString()
@@ -2000,6 +2005,8 @@ function createNewsEntry(item) {
 				// Present result to user
 				if (code == 0) {
 					hyper.UI.buildStatus("Build succeeded.")
+					var resultAPK = PATH.join(resultDir, name + '.apk')
+					hyper.UI.buildResult(resultAPK)
 					window.alert("Success!!")
 				} else {
 					hyper.UI.buildStatus("Build failed.")
