@@ -1277,6 +1277,16 @@ function createNewsEntry(item) {
 
 	hyper.UI.saveSettings = function()
 	{
+		var keyPassword = hyper.UI.$('#input-setting-keypassword').val()
+		var storePassword = hyper.UI.$('#input-setting-storepassword').val()
+		if (keyPassword.length < 6) {
+      window.alert('The key password needs to be at least 6 characters long.')
+			return
+		}
+		if (storePassword.length < 6) {
+      window.alert('The key store password needs to be at least 6 characters long.')
+			return
+		}
 		// Hide settings dialog.
 		hyper.UI.$('#dialog-settings').modal('hide')
 
@@ -1286,8 +1296,8 @@ function createNewsEntry(item) {
 		SETTINGS.setCordovaPrefix(hyper.UI.$('#input-setting-cordova-prefix').val())
 		SETTINGS.setKeystoreFilename(hyper.UI.$('#input-setting-keystore-filename').val())
 		SETTINGS.setKeystoreCreateCommand(hyper.UI.$('#input-setting-keystore-create-command').val())
-		SETTINGS.setKeyPassword(hyper.UI.$('#input-setting-keypassword').val())
-		SETTINGS.setStorePassword(hyper.UI.$('#input-setting-storepassword').val())
+		SETTINGS.setKeyPassword(keyPassword)
+		SETTINGS.setStorePassword(storePassword)
 
 		// TODO: Make this take effect instantly.
 		SETTINGS.setWorkbenchFontSize(hyper.UI.$('#input-setting-javascript-workbench-font-size').val())
