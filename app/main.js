@@ -12,7 +12,7 @@ main.PATCH = 0
 main.BUILD = "alpha2"
 
 // This one is burned in by scripts
-main.TIMESTAMP = 'Wed Oct 12 15:18:22 CEST 2016'
+main.TIMESTAMP = '<timestamp>'
 
 // Don't edit below
 main.VERSION = main.MAJOR + '.' + main.MINOR
