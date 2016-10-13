@@ -1628,7 +1628,6 @@ function createNewsEntry(item) {
     var html = ''
     var count = 0
     for (plugin of hyper.UI.mPluginList) {
-      count++
       var checked = ''
       var usedVersion = plugin.version
       if (plugins) {
@@ -1638,13 +1637,14 @@ function createNewsEntry(item) {
 			// If more versions are available, we list each separately
 			if (plugin.versions) {
 				for (ver of plugin.versions) {
-					if (usedPlugin) {
-						if (usedPlugin.version == ver) {
-							checked = `checked="checked"`
-						}
+					if (usedPlugin && usedPlugin.version == ver) {
+						checked = `checked="checked"`
+					} else {
+						checked = ''
 					}
+					count++
 		      html += `<div class="checkbox">
-  <input type="checkbox" ${checked} id="input-config-app-plugin-${count}" data-plugin="${plugin.name}" data-version="${usedVersion}">
+  <input type="checkbox" ${checked} id="input-config-app-plugin-${count}" data-plugin="${plugin.name}" data-version="${ver}">
 	<label for="input-config-app-plugin-${count}">${plugin.name} (${ver}) - ${plugin.description}</label></div>`
 				}
 			} else {
@@ -1652,6 +1652,7 @@ function createNewsEntry(item) {
 				if (usedPlugin) {
 						checked = `checked="checked"`
 				}
+				count++
 	      html += `<div class="checkbox">
   <input type="checkbox" ${checked} id="input-config-app-plugin-${count}" data-plugin="${plugin.name}">
 	<label for="input-config-app-plugin-${count}">${plugin.name} - ${plugin.description}</label></div>`
@@ -1667,17 +1668,17 @@ function createNewsEntry(item) {
     var html = ''
     var count = 0
     for (lib of hyper.UI.mLibraryList) {
-      count++
       var checked = ''
       // Ok, the app has a list of libraries we can check against
       var usedLib = libs.find(each => each.name == lib.name)
 			// If more versions are available, we list each separately
 			for (ver of lib.versions) {
-				if (usedLib) {
-					if (usedLib.version == ver) {
-						checked = `checked="checked"`
-					}
+				if (usedLib && usedLib.version == ver) {
+					checked = `checked="checked"`
+				} else {
+					checked = ''
 				}
+				count++
 				html += `<div class="checkbox">
 		<input type="checkbox" ${checked} id="input-config-app-library-${count}" data-lib="${lib.name}" data-version="${ver}"> 
 			<label for="input-config-app-library-${count}">
@@ -1752,6 +1753,16 @@ function createNewsEntry(item) {
       }
     })
 
+		// We can today select multiple versions - prevent that
+		var names = new Set()
+		for (let p of plugins) {
+			if (names.has(p.name)) {
+				window.alert(`You can only have one version of ${p.name}.`)
+				return
+			}
+			names.add(p.name)
+		}
+
     // Collect checked libs
     var checkboxes = hyper.UI.$('#input-config-app-libraries').find('input')
     var libs = []
@@ -1762,6 +1773,16 @@ function createNewsEntry(item) {
         libs.push({ "name": libname, "version": libversion })
       }
     })
+
+		// We can today select multiple versions - prevent that
+		var names = new Set()
+		for (let l of libs) {
+			if (names.has(l.name)) {
+				window.alert(`You can only have one version of ${l.name}.`)
+				return
+			}
+			names.add(l.name)
+		}
 
   	// Hide dialog.
 		hyper.UI.$('#dialog-config-app').modal('hide')
