@@ -382,6 +382,7 @@ exports.defineUIFunctions = function(hyper)
 	 *   options.path
 	 *   options.title
 	 *   options.version
+	 *   options.versions
 	 *   options.description
 	 *   options.tags { label, type }
 	 *   options.libraries { name, version }
@@ -419,6 +420,7 @@ exports.defineUIFunctions = function(hyper)
     var appTags = options.tags || []
     var appLibraries = options.libraries || []
 		var appVersion = options.version || null
+		var versions = options.versions || null
 		var shortName = options.name
     var appName = options.title
     var appDescription = options.description
@@ -599,6 +601,9 @@ exports.defineUIFunctions = function(hyper)
     if (appVersion) {
       metaHTML += ' <strong>Version:</strong>&nbsp;' + appVersion
     }
+		if (versions) {
+			metaHTML += ' <strong>Versions:</strong>&nbsp;' + versions
+		}
     if (appLibraries.length > 0) {
       metaHTML += ' <strong>Libraries:</strong>'
       var first = true
@@ -1217,7 +1222,7 @@ function createNewsEntry(item) {
 			    path: entry.name,  // Note that we only have name here
 			    url: entry.url,   // This is the base URL where we loaded it from
 			    title: entry.title,
-			    version: entry.version,
+			    versions: entry.versions,
 			    description: entry.description,
 			    tags: entry.tags,
 			    docURL: entry['doc-url'], //|| baseDoc + entry.name + '.html',
@@ -1873,7 +1878,8 @@ function createNewsEntry(item) {
 		if (!FS.existsSync(vagrantFile)) {
 			// Explain that this will take some time...
 		  var doit = "Ok, go for it"
-			var res = MAIN.openWorkbenchDialog('Build Tools', 'Install Evobox?', 'Evothings runs the build in an isolated Virtualbox VM called Evobox. Proceed to download and then run the build in Evobox?', 'question', [doit, "Cancel"])
+			var res = MAIN.openWorkbenchDialog('Build Tools', 'Install Evobox?',
+				'Evothings runs the build in an isolated Virtualbox VM called Evobox. The download is large but you can track progress in the Build tab. Proceed to download and then run the build in Evobox?', 'question', [doit, "Cancel"])
 			if (res == doit) {
 				// Run vagrant init to produce Vagrantfile
 				try {
@@ -1891,9 +1897,15 @@ function createNewsEntry(item) {
 		}
 
 		if (!UTIL.isVagrantUp(evoboxDir)) {
+			hyper.UI.buildStartTask("Starting Evobox in Vagrant")
+			var re = /\d+,default,ui,detail,(.*)/
 			// Vagrant up will perform download of Evobox if not done already
 			const build = CHILD_PROCESS.spawn('vagrant', ['up', '--machine-readable'], {cwd: evoboxDir})
 			build.stdout.on('data', (data) => {
+				var match = data.match(re)
+				if (match) {
+					hyper.UI.buildStatus(match[1])
+				}
 				console.log(`stdout: ${data}`);
 			});
 			build.stderr.on('data', (data) => {
@@ -1929,10 +1941,10 @@ function createNewsEntry(item) {
 		hyper.UI.buildApp(path, name, filename, debug, keyPassword, storePassword)
 	}
 
-	hyper.UI.clearBuildLog = function(name) {
+	hyper.UI.buildStartTask = function(task) {
 		var div = hyper.UI.$('#build-screen-content')
 		div.empty()
-		div.append(hyper.UI.$(`<h2>Building ${name}</h2><p id="build-result">No result yet ...</p>`))
+		div.append(hyper.UI.$(`<h2>${task}</h2><p id="build-result"></p>`))
 		div.append(hyper.UI.$(`<h2>Status</h2><p id="build-status"></p>`))
 		div.append(hyper.UI.$(`<h2>Log</h2><pre id="build-log"></pre>`))
 	}
@@ -1948,7 +1960,7 @@ function createNewsEntry(item) {
 
 	hyper.UI.buildApp = function(path, name, filename, debug, keyPassword, storePassword) {
 		// Clear build log
-		hyper.UI.clearBuildLog(name)
+		hyper.UI.buildStartTask("Building " + name)
 
 		// Start build log
 		hyper.UI.buildStatus("Starting Evobox for build ...")
