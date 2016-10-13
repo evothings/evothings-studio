@@ -1847,6 +1847,8 @@ function createNewsEntry(item) {
 					hyper.UI.openInBrowser('https://www.vagrantup.com/downloads.html')
 				}
 				return
+			} else {
+				return // Cancel button
 			}
 		}
 		// Proceed with box
@@ -1884,14 +1886,24 @@ function createNewsEntry(item) {
 				// Run vagrant init to produce Vagrantfile
 				try {
 					CHILD_PROCESS.execFileSync('vagrant', ['init', 'evobox', config.boxUrl],  {cwd: evoboxDir})
-					UTIL.getJSON(config.scriptUrl, 'application/x-ruby').then(function(contentAndUrl) {
-						FS.writeFileSync(PATH.join(evoboxDir, 'build.rb'), contentAndUrl[0])
-					})
 				} catch (er) {
 					window.alert('Something went wrong setting up Evobox Vagrant machine:' + er.stdout) 
 					return
 				}
 			} else {
+				return
+			}
+		}
+
+		var buildScript = PATH.join(evoboxDir, 'build.rb')
+		if (!FS.existsSync(buildScript)) {
+			// Download script
+			try {
+				UTIL.getJSON(config.scriptUrl, 'application/x-ruby').then(function(contentAndUrl) {
+					FS.writeFileSync(buildScript, contentAndUrl[0])
+				})
+			} catch (er) {
+				window.alert('Something went wrong downloading build script:' + er.stdout) 
 				return
 			}
 		}

@@ -40,10 +40,10 @@
     "devdeps": "npm install",
     "deps": "npm install app",
     "pack": "build",
-    "dist": "build --linux deb rpm && build --osx && build --win && build --win --ia32",
-    "dist:osx": "build --osx --x64",
-    "dist:linux": "build --linux --x64",
-    "dist:win": "build --win --x64",
+    "dist": "build --linux deb rpm && build --mac && build --win && build --win --ia32",
+    "dist:mac": "build --mac",
+    "dist:linux": "build --linux",
+    "dist:win": "build --win",
     "dist:win32": "build --win --ia32",
     "start": "cd app && electron --enable-logging main.js"
   }
