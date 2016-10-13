@@ -4,10 +4,10 @@
 # installed and configured with access keys.
 
 # Extract VERSION from app/main.js
-MAJOR=$(sed -n '/^main\.MAJOR.*=.*/p' app/main.js | cut -d' ' -f 3)
-MINOR=$(sed -n '/^main\.MINOR.*=.*/p' app/main.js | cut -d' ' -f 3)
-PATCH=$(sed -n '/^main\.PATCH.*=.*/p' app/main.js | cut -d' ' -f 3)
-BUILD=$(sed -n '/^main\.BUILD.*=.*/p' app/main.js | cut -d"\"" -f 2)
+MAJOR=$(sed -n '/^main\.MAJOR =.*/p' app/main.js | cut -d' ' -f 3)
+MINOR=$(sed -n '/^main\.MINOR =.*/p' app/main.js | cut -d' ' -f 3)
+PATCH=$(sed -n '/^main\.PATCH =.*/p' app/main.js | cut -d' ' -f 3)
+BUILD=$(sed -n '/^main\.BUILD =.*/p' app/main.js | cut -d"\"" -f 2)
 if [ ! -z "$BUILD" ] ; then
   VER=$MAJOR.$MINOR.$PATCH-$BUILD
 else
