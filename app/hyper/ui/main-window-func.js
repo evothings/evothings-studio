@@ -1629,24 +1629,28 @@ function createNewsEntry(item) {
       if (plugins) {
         // Ok, the app has a list of plugins we can check against
         var usedPlugin = plugins.find(each => each.name == plugin.name)
-        if (usedPlugin) {
-          checked = `checked="checked"`
-          usedVersion = usedPlugin.version
-        }
       }
-      html += `<div class="checkbox">
-  <input type="checkbox" ${checked} id="input-config-app-plugin-${count}" data-plugin="${plugin.name}"`
-	    if (usedVersion) {
-				html += ` data-version="${usedVersion}"`
+			// If more versions are available, we list each separately
+			if (plugin.versions) {
+				for (ver of plugin.versions) {
+					if (usedPlugin) {
+						if (usedPlugin.version == ver) {
+							checked = `checked="checked"`
+						}
+					}
+		      html += `<div class="checkbox">
+  <input type="checkbox" ${checked} id="input-config-app-plugin-${count}" data-plugin="${plugin.name}" data-version="${usedVersion}">
+	<label for="input-config-app-plugin-${count}">${plugin.name} (${ver}) - ${plugin.description}</label></div>`
+				}
+			} else {
+				// Otherwise we just make one listing without version
+				if (usedPlugin) {
+						checked = `checked="checked"`
+				}
+	      html += `<div class="checkbox">
+  <input type="checkbox" ${checked} id="input-config-app-plugin-${count}" data-plugin="${plugin.name}">
+	<label for="input-config-app-plugin-${count}">${plugin.name} - ${plugin.description}</label></div>`
 			}
-			html += `><label for="input-config-app-plugin-${count}">
-      ${plugin.name}`
-			if (usedVersion) {
-				html += ` (${usedVersion})`
-			}
-			html += ` - ${plugin.description}
-    </label>
-</div>`
     }
     // Create and insert HTML
 		var element = hyper.UI.$(html)
@@ -1660,23 +1664,22 @@ function createNewsEntry(item) {
     for (lib of hyper.UI.mLibraryList) {
       count++
       var checked = ''
-      var usedVersion = lib.version
-      if (libs) {
-        // Ok, the app has a list of libraries we can check against
-        var usedLib = libs.find(each => each.name == lib.name)
-        if (usedLib) {
-          checked = `checked="checked"`
-					if (usedLib.version) {
-	          usedVersion = usedLib.version
+      // Ok, the app has a list of libraries we can check against
+      var usedLib = libs.find(each => each.name == lib.name)
+			// If more versions are available, we list each separately
+			for (ver of lib.versions) {
+				if (usedLib) {
+					if (usedLib.version == ver) {
+						checked = `checked="checked"`
 					}
-        }
-      }
-      html += `<div class="checkbox">
-  <input type="checkbox" ${checked} id="input-config-app-library-${count}" data-lib="${lib.name}" data-version="${usedVersion}"> 
-    <label for="input-config-app-library-${count}">
-      ${lib.title} (${usedVersion}) - ${lib.description}
-    </label>
-</div>`
+				}
+				html += `<div class="checkbox">
+		<input type="checkbox" ${checked} id="input-config-app-library-${count}" data-lib="${lib.name}" data-version="${ver}"> 
+			<label for="input-config-app-library-${count}">
+				${lib.title} (${ver}) - ${lib.description}
+			</label>
+	</div>`
+			}
     }
     // Create and insert HTML
 		var element = hyper.UI.$(html)
