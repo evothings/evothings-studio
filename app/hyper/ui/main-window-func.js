@@ -1813,6 +1813,7 @@ function createNewsEntry(item) {
 	}
 
 	hyper.UI.openBuildAppDialog = function(path) {
+		hyper.UI.showTab('build')
 		// Verify we have virtualbox, vagrant and evobox ready to run.
 		hyper.UI.verifyBuildEnvironment(path, function() {
 			// Evobox is up and running, now we can ask user for build details
@@ -1934,18 +1935,27 @@ function createNewsEntry(item) {
 
 		if (!UTIL.isVagrantUp(evoboxDir)) {
 			hyper.UI.buildStartTask("Starting Evobox in Vagrant")
-			var re = /\d+,default,ui,detail,(.*)/
+			var reUI = /\d+,default,ui,.*,.*default: (.*)/
+			var reUPSTART = /\d+,default,action,up,start/
+			var reUPEND = /\d+,default,action,up,end/
 			// Vagrant up will perform download of Evobox if not done already
 			const build = CHILD_PROCESS.spawn('vagrant', ['up', '--machine-readable'], {cwd: evoboxDir})
 			build.stdout.on('data', (data) => {
-				var match = data.match(re)
+				var s = data.toString()
+				var match = s.match(reUI)
 				if (match) {
-					hyper.UI.buildStatus(match[1])
+					hyper.UI.buildLog(match[1] + "\n")
 				}
-				console.log(`stdout: ${data}`);
+				if (s.match(reUPSTART)) {
+					hyper.UI.buildStatus("Evobox being started ...")
+				}
+				if (s.match(reUPEND)) {
+					hyper.UI.buildStatus("Evobox started.")
+				}
 			});
 			build.stderr.on('data', (data) => {
-				console.log(`stderr: ${data}`);
+				var s = data.toString()
+				hyper.UI.buildLog('stderr: ' + s)
 			});
 			build.on('close', (code) => {
 				if (code != 0) {
@@ -1981,8 +1991,8 @@ function createNewsEntry(item) {
 		var div = hyper.UI.$('#build-screen-content')
 		div.empty()
 		div.append(hyper.UI.$(`<h2>${task}</h2><p id="build-result"></p>`))
-		div.append(hyper.UI.$(`<h2>Status</h2><p id="build-status"></p>`))
-		div.append(hyper.UI.$(`<h2>Log</h2><pre id="build-log"></pre>`))
+		div.append(hyper.UI.$(`<h3>Status</h3><p id="build-status"></p>`))
+		div.append(hyper.UI.$(`<h3>Log</h3><pre id="build-log"></pre>`))
 	}
 
 	hyper.UI.buildStatus = function(status) {
@@ -2043,8 +2053,8 @@ function createNewsEntry(item) {
 			})
 			proc.stderr.on('data', (data) => {
 				var s = data.toString()
-				build.log.push('err:' + s)
-				hyper.UI.buildLog(s)
+				build.log.push('stderr:' + s)
+				hyper.UI.buildLog('stderr: ' + s)
 			})
 			proc.on('close', (code) => {
 				build.exitCode = code
@@ -2083,8 +2093,8 @@ function createNewsEntry(item) {
 			var s = fullPlugin.name
 			if (fullPlugin.location) {
 				s = fullPlugin.location
-				if (fullPlugin.version) {
-					s += "#" + fullPlugin.version
+				if (p.version) {
+					s += "#" + p.version
 				}
 			}
 			pluginArray.push('"'+s+'"')
