@@ -77,12 +77,14 @@ if [ -z "$PLATFORM" ] || [ "$PLATFORM" == "linux" ] ; then
   npm run dist:linux
   if [ ! -z "$DOUPLOAD" ] ; then
     # Upload deb, rpm, AppImage
+    mv dist/*.deb dist/$NAME-$VER.deb
     s3cmd put dist/*.deb s3://evothings-download/
     s3cmd put dist/*.rpm s3://evothings-download/
+    mv dist/*.AppImage dist/$NAME-$VER.AppImage
     s3cmd put dist/*.AppImage s3://evothings-download/
-    s3cmd setacl --acl-public s3://evothings-download/$NAME-$VER-amd64.deb
+    s3cmd setacl --acl-public s3://evothings-download/$NAME-$VER.deb
     s3cmd setacl --acl-public s3://evothings-download/$NAME-$VER.rpm
-    s3cmd setacl --acl-public s3://evothings-download/$NAME-$VER-x86_64.AppImage
+    s3cmd setacl --acl-public s3://evothings-download/$NAME-$VER.AppImage
   fi
 fi
 
@@ -127,7 +129,7 @@ fi
 sed -i '' -e "s/main\.TIMESTAMP = '.*'/main\.TIMESTAMP = '<timestamp>'/g" ./app/main.js
 
 echo PASTE INTO GITTER:
-echo https://s3-eu-west-1.amazonaws.com/evothings-download/$NAME-$VER-amd64.deb
+echo https://s3-eu-west-1.amazonaws.com/evothings-download/$NAME-$VER.deb
 echo https://s3-eu-west-1.amazonaws.com/evothings-download/$NAME-$VER.rpm
 echo https://s3-eu-west-1.amazonaws.com/evothings-download/$NAME-$VER.AppImage
 echo https://s3-eu-west-1.amazonaws.com/evothings-download/$NAME-$VER.dmg
