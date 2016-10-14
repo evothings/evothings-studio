@@ -780,37 +780,51 @@ exports.defineUIFunctions = function(hyper)
 	    SETTINGS.setProjectList(mProjectList)
 	}
 
-	// TODO: Simplify, use updateProjectList instead.
-	hyper.UI.addProject = function(path)
-	{
-	    if (FILEUTIL.fileIsHTML(path))
-	    {
-	        // Add the path, including HTML file, to the project list.
-		    mProjectList.unshift(path)
-		    saveProjectList()
-	    }
-	    else if (FILEUTIL.fileIsEvothingsSettings(path))
-	    {
-	        // Add the folder path to the project list.
-		    mProjectList.unshift(PATH.dirname(path))
-		    saveProjectList()
-	    }
-	    else if (FILEUTIL.fileIsDirectory(path))
-	    {
-	        // Add the path to the project list.
-		    mProjectList.unshift(path)
-		    saveProjectList()
-	    }
+	hyper.UI.addProject = function(path) {
+		var dir
+		if (FILEUTIL.fileIsHTML(path) || FILEUTIL.fileIsEvothingsSettings(path)) {
+			var dir = PATH.dirname(path)
+		} else if (FILEUTIL.fileIsDirectory(path)) {
+			dir = path
+		}
+		// If duplicate, then warn and offer to fix - otherwise bail out
+		if (hyper.UI.duplicateUUID(dir)) {
+			var doit = "Yes, please fix it"
+			var answer = MAIN.openWorkbenchDialog('Duplicate UUID',
+				'Generate a new UUID?',
+				`The evothings.json file for this new project has a duplicate UUID. This can happen if you copied the whole app directory using tools outside Evothings. The easy fix is to just generate a new unique UUID.\n\nShould we generate a new UUID?`, 'question', [doit, "Cancel"])
+			if (answer = doit) {
+				APP_SETTINGS.generateNewAppUUID(dir)
+			} else {
+				return // Do NOT add project
+			}
+		}
+		// Add the path to the project list.
+		if (FILEUTIL.fileIsHTML(path)) {
+			// Add the path, including HTML file, to the project list.
+			mProjectList.unshift(path)
+		} else {
+			mProjectList.unshift(dir)
+		}
+		saveProjectList()
 	}
 
-	hyper.UI.setProjectList = function(list)
-	{
+	hyper.UI.duplicateUUID = function(path) {
+		var newUUID = APP_SETTINGS.getAppID(path)
+		for (let p of mProjectList) {
+			if (APP_SETTINGS.getAppID(p) == newUUID) {
+				return true
+			}
+		}
+		return false
+	}
+
+	hyper.UI.setProjectList = function(list) {
 		mProjectList = list
 		saveProjectList()
 	}
 
-	hyper.UI.getProjectList = function()
-	{
+	hyper.UI.getProjectList = function() {
 		return mProjectList
 	}
 
@@ -818,8 +832,7 @@ exports.defineUIFunctions = function(hyper)
 	 * If path is not a full path, make it so. This is
 	 * used to make relative example paths full paths.
 	 */
-	hyper.UI.getAppFullPath = function(path)
-	{
+	hyper.UI.getAppFullPath = function(path) {
 		if (!FILEUTIL.isPathAbsolute(path))
 		{
 			return PATH.join(hyper.UI.getWorkbenchPath(), path)
