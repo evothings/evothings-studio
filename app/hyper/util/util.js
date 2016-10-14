@@ -111,6 +111,15 @@ exports.haveVagrant = function() {
   }
 }
 
+exports.haveVSCode = function() {
+  try {
+    var output = CHILD_PROCESS.execFileSync('code', ['-h']).toString()
+    return output.startsWith("Visual Studio Code")
+  } catch (er) {
+    return false
+  }
+}
+
 exports.isVagrantUp = function(dir) {
   try {
     var re = /\d+,default,state,running/;

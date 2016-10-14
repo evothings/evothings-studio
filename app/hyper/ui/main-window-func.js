@@ -839,18 +839,44 @@ exports.defineUIFunctions = function(hyper)
 	}
 
 	/**
-	 * Edit app in VS Code.
+	 * Edit app in VS Code, either a file path or dir path.
 	 */
-	hyper.UI.editApp = function(path)
-	{
+	hyper.UI.editApp = function(path) {
 		const build = CHILD_PROCESS.spawn('code', [path], {
-  		cwd: path,
+  		cwd: PATH.dirname(path),
   		env: process.env
 		})
-
 		build.on('close', (code) => {
 			console.log(`Spawn of VSCode exited with code ${code}`);
+			// If we fail then... let's check
+			if (code != 0) {
+				hyper.UI.checkVSCode()
+			}
 		})
+	}
+
+	/**
+	 * Check for VS Code and offer download
+	 */
+	hyper.UI.checkVSCode = function(path) {
+		var haveVSCode = UTIL.haveVSCode()
+		var have = ""
+		var doit = "Ok, open download page(s)"
+		// Verify we have it
+		if (!haveVSCode) {
+			var osx = ''
+			if (process.platform == 'darwin') {
+				osx = "You also need to open Command Palette (under View) and type in 'shell command' and pick 'Shell Command: Install code command in PATH'" 
+			}
+			var res = MAIN.openWorkbenchDialog('Tools',
+				'Install Visual Studio Code?',
+				`Visual Studio Code works great together with Evothings and we recommend it as a good lightweight open source cross platform IDE.\n\nInstallation is easy, just download and run appropriate installer.${osx}\n\nThen try edit again!`, 'question', [doit, "Cancel"])
+			if (res == doit) {
+				hyper.UI.openInBrowser('https://code.visualstudio.com/Download')
+			} else {
+				return // Cancel button
+			}
+		}
 	}
 
 	hyper.UI.toggleEntryMenu = function(menuId)
