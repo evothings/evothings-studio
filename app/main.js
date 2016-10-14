@@ -31,6 +31,13 @@ main.TRANSLATIONS = main.BASE + '/translations'
 
 main.limits = 'Not yet available'
 
+// Fix for accessing vagrant, virtualbox and vscode that usually installs in /usr/local/bin
+// When OSX runs a UI app it often seems to only include core bin PATHs and not user .profile paths.
+if (process.platform == 'darwin') {
+  if (!process.env['PATH'].includes('/usr/local/bin')) {
+    process.env['PATH'] += ':/usr/local/bin'
+  }
+}
 
 const electron = require('electron')
 const app = electron.app
