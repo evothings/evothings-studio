@@ -44,9 +44,12 @@ var TEMP = require('temp').track()
 var BABEL = require('babel-core')
 var GLOB = require('glob')
 var CHEERIO = require('cheerio')
+var SEMVER_REGEX = require('semver-regex')
 var URL = require('url')
 const CHILD_PROCESS = require('child_process')
 
+// This is not a strict domain regex, but enough to make Cordova happy (and Cordova is not fully sane either)
+const reverseDomainRE = /^(([a-zA-Z0-9\-\_]+)\.)*([a-zA-Z0-9\-\_]+)$/
 
 // Counter for "popup" menus on an app entry in the My Apps list.
 var mEntryMenuIdCounter = 0
@@ -855,7 +858,8 @@ exports.defineUIFunctions = function(hyper)
 	 * Edit app in VS Code, either a file path or dir path.
 	 */
 	hyper.UI.editApp = function(path) {
-		const build = CHILD_PROCESS.spawn('code', [path], {
+		cmd = SETTINGS.getEditorCommand()
+		const build = CHILD_PROCESS.spawn(cmd, [path], {
   		cwd: PATH.dirname(path),
   		env: process.env
 		})
@@ -883,7 +887,7 @@ exports.defineUIFunctions = function(hyper)
 			}
 			var res = MAIN.openWorkbenchDialog('Tools',
 				'Install Visual Studio Code?',
-				`Visual Studio Code works great together with Evothings and we recommend it as a good lightweight open source cross platform IDE.\n\nInstallation is easy, just download and run appropriate installer.${osx}\n\nThen try edit again!`, 'question', [doit, "Cancel"])
+				`Visual Studio Code works great together with Evothings and we recommend it as a good lightweight open source cross platform IDE.\n\nInstallation is easy, just download and run appropriate installer.${osx}\n\nThen try edit again!\n\nFor other editors, change Editor Command under settings.`, 'question', [doit, "Cancel"])
 			if (res == doit) {
 				hyper.UI.openInBrowser('https://code.visualstudio.com/Download')
 			} else {
@@ -1298,6 +1302,7 @@ function createNewsEntry(item) {
 		hyper.UI.$('#input-setting-author-email').val(SETTINGS.getAuthorEmail())
 		hyper.UI.$('#input-setting-author-url').val(SETTINGS.getAuthorURL())
 		hyper.UI.$('#input-setting-cordova-prefix').val(SETTINGS.getCordovaPrefix())
+		hyper.UI.$('#input-setting-editor-command').val(SETTINGS.getEditorCommand())
 
 		hyper.UI.$('#input-setting-keystore-filename').val(SETTINGS.getKeystoreFilename())
 		hyper.UI.$('#input-setting-keystore-create-command').val(SETTINGS.getKeystoreCreateCommand())
@@ -1323,12 +1328,22 @@ function createNewsEntry(item) {
 	{
 		var keyPassword = hyper.UI.$('#input-setting-keypassword').val()
 		var storePassword = hyper.UI.$('#input-setting-storepassword').val()
-		if (keyPassword.length < 6) {
-      window.alert('The key password needs to be at least 6 characters long.')
-			return
+		if (keyPassword.length > 0) {
+			if (keyPassword.length < 6) {
+				window.alert('The key password needs to be at least 6 characters long.')
+				return
+			}
 		}
-		if (storePassword.length < 6) {
-      window.alert('The key store password needs to be at least 6 characters long.')
+		if (storePassword.length > 0) {
+			if (storePassword.length < 6) {
+ 	    	window.alert('The key store password needs to be at least 6 characters long.')
+				return
+			}
+		}
+		var cordovaPrefix = hyper.UI.$('#input-setting-cordova-prefix').val()
+
+		if (!reverseDomainRE.test(cordovaPrefix)) {
+ 	    window.alert('The Cordova prefix should be in reverse domain style like "com.acme.dev" with no ending period. Letters, digit, underscore and hyphens are allowed.')
 			return
 		}
 		// Hide settings dialog.
@@ -1337,7 +1352,8 @@ function createNewsEntry(item) {
 		SETTINGS.setAuthorName(hyper.UI.$('#input-setting-author-name').val())
 		SETTINGS.setAuthorEmail(hyper.UI.$('#input-setting-author-email').val())
 		SETTINGS.setAuthorURL(hyper.UI.$('#input-setting-author-url').val())
-		SETTINGS.setCordovaPrefix(hyper.UI.$('#input-setting-cordova-prefix').val())
+		SETTINGS.setCordovaPrefix(cordovaPrefix)
+		SETTINGS.setEditorCommand(hyper.UI.$('#input-setting-editor-command').val())
 		SETTINGS.setKeystoreFilename(hyper.UI.$('#input-setting-keystore-filename').val())
 		SETTINGS.setKeystoreCreateCommand(hyper.UI.$('#input-setting-keystore-create-command').val())
 		SETTINGS.setKeyPassword(keyPassword)
@@ -1639,19 +1655,32 @@ function createNewsEntry(item) {
 		})
 	}
 
-	hyper.UI.onlyLettersAndDots = function(str) {
-		var result = str.replace(/[^a-zA-Z0-9]/g, '.')
-		return result.replace(/\.+/g, '.')
+	// Try to produce a proper Cordova Widget id (reverse domain style) from str
+	hyper.UI.sanitizeForCordovaID = function(str) {
+		// Replace non conforming characters with "."
+		var result = str.replace(/[^a-zA-Z0-9\-\_\.]/g, '.')
+		result = result.toLowerCase()
+		// Collapse multiple ".." to a single "."
+		result = result.replace(/\.+/g, '.')
+		// Remove leading and trailing "."
+		return result.replace(/(^\.|\.$)/g, '')
 	}
 
-  hyper.UI.openConfigAppDialog = function(path)
-	{
+  hyper.UI.openConfigAppDialog = function(dirOrFile) {
+		var path = PATH.dirname(dirOrFile)
+		// Trying to be clever with coming up with a name if missing
+		var name = APP_SETTINGS.getName(path) || PATH.basename(dirOrFile)
+		if (name.startsWith('index.htm')) {
+			name = PATH.basename(path)
+		}
+		// Same sanitization as for Cordova ID
+		name = hyper.UI.sanitizeForCordovaID(name)
 		// Populate input fields.
 		hyper.UI.$('#input-config-app-path').val(path) // Hidden field.
-    hyper.UI.$('#input-config-app-name').val(APP_SETTINGS.getName(path))
+    hyper.UI.$('#input-config-app-name').val(name)
 		hyper.UI.$('#input-config-app-cordova-id').val(
 			APP_SETTINGS.getCordovaID(path) ||
-			SETTINGS.getCordovaPrefix() + hyper.UI.onlyLettersAndDots(APP_SETTINGS.getName(path)))
+			SETTINGS.getCordovaPrefix() + "." + hyper.UI.sanitizeForCordovaID(name))
 
     hyper.UI.$('#input-config-app-description').val(APP_SETTINGS.getDescription(path))
     hyper.UI.$('#input-config-app-long-description').val(APP_SETTINGS.getLongDescription(path))
@@ -1703,7 +1732,7 @@ function createNewsEntry(item) {
 
     // Use jQuery to create library checkboxes
     hyper.UI.$('#input-config-app-libraries').empty()
-    var libs = APP_SETTINGS.getLibraries(path)
+    var libs = APP_SETTINGS.getLibraries(path) || []
     var html = ''
     var count = 0
     for (lib of hyper.UI.mLibraryList) {
@@ -1743,15 +1772,20 @@ function createNewsEntry(item) {
 		var authorName = hyper.UI.$('#input-config-app-author-name').val()
 		var authorEmail = hyper.UI.$('#input-config-app-author-email').val()
 		var authorURL = hyper.UI.$('#input-config-app-author-url').val()
-    var cordovaID = hyper.UI.$('#input-config-app-cordova-id').val()
+		var cordovaID = hyper.UI.$('#input-config-app-cordova-id').val()
+
+		if (!reverseDomainRE.test(cordovaID)) {
+ 	    window.alert('The Cordova ID should be in reverse domain style like "com.acme.dev" with no ending period. Letters, digit, underscore and hyphens are allowed.')
+			return
+		}
 
 		if (description.length < 10 || description.length > 80) {
-      window.alert('The one line description should be 10-80 characters long.')
+			window.alert('The one line description should be 10-80 characters long.')
 			return
 		}
 
 		if (longDescription.length < 10 || longDescription.length > 4000) {
-      window.alert('The long description should be 10-4000 characters long.')
+			window.alert('The long description should be 10-4000 characters long.')
 			return
 		}
 
@@ -1761,16 +1795,15 @@ function createNewsEntry(item) {
       var newName = name.replace(/\s/g, '-')
       newName = newName.toLowerCase()
       hyper.UI.$('#input-config-app-name').val(newName)
-			return // Abort (dialog is still visible)
+	  	return // Abort (dialog is still visible)
     }
-    
-    if (/[^a-z0-9\.\-]/.test(version)) {
-      window.alert('The version should only consist of lower case letters, digits, dots and dashes.')
+
+    if (version.length > 0 && !SEMVER_REGEX().test(version)) {
+      window.alert('The version should follow semantic versioning style in the form of MAJOR.MINOR.PATCH, see semver.org for details.')
       // This is just to try to make it match the regexp test
       var newVersion = version.replace(/\s/g, '-')
-      newVersion = newVersion.toLowerCase()
       hyper.UI.$('#input-config-app-version').val(newVersion)
-			return // Abort (dialog is still visible)
+	  	return // Abort (dialog is still visible)
     }
 
     // Collect checked plugins
@@ -1839,6 +1872,7 @@ function createNewsEntry(item) {
     }
 
     // Store all meta data
+		APP_SETTINGS.getAppID(path) // Hack to make sure evothings.json is written
     APP_SETTINGS.setName(path, name)
     APP_SETTINGS.setDescription(path, description)
     APP_SETTINGS.setLongDescription(path, longDescription)
@@ -1863,17 +1897,29 @@ function createNewsEntry(item) {
 			hyper.UI.$('#input-build-app-name').val(shortName) // Hidden field
 			hyper.UI.$('#input-build-app-debug').prop('checked', old.debug)
 			hyper.UI.$('#input-build-app-filename').val(old.filename)
-			// Use stored passwords if we have them, and then hide fields
+			// This one will just have previous value
+			//hyper.UI.$('#input-build-app-session').prop('checked', ...)
+			hyper.UI.$('#input-build-app-save').prop('checked', false)
+
+			// If we should not remember these fields during the session, we clear them first
+			var sessionPasswords = hyper.UI.$('#input-build-app-session').prop('checked')
+			if (!sessionPasswords) {
+				hyper.UI.$('#input-build-app-storepassword').val('')
+				hyper.UI.$('#input-build-app-keypassword').val('')
+			}
+
+			// And if we have stored passwords we use them
 			var storePassword = SETTINGS.getStorePassword()
 			var keyPassword = SETTINGS.getKeyPassword()
 			if (storePassword) {
 				hyper.UI.$('#input-build-app-storepassword').val(storePassword)
-				hyper.UI.$('#input-build-app-storepassword-div').hide()
+//				hyper.UI.$('#input-build-app-storepassword-div').hide()
 			}
 			if (keyPassword) {
 				hyper.UI.$('#input-build-app-keypassword').val(keyPassword)
-				hyper.UI.$('#input-build-app-keypassword-div').hide()
+//				hyper.UI.$('#input-build-app-keypassword-div').hide()
 			}
+
 			hyper.UI.$('#dialog-build-app').modal('show')
 		})
 	}
@@ -2016,8 +2062,34 @@ function createNewsEntry(item) {
 		var name = hyper.UI.$('#input-build-app-name').val()
 		var filename = hyper.UI.$('#input-build-app-filename').val()
 		var debug = hyper.UI.$('#input-build-app-debug').prop('checked')
+		var sessionPasswords = hyper.UI.$('#input-build-app-session').prop('checked')
+		var savePasswords = hyper.UI.$('#input-build-app-save').prop('checked')
 		var storePassword = hyper.UI.$('#input-build-app-storepassword').val()
 		var keyPassword = hyper.UI.$('#input-build-app-keypassword').val()
+
+		if (filename.length = 0) {
+			window.alert('The target filename can not be empty.')
+			return
+		}
+		if (keyPassword.length < 6) {
+			window.alert('The key password needs to be at least 6 characters long.')
+			return
+		}
+		if (storePassword.length < 6) {
+			window.alert('The key store password needs to be at least 6 characters long.')
+			return
+		}
+		// User wants to save them in settings so we do
+		if (savePasswords) {
+			SETTINGS.setKeyPassword(keyPassword)
+			SETTINGS.setStorePassword(storePassword)
+		}
+
+		// We clear the fields unless the user wants to keep them for the session
+		if (!sessionPasswords) {
+			hyper.UI.$('#input-build-app-storepassword').val('')
+			hyper.UI.$('#input-build-app-keypassword').val('')
+		}
 
   	// Hide dialog.
 		hyper.UI.$('#dialog-build-app').modal('hide')
@@ -2083,10 +2155,17 @@ function createNewsEntry(item) {
 			hyper.UI.createBuildConfig(evoboxDir, build, storePassword, keyPassword)
 
 			// Spawn the build, progress shown in Build tab
+			var hasPassRE = /-(key|store)pass/
+			var escapedStorePassword = storePassword.replace('"', '\\"')
+			var escapedKeyPassword = keyPassword.replace('"', '\\"')
 			hyper.UI.buildStatus("Running build script ...")
 			const proc = CHILD_PROCESS.spawn('vagrant', ['ssh', '-c', `'cd\ /vagrant\ &&\ ruby\ build.rb\ ${name}.rb'`], {cwd: evoboxDir, shell: true})
 			proc.stdout.on('data', (data) => {
 				var s = data.toString()
+				if (hasPassRE.test(s)) {
+					s = s.replace(escapedStorePassword, '*****')
+					s = s.replace(escapedKeyPassword, '*****')
+				}
 				build.log.push(s)
 				hyper.UI.buildLog(s)
 			})
@@ -2125,6 +2204,9 @@ function createNewsEntry(item) {
 		var signCommand = SETTINGS.getJarSignCommand()
 		var verifyCommand = SETTINGS.getJarVerifyCommand()
 		var distinguishedName = SETTINGS.getDistinguishedName()
+		// Looks insane but it gets unescaped twice...
+		var escapedStorePassword = storePassword.replace('"', '\\\\\\"')
+		var escapedKeyPassword = keyPassword.replace('"', '\\\\\\"')
 		// Compose a reasonable Ruby array
 		pluginArray = []
 		for (p of build.plugins) {
@@ -2159,11 +2241,11 @@ FeatureGraphic = SourceDirectory + '/res/feature-graphic-1024x500.png'
 PromoGraphic = SourceDirectory + '/res/promo-graphic-180x120.png'
 Keystore = '${keyStore}'
 ReleaseOrDebug = "${debugMode}"
-StorePassword = "${storePassword}"
-KeyPassword = "${keyPassword}"
+StorePassword = "${escapedStorePassword}"
+KeyPassword = "${escapedKeyPassword}"
 DistinguishedName = "${distinguishedName}"
 KeytoolGenKey = "${keyCommand}"
-KeytoolList = "keytool -list -keystore #{Keystore} -storepass #{StorePassword} -v"
+KeytoolList = "keytool -list -keystore #{Keystore} -storepass \\"#{StorePassword}\\" -v"
 Jarsigner = "${signCommand}"
 JarVerify = "${verifyCommand}"
 `

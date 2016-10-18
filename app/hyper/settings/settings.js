@@ -114,6 +114,11 @@ systemSetting('JarVerifyCommand', 'jarsigner -verify -verbose -certs #{TargetFil
 systemSetting('CordovaPrefix', 'com.evothings.samples.')
 
 /**
+ * Tools settings.
+ */
+systemSetting('EditorCommand', 'code')
+
+/**
  * Workbench window settings.
  */
 systemSetting('WorkbenchFontSize', '18px')
