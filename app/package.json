@@ -25,7 +25,6 @@
     "babel-preset-es2015": "^6.16.0",
     "cheerio": "^0.22.0",
     "coffee-script": "^1.11.1",
-    "domain-regex": "0.0.1",
     "font-awesome": "^4.6.3",
     "fs-extra": "^0.30.0",
     "glob": "^7.1.0",

@@ -105,11 +105,11 @@ systemSetting('AuthorName', 'Evo Things')
 systemSetting('AuthorEmail', 'build@evothings.com')
 systemSetting('AuthorURL', 'https://evothings.com')
 systemSetting('KeystoreFilename', 'evo256.keystore')
-systemSetting('KeystoreCreateCommand', 'keytool -genkey -noprompt -dname \\"#{DistinguishedName}\\" -v -keystore #{Keystore} -alias evokey256 -keyalg RSA -keysize 2048 -validity 10000 -storepass #{StorePassword} -keypass #{KeyPassword}')
-systemSetting('KeyPassword', '') // No default value :)
-systemSetting('StorePassword', '') // No default value :)
+systemSetting('KeystoreCreateCommand', 'keytool -genkey -noprompt -dname \\"#{DistinguishedName}\\" -v -keystore #{Keystore} -alias evokey256 -keyalg RSA -keysize 2048 -validity 10000 -storepass \\"#{StorePassword}\\" -keypass \\"#{KeyPassword}\\"')
+systemSetting('KeyPassword', '') // No default value :) Needs to have " escaped as \"
+systemSetting('StorePassword', '') // No default value :) Needs to have " escaped as \"
 systemSetting('DistinguishedName', 'CN=Evothings, OU=Dev, O=Evothings, L=Stockholm, S=Stockholm, C=SE')
-systemSetting('JarSignCommand', 'jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -tsa http://timestamp.digicert.com -keystore #{RootDir}/#{Keystore} -storepass #{StorePassword} -keypass #{KeyPassword} #{TargetFileName}-unaligned.apk evokey256')
+systemSetting('JarSignCommand', 'jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -tsa http://timestamp.digicert.com -keystore #{RootDir}/#{Keystore} -storepass \\"#{StorePassword}\\" -keypass \\"#{KeyPassword}\\" #{TargetFileName}-unaligned.apk evokey256')
 systemSetting('JarVerifyCommand', 'jarsigner -verify -verbose -certs #{TargetFileName}-unaligned.apk')
 systemSetting('CordovaPrefix', 'com.evothings.samples.')
 
