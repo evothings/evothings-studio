@@ -10,11 +10,11 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
-    "electron-builder": "^7.9.0",
-    "electron-packager": "^8.0.0",
-    "electron-prebuilt": "^1.2.1",
+    "electron-builder": "^7.14.1",
+    "electron-packager": "^8.1.0",
+    "electron-prebuilt": "^1.4.3",
     "node-promise": "^0.5.12",
-    "spectron": "^3.3.0"
+    "spectron": "^3.4.0"
   },
   "build": {
     "appId": "com.evothings.studio",
@@ -30,11 +30,11 @@
     "dmg": {
        "contents": [
          {
-          "x": 450,
+          "x": 140,
           "y": 220
          },
          {
-          "x": 140,
+          "x": 450,
           "y": 220,
           "type": "link",
           "path": "/Applications"
