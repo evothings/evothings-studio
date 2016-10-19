@@ -1667,14 +1667,12 @@ function createNewsEntry(item) {
 	}
 
   hyper.UI.openConfigAppDialog = function(dirOrFile) {
-		var path = PATH.dirname(dirOrFile)
+		var path = FILEUTIL.getAppDirectory(dirOrFile)
 		// Trying to be clever with coming up with a name if missing
 		var name = APP_SETTINGS.getName(path) || PATH.basename(dirOrFile)
 		if (name.startsWith('index.htm')) {
 			name = PATH.basename(path)
 		}
-		// Same sanitization as for Cordova ID
-		name = hyper.UI.sanitizeForCordovaID(name)
 		// Populate input fields.
 		hyper.UI.$('#input-config-app-path').val(path) // Hidden field.
     hyper.UI.$('#input-config-app-name').val(name)
