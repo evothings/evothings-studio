@@ -27,6 +27,20 @@
     "mac": {
       "category": "public.app-category.developer-tools"
     },
+    "dmg": {
+       "contents": [
+         {
+          "x": 450,
+          "y": 220
+         },
+         {
+          "x": 140,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
     "win": {
       "target": ["nsis", "squirrel"]
     },
