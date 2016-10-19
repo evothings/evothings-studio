@@ -2109,6 +2109,48 @@ function createNewsEntry(item) {
 		hyper.UI.$('#build-result').html(hyper.UI.$(`<a href="file://${pathAPK}">${file}</a>`))
 	}
 
+	hyper.UI.copyAppForBuild = function(fullPath, destination) {
+		// Make sure www directory in copied app has all that needs to go into Cordova www
+		// First we copy the whole app, and remove any existing first
+		FSEXTRA.removeSync(destination)
+		FSEXTRA.copySync(fullPath, destination)
+		// Then we figure out what to copy into www, if anything
+		var www = PATH.join(destination, 'www')
+		if (FILEUTIL.fileIsDirectory(fullPath)) {
+			// Get index file to run from evothings.json.
+			//var indexFile = APP_SETTINGS.getIndexFile(fullPath)
+			//if (!indexFile)
+			//{
+				// Error. Must have index file.
+			//	buildCallback(
+			//		'evothings.json is missing or index-file entry is missing: '
+			//		+ fullPath)
+			//	return
+			//}
+
+			// If we have www dir we just use it as is
+			var wwwDir = APP_SETTINGS.getWwwDir(fullPath)
+			if (wwwDir) {
+				return
+			}
+
+			// Otherwise we use the app dir
+			var appDir = APP_SETTINGS.getAppDir(fullPath)
+			if (appDir) {
+				FSEXTRA.copySync(PATH.join(destination, appDir), www)
+				return
+			}
+		}
+		// Otherwise we copy everything except res & evothings.json & icon
+		FSEXTRA.copySync(fullPath, www)
+		FSEXTRA.removeSync(PATH.join(www, 'res'))
+		FSEXTRA.removeSync(PATH.join(www, 'evothings.json'))
+		var image = APP_SETTINGS.getAppImage(fullPath)
+		if (image) {
+			FSEXTRA.removeSync(PATH.join(www, image))
+		}
+	}
+
 	hyper.UI.buildApp = function(path, name, filename, debug, keyPassword, storePassword) {
 		// Clear build log
 		hyper.UI.buildStartTask("Building " + name)
@@ -2117,6 +2159,10 @@ function createNewsEntry(item) {
 		hyper.UI.buildStatus("Starting Evobox for build ...")
 
 		hyper.UI.startEvobox(path, function(path, evoboxDir) {
+			// Copy app into build box directory and make sure source is in www
+			hyper.UI.buildStatus("Copying app source to build directory ...")
+			hyper.UI.copyAppForBuild(path, PATH.join(evoboxDir, name))
+
 			// Create a Build object
 			var build = {
 				start: Date.now(),
@@ -2130,15 +2176,13 @@ function createNewsEntry(item) {
 				authorEmail: APP_SETTINGS.getAuthorEmail(path),
 				authorURL: APP_SETTINGS.getAuthorURL(path),
 				path: path,
+				source: '/www/',
 				plugins: JSON.parse(JSON.stringify(APP_SETTINGS.getPlugins(path))),
 				debug: debug,
 				log: []
 			}
 			hyper.UI.mBuildList.push(build)
 
-			// Copy app into build box directory
-			hyper.UI.buildStatus("Copying app source to build directory ...")
-			FSEXTRA.copySync(path, PATH.join(evoboxDir, name))
 
 			// Purge any existing previous build
 			var resultDir = PATH.join(evoboxDir, 'result', name)
@@ -2222,7 +2266,7 @@ AuthorEmail = "${build.authorEmail}"
 AuthorHref = "${build.authorURL}"
 AuthorName = "${build.authorName}"
 SourceDirectory = "${build.name}"
-AppSource = "/."
+AppSource = "${build.source}"
 TargetFileName = '${build.filename}'
 AppId = '${build.appID}'
 Plugins = [${pluginArray.toString()}]
