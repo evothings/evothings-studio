@@ -1870,7 +1870,7 @@ function createNewsEntry(item) {
     }
 
     // Store all meta data
-		APP_SETTINGS.getAppID(path) // Hack to make sure evothings.json is written
+		APP_SETTINGS.getOrCreateAppID(path) // Make sure we have evothings.json
     APP_SETTINGS.setName(path, name)
     APP_SETTINGS.setDescription(path, description)
     APP_SETTINGS.setLongDescription(path, longDescription)

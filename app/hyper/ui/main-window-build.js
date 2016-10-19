@@ -176,7 +176,7 @@ exports.defineBuildFunctions = function(hyper)
 		SERVER.setAppFileName(indexFile)
 
 		// Set app id, will create evothings.json with new id if not existing.
-		SERVER.setAppID(APP_SETTINGS.getAppID(evothingsJsonPath || appBasePath))
+		SERVER.setAppID(APP_SETTINGS.getOrCreateAppID(evothingsJsonPath || appBasePath))
 
 		// Monitor files.
 		MONITOR.setBasePath(appBasePath)
@@ -238,7 +238,7 @@ exports.defineBuildFunctions = function(hyper)
 			// Set server www path. Build continues below.
 			SERVER.setAppPath(PATH.join(fullPath, wwwDir))
 			SERVER.setAppFileName(indexFile)
-			SERVER.setAppID(APP_SETTINGS.getAppID(fullPath))
+			SERVER.setAppID(APP_SETTINGS.getOrCreateAppID(fullPath))
 			MONITOR.setBasePath(PATH.join(fullPath, appDir))
 		}
 		else

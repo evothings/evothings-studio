@@ -38,52 +38,45 @@ var UUID = require('./uuid.js')
  * Get the app ID. Create ID if it does not exist.
  * This ID is used to identify apps.
  */
-exports.getAppID = function(appPath)
-{
-	var settings = readAppSettings(appPath)
-
-	if (!settings) {
-		settings = {}
-	}
-
-	if (!(settings['uuid']))
-	{
+exports.getOrCreateAppID = function(appPath) {
+	var settings = readAppSettings(appPath) || {}
+	if (!(settings['uuid'])) {
 		settings['uuid'] = UUID.generateUUID()
 		writeAppSettings(settings, appPath)
+	}
+	return settings['uuid']
+}
+
+/**
+ * Get the app ID, return null if it does not exist.
+ */
+exports.getAppID = function(appPath) {
+	var settings = readAppSettings(appPath)
+	if (settings && settings['uuid']) {
 		return settings['uuid']
 	}
-
-	return settings['uuid']
+	return null
 }
 
 /**
  * Return short name for app, or null if not set.
  */
-exports.getName = function(appPath)
-{
+exports.getName = function(appPath) {
 	var settings = readAppSettings(appPath)
-	if (settings && settings['name'])
-	{
+	if (settings && settings['name']) {
 		return settings['name']
 	}
-	else
-	{
-		return null
-	}
+	return null
 }
-exports.setName = function(appPath, name)
-{
+exports.setName = function(appPath, name) {
 	var settings = readAppSettings(appPath)
-	if (settings)
-	{
+	if (settings) {
 		settings['name'] = name
 		writeAppSettings(settings, appPath)
 	}
-	else
-	{
-		return null
-	}
+	return null
 }
+
 /**
  * Return oneline description for app, or null if not set.
  */
