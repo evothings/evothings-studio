@@ -843,16 +843,21 @@ exports.defineUIFunctions = function(hyper)
 	 * Edit app in VS Code, either a file path or dir path.
 	 */
 	hyper.UI.editApp = function(path) {
+		var error = null
 		cmd = SETTINGS.getEditorCommand()
-		const build = CHILD_PROCESS.spawn(cmd, [path], {
+		const edit = CHILD_PROCESS.spawn(cmd, [path], {
   		cwd: PATH.dirname(path),
   		env: process.env
 		})
-		build.on('close', (code) => {
-			console.log(`Spawn of VSCode exited with code ${code}`);
+		edit.on('error', (err) => {
+			error = err
+			console.log(`Spawn of editor exited with error: ${err}`);
+		})
+		edit.on('close', (code) => {
+			console.log(`Spawn of editor exited with code ${code}`);
 			// If we fail then... let's check
 			if (code != 0) {
-				hyper.UI.checkVSCode()
+				hyper.UI.checkVSCode(code, error)
 			}
 		})
 	}
@@ -860,24 +865,34 @@ exports.defineUIFunctions = function(hyper)
 	/**
 	 * Check for VS Code and offer download
 	 */
-	hyper.UI.checkVSCode = function(path) {
+	hyper.UI.checkVSCode = function(code, error) {
 		var haveVSCode = UTIL.haveVSCode()
-		var have = ""
-		var doit = "Ok, open download page(s)"
-		// Verify we have it
-		if (!haveVSCode) {
-			var osx = ''
-			if (process.platform == 'darwin') {
-				osx = "You also need to open Command Palette (under View) and type in 'shell command' and pick 'Shell Command: Install code command in PATH'" 
-			}
-			var res = MAIN.openWorkbenchDialog('Tools',
-				'Install Visual Studio Code?',
-				`Visual Studio Code works great together with Evothings and we recommend it as a good lightweight open source cross platform IDE.\n\nInstallation is easy, just download and run appropriate installer.${osx}\n\nThen try edit again!\n\nFor other editors, change Editor Command under settings.`, 'question', [doit, "Cancel"])
-			if (res == doit) {
-				hyper.UI.openInBrowser('https://code.visualstudio.com/Download')
+		var cmd = SETTINGS.getEditorCommand()
+		if (cmd == 'code') {
+			var doit = "Ok, open download page(s)"
+			// Verify we have it
+			if (!haveVSCode) {
+				var osx = ''
+				if (process.platform == 'darwin') {
+					osx = "You also need to open Command Palette (under View) and type in 'shell command' and pick 'Shell Command: Install code command in PATH'" 
+				}
+				var res = MAIN.openWorkbenchDialog('Tools',
+					'Install Visual Studio Code?',
+					`Visual Studio Code works great together with Evothings and we recommend it as a good lightweight open source cross platform IDE.\n\nInstallation is easy, just download and run appropriate installer.${osx}\n\nThen try edit again!\n\nFor other editors, change Editor Command under settings.`, 'question', [doit, "Cancel"])
+				if (res == doit) {
+					hyper.UI.openInBrowser('https://code.visualstudio.com/Download')
+				} else {
+					return // Cancel button
+				}
 			} else {
-				return // Cancel button
+				MAIN.openWorkbenchDialog('Tools',
+					'Visual Studio Code failed',
+					`Visual Studio Code failed with exit code ${code} and error: ${error}.`, 'warning', ["Ok"])
 			}
+		} else {
+			MAIN.openWorkbenchDialog('Tools',
+					'Opening Editor failed',
+					`Your editor command '${cmd}̈́ failed with exit code ${code} and error: ${error}.`, 'warning', ["Ok"])
 		}
 	}
 
@@ -2212,7 +2227,14 @@ function createNewsEntry(item) {
 				build.log.push('stderr:' + s)
 				hyper.UI.buildLog('stderr: ' + s)
 			})
+			proc.on('error', (err) => {
+				console.log(`Build process exited with error: ${err}`);
+				console.dir(build)
+  			hyper.UI.buildStatus("Build failed due to unexpected error.")
+				MAIN.openWorkbenchDialog('Build Failed Unexpectedly', `Build of ${build.name} failed!`, `The build of ${build.name} failed unexpectedly with error ${error}.\n\nSee log in Build tab for details.`, 'error', ["Ok"])
+			})
 			proc.on('close', (code) => {
+
 				build.exitCode = code
 				console.log(`Build process exited with code ${code}`);
 				console.dir(build)
