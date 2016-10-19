@@ -2212,6 +2212,7 @@ function createNewsEntry(item) {
 			var escapedStorePassword = storePassword.replace('"', '\\"')
 			var escapedKeyPassword = keyPassword.replace('"', '\\"')
 			hyper.UI.buildStatus("Running build script ...")
+			var error = null
 			const proc = CHILD_PROCESS.spawn('vagrant', ['ssh', '-c', `'cd\ /vagrant\ &&\ ruby\ build.rb\ ${name}.rb'`], {cwd: evoboxDir, shell: true})
 			proc.stdout.on('data', (data) => {
 				var s = data.toString()
@@ -2229,24 +2230,26 @@ function createNewsEntry(item) {
 			})
 			proc.on('error', (err) => {
 				console.log(`Build process exited with error: ${err}`);
-				console.dir(build)
-  			hyper.UI.buildStatus("Build failed due to unexpected error.")
-				MAIN.openWorkbenchDialog('Build Failed Unexpectedly', `Build of ${build.name} failed!`, `The build of ${build.name} failed unexpectedly with error ${error}.\n\nSee log in Build tab for details.`, 'error', ["Ok"])
+				error = err
 			})
 			proc.on('close', (code) => {
-
 				build.exitCode = code
 				console.log(`Build process exited with code ${code}`);
 				console.dir(build)
-				// Present result to user
-				if (code == 0) {
-					hyper.UI.buildStatus("Build succeeded.")
-					var resultAPK = PATH.join(resultDir, name + '.apk')
-					hyper.UI.buildResult(resultAPK)
-					MAIN.openWorkbenchDialog('Build Ready', `Build of ${build.name} succeeded!`, `The build of ${build.name} succeeded and the resulting apk can be found at:\n\n${resultAPK}\n\nAlso see link at top of Build tab.`, 'info', ["Ok"])
+				if (error) {
+					hyper.UI.buildStatus("Build failed due to unexpected error.")
+					MAIN.openWorkbenchDialog('Build Failed Unexpectedly', `Build of ${build.name} failed!`, `The build of ${build.name} failed unexpectedly with error ${error} and exit code ${code}.\n\nSee log in Build tab for details.`, 'error', ["Ok"])
 				} else {
-					hyper.UI.buildStatus("Build failed.")
-					MAIN.openWorkbenchDialog('Build Failed', `Build of ${build.name} failed!`, `The build of ${build.name} failed with exit code ${code}.\n\nSee log in Build tab for details.`, 'error', ["Ok"])
+					// Present result to user
+					if (code == 0) {
+						hyper.UI.buildStatus("Build succeeded.")
+						var resultAPK = PATH.join(resultDir, name + '.apk')
+						hyper.UI.buildResult(resultAPK)
+						MAIN.openWorkbenchDialog('Build Ready', `Build of ${build.name} succeeded!`, `The build of ${build.name} succeeded and the resulting apk can be found at:\n\n${resultAPK}\n\nAlso see link at top of Build tab.`, 'info', ["Ok"])
+					} else {
+						hyper.UI.buildStatus("Build failed.")
+						MAIN.openWorkbenchDialog('Build Failed', `Build of ${build.name} failed!`, `The build of ${build.name} failed with exit code ${code}.\n\nSee log in Build tab for details.`, 'error', ["Ok"])
+					}
 				}
 			})
 		})
