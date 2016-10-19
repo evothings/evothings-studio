@@ -1659,7 +1659,7 @@ function createNewsEntry(item) {
 	hyper.UI.sanitizeForCordovaID = function(str) {
 		// Replace non conforming characters with "."
 		var result = str.replace(/[^a-zA-Z0-9\.]/g, '.')
-		result = result.toLowerCase()
+		// Not needed, Cordova id can handle case: result = result.toLowerCase()
 		// Collapse multiple ".." to a single "."
 		result = result.replace(/\.+/g, '.')
 		// Remove leading and trailing "."
