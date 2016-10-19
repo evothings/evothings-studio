@@ -1869,6 +1869,12 @@ function createNewsEntry(item) {
 	}
 
 	hyper.UI.openBuildAppDialog = function(path) {
+		if (process.platform == 'win32') {
+			MAIN.openWorkbenchDialog('Tools',
+				'Build function not yet supported on Windows',
+				`Evothings can build the Android apk file for your application, but currently only on OSX and Linux. We will soon release this support also for Windows. Also note that we are working on supporting the iOS build also.`, 'info', ["Ok"])
+			return
+		}
 		// Before we open the dialog, we need to make sure the app itself is built (ES6)
 		hyper.UI.buildAppIfNeeded(path, null, false, function(error) {
 			if (!error) {
