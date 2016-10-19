@@ -49,7 +49,7 @@ var URL = require('url')
 const CHILD_PROCESS = require('child_process')
 
 // This is not a strict domain regex, but enough to make Cordova happy (and Cordova is not fully sane either)
-const reverseDomainRE = /^(([a-zA-Z0-9\-\_]+)\.)*([a-zA-Z0-9\-\_]+)$/
+const reverseDomainRE = /^(([a-zA-Z0-9]+)\.)*([a-zA-Z0-9]+)$/
 
 // Counter for "popup" menus on an app entry in the My Apps list.
 var mEntryMenuIdCounter = 0
@@ -832,21 +832,6 @@ exports.defineUIFunctions = function(hyper)
 	}
 
 	/**
-	 * If path is not a full path, make it so. This is
-	 * used to make relative example paths full paths.
-	 */
-	hyper.UI.getAppFullPath = function(path) {
-		if (!FILEUTIL.isPathAbsolute(path))
-		{
-			return PATH.join(hyper.UI.getWorkbenchPath(), path)
-		}
-		else
-		{
-			return path
-		}
-	}
-
-	/**
 	 * Get path to the Workbench application directory.
 	 */
 	hyper.UI.getWorkbenchPath = function(path)
@@ -1343,7 +1328,7 @@ function createNewsEntry(item) {
 		var cordovaPrefix = hyper.UI.$('#input-setting-cordova-prefix').val()
 
 		if (!reverseDomainRE.test(cordovaPrefix)) {
- 	    window.alert('The Cordova prefix should be in reverse domain style like "com.acme.dev" with no ending period. Letters, digit, underscore and hyphens are allowed.')
+ 	    window.alert('The Cordova prefix should be in reverse domain style like "com.acme.dev" with no ending period. Letters and digits are allowed.')
 			return
 		}
 		// Hide settings dialog.
@@ -1658,8 +1643,8 @@ function createNewsEntry(item) {
 	// Try to produce a proper Cordova Widget id (reverse domain style) from str
 	hyper.UI.sanitizeForCordovaID = function(str) {
 		// Replace non conforming characters with "."
-		var result = str.replace(/[^a-zA-Z0-9\-\_\.]/g, '.')
-		result = result.toLowerCase()
+		var result = str.replace(/[^a-zA-Z0-9\.]/g, '.')
+		// Not needed, Cordova id can handle case: result = result.toLowerCase()
 		// Collapse multiple ".." to a single "."
 		result = result.replace(/\.+/g, '.')
 		// Remove leading and trailing "."
@@ -1667,14 +1652,12 @@ function createNewsEntry(item) {
 	}
 
   hyper.UI.openConfigAppDialog = function(dirOrFile) {
-		var path = PATH.dirname(dirOrFile)
+		var path = FILEUTIL.getAppDirectory(dirOrFile)
 		// Trying to be clever with coming up with a name if missing
 		var name = APP_SETTINGS.getName(path) || PATH.basename(dirOrFile)
 		if (name.startsWith('index.htm')) {
 			name = PATH.basename(path)
 		}
-		// Same sanitization as for Cordova ID
-		name = hyper.UI.sanitizeForCordovaID(name)
 		// Populate input fields.
 		hyper.UI.$('#input-config-app-path').val(path) // Hidden field.
     hyper.UI.$('#input-config-app-name').val(name)
@@ -1775,7 +1758,7 @@ function createNewsEntry(item) {
 		var cordovaID = hyper.UI.$('#input-config-app-cordova-id').val()
 
 		if (!reverseDomainRE.test(cordovaID)) {
- 	    window.alert('The Cordova ID should be in reverse domain style like "com.acme.dev" with no ending period. Letters, digit, underscore and hyphens are allowed.')
+ 	    window.alert('The Cordova ID should be in reverse domain style like "com.acme.dev" with no ending period. Letters and digits are allowed.')
 			return
 		}
 
@@ -1872,7 +1855,7 @@ function createNewsEntry(item) {
     }
 
     // Store all meta data
-		APP_SETTINGS.getAppID(path) // Hack to make sure evothings.json is written
+		APP_SETTINGS.getOrCreateAppID(path) // Make sure we have evothings.json
     APP_SETTINGS.setName(path, name)
     APP_SETTINGS.setDescription(path, description)
     APP_SETTINGS.setLongDescription(path, longDescription)
@@ -1886,41 +1869,46 @@ function createNewsEntry(item) {
 	}
 
 	hyper.UI.openBuildAppDialog = function(path) {
-		hyper.UI.showTab('build')
-		// Verify we have virtualbox, vagrant and evobox ready to run.
-		hyper.UI.verifyBuildEnvironment(path, function() {
-			// Evobox is up and running, now we can ask user for build details
-			// First we find any previous build to copy values from
-			var shortName = APP_SETTINGS.getName(path)
-			old = hyper.UI.findPreviousBuild(path) || {debug: true, filename: shortName}
-			hyper.UI.$('#input-build-app-path').val(path) // Hidden field.
-			hyper.UI.$('#input-build-app-name').val(shortName) // Hidden field
-			hyper.UI.$('#input-build-app-debug').prop('checked', old.debug)
-			hyper.UI.$('#input-build-app-filename').val(old.filename)
-			// This one will just have previous value
-			//hyper.UI.$('#input-build-app-session').prop('checked', ...)
-			hyper.UI.$('#input-build-app-save').prop('checked', false)
+		// Before we open the dialog, we need to make sure the app itself is built (ES6)
+		hyper.UI.buildAppIfNeeded(path, null, false, function(error) {
+			if (!error) {
+				hyper.UI.showTab('build')
+				// Verify we have virtualbox, vagrant and evobox ready to run.
+				hyper.UI.verifyBuildEnvironment(path, function() {
+					// Evobox is up and running, now we can ask user for build details
+					// First we find any previous build to copy values from
+					var shortName = APP_SETTINGS.getName(path)
+					old = hyper.UI.findPreviousBuild(path) || {debug: true, filename: shortName}
+					hyper.UI.$('#input-build-app-path').val(path) // Hidden field.
+					hyper.UI.$('#input-build-app-name').val(shortName) // Hidden field
+					hyper.UI.$('#input-build-app-debug').prop('checked', old.debug)
+					hyper.UI.$('#input-build-app-filename').val(old.filename)
+					// This one will just have previous value
+					//hyper.UI.$('#input-build-app-session').prop('checked', ...)
+					hyper.UI.$('#input-build-app-save').prop('checked', false)
 
-			// If we should not remember these fields during the session, we clear them first
-			var sessionPasswords = hyper.UI.$('#input-build-app-session').prop('checked')
-			if (!sessionPasswords) {
-				hyper.UI.$('#input-build-app-storepassword').val('')
-				hyper.UI.$('#input-build-app-keypassword').val('')
-			}
+					// If we should not remember these fields during the session, we clear them first
+					var sessionPasswords = hyper.UI.$('#input-build-app-session').prop('checked')
+					if (!sessionPasswords) {
+						hyper.UI.$('#input-build-app-storepassword').val('')
+						hyper.UI.$('#input-build-app-keypassword').val('')
+					}
 
-			// And if we have stored passwords we use them
-			var storePassword = SETTINGS.getStorePassword()
-			var keyPassword = SETTINGS.getKeyPassword()
-			if (storePassword) {
-				hyper.UI.$('#input-build-app-storepassword').val(storePassword)
-//				hyper.UI.$('#input-build-app-storepassword-div').hide()
-			}
-			if (keyPassword) {
-				hyper.UI.$('#input-build-app-keypassword').val(keyPassword)
-//				hyper.UI.$('#input-build-app-keypassword-div').hide()
-			}
+					// And if we have stored passwords we use them
+					var storePassword = SETTINGS.getStorePassword()
+					var keyPassword = SETTINGS.getKeyPassword()
+					if (storePassword) {
+						hyper.UI.$('#input-build-app-storepassword').val(storePassword)
+		//				hyper.UI.$('#input-build-app-storepassword-div').hide()
+					}
+					if (keyPassword) {
+						hyper.UI.$('#input-build-app-keypassword').val(keyPassword)
+		//				hyper.UI.$('#input-build-app-keypassword-div').hide()
+					}
 
-			hyper.UI.$('#dialog-build-app').modal('show')
+					hyper.UI.$('#dialog-build-app').modal('show')
+				})
+			}
 		})
 	}
 

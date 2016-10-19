@@ -59,11 +59,11 @@ exports.defineBuildFunctions = function(hyper)
 		// Stop monitoring files while building.
 		MONITOR.stopFileSystemMonitor()
 
-		// Prepend application path if this is not an absolute path.
-		mAppFullPath = hyper.UI.getAppFullPath(path)
+		// Should now always be an absolute path.
+		mAppFullPath = path
 
 		// Build the app.
-		buildAppIfNeeded(mAppFullPath, null, buildCallback)
+		hyper.UI.buildAppIfNeeded(mAppFullPath, null, true, buildCallback)
 
 		function buildCallback(error)
 		{
@@ -117,7 +117,7 @@ exports.defineBuildFunctions = function(hyper)
 		MONITOR.stopFileSystemMonitor()
 
 		// Build the app.
-		buildAppIfNeeded(mAppFullPath, changedFiles, buildCallback)
+		hyper.UI.buildAppIfNeeded(mAppFullPath, changedFiles, true, buildCallback)
 
 		function buildCallback(error)
 		{
@@ -176,7 +176,7 @@ exports.defineBuildFunctions = function(hyper)
 		SERVER.setAppFileName(indexFile)
 
 		// Set app id, will create evothings.json with new id if not existing.
-		SERVER.setAppID(APP_SETTINGS.getAppID(evothingsJsonPath || appBasePath))
+		SERVER.setAppID(APP_SETTINGS.getOrCreateAppID(evothingsJsonPath || appBasePath))
 
 		// Monitor files.
 		MONITOR.setBasePath(appBasePath)
@@ -185,20 +185,22 @@ exports.defineBuildFunctions = function(hyper)
 	/**
 	 * @param fullPath - the project folder root.
 	 */
-	function buildAppIfNeeded(fullPath, changedFiles, buildCallback)
+	hyper.UI.buildAppIfNeeded = function(fullPath, changedFiles, willRun, buildCallback)
 	{
 		// Standard HTML file project.
 		if (FILEUTIL.fileIsHTML(fullPath))
 		{
-			// No build performed when running an HTML file project.
-			makeProjectCurrentWithoutBuildingIt(fullPath, null)
+			// No build performed for an HTML file project.
+			if (willRun) {
+				makeProjectCurrentWithoutBuildingIt(fullPath, null)
+			}
 			buildCallback(null)
 			return
 		}
 		// Project specified by directory with evothings.json.
 		else if (FILEUTIL.fileIsDirectory(fullPath))
 		{
-			// Get app to run from evothings.json.
+			// Get index file to run from evothings.json.
 			var evothingsJsonPath = fullPath
 			var indexFile = APP_SETTINGS.getIndexFile(fullPath)
 			if (!indexFile)
@@ -214,9 +216,11 @@ exports.defineBuildFunctions = function(hyper)
 			var appDir = APP_SETTINGS.getAppDir(fullPath)
 			if (!appDir)
 			{
-				// app dir is missing, run the HTML index file without building.
-				var indexFileFullPath = PATH.join(fullPath, indexFile)
-				makeProjectCurrentWithoutBuildingIt(indexFileFullPath, evothingsJsonPath)
+				// app dir is missing, if willRun - run the HTML index file without building.
+				if (willRun) {
+					var indexFileFullPath = PATH.join(fullPath, indexFile)
+					makeProjectCurrentWithoutBuildingIt(indexFileFullPath, evothingsJsonPath)
+				}
 				buildCallback(null)
 				return
 			}
@@ -225,9 +229,11 @@ exports.defineBuildFunctions = function(hyper)
 			var wwwDir = APP_SETTINGS.getWwwDir(fullPath)
 			if (!wwwDir)
 			{
-				// www dir is missing, run the HTML index file without building.
-				var indexFileFullPath = PATH.join(fullPath, appDir, indexFile)
-				makeProjectCurrentWithoutBuildingIt(indexFileFullPath, evothingsJsonPath)
+				// www dir is missing, if willRun - run the HTML index file without building.
+				if (willRun) {
+					var indexFileFullPath = PATH.join(fullPath, appDir, indexFile)
+					makeProjectCurrentWithoutBuildingIt(indexFileFullPath, evothingsJsonPath)
+				}
 				buildCallback(null)
 				return
 			}
@@ -235,11 +241,13 @@ exports.defineBuildFunctions = function(hyper)
 			// Get list of directories that should not be processed by the build.
 			var dontBuildDirs = APP_SETTINGS.getAppDontBuildDirs(fullPath)
 
-			// Set server www path. Build continues below.
-			SERVER.setAppPath(PATH.join(fullPath, wwwDir))
-			SERVER.setAppFileName(indexFile)
-			SERVER.setAppID(APP_SETTINGS.getAppID(fullPath))
-			MONITOR.setBasePath(PATH.join(fullPath, appDir))
+			if (willRun) {
+				// Set server www path. Build continues below.
+				SERVER.setAppPath(PATH.join(fullPath, wwwDir))
+				SERVER.setAppFileName(indexFile)
+				SERVER.setAppID(APP_SETTINGS.getOrCreateAppID(fullPath))
+				MONITOR.setBasePath(PATH.join(fullPath, appDir))
+			}
 		}
 		else
 		{
