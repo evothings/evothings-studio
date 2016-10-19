@@ -832,21 +832,6 @@ exports.defineUIFunctions = function(hyper)
 	}
 
 	/**
-	 * If path is not a full path, make it so. This is
-	 * used to make relative example paths full paths.
-	 */
-	hyper.UI.getAppFullPath = function(path) {
-		if (!FILEUTIL.isPathAbsolute(path))
-		{
-			return PATH.join(hyper.UI.getWorkbenchPath(), path)
-		}
-		else
-		{
-			return path
-		}
-	}
-
-	/**
 	 * Get path to the Workbench application directory.
 	 */
 	hyper.UI.getWorkbenchPath = function(path)

@@ -59,8 +59,8 @@ exports.defineBuildFunctions = function(hyper)
 		// Stop monitoring files while building.
 		MONITOR.stopFileSystemMonitor()
 
-		// Prepend application path if this is not an absolute path.
-		mAppFullPath = hyper.UI.getAppFullPath(path)
+		// Should now always be an absolute path.
+		mAppFullPath = path
 
 		// Build the app.
 		buildAppIfNeeded(mAppFullPath, null, buildCallback)
