@@ -9,7 +9,7 @@ main.MAJOR = 2
 main.MINOR = 2
 main.PATCH = 0
 // Disabled for a real release:
-main.BUILD = "alpha4"
+main.BUILD = "alpha5"
 
 // This one is burned in by scripts
 main.TIMESTAMP = '<timestamp>'
