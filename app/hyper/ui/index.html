@@ -236,7 +236,7 @@ Copyright (c) 2013-2015 Evothings AB
 						<div class="modal-body">
 							<div class="form-group">
 								<label for="input-new-app-name">
-									App short name (lower case, no whitespace):</label>
+									App short name (lower case letters, digits, hyphens, underscores and dashes):</label>
 								<input type="text"
 									id="input-new-app-name"
 									class="form-control"
@@ -311,8 +311,15 @@ Copyright (c) 2013-2015 Evothings AB
 								<input type="text"
 									id="input-config-app-name"
 									class="form-control"
-									value="my-new-app"
 									placeholder="App short name"/>
+							</div>
+							<div class="form-group">
+								<label for="input-config-app-title">
+									App title (3-30 characters):</label>
+								<input type="text"
+									id="input-config-app-title"
+									class="form-control"
+									placeholder="App title"/>
 							</div>
 							<div class="form-group">
 								<label for="input-config-app-cordova-id">
@@ -320,12 +327,11 @@ Copyright (c) 2013-2015 Evothings AB
 								<input type="text"
 									id="input-config-app-cordova-id"
 									class="form-control"
-									value="my-new-app"
 									placeholder="App Cordova id"/>
 							</div>
 							<div class="form-group">
 								<label for="input-config-app-description">
-									One line description:</label>
+									One line description (10-80 characters):</label>
 								<input type="text"
 									id="input-config-app-description"
 									class="form-control"
@@ -333,7 +339,7 @@ Copyright (c) 2013-2015 Evothings AB
 							</div>
 							<div class="form-group">
 								<label for="input-config-app-long-description">
-									Long description:</label>
+									Long description (10-4000 characters):</label>
 								<textarea
 									id="input-config-app-long-description"
 									class="form-control"
@@ -522,7 +528,7 @@ Copyright (c) 2013-2015 Evothings AB
 							<input id="input-copy-app-source-path" type="hidden" value="">
 							<div class="form-group">
 								<label for="input-copy-app-name">
-									New app short name (lower case, no whitespace):</label>
+									New app short name (lower case letters, digits, hyphens, underscores and dashes):</label>
 								<input type="text"
 									id="input-copy-app-name"
 									class="form-control"

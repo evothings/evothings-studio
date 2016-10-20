@@ -425,7 +425,7 @@ exports.defineUIFunctions = function(hyper)
 		var appVersion = options.version || null
 		var versions = options.versions || null
 		var shortName = options.name
-    var appName = options.title
+    var appTitle = options.title
     var appDescription = options.description
 
 		// Escape any backslashes in the path (needed on Windows).
@@ -459,15 +459,15 @@ exports.defineUIFunctions = function(hyper)
 		// Get app name.
 		var appHasValidHTMLFile = options.runButton
     if (isLocal) {
-		  // Get name of app, either given in options above or extracted from project.
+		  // Get title of app, either given in options above or extracted from project.
 		  // Uses title tag as first choice.
-      if (!appName) {
+      if (!appTitle) {
         // Returns null if HTML file not found.
-		    appName = hyper.UI.getProjectNameFromFile(options.path)
-		    appHasValidHTMLFile = !!appName
+		    appTitle = hyper.UI.getTitleFromFile(options.path)
+		    appHasValidHTMLFile = !!appTitle
 		    if (!appHasValidHTMLFile) {
 			    // If app name was not found, index.html does not exist.
-			    appName = 'Warning: HTML file does not exist'
+			    appTitle = 'Warning: HTML file does not exist, no title found'
 		    }
       }
     }
@@ -632,7 +632,7 @@ exports.defineUIFunctions = function(hyper)
 		  entryContentClass += '-examples'
 		}
 		
-		html += `<div class="${entryContentClass}"><h4>${appName}</h4>`
+		html += `<div class="${entryContentClass}"><h4>${appTitle}</h4>`
 		html += `<p>${appDescription}</p>`
 		html += '<p>'
 		if (metaHTML.length > 0) {
@@ -646,30 +646,6 @@ exports.defineUIFunctions = function(hyper)
 
 		// Insert element first in list.
 		options.screen && hyper.UI.$(options.screen).append(element)
-	}
-
-	function getTagContent(data, tag)
-	{
-		var tagStart = '<' + tag + '>'
-		var tagEnd = '</' + tag + '>'
-		var pos1 = data.indexOf(tagStart)
-		if (-1 === pos1) { return null }
-		var pos2 = data.indexOf(tagEnd)
-		if (-1 === pos2) { return null }
-		return data.substring(pos1 + tagStart.length, pos2)
-	}
-
-	// Use last part of path as name.
-	// E.g. '/home/apps/HelloWorld/index.html' -> 'HelloWorld/index.html'
-	// Use full path as fallback.
-	function getNameFromPath(path)
-	{
-		path = path.replace(new RegExp('\\' + PATH.sep, 'g'), '/')
-		var pos = path.lastIndexOf('/')
-		if (-1 === pos) { return path }
-		pos = path.lastIndexOf('/', pos - 1)
-		if (-1 === pos) { return path }
-		return path.substring(pos + 1)
 	}
 
 	// Get last part of path. Purpose is to make path fit
@@ -720,42 +696,9 @@ exports.defineUIFunctions = function(hyper)
 		hyper.UI.setProjectList(projects)
 	}
 
-	hyper.UI.getProjectNameFromFile = function(path)
+	hyper.UI.getTitleFromFile = function(path)
 	{
-	    // Is it an HTML file?
-	    if (FILEUTIL.fileIsHTML(path))
-	    {
-	        var indexPath = path
-	    }
-	    // Is it a directory with evothings.json in it?
-	    else if (FILEUTIL.directoryHasEvothingsJson(path))
-	    {
-	        // Read index file from evothings.json
-	        var indexPath = APP_SETTINGS.getIndexFileFullPath(path)
-	    }
-	    // Is it unknown?
-	    else
-	    {
-			// Return null on unknown file type.
-	        return null
-	    }
-
-		// Read app main file.
-		var data = FILEUTIL.readFileSync(indexPath)
-		if (!data)
-		{
-			// Return null on error (file does not exist).
-			return null
-		}
-
-		var name = getTagContent(data, 'title')
-		if (!name)
-		{
-			// If title tag is missing, use short form of path as app name.
-			name = getNameFromPath(indexPath)
-		}
-
-		return name
+			return APP_SETTINGS.getTitle(path)
 	}
 
 	function parseProjectList(json)
@@ -1676,6 +1619,7 @@ function createNewsEntry(item) {
 		// Populate input fields.
 		hyper.UI.$('#input-config-app-path').val(path) // Hidden field.
     hyper.UI.$('#input-config-app-name').val(name)
+		hyper.UI.$('#input-config-app-title').val(APP_SETTINGS.getTitle(path))
 		hyper.UI.$('#input-config-app-cordova-id').val(
 			APP_SETTINGS.getCordovaID(path) ||
 			SETTINGS.getCordovaPrefix() + "." + hyper.UI.sanitizeForCordovaID(name))
@@ -1764,6 +1708,7 @@ function createNewsEntry(item) {
 	hyper.UI.saveConfigApp = function() {
 		var path = hyper.UI.$('#input-config-app-path').val()
 		var name = hyper.UI.$('#input-config-app-name').val()
+		var title = hyper.UI.$('#input-config-app-title').val()
 		var description = hyper.UI.$('#input-config-app-description').val()
 		var longDescription = hyper.UI.$('#input-config-app-long-description').val()
 		var version = hyper.UI.$('#input-config-app-version').val()
@@ -1777,13 +1722,18 @@ function createNewsEntry(item) {
 			return
 		}
 
+		if (title.length < 3 || title.length > 30) {
+			window.alert(`The app title is ${title.length} characters but should be 3-30 characters long.`)
+			return
+		}
+
 		if (description.length < 10 || description.length > 80) {
-			window.alert('The one line description should be 10-80 characters long.')
+			window.alert(`The one line description is ${description.length} characters but should be 10-80 characters long.`)
 			return
 		}
 
 		if (longDescription.length < 10 || longDescription.length > 4000) {
-			window.alert('The long description should be 10-4000 characters long.')
+			window.alert(`The long description is ${longDescription.length} characters should be 10-4000 characters long.`)
 			return
 		}
 
@@ -1872,6 +1822,7 @@ function createNewsEntry(item) {
     // Store all meta data
 		APP_SETTINGS.getOrCreateAppID(path) // Make sure we have evothings.json
     APP_SETTINGS.setName(path, name)
+		APP_SETTINGS.setTitle(path, title)
     APP_SETTINGS.setDescription(path, description)
     APP_SETTINGS.setLongDescription(path, longDescription)
     APP_SETTINGS.setVersion(path, version)
@@ -2049,7 +2000,7 @@ function createNewsEntry(item) {
 			});
 			build.stderr.on('data', (data) => {
 				var s = data.toString()
-				hyper.UI.buildLog('stderr: ' + s)
+				hyper.UI.buildLog('stderr: ' + s + '\n')
 			});
 			build.on('close', (code) => {
 				if (code != 0) {
@@ -2185,6 +2136,7 @@ function createNewsEntry(item) {
 				name: name,
 				filename: filename,
 				appID: APP_SETTINGS.getCordovaID(path),
+				title: APP_SETTINGS.getTitle(path),
 				shortDescription: APP_SETTINGS.getDescription(path),
 				longDescription: APP_SETTINGS.getLongDescription(path),
 				authorName: APP_SETTINGS.getAuthorName(path),
@@ -2205,53 +2157,55 @@ function createNewsEntry(item) {
 
 			// Create <name>.rb
 			hyper.UI.buildStatus("Creating build configuration ...")
-			hyper.UI.createBuildConfig(evoboxDir, build, storePassword, keyPassword)
+			var ok = hyper.UI.createBuildConfig(evoboxDir, build, storePassword, keyPassword)
 
-			// Spawn the build, progress shown in Build tab
-			var hasPassRE = /-(key|store)pass/
-			var escapedStorePassword = storePassword.replace('"', '\\"')
-			var escapedKeyPassword = keyPassword.replace('"', '\\"')
-			hyper.UI.buildStatus("Running build script ...")
-			var error = null
-			const proc = CHILD_PROCESS.spawn('vagrant', ['ssh', '-c', `'cd\ /vagrant\ &&\ ruby\ build.rb\ ${name}.rb'`], {cwd: evoboxDir, shell: true})
-			proc.stdout.on('data', (data) => {
-				var s = data.toString()
-				if (hasPassRE.test(s)) {
-					s = s.replace(escapedStorePassword, '*****')
-					s = s.replace(escapedKeyPassword, '*****')
-				}
-				build.log.push(s)
-				hyper.UI.buildLog(s)
-			})
-			proc.stderr.on('data', (data) => {
-				var s = data.toString()
-				build.log.push('stderr:' + s)
-				hyper.UI.buildLog('stderr: ' + s)
-			})
-			proc.on('error', (err) => {
-				console.log(`Build process exited with error: ${err}`);
-				error = err
-			})
-			proc.on('close', (code) => {
-				build.exitCode = code
-				console.log(`Build process exited with code ${code}`);
-				console.dir(build)
-				if (error) {
-					hyper.UI.buildStatus("Build failed due to unexpected error.")
-					MAIN.openWorkbenchDialog('Build Failed Unexpectedly', `Build of ${build.name} failed!`, `The build of ${build.name} failed unexpectedly with error ${error} and exit code ${code}.\n\nSee log in Build tab for details.`, 'error', ["Ok"])
-				} else {
-					// Present result to user
-					if (code == 0) {
-						hyper.UI.buildStatus("Build succeeded.")
-						var resultAPK = PATH.join(resultDir, name + '.apk')
-						hyper.UI.buildResult(resultAPK)
-						MAIN.openWorkbenchDialog('Build Ready', `Build of ${build.name} succeeded!`, `The build of ${build.name} succeeded and the resulting apk can be found at:\n\n${resultAPK}\n\nAlso see link at top of Build tab.`, 'info', ["Ok"])
-					} else {
-						hyper.UI.buildStatus("Build failed.")
-						MAIN.openWorkbenchDialog('Build Failed', `Build of ${build.name} failed!`, `The build of ${build.name} failed with exit code ${code}.\n\nSee log in Build tab for details.`, 'error', ["Ok"])
+			if (ok) {
+				// Spawn the build, progress shown in Build tab
+				var hasPassRE = /-(key|store)pass/
+				var escapedStorePassword = storePassword.replace('"', '\\"')
+				var escapedKeyPassword = keyPassword.replace('"', '\\"')
+				hyper.UI.buildStatus("Running build script ...")
+				var error = null
+				const proc = CHILD_PROCESS.spawn('vagrant', ['ssh', '-c', `'cd\ /vagrant\ &&\ ruby\ build.rb\ ${name}.rb'`], {cwd: evoboxDir, shell: true})
+				proc.stdout.on('data', (data) => {
+					var s = data.toString()
+					if (hasPassRE.test(s)) {
+						s = s.replace(escapedStorePassword, '*****')
+						s = s.replace(escapedKeyPassword, '*****')
 					}
-				}
-			})
+					build.log.push(s)
+					hyper.UI.buildLog(s)
+				})
+				proc.stderr.on('data', (data) => {
+					var s = data.toString()
+					build.log.push('stderr:' + s)
+					hyper.UI.buildLog('stderr: ' + s)
+				})
+				proc.on('error', (err) => {
+					console.log(`Build process exited with error: ${err}`);
+					error = err
+				})
+				proc.on('close', (code) => {
+					build.exitCode = code
+					console.log(`Build process exited with code ${code}`);
+					console.dir(build)
+					if (error) {
+						hyper.UI.buildStatus("Build failed due to unexpected error.")
+						MAIN.openWorkbenchDialog('Build Failed Unexpectedly', `Build of ${build.name} failed!`, `The build of ${build.name} failed unexpectedly with error ${error} and exit code ${code}.\n\nSee log in Build tab for details.`, 'error', ["Ok"])
+					} else {
+						// Present result to user
+						if (code == 0) {
+							hyper.UI.buildStatus("Build succeeded.")
+							var resultAPK = PATH.join(resultDir, name + '.apk')
+							hyper.UI.buildResult(resultAPK)
+							MAIN.openWorkbenchDialog('Build Ready', `Build of ${build.name} succeeded!`, `The build of ${build.name} succeeded and the resulting apk can be found at:\n\n${resultAPK}\n\nAlso see link at top of Build tab.`, 'info', ["Ok"])
+						} else {
+							hyper.UI.buildStatus("Build failed.")
+							MAIN.openWorkbenchDialog('Build Failed', `Build of ${build.name} failed!`, `The build of ${build.name} failed with exit code ${code}.\n\nSee log in Build tab for details.`, 'error', ["Ok"])
+						}
+					}
+				})
+			}
 		})
 	}
 
@@ -2274,6 +2228,12 @@ function createNewsEntry(item) {
 		pluginArray = []
 		for (p of build.plugins) {
 			var fullPlugin = hyper.UI.mPluginList.find(each => each.name == p.name)
+			if (!fullPlugin) {
+				hyper.UI.buildLog("Unknown plugin in evothings.json: " + p.name)
+				hyper.UI.buildStatus("Build failed.")
+				MAIN.openWorkbenchDialog('Build Failed', `Build of ${build.name} failed!`, `The build of ${build.name} failed. Unknown plugin in evothings.json: ` + p.name, 'error', ["Ok"])
+				return false
+			}
 			var s = fullPlugin.name
 			if (fullPlugin.location) {
 				s = fullPlugin.location
@@ -2284,7 +2244,7 @@ function createNewsEntry(item) {
 			pluginArray.push('"'+s+'"')
 		}
 		// Ruby config template
-		config = `Title = "${build.name}"
+		config = `Title = "${build.title}"
 ShortDesc = "${build.shortDescription}"
 LongDesc = "${build.longDescription}"
 AuthorEmail = "${build.authorEmail}"
@@ -2314,6 +2274,7 @@ JarVerify = "${verifyCommand}"
 `
 		var file = PATH.join(evoboxDir, build.name + ".rb")
 		FS.writeFileSync(file, config)
+		return true
 	}
 
   hyper.UI.applyPlugins = function(path, oldPlugins, newPlugins) {

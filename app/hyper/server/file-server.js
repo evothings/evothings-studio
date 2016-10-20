@@ -561,7 +561,7 @@ exports.runApp = function()
 		{
 			sessionID: mSessionID,
 			appID: mAppID,
-			appName: hyper.UI.getProjectNameFromFile(exports.getAppPath()),
+			appName: hyper.UI.getTitleFromFile(exports.getAppPath()),
 			url: getAppURL(),
 			protocol: SETTINGS.getRunProtocol()
 		})
@@ -579,7 +579,7 @@ exports.reloadApp = function()
 		{
 			sessionID: mSessionID,
 			appID: mAppID,
-			appName: hyper.UI.getProjectNameFromFile(exports.getAppPath())
+			appName: hyper.UI.getTitleFromFile(exports.getAppPath())
 		})
 	mReloadCallback && mReloadCallback()
 }

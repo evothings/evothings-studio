@@ -78,6 +78,82 @@ exports.setName = function(appPath, name) {
 }
 
 /**
+ * Return title for app, or null if not set.
+ */
+exports.getTitle = function(appPath) {
+	var settings = readAppSettings(appPath)
+	if (settings && settings['title']) {
+		return settings['title']
+	}
+	// Otherwise we try to extract it from title tag
+	return getTitleFromFile(appPath)
+}
+exports.setTitle = function(appPath, title) {
+	var settings = readAppSettings(appPath)
+	if (settings) {
+		settings['title'] = title
+		writeAppSettings(settings, appPath)
+		// Here we ought to set it in the index file too
+	}
+	return null
+}
+
+function getTitleFromFile(path) {
+	// Is it an HTML file?
+	if (FILEUTIL.fileIsHTML(path)) {
+			var indexPath = path
+	}	else if (FILEUTIL.directoryHasEvothingsJson(path)) {
+		// Is it a directory with evothings.json in it?
+		// Read index file from evothings.json
+		var indexPath = APP_SETTINGS.getIndexFileFullPath(path)
+	}	else 	{
+		// Return null on unknown file type.
+		return null
+	}
+
+	// Read app main file.
+	var data = FILEUTIL.readFileSync(indexPath)
+	if (!data) {
+		// Return null on error (file does not exist).
+		return null
+	}
+
+	var title = getTagContent(data, 'title')
+	if (!title) {
+		// If title tag is missing, use short form of path as title.
+		title = getNameFromPath(indexPath)
+	}
+
+	return title
+}
+
+
+function getTagContent(data, tag)
+{
+	var tagStart = '<' + tag + '>'
+	var tagEnd = '</' + tag + '>'
+	var pos1 = data.indexOf(tagStart)
+	if (-1 === pos1) { return null }
+	var pos2 = data.indexOf(tagEnd)
+	if (-1 === pos2) { return null }
+	return data.substring(pos1 + tagStart.length, pos2)
+}
+
+// Use last part of path as name.
+// E.g. '/home/apps/HelloWorld/index.html' -> 'HelloWorld/index.html'
+// Use full path as fallback.
+function getNameFromPath(path)
+{
+	path = path.replace(new RegExp('\\' + PATH.sep, 'g'), '/')
+	var pos = path.lastIndexOf('/')
+	if (-1 === pos) { return path }
+	pos = path.lastIndexOf('/', pos - 1)
+	if (-1 === pos) { return path }
+	return path.substring(pos + 1)
+}
+
+
+/**
  * Return oneline description for app, or null if not set.
  */
 exports.getDescription = function(appPath)
