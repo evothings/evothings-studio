@@ -1253,6 +1253,9 @@ function createNewsEntry(item) {
 		hyper.UI.$('#input-setting-keystore-create-command').val(SETTINGS.getKeystoreCreateCommand())
 		hyper.UI.$('#input-setting-keypassword').val(SETTINGS.getKeyPassword())
 		hyper.UI.$('#input-setting-storepassword').val(SETTINGS.getStorePassword())
+		hyper.UI.$('#input-setting-keystore-distinguished-name').val(SETTINGS.getDistinguishedName())
+		hyper.UI.$('#input-setting-keystore-jarsigner-sign-command').val(SETTINGS.getJarSignCommand())
+		hyper.UI.$('#input-setting-keystore-jarsigner-verify-command').val(SETTINGS.getJarVerifyCommand())
 
 		hyper.UI.$('#input-setting-javascript-workbench-font-size').val(SETTINGS.getWorkbenchFontSize())
 		hyper.UI.$('#input-setting-number-of-directory-levels').val(SETTINGS.getNumberOfDirecoryLevelsToTraverse())
@@ -1303,6 +1306,9 @@ function createNewsEntry(item) {
 		SETTINGS.setKeystoreCreateCommand(hyper.UI.$('#input-setting-keystore-create-command').val())
 		SETTINGS.setKeyPassword(keyPassword)
 		SETTINGS.setStorePassword(storePassword)
+		SETTINGS.SetDistinguishedName(hyper.UI.$('#input-setting-keystore-distinguished-name').val())
+		SETTINGS.SetJarSignCommand(hyper.UI.$('#input-setting-keystore-jarsigner-sign-command').val())
+		SETTINGS.SetJarVerifyCommand(hyper.UI.$('#input-setting-keystore-jarsigner-verify-command').val())
 
 		// TODO: Make this take effect instantly.
 		SETTINGS.setWorkbenchFontSize(hyper.UI.$('#input-setting-javascript-workbench-font-size').val())
