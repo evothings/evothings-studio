@@ -427,9 +427,10 @@ exports.defineUIFunctions = function(hyper)
 		var shortName = options.name
     var appTitle = options.title
     var appDescription = options.description
+		var dirOrFile = options.dirOrFile || options.path  // Ugh..
 
 		// Escape any backslashes in the path (needed on Windows).
-		var escapedPath = options.path.replace(/[\\]/g,'\\\\')
+		var escapedPath = dirOrFile.replace(/[\\]/g,'\\\\')
     
     if (isLocal) {
 		  var imagePath = imagePath || APP_SETTINGS.getAppImage(options.path)
@@ -463,7 +464,7 @@ exports.defineUIFunctions = function(hyper)
 		  // Uses title tag as first choice.
       if (!appTitle) {
         // Returns null if HTML file not found.
-		    appTitle = hyper.UI.getTitleFromFile(options.path)
+		    appTitle = hyper.UI.getTitleFromFile(options.dirOrFile)
 		    appHasValidHTMLFile = !!appTitle
 		    if (!appHasValidHTMLFile) {
 			    // If app name was not found, index.html does not exist.
@@ -916,7 +917,8 @@ exports.defineUIFunctions = function(hyper)
 				  false,
 //					'file://',
 					{
-					  path: path,
+						dirOrFile: path,
+					  path: FILEUTIL.getAppDirectory(path),
 					  active: (path == hyper.UI.activeAppPath),
 						screen: '#screen-projects',
 						openButton: true,
@@ -1619,13 +1621,13 @@ function createNewsEntry(item) {
 		// Populate input fields.
 		hyper.UI.$('#input-config-app-path').val(path) // Hidden field.
     hyper.UI.$('#input-config-app-name').val(name)
-		hyper.UI.$('#input-config-app-title').val(APP_SETTINGS.getTitle(path))
+		hyper.UI.$('#input-config-app-title').val(APP_SETTINGS.getTitle(dirOrFile))
 		hyper.UI.$('#input-config-app-cordova-id').val(
 			APP_SETTINGS.getCordovaID(path) ||
 			SETTINGS.getCordovaPrefix() + "." + hyper.UI.sanitizeForCordovaID(name))
 
-    hyper.UI.$('#input-config-app-description').val(APP_SETTINGS.getDescription(path))
-    hyper.UI.$('#input-config-app-long-description').val(APP_SETTINGS.getLongDescription(path))
+    hyper.UI.$('#input-config-app-description').val(APP_SETTINGS.getDescription(path) || 'App oneline description.')
+    hyper.UI.$('#input-config-app-long-description').val(APP_SETTINGS.getLongDescription(path) || 'App long description.')
 		hyper.UI.$('#input-config-app-version').val(APP_SETTINGS.getVersion(path))
 
     hyper.UI.$('#input-config-app-author-name').val(APP_SETTINGS.getAuthorName(path) || SETTINGS.getAuthorName())
@@ -1834,15 +1836,26 @@ function createNewsEntry(item) {
     hyper.UI.displayProjectList()
 	}
 
-	hyper.UI.openBuildAppDialog = function(path) {
+	hyper.UI.openBuildAppDialog = function(dirOrFile) {
+		var path = FILEUTIL.getAppDirectory(dirOrFile)
 		if (process.platform == 'win32') {
 			MAIN.openWorkbenchDialog('Tools',
 				'Build function not yet supported on Windows',
 				`Evothings can build the Android apk file for your application, but currently only on OSX and Linux. We will soon release this support also for Windows. Also note that we are working on supporting the iOS build also.`, 'info', ["Ok"])
 			return
 		}
+		if (!APP_SETTINGS.getCordovaID(path)) {
+			var doit = "Ok, open config dialog"
+			var res = MAIN.openWorkbenchDialog('App configuration needed',
+				'Open app configuration dialog?',
+				`Evothings can build the Android apk file for your application, but you first need to configure the app, then you can try building again.\n\nOpen the configuration dialog?`, 'question', [doit, "Cancel"])
+			if (res == doit) {
+				hyper.UI.openConfigAppDialog(dirOrFile)
+			}
+			return
+		}
 		// Before we open the dialog, we need to make sure the app itself is built (ES6)
-		hyper.UI.buildAppIfNeeded(path, null, false, function(error) {
+		hyper.UI.buildAppIfNeeded(dirOrFile, null, false, function(error) {
 			if (!error) {
 				hyper.UI.showTab('build')
 				// Verify we have virtualbox, vagrant and evobox ready to run.
@@ -1966,7 +1979,8 @@ function createNewsEntry(item) {
 		}
 
 		var buildScript = PATH.join(evoboxDir, 'build.rb')
-		if (!FS.existsSync(buildScript)) {
+		// Always download for now
+		//if (!FS.existsSync(buildScript)) {
 			// Download script
 			try {
 				UTIL.getJSON(config.scriptUrl, 'application/x-ruby').then(function(contentAndUrl) {
@@ -1976,7 +1990,7 @@ function createNewsEntry(item) {
 				window.alert('Something went wrong downloading build script:' + er.stdout) 
 				return
 			}
-		}
+		//}
 
 		if (!UTIL.isVagrantUp(evoboxDir)) {
 			hyper.UI.buildStartTask("Starting Evobox in Vagrant")
@@ -2031,13 +2045,15 @@ function createNewsEntry(item) {
 			window.alert('The target filename can not be empty.')
 			return
 		}
-		if (keyPassword.length < 6) {
-			window.alert('The key password needs to be at least 6 characters long.')
-			return
-		}
-		if (storePassword.length < 6) {
-			window.alert('The key store password needs to be at least 6 characters long.')
-			return
+		if (!debug) {
+			if (keyPassword.length < 6) {
+				window.alert('The key password is needed for a release build and it needs to be at least 6 characters long.')
+				return
+			}
+			if (storePassword.length < 6) {
+				window.alert('The key store password is needed for a release build and it needs to be at least 6 characters long.')
+				return
+			}
 		}
 		// User wants to save them in settings so we do
 		if (savePasswords) {
