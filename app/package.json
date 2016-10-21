@@ -2,7 +2,7 @@
   "name": "evothings-studio",
   "productName": "Evothings Studio",
   "description": "HTML/JS IoT mobile app development tool",
-  "version": "2.2.0-alpha5",
+  "version": "2.2.0-beta1",
   "author": "Evothings <info@evothings.com>",
   "homepage": "https://evothings.com",
   "license": "Apache-2.0",
