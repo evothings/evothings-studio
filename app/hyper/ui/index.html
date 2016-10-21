@@ -448,6 +448,9 @@ Copyright (c) 2013-2015 Evothings AB
 									value="some-filename"
 									placeholder="Target filename"/>
 							</div>
+							<div class="form-group">
+								<p>The following passwords are needed so that the Workbench can create a key for signing your app, and a key store file to keep it in. When building in debug mode Android uses another signing key and these passwords can be left out.</p>
+							</div>
 							<div id="input-build-app-storepassword-div" class="form-group">
 								<label for="input-build-app-storepassword">
 									Keystore password:</label>
@@ -466,7 +469,7 @@ Copyright (c) 2013-2015 Evothings AB
 							</div>
 							<div class="form-group">
 								<label for="input-build-app-session-div">
-									Remember passwords during session so that you do not need to enter them at every build.</label>
+									Remember passwords during session so you only need to enter them when restarting.</label>
 								<div id="input-build-app-session-div">
 									<div class="checkbox">
 										<input type="checkbox"
@@ -479,14 +482,14 @@ Copyright (c) 2013-2015 Evothings AB
 							</div>
 							<div class="form-group">
 								<label for="input-build-app-save-div">
-									Save passwords as permanent settings. Convenient but of course less secure.</label>
+									Remember passwords as permanent settings. Convenient but of course less secure.</label>
 								<div id="input-build-app-save-div">
 									<div class="checkbox">
 										<input type="checkbox"
 											id="input-build-app-save"
 											checked="checked"/>
 										<label for="input-build-app-save">
-											Save passwords as settings</label>
+											Remember passwords as settings</label>
 									</div>
 								</div>
 							</div>

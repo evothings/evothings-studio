@@ -105,7 +105,7 @@ function getTitleFromFile(path) {
 	}	else if (FILEUTIL.directoryHasEvothingsJson(path)) {
 		// Is it a directory with evothings.json in it?
 		// Read index file from evothings.json
-		var indexPath = APP_SETTINGS.getIndexFileFullPath(path)
+		var indexPath = exports.getIndexFileFullPath(path)
 	}	else 	{
 		// Return null on unknown file type.
 		return null

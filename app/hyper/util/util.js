@@ -32,24 +32,19 @@ exports.alertDownloadError = function(msg, url, status) {
   window.alert(`${msg}\n\nURL: ${url}\nSTATUS: ${status}\n\nDo you have internet access?`)
 }
 
-var getJSON = function(url, type)
-{
-    return new Promise(function(resolve, reject)
-    {
+var getJSON = function(url, type) {
+    return new Promise(function(resolve, reject) {
         var xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function()
-        {
-            if (xhr.readyState === 4)
-            {   //if complete
-                if (xhr.status === 200)
-                {  //check if "OK" (200)
-                    resolve([xhr.response, url]);
-                }
-                else
-                {
-                    reject([xhr.statusText, url]);
-                }
+        xhr.onreadystatechange = function() {
+          if (xhr.readyState === 4) {
+            //if complete
+            if (xhr.status === 200) {
+              //check if "OK" (200)
+              resolve([xhr.response, url]);
+            } else {
+              reject([xhr.statusText, url]);
             }
+          }
         }
         xhr.open('get', url, true);
         xhr.responseType = type || 'json';
@@ -57,40 +52,30 @@ var getJSON = function(url, type)
     });
 };
 
-exports.updateTranslations = function(url)
-{
-    console.log('UTIL.updateTranslations called')
-    getJSON(url).then(function(ttext)
-    {
-        console.log('UTIL.updateTranslations got new translations.')
-        console.dir(ttext)
-        translations = ttext
-    }, function(err)
-    {
-        console.log('unable to donwload translations :(')
-        console.dir(err)
+exports.updateTranslations = function(url) {
+    getJSON(url).then(json => {
+        translations = json
+    }, error => {
+        console.log('Unable to download translations')
     })
 }
-
 
 exports.getJSON = getJSON
 
 exports.checkInternet = function() {
-  return exports.getJSON('http://evothings.com/pong.json').then(json =>
-      {
-        // If there is an alert message, show it to the user
-        if (json[0].alert) {
-          window.alert(json[0].alert)
-        }
-        // Otherwise we just log that we are fine
-        console.log(json[0].message)
-        return true
-      }, error =>
-      {
-        // Ok, couldn't reach pong.json, internet is probably down
-        window.alert('You do not seem to have internet access?\n\nEvothings Studio requires access to the Internet.');
-        return false
-      })
+  return exports.getJSON('http://evothings.com/pong.json').then(json => {
+      // If there is an alert message, show it to the user
+      if (json[0].alert) {
+        window.alert(json[0].alert)
+      }
+      // Otherwise we just log that we are fine
+      console.log(json[0].message)
+      return true
+    }, error => {
+      // Ok, couldn't reach pong.json, internet is probably down
+      window.alert('You do not seem to have internet access?\n\nEvothings Studio requires access to the Internet.');
+      return false
+    })
 }
 
 exports.haveVirtualbox = function() {
