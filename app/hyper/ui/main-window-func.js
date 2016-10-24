@@ -2037,6 +2037,13 @@ function createNewsEntry(item) {
 		}
 	}
 
+	hyper.UI.currentBuild = function() {
+		// Return the currently building build - or null if we aren't busy building
+		return hyper.UI.mBuildList.slice().reverse().find(b => {
+			return !b.hasOwnProperty('exitCode')
+		})
+	}
+
 	hyper.UI.saveBuildApp = function() {
 		var path = hyper.UI.$('#input-build-app-path').val()
 		var name = hyper.UI.$('#input-build-app-name').val()
@@ -2051,6 +2058,14 @@ function createNewsEntry(item) {
 			window.alert('The target filename can not be empty.')
 			return
 		}
+
+		// Check if we are already building
+		var currentBuild = hyper.UI.currentBuild()
+		if (currentBuild) {
+			window.alert(`Evothings is currently limited to building one application at a time and we are already building "${currentBuild.title}". Try again later.`)
+			return
+		}
+
 		if (!debug) {
 			if (keyPassword.length < 6) {
 				window.alert('The key password is needed for a release build and it needs to be at least 6 characters long.')
@@ -2211,6 +2226,7 @@ function createNewsEntry(item) {
 					build.exitCode = code
 					console.log(`Build process exited with code ${code}`);
 					console.dir(build)
+					build.stop = Date.now()
 					if (error) {
 						hyper.UI.buildStatus("Build failed due to unexpected error.")
 						MAIN.openWorkbenchDialog('Build Failed Unexpectedly', `Build of ${build.name} failed!`, `The build of ${build.name} failed unexpectedly with error ${error} and exit code ${code}.\n\nSee log in Build tab for details.`, 'error', ["Ok"])
