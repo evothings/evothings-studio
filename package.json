@@ -12,7 +12,7 @@
     "chai": "^3.5.0",
     "electron-builder": "^7.14.1",
     "electron-packager": "^8.1.0",
-    "electron-prebuilt": "^1.4.3",
+    "electron-prebuilt": "^1.2.6",
     "node-promise": "^0.5.12",
     "spectron": "^3.4.0"
   },
