@@ -85,6 +85,12 @@ exports.defineUIEvents = function(hyper)
 			'com.evothings.evothingsviewer&hl=en')
 	})
 
+	hyper.UI.$('.button-vscode').click(function()
+	{
+		hyper.UI.openInBrowser('https://code.visualstudio.com/')
+	})
+
+
 	hyper.UI.$('.button-evothings-viewer-on-itunes').click(function()
 	{
 		hyper.UI.openInBrowser(
