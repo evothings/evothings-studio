@@ -1308,9 +1308,9 @@ function createNewsEntry(item) {
 		SETTINGS.setKeystoreCreateCommand(hyper.UI.$('#input-setting-keystore-create-command').val())
 		SETTINGS.setKeyPassword(keyPassword)
 		SETTINGS.setStorePassword(storePassword)
-		SETTINGS.SetDistinguishedName(hyper.UI.$('#input-setting-keystore-distinguished-name').val())
-		SETTINGS.SetJarSignCommand(hyper.UI.$('#input-setting-keystore-jarsigner-sign-command').val())
-		SETTINGS.SetJarVerifyCommand(hyper.UI.$('#input-setting-keystore-jarsigner-verify-command').val())
+		SETTINGS.setDistinguishedName(hyper.UI.$('#input-setting-keystore-distinguished-name').val())
+		SETTINGS.setJarSignCommand(hyper.UI.$('#input-setting-keystore-jarsigner-sign-command').val())
+		SETTINGS.setJarVerifyCommand(hyper.UI.$('#input-setting-keystore-jarsigner-verify-command').val())
 
 		// TODO: Make this take effect instantly.
 		SETTINGS.setWorkbenchFontSize(hyper.UI.$('#input-setting-javascript-workbench-font-size').val())
