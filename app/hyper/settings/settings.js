@@ -20,6 +20,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+var FS = require('fs')
 var FILEUTIL = require('../server/file-util.js')
 var PATH = require('path')
 var UUID = require('../server/uuid.js')
@@ -156,7 +157,24 @@ systemSetting('DoNotShowUpdateDialogForVersion', null)
 /**
  * Where we keep the apps.
  */
-systemSetting('MyAppsPath', FILEUTIL.getEvothingsUserFolderPath())
+systemSetting('MyAppsPath', FILEUTIL.getEvothingsMyAppsPath())
+
+exports.getOrCreateMyAppsPath = function() {
+  var homeDir = FILEUTIL.getEvothingsHomePath()
+  var myAppsDir = exports.getMyAppsPath()
+  // Make directory if missing
+  if (!FS.existsSync(myAppsDir)) {
+    try {
+      FS.mkdirSync(homeDir)
+      FS.mkdirSync(myAppsDir)
+    } catch (error) {
+      window.alert(`Something went wrong creating '${myAppsDir}'.`)
+      LOGGER.log('[main-window-func.js] Error in getOrCreateMyAppsPath: ' + error)
+      return
+    }
+  }
+  return myAppsDir
+}
 
 /**
  * Session ID for the Workbench.

@@ -1319,6 +1319,7 @@ function createNewsEntry(item) {
 		SETTINGS.setNumberOfDirecoryLevelsToTraverse(parseInt(hyper.UI.$('#input-setting-number-of-directory-levels').val()))
 
 		SETTINGS.setMyAppsPath(hyper.UI.$('#input-setting-my-apps-path').val())
+		SETTINGS.getOrCreateMyAppsPath() // Force creation
 		
 		var newUrls = hyper.UI.$('#input-setting-repository-urls').val()
 		var oldUrls = SETTINGS.getRepositoryURLs()
@@ -1369,7 +1370,7 @@ function createNewsEntry(item) {
 		// Set sourcePath and folder name of app to copy.
 		var sourcePath = path
 		var appFolderName = PATH.basename(sourcePath)
-		var myAppsDir = SETTINGS.getMyAppsPath()
+		var myAppsDir = SETTINGS.getOrCreateMyAppsPath()
 
 		// Set dialog box fields.
 		hyper.UI.$('#input-copy-app-source-path').val(path) // Hidden field.
@@ -1528,7 +1529,7 @@ function createNewsEntry(item) {
 	hyper.UI.openNewAppDialog = function()
 	{
 		// Populate input fields.
-		var path = SETTINGS.getMyAppsPath()
+		var path = SETTINGS.getOrCreateMyAppsPath()
 		hyper.UI.$('#input-new-app-name').val(null)
 		hyper.UI.$('#input-new-app-folder').val(null)
 		hyper.UI.$('#input-new-app-parent-folder').val(path)

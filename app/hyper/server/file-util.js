@@ -140,20 +140,31 @@ exports.downloadAsString = function(url, userAgent, callbackFun)
 		})
 }
 
-exports.getEvothingsUserFolderPath = function()
-{
-	var myAppsDir = 'EnterPathToMyAppsFolder'
+exports.getEvothingsHomePath = function() {
+	var evothingsHome
 	try	{
-		var userDir = exports.getHomeDir()
-		if (userDir) {
-			myAppsDir =	PATH.join(userDir, 'EvothingsStudio', 'MyApps')
+		var home = exports.getHomeDir()
+		if (home) {
+			evothingsHome =	PATH.join(home, 'EvothingsStudio')
+		}
+	} catch (error) {
+		HYPER.log('[fileutil.js] Failed to get Evothings home path')
+	}
+	return evothingsHome
+}
+
+exports.getEvothingsMyAppsPath = function() {
+	var myAppsDir
+	try	{
+		var home = exports.getEvothingsHomePath()
+		if (home) {
+			myAppsDir =	PATH.join(home, 'EvothingsStudio', 'MyApps')
 		}
 	}
 	catch (error)
 	{
-		HYPER.log('[fileutil.js] Failed to get user home path')
+		HYPER.log('[fileutil.js] Failed to get MyApps path')
 	}
-
 	return myAppsDir
 }
 
