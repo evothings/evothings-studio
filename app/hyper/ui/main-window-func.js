@@ -235,7 +235,9 @@ exports.defineUIFunctions = function(hyper)
 		var win = MAIN.workbenchWindow
     win.on('close', function() {
       saveUIState()
-      this.close(true)
+			hyper.UI.stopEvobox(function() {
+	      this.close(true)
+			})
     })
 	}
 
@@ -1954,6 +1956,38 @@ function createNewsEntry(item) {
 		}
 		// Proceed with box
 		hyper.UI.startEvobox(path, cb)
+	}
+
+	hyper.UI.stopEvobox = function(cb) {
+		var config = hyper.UI.mBuildConfigList[0]
+		var myAppsDir = SETTINGS.getMyAppsPath()
+		var buildDir = PATH.join(myAppsDir, 'build')
+		var evoboxDir = PATH.join(buildDir, config.name)
+		if (!FS.existsSync(evoboxDir)) {
+			cb()
+		} else {
+			if (UTIL.isVagrantUp(evoboxDir)) {
+				const build = CHILD_PROCESS.spawn('vagrant', ['halt', '--machine-readable'], {cwd: evoboxDir})
+				build.stdout.on('data', (data) => {
+					var s = data.toString()
+					console.log(s)
+				})
+				build.stderr.on('data', (data) => {
+					var s = data.toString()
+					console.log(s)
+				});
+				build.on('close', (code) => {
+					if (code != 0) {
+						console.log(`child process exited with code ${code}`);
+						window.alert('Something went wrong stopping Evobox Vagrant machine')
+						LOGGER.log('[main-window-func.js] Error in stopEvobox')
+					}
+					cb()
+				})
+			} else {
+				cb()
+			}
+		}
 	}
 
 	hyper.UI.startEvobox = function(path, cb) {
