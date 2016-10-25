@@ -740,7 +740,7 @@ exports.defineUIFunctions = function(hyper)
 			var answer = MAIN.openWorkbenchDialog('Duplicate UUID',
 				'Generate a new UUID?',
 				`The evothings.json file for this new project has a duplicate UUID. This can happen if you copied the whole app directory using tools outside Evothings. The easy fix is to just generate a new unique UUID.\n\nShould we generate a new UUID?`, 'question', [doit, "Cancel"])
-			if (answer = doit) {
+			if (answer == doit) {
 				APP_SETTINGS.generateNewAppUUID(dir)
 			} else {
 				return // Do NOT add project
@@ -2100,11 +2100,57 @@ function createNewsEntry(item) {
 			hyper.UI.$('#input-build-app-keypassword').val('')
 		}
 
-  	// Hide dialog.
-		hyper.UI.$('#dialog-build-app').modal('hide')
+		if (!hasResDirectory(path)) {
+			var doit = "Yes, please add default graphics"
+			var answer = MAIN.openWorkbenchDialog('Missing res directory',
+				'Add default graphics needed to package app?',
+				`The app needs a 'res' directory with an icon, two screenshots, a feature graphic and a promo graphic in order for the app to be submittable to app stores.\n\nShould we add a set of default graphics?`, 'question', [doit, "Cancel"])
+			if (answer == doit) {
+				ensureResDirectory(path, function() {
+					// Hide dialog.
+					hyper.UI.$('#dialog-build-app').modal('hide')
+					// Fire away build of the app in background
+					hyper.UI.buildApp(path, name, filename, debug, keyPassword, storePassword)
+				})
+			} else {
+				return // Do NOT add res graphics
+			}
+		} else {
+			// Hide dialog.
+			hyper.UI.$('#dialog-build-app').modal('hide')
+			// Fire away build of the app in background
+			hyper.UI.buildApp(path, name, filename, debug, keyPassword, storePassword)
+		}
+	}
 
-		// Fire away build of the app in background
-		hyper.UI.buildApp(path, name, filename, debug, keyPassword, storePassword)
+function hasResDirectory(path) {
+	return FS.existsSync(PATH.join(path, 'res'))
+}
+
+function ensureResDirectory(targetDir, cb) {
+		sourceURL = MAIN.BASE + '/resources/res.zip'
+	  try {
+		  // Download zip to temp
+		  UTIL.download(sourceURL, (zipFile, err) => {
+		    if (err) {
+  		    UTIL.alertDownloadError('Something went wrong, could not download default res graphics.', sourceURL, err)
+    		  LOGGER.log('[main-window-func.js] Error in ensureResDirectory: ' + err)
+    		} else {		    
+	    	  UTIL.unzip(zipFile, targetDir, function(err) {
+	  		    if (err) {
+        		  window.alert('Something went wrong when downloading/unzipping library.')
+        		  LOGGER.log('[main-window-func.js] Error in ensureResDirectory: ' + err)
+        		} else {       
+		          //Callback
+		          cb()
+		        }
+		      })
+		    }
+	  	})
+	  } catch (error) {
+		  window.alert('Something went wrong, could not download and unzip default res graphics.')
+		  LOGGER.log('[main-window-func.js] Error in ensureResDirectory: ' + error)
+	  }
 	}
 
 	hyper.UI.buildStartTask = function(task) {
