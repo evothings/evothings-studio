@@ -759,7 +759,9 @@ exports.defineUIFunctions = function(hyper)
 	hyper.UI.duplicateUUID = function(path) {
 		var newUUID = APP_SETTINGS.getAppID(path)
 		for (let p of mProjectList) {
-			if (APP_SETTINGS.getAppID(p) == newUUID) {
+			// p can actually be == path, since the Studio may have an old entry
+			// pointing to this new path (if you copy stuff around too much!)
+			if (p != path && APP_SETTINGS.getAppID(p) == newUUID) {
 				return true
 			}
 		}
