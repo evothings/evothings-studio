@@ -790,11 +790,20 @@ exports.defineUIFunctions = function(hyper)
 	 */
 	hyper.UI.editApp = function(path) {
 		var error = null
+		var edit
 		cmd = SETTINGS.getEditorCommand()
-		const edit = CHILD_PROCESS.spawn(cmd, [path], {
-  		cwd: PATH.dirname(path),
-  		env: process.env
-		})
+		if (process.platform == 'win32') {
+			// For some reason we needed to use cmd.exe here
+			edit = CHILD_PROCESS.spawn('cmd', ['/c', cmd, path], {
+				cwd: PATH.dirname(path),
+				env: process.env
+			})
+		} else {
+			edit = CHILD_PROCESS.spawn(cmd, [path], {
+				cwd: PATH.dirname(path),
+				env: process.env
+			})			
+		}
 		edit.on('error', (err) => {
 			error = err
 			console.log(`Spawn of editor exited with error: ${err}`);
@@ -936,7 +945,7 @@ exports.defineUIFunctions = function(hyper)
 			var html =
 				'<div class="style-big-para" style="padding: 0px 10px 10px 10px;">' +
 				'<h2>How to create a new app</h2>' +
-				'<p>Create a new app by copying one of the example apps (click "Copy") or by clicking the "New" button.</p>' +
+				'<p>Create a new app by copying one of the example apps (click "Copy") or by clicking the "New App" button above.</p>' +
 				'<p>You can also drag and drop an .html file (typically index.html) or an evothings.json file to this window.</p>' +
 				'<p>Arrange apps in the list using drag and drop. Click the close icon (x) to delete an app entry. This will NOT delete the application files.</p>' +
 				'</div>'
