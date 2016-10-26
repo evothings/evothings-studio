@@ -158,7 +158,7 @@ exports.getEvothingsMyAppsPath = function() {
 	try	{
 		var home = exports.getEvothingsHomePath()
 		if (home) {
-			myAppsDir =	PATH.join(home, 'EvothingsStudio', 'MyApps')
+			myAppsDir =	PATH.join(home, 'MyApps')
 		}
 	}
 	catch (error)

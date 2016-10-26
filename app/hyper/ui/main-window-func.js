@@ -235,7 +235,9 @@ exports.defineUIFunctions = function(hyper)
 		var win = MAIN.workbenchWindow
     win.on('close', function() {
       saveUIState()
-      this.close(true)
+			hyper.UI.stopEvobox(function() {
+	      this.close(true)
+			})
     })
 	}
 
@@ -417,7 +419,8 @@ exports.defineUIFunctions = function(hyper)
 		html += '>'
 
 		// Full URL to application, local or online
-		var appURL = URL.resolve(base, options.path)
+		var dirOrFile = options.dirOrFile || options.path  // Ugh..
+		var appURL = URL.resolve(base, dirOrFile)
     var imagePath = options.imagePath
     var docURL = options.docURL
     var appTags = options.tags || []
@@ -427,7 +430,6 @@ exports.defineUIFunctions = function(hyper)
 		var shortName = options.name
     var appTitle = options.title
     var appDescription = options.description
-		var dirOrFile = options.dirOrFile || options.path  // Ugh..
 
 		// Escape any backslashes in the path (needed on Windows).
 		var escapedPath = dirOrFile.replace(/[\\]/g,'\\\\')
@@ -444,7 +446,7 @@ exports.defineUIFunctions = function(hyper)
     
     // Fallback on missing doc-url is locally inside the app/library
     if (!docURL) {
-      docURL = URL.resolve(appURL, 'doc', 'index.html')
+      docURL = URL.resolve(appURL, 'doc/index.html')
     }
     
 		// Show app icon.
@@ -498,7 +500,7 @@ exports.defineUIFunctions = function(hyper)
 		}
 
 		// Doc button for libs.
-		if (isLibrary)
+		if (isLibrary && docURL)
 		{
 			html +=
 				'<button type="button" '
@@ -508,7 +510,7 @@ exports.defineUIFunctions = function(hyper)
 		}
 
 		// Doc button for examples.
-		if (!isLocal && !isLibrary)
+		if (!isLocal && !isLibrary && docURL)
 		{
 			html +=
 				'<button type="button" '
@@ -560,6 +562,13 @@ exports.defineUIFunctions = function(hyper)
 				+	'class="btn btn-default entry-menu-button" '
 				+	`onclick="window.hyper.UI.openConfigAppDialog('${escapedPath}')">`
 				+	'Config</button>'
+			
+			// Copy button.
+			html +=
+				'<button type="button" '
+				+	'class="btn btn-default entry-menu-button" '
+				+	`onclick="window.hyper.UI.openCopyAppDialog('${escapedPath}', '${shortName}')">`
+				+	'Copy</button>'
 
 			// Build button.
 		  html +=
@@ -569,12 +578,13 @@ exports.defineUIFunctions = function(hyper)
 				+	'Build</button>'
 
 			// Doc button.
-		  html +=
-				'<button type="button" '
-				+	'class="btn btn-default entry-menu-button" '
-				+	`onclick="window.hyper.UI.openDocURL('${docURL}')">`
-				+	'Doc</button>'
-
+			if (docURL) {
+				html +=
+					'<button type="button" '
+					+	'class="btn btn-default entry-menu-button" '
+					+	`onclick="window.hyper.UI.openDocURL('${docURL}')">`
+					+	'Doc</button>'
+			}
 			// End of entry menu.
 			html += '</div>'
 		}
@@ -997,7 +1007,7 @@ exports.defineUIFunctions = function(hyper)
 
     	  // Push and sort them on stamp (UTC seconds)
 				entries.push(entry)
-        entries.sort(function(a, b) { return a.stamp - b.stamp })
+        entries.sort(function(a, b) { return b.stamp - a.stamp })
 
 				// And redisplay them all, yes we will do this a bunch of redundant times...
 				screen.empty()
@@ -1378,11 +1388,15 @@ function createNewsEntry(item) {
 	{
 		// Set sourcePath and folder name of app to copy.
 		var sourcePath = path
+		// We REALLY should stop this index.html file stuff...
+		if (!FILEUTIL.fileIsDirectory(sourcePath)) {
+			sourcePath = PATH.dirname(sourcePath)
+		}
 		var appFolderName = PATH.basename(sourcePath)
 		var myAppsDir = SETTINGS.getOrCreateMyAppsPath()
 
 		// Set dialog box fields.
-		hyper.UI.$('#input-copy-app-source-path').val(path) // Hidden field.
+		hyper.UI.$('#input-copy-app-source-path').val(sourcePath) // Hidden field.
 		hyper.UI.$('#input-copy-app-name').val(shortName)
 		hyper.UI.$('#input-copy-app-target-folder').val(appFolderName)
 		hyper.UI.$('#input-copy-app-target-parent-folder').val(myAppsDir)
@@ -1509,7 +1523,7 @@ function createNewsEntry(item) {
     		  LOGGER.log('[main-window-func.js] Error in copyAppFromURL: ' + err)
     		} else {		    
     		  // Extract into targetDir
-    		  FS.mkdirSync(targetDir)
+    		  FSEXTRA.mkdirsSync(targetDir)
 	    	  UTIL.unzip(zipFile, targetDir, function(err) {
 	  		    if (err) {
 	  		      // TODO: This doesn't seem to work
@@ -1956,6 +1970,38 @@ function createNewsEntry(item) {
 		hyper.UI.startEvobox(path, cb)
 	}
 
+	hyper.UI.stopEvobox = function(cb) {
+		var config = hyper.UI.mBuildConfigList[0]
+		var myAppsDir = SETTINGS.getMyAppsPath()
+		var buildDir = PATH.join(myAppsDir, 'build')
+		var evoboxDir = PATH.join(buildDir, config.name)
+		if (!FS.existsSync(evoboxDir)) {
+			cb()
+		} else {
+			if (UTIL.isVagrantUp(evoboxDir)) {
+				const build = CHILD_PROCESS.spawn('vagrant', ['halt', '--machine-readable'], {cwd: evoboxDir})
+				build.stdout.on('data', (data) => {
+					var s = data.toString()
+					console.log(s)
+				})
+				build.stderr.on('data', (data) => {
+					var s = data.toString()
+					console.log(s)
+				});
+				build.on('close', (code) => {
+					if (code != 0) {
+						console.log(`child process exited with code ${code}`);
+						window.alert('Something went wrong stopping Evobox Vagrant machine')
+						LOGGER.log('[main-window-func.js] Error in stopEvobox')
+					}
+					cb()
+				})
+			} else {
+				cb()
+			}
+		}
+	}
+
 	hyper.UI.startEvobox = function(path, cb) {
 		var config = hyper.UI.mBuildConfigList[0]
 
@@ -1967,9 +2013,9 @@ function createNewsEntry(item) {
 		// Make directories if missing
 		if (!FS.existsSync(evoboxDir)) {
 			try {
-				FS.mkdirSync(buildDir)
-				FS.mkdirSync(evoboxDir)
-				FS.mkdirSync(resultDir)
+				FSEXTRA.mkdirsSync(buildDir)
+				FSEXTRA.mkdirsSync(evoboxDir)
+				FSEXTRA.mkdirsSync(resultDir)
 			} catch (error) {
 				window.alert('Something went wrong creating directories for Evobox.')
 				LOGGER.log('[main-window-func.js] Error in startEvobox: ' + error)
@@ -2512,7 +2558,7 @@ JarVerify = "${verifyCommand}"
     		  LOGGER.log('[main-window-func.js] Error in copyLibraryFromURL: ' + err)
     		} else {		    
     		  // Extract into targetDir
-    		  FS.mkdirSync(targetDir)
+    		  FSEXTRA.mkdirsSync(targetDir)
 	    	  UTIL.unzip(zipFile, targetDir, function(err) {
 	  		    if (err) {
 	  		      // TODO: This doesn't seem to work
@@ -2599,7 +2645,7 @@ JarVerify = "${verifyCommand}"
 	hyper.UI.showStartScreenHelp = function()
 	{
 		SETTINGS.setShowStartScreenHelp(true)
-		hyper.UI.$('#button-toogle-help').html('Hide Help')
+		hyper.UI.$('.button-toggle-help').html('Hide Help')
 		hyper.UI.$('.screen-start-help').show()
 	}
 
@@ -2607,7 +2653,7 @@ JarVerify = "${verifyCommand}"
 	{
 		SETTINGS.setShowStartScreenHelp(false)
 		var show = SETTINGS.getShowStartScreenHelp()
-		hyper.UI.$('#button-toogle-help').html('Show Help')
+		hyper.UI.$('.button-toggle-help').html('Show Help')
 		hyper.UI.$('.screen-start-help').hide()
 	}
 

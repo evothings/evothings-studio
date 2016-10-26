@@ -913,8 +913,8 @@ Copyright (c) 2013-2015 Evothings AB
 								We plan to add features and services going forward.</p>
 						</div>
 
-						<button id="button-toogle-help" type="button"
-							class="btn et-btn-charcoal connect-screen-element">
+						<button type="button"
+							class="button-toggle-help btn et-btn-charcoal connect-screen-element">
 							Hide Help
 						</button>
 
@@ -949,7 +949,24 @@ Copyright (c) 2013-2015 Evothings AB
 			<div id="screen-projects" class="hyper-screen project-list"></div>
 
 			<!-- Build screen -->
-			<div id="screen-build" class="hyper-screen project-list"><div class="panel"><div id="build-screen-content" class="panel-body"></div></div></div>
+			<div id="screen-build" class="hyper-screen project-list">
+				<div class="panel">
+					<div class="panel-body">
+						<div class="screen-start-help framed-box style-big-para" style="margin-bottom:5px">
+							<p><strong>Evothings has the ability to build your application for Android, and iOS is coming soon!</strong></p>
+							<p>To build your application you simply press the <button type="button" class="btn et-btn-indigo-no-highlight style-small-button">More</button> button on your app under <strong>My Apps</strong> and then hit the <button type="button" class="btn et-btn-blue-no-highlight style-small-button">Build</button> button that appears, and follow the instructions.</p>
+							<p>The build mechanism uses a virtual preconfigured Cordova build process which requires only minimal input from you to work automatically. It will generate an Android APK file that can be installed on Android devices or published to Google play.</p>
+							<p>The Studio will guide you to download two external tools needed - VirtualBox and Vagrant - both very easy to install. Then it will proceed with automatically setting up a virtual build environment and finally start the build process. <strong>These steps are only performed once, any subsequent builds are just a single click.</strong></p>
+							<p>The build process will run in the background and a live log of the process is shown here below. When the process is finished, you will be alerted and you will find a link to the Android APK file at the top of the Build tab. Click and save it, this APK can now be sent to, and installed on your Android devices or be published at Google play.</p>
+						</div>
+						<button type="button"
+							class="button-toggle-help btn et-btn-charcoal connect-screen-element">
+							Hide Help
+						</button>
+						<div id="build-screen-content"></div>
+					</div>
+				</div>
+			</div>
 			<!-- End of Build screen -->
 
 			<!-- Viewers screen -->

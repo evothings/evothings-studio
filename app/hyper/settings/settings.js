@@ -21,6 +21,7 @@ limitations under the License.
 */
 
 var FS = require('fs')
+var FSEXTRA = require('fs-extra')
 var FILEUTIL = require('../server/file-util.js')
 var PATH = require('path')
 var UUID = require('../server/uuid.js')
@@ -112,7 +113,7 @@ systemSetting('StorePassword', '') // No default value :) Needs to have " escape
 systemSetting('DistinguishedName', 'CN=Evothings, OU=Dev, O=Evothings, L=Stockholm, S=Stockholm, C=SE')
 systemSetting('JarSignCommand', 'jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -tsa http://timestamp.digicert.com -keystore #{RootDir}/#{Keystore} -storepass \\"#{StorePassword}\\" -keypass \\"#{KeyPassword}\\" #{TargetFileName}-unaligned.apk evokey256')
 systemSetting('JarVerifyCommand', 'jarsigner -verify -verbose -certs #{TargetFileName}-unaligned.apk')
-systemSetting('CordovaPrefix', 'com.evothings.samples.')
+systemSetting('CordovaPrefix', 'com.evothings.samples')
 
 /**
  * Tools settings.
@@ -165,8 +166,8 @@ exports.getOrCreateMyAppsPath = function() {
   // Make directory if missing
   if (!FS.existsSync(myAppsDir)) {
     try {
-      FS.mkdirSync(homeDir)
-      FS.mkdirSync(myAppsDir)
+      FSEXTRA.mkdirsSync(homeDir)
+      FSEXTRA.mkdirsSync(myAppsDir)
     } catch (error) {
       window.alert(`Something went wrong creating '${myAppsDir}'.`)
       LOGGER.log('[main-window-func.js] Error in getOrCreateMyAppsPath: ' + error)
