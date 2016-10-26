@@ -1511,7 +1511,7 @@ function createNewsEntry(item) {
     		  LOGGER.log('[main-window-func.js] Error in copyAppFromURL: ' + err)
     		} else {		    
     		  // Extract into targetDir
-    		  FS.mkdirSync(targetDir)
+    		  FSEXTRA.mkdirsSync(targetDir)
 	    	  UTIL.unzip(zipFile, targetDir, function(err) {
 	  		    if (err) {
 	  		      // TODO: This doesn't seem to work
@@ -2001,9 +2001,9 @@ function createNewsEntry(item) {
 		// Make directories if missing
 		if (!FS.existsSync(evoboxDir)) {
 			try {
-				FS.mkdirSync(buildDir)
-				FS.mkdirSync(evoboxDir)
-				FS.mkdirSync(resultDir)
+				FSEXTRA.mkdirsSync(buildDir)
+				FSEXTRA.mkdirsSync(evoboxDir)
+				FSEXTRA.mkdirsSync(resultDir)
 			} catch (error) {
 				window.alert('Something went wrong creating directories for Evobox.')
 				LOGGER.log('[main-window-func.js] Error in startEvobox: ' + error)
@@ -2546,7 +2546,7 @@ JarVerify = "${verifyCommand}"
     		  LOGGER.log('[main-window-func.js] Error in copyLibraryFromURL: ' + err)
     		} else {		    
     		  // Extract into targetDir
-    		  FS.mkdirSync(targetDir)
+    		  FSEXTRA.mkdirsSync(targetDir)
 	    	  UTIL.unzip(zipFile, targetDir, function(err) {
 	  		    if (err) {
 	  		      // TODO: This doesn't seem to work
