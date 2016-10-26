@@ -423,17 +423,10 @@ html, body
 	padding-bottom: 0px !important;
 }
 
-#button-toogle-help
+.button-toggle-help
 {
-	/*
-	position: absolute;
-	width: 115px;
-	height: auto;
-	top: 0px;
-	right: 0px;
-	*/
 	display: block;
-	font-size: 100% !important;
+	font-size: 85% !important;
 }
 
 .framed-box

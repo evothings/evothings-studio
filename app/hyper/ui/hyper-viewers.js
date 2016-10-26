@@ -1150,7 +1150,7 @@ $(function()
 			mOldClientList = info.clients
 		}
 
-		var thelp = document.getElementById('button-toogle-help')
+		var thelp = document.getElementById('button-toggle-help')
 		thelp.ishidden = false
 		$('.screen-start-help').show()
 		thelp.addEventListener('click', function()

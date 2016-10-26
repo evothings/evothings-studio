@@ -150,7 +150,7 @@ exports.defineUIEvents = function(hyper)
 
 	// ************** Connect Screen Toggle Help Button **************
 
-	hyper.UI.$('#button-toogle-help').click(function()
+	hyper.UI.$('.button-toggle-help').click(function()
 	{
 		hyper.UI.toogleStartScreenHelp()
 	})

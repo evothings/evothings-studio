@@ -2633,7 +2633,7 @@ JarVerify = "${verifyCommand}"
 	hyper.UI.showStartScreenHelp = function()
 	{
 		SETTINGS.setShowStartScreenHelp(true)
-		hyper.UI.$('#button-toogle-help').html('Hide Help')
+		hyper.UI.$('.button-toggle-help').html('Hide Help')
 		hyper.UI.$('.screen-start-help').show()
 	}
 
@@ -2641,7 +2641,7 @@ JarVerify = "${verifyCommand}"
 	{
 		SETTINGS.setShowStartScreenHelp(false)
 		var show = SETTINGS.getShowStartScreenHelp()
-		hyper.UI.$('#button-toogle-help').html('Show Help')
+		hyper.UI.$('.button-toggle-help').html('Show Help')
 		hyper.UI.$('.screen-start-help').hide()
 	}
 
