@@ -999,7 +999,7 @@ exports.defineUIFunctions = function(hyper)
 
     	  // Push and sort them on stamp (UTC seconds)
 				entries.push(entry)
-        entries.sort(function(a, b) { return a.stamp - b.stamp })
+        entries.sort(function(a, b) { return b.stamp - a.stamp })
 
 				// And redisplay them all, yes we will do this a bunch of redundant times...
 				screen.empty()
