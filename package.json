@@ -50,7 +50,6 @@
   },
   "scripts": {
     "test": "electron-mocha",
-    "libs": "ruby init.rb",
     "devdeps": "npm install",
     "deps": "npm install app",
     "pack": "build",
