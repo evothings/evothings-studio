@@ -419,7 +419,8 @@ exports.defineUIFunctions = function(hyper)
 		html += '>'
 
 		// Full URL to application, local or online
-		var appURL = URL.resolve(base, options.path)
+		var dirOrFile = options.dirOrFile || options.path  // Ugh..
+		var appURL = URL.resolve(base, dirOrFile)
     var imagePath = options.imagePath
     var docURL = options.docURL
     var appTags = options.tags || []
@@ -429,7 +430,6 @@ exports.defineUIFunctions = function(hyper)
 		var shortName = options.name
     var appTitle = options.title
     var appDescription = options.description
-		var dirOrFile = options.dirOrFile || options.path  // Ugh..
 
 		// Escape any backslashes in the path (needed on Windows).
 		var escapedPath = dirOrFile.replace(/[\\]/g,'\\\\')
@@ -446,7 +446,7 @@ exports.defineUIFunctions = function(hyper)
     
     // Fallback on missing doc-url is locally inside the app/library
     if (!docURL) {
-      docURL = URL.resolve(appURL, 'doc', 'index.html')
+      docURL = URL.resolve(appURL, 'doc/index.html')
     }
     
 		// Show app icon.
@@ -500,7 +500,7 @@ exports.defineUIFunctions = function(hyper)
 		}
 
 		// Doc button for libs.
-		if (isLibrary)
+		if (isLibrary && docURL)
 		{
 			html +=
 				'<button type="button" '
@@ -510,7 +510,7 @@ exports.defineUIFunctions = function(hyper)
 		}
 
 		// Doc button for examples.
-		if (!isLocal && !isLibrary)
+		if (!isLocal && !isLibrary && docURL)
 		{
 			html +=
 				'<button type="button" '
@@ -571,12 +571,13 @@ exports.defineUIFunctions = function(hyper)
 				+	'Build</button>'
 
 			// Doc button.
-		  html +=
-				'<button type="button" '
-				+	'class="btn btn-default entry-menu-button" '
-				+	`onclick="window.hyper.UI.openDocURL('${docURL}')">`
-				+	'Doc</button>'
-
+			if (docURL) {
+				html +=
+					'<button type="button" '
+					+	'class="btn btn-default entry-menu-button" '
+					+	`onclick="window.hyper.UI.openDocURL('${docURL}')">`
+					+	'Doc</button>'
+			}
 			// End of entry menu.
 			html += '</div>'
 		}
