@@ -1,10 +1,6 @@
 .DS_Store
 /dist
-/downloads
-/localConfig.rb
-/app/hyper/libs
 /app/node_modules
 /node_modules
-/app/examples
 /app/npm-debug.log
 npm-debug.log
