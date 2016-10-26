@@ -1389,7 +1389,7 @@ function createNewsEntry(item) {
 		// Set sourcePath and folder name of app to copy.
 		var sourcePath = path
 		// We REALLY should stop this index.html file stuff...
-		if (!FILEUTIL.fileIsDirectory(sourcePath)) {
+		if (FILEUTIL.fileIsHTML(sourcePath)) {
 			sourcePath = PATH.dirname(sourcePath)
 		}
 		var appFolderName = PATH.basename(sourcePath)
