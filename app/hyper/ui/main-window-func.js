@@ -562,6 +562,13 @@ exports.defineUIFunctions = function(hyper)
 				+	'class="btn btn-default entry-menu-button" '
 				+	`onclick="window.hyper.UI.openConfigAppDialog('${escapedPath}')">`
 				+	'Config</button>'
+			
+			// Copy button.
+			html +=
+				'<button type="button" '
+				+	'class="btn btn-default entry-menu-button" '
+				+	`onclick="window.hyper.UI.openCopyAppDialog('${escapedPath}', '${shortName}')">`
+				+	'Copy</button>'
 
 			// Build button.
 		  html +=
@@ -1381,11 +1388,15 @@ function createNewsEntry(item) {
 	{
 		// Set sourcePath and folder name of app to copy.
 		var sourcePath = path
+		// We REALLY should stop this index.html file stuff...
+		if (!FILEUTIL.fileIsDirectory(sourcePath)) {
+			sourcePath = PATH.dirname(sourcePath)
+		}
 		var appFolderName = PATH.basename(sourcePath)
 		var myAppsDir = SETTINGS.getOrCreateMyAppsPath()
 
 		// Set dialog box fields.
-		hyper.UI.$('#input-copy-app-source-path').val(path) // Hidden field.
+		hyper.UI.$('#input-copy-app-source-path').val(sourcePath) // Hidden field.
 		hyper.UI.$('#input-copy-app-name').val(shortName)
 		hyper.UI.$('#input-copy-app-target-folder').val(appFolderName)
 		hyper.UI.$('#input-copy-app-target-parent-folder').val(myAppsDir)
