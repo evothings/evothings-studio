@@ -112,7 +112,7 @@ systemSetting('StorePassword', '') // No default value :) Needs to have " escape
 systemSetting('DistinguishedName', 'CN=Evothings, OU=Dev, O=Evothings, L=Stockholm, S=Stockholm, C=SE')
 systemSetting('JarSignCommand', 'jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -tsa http://timestamp.digicert.com -keystore #{RootDir}/#{Keystore} -storepass \\"#{StorePassword}\\" -keypass \\"#{KeyPassword}\\" #{TargetFileName}-unaligned.apk evokey256')
 systemSetting('JarVerifyCommand', 'jarsigner -verify -verbose -certs #{TargetFileName}-unaligned.apk')
-systemSetting('CordovaPrefix', 'com.evothings.samples.')
+systemSetting('CordovaPrefix', 'com.evothings.samples')
 
 /**
  * Tools settings.
