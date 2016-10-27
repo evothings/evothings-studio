@@ -2324,7 +2324,7 @@ function ensureResDirectory(targetDir, cb) {
 				var escapedKeyPassword = keyPassword.replace('"', '\\"')
 				hyper.UI.buildStatus("Running build script ...")
 				var error = null
-				const proc = CHILD_PROCESS.spawn('vagrant', ['ssh', '-c', `'cd\ /vagrant\ &&\ ruby\ build.rb\ ${name}.rb'`], {cwd: evoboxDir, shell: true})
+				const proc = CHILD_PROCESS.spawn('vagrant', ['ssh', '-c', `"cd\ /vagrant\ &&\ ruby\ build.rb\ ${name}.rb"`], {cwd: evoboxDir, shell: true})
 				proc.stdout.on('data', (data) => {
 					var s = data.toString()
 					if (hasPassRE.test(s)) {
