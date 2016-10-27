@@ -49,7 +49,7 @@ var URL = require('url')
 const CHILD_PROCESS = require('child_process')
 
 // This is not a strict domain regex, but enough to make Cordova happy (and Cordova is not fully sane either)
-const reverseDomainRE = /^(([a-zA-Z0-9]+)\.)*([a-zA-Z0-9]+)$/
+const reverseDomainRE = /^(([a-zA-Z]+)\.)*([a-zA-Z]+)$/
 
 // Counter for "popup" menus on an app entry in the My Apps list.
 var mEntryMenuIdCounter = 0
@@ -1313,7 +1313,7 @@ function createNewsEntry(item) {
 		var cordovaPrefix = hyper.UI.$('#input-setting-cordova-prefix').val()
 
 		if (!reverseDomainRE.test(cordovaPrefix)) {
- 	    window.alert('The Cordova prefix should be in reverse domain style like "com.acme.dev" with no ending period. Letters and digits are allowed.')
+ 	    window.alert('The Cordova prefix should be in reverse domain style like "com.acme.dev" with no ending period. Letters and dots are allowed.')
 			return
 		}
 		// Hide settings dialog.
@@ -1636,7 +1636,7 @@ function createNewsEntry(item) {
 	// Try to produce a proper Cordova Widget id (reverse domain style) from str
 	hyper.UI.sanitizeForCordovaID = function(str) {
 		// Replace non conforming characters with "."
-		var result = str.replace(/[^a-zA-Z0-9\.]/g, '.')
+		var result = str.replace(/[^a-zA-Z\.]/g, '.')
 		// Not needed, Cordova id can handle case: result = result.toLowerCase()
 		// Collapse multiple ".." to a single "."
 		result = result.replace(/\.+/g, '.')
@@ -1753,7 +1753,7 @@ function createNewsEntry(item) {
 		var cordovaID = hyper.UI.$('#input-config-app-cordova-id').val()
 
 		if (!reverseDomainRE.test(cordovaID)) {
- 	    window.alert('The Cordova ID should be in reverse domain style like "com.acme.dev" with no ending period. Letters and digits are allowed.')
+ 	    window.alert('The Cordova ID should be in reverse domain style like "com.acme.dev" with no ending period. Letters and dots are allowed.')
 			return
 		}
 
