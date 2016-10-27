@@ -803,10 +803,11 @@ exports.defineUIFunctions = function(hyper)
 		var edit
 		cmd = SETTINGS.getEditorCommand()
 		if (process.platform == 'win32') {
-			// For some reason we needed to use cmd.exe here
-			edit = CHILD_PROCESS.spawn('cmd', ['/c', cmd, path], {
+			// For some reason we needed to use shell here
+			edit = CHILD_PROCESS.spawn(cmd, [path], {
 				cwd: PATH.dirname(path),
-				env: process.env
+				env: process.env,
+				shell: true
 			})
 		} else {
 			edit = CHILD_PROCESS.spawn(cmd, [path], {
@@ -1870,12 +1871,12 @@ function createNewsEntry(item) {
 
 	hyper.UI.openBuildAppDialog = function(dirOrFile) {
 		var path = FILEUTIL.getAppDirectory(dirOrFile)
-		if (process.platform == 'win32') {
-			MAIN.openWorkbenchDialog('Tools',
-				'Build function not yet supported on Windows',
-				`Evothings can build the Android apk file for your application, but currently only on OSX and Linux. We will soon release this support also for Windows. Also note that we are working on supporting the iOS build also.`, 'info', ["Ok"])
-			return
-		}
+		//if (process.platform == 'win32') {
+		//	MAIN.openWorkbenchDialog('Tools',
+		//		'Build function not yet supported on Windows',
+		//		`Evothings can build the Android apk file for your application, but currently only on OSX and Linux. We will soon release this support also for Windows. Also note that we are working on supporting the iOS build also.`, 'info', ["Ok"])
+		//	return
+		//}
 		if (!APP_SETTINGS.getCordovaID(path)) {
 			var doit = "Ok, open config dialog"
 			var res = MAIN.openWorkbenchDialog('App configuration needed',
@@ -1934,8 +1935,19 @@ function createNewsEntry(item) {
 		return reversed.find(each => each.path == path)
 	}
 
+	hyper.UI.haveVirtualbox = function() {
+		var vbox
+		if (process.platform == "win32") {
+ 			// On Windows we use an explicit setting, or we try the obvious place
+      		vbox = SETTINGS.getVBoxManagePath() || PATH.join(process.env['programfiles'], 'Oracle', 'VirtualBox', 'VBoxManage.exe')
+		} else {
+			vbox = 'VBoxManage'
+		}
+		return UTIL.haveVirtualbox(vbox)
+	}
+
 	hyper.UI.verifyBuildEnvironment = function(path, cb) {
-		var haveVirtualbox = UTIL.haveVirtualbox()
+		var haveVirtualbox = hyper.UI.haveVirtualbox()
 		var haveVagrant = UTIL.haveVagrant()
 		var have = ""
 		var doit = "Ok, open download page(s)"
@@ -2065,9 +2077,14 @@ function createNewsEntry(item) {
 			const build = CHILD_PROCESS.spawn('vagrant', ['up', '--machine-readable'], {cwd: evoboxDir})
 			build.stdout.on('data', (data) => {
 				var s = data.toString()
+				s = s.replace('%!(VAGRANT_COMMA)', ', ')
 				var match = s.match(reUI)
 				if (match) {
-					hyper.UI.buildLog(match[1] + "\n")
+					if (match[1].startsWith('Progress:')) {
+						hyper.UI.buildStatus(match[1])
+					} else {
+						hyper.UI.buildLog(match[1] + "\n")
+					}
 				}
 				if (s.match(reUPSTART)) {
 					hyper.UI.buildStatus("Evobox being started ...")

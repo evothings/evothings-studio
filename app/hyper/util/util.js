@@ -78,9 +78,9 @@ exports.checkInternet = function() {
     })
 }
 
-exports.haveVirtualbox = function() {
+exports.haveVirtualbox = function(vboxPath) {
   try {
-    var output = CHILD_PROCESS.execFileSync('VBoxManage', ['--version']).toString()
+    var output = CHILD_PROCESS.execFileSync(vboxPath, ['--version']).toString()
     return output.startsWith("5.1.")
   } catch (er) {
     return false
