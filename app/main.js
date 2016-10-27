@@ -135,25 +135,25 @@ main.addMenu = function() {
       submenu: [
         {
           label: 'New App...',
-          click: function() { main.workbenchWindow.webContents.send('command', {message: 'newApp'}) }
+          click: function() { if (main.workbenchWindow) {main.workbenchWindow.webContents.send('command', {message: 'newApp'})} }
         },
         {
           type: 'separator'
         },
         {
           label: 'Settings...',
-          click: function() { main.workbenchWindow.webContents.send('command', {message: 'openSettingsDialog'}) }
+          click: function() { if (main.workbenchWindow) {main.workbenchWindow.webContents.send('command', {message: 'openSettingsDialog'})} }
         },
         {
           type: 'separator'
         },
         {
           label: 'Getting Started',
-          click: function() { main.workbenchWindow.webContents.send('command', {message: 'gettingStarted'}) }
+          click: function() { if (main.workbenchWindow) {main.workbenchWindow.webContents.send('command', {message: 'gettingStarted'})} }
         },
         {
           label: 'Share in Social Media',
-          click: function() { main.workbenchWindow.webContents.send('command', {message: 'shareInSocialMedia'}) }
+          click: function() { if (main.workbenchWindow) {main.workbenchWindow.webContents.send('command', {message: 'shareInSocialMedia'})} }
         }
       ]
     },
@@ -200,7 +200,7 @@ main.addMenu = function() {
       submenu: [
         {
           label: 'Disconnect all Viewers',
-          click: function() { main.workbenchWindow.webContents.send('command', {message: 'disconnectAllViewers'}) }
+          click: function() { if (main.workbenchWindow) {main.workbenchWindow.webContents.send('command', {message: 'disconnectAllViewers'})} }
         }
       ]
     },
@@ -211,12 +211,12 @@ main.addMenu = function() {
         {
           label: 'JavaScript Console',
           accelerator: 'CmdOrCtrl+J',
-          click: function() { main.workbenchWindow.webContents.send('command', {message: 'openConsoleWindow'}) }
+          click: function() { if (main.workbenchWindow) {main.workbenchWindow.webContents.send('command', {message: 'openConsoleWindow'})} }
         },
         {
           label: 'Viewers Explorer',
           accelerator: 'CmdOrCtrl+E',
-          click: function() { main.workbenchWindow.webContents.send('command', {message: 'openViewersWindow'}) }
+          click: function() { if (main.workbenchWindow) {main.workbenchWindow.webContents.send('command', {message: 'openViewersWindow'})} }
         },
       ]
     },
@@ -462,7 +462,7 @@ main.createWorkbenchWindow = function() {
   main.workbenchWindow.center()
 }
 main.showWorkbenchWindow = function() {
-    main.workbenchWindow.show()
+    if (main.workbenchWindow) {main.workbenchWindow.show()}
 }
 
 main.openConsoleWindow = function() {
@@ -595,7 +595,6 @@ ipcMain.on('events-publish', function(event, channel, obj) {
     }
   }
 });
-
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
