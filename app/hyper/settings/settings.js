@@ -103,7 +103,7 @@ systemSetting('ShowStartScreenHelp', true)
 /**
  * Build settings.
  */
-systemSetting('AuthorName', 'Evo Things')
+systemSetting('AuthorName', 'Evothings')
 systemSetting('AuthorEmail', 'build@evothings.com')
 systemSetting('AuthorURL', 'https://evothings.com')
 systemSetting('KeystoreFilename', 'evo256.keystore')
