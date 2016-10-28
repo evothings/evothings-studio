@@ -1278,6 +1278,7 @@ function createNewsEntry(item) {
 		hyper.UI.$('#input-setting-keystore-distinguished-name').val(SETTINGS.getDistinguishedName())
 		hyper.UI.$('#input-setting-keystore-jarsigner-sign-command').val(SETTINGS.getJarSignCommand())
 		hyper.UI.$('#input-setting-keystore-jarsigner-verify-command').val(SETTINGS.getJarVerifyCommand())
+		hyper.UI.$('#input-setting-vboxmanage-path').val(SETTINGS.getVBoxManagePath())
 
 		hyper.UI.$('#input-setting-javascript-workbench-font-size').val(SETTINGS.getWorkbenchFontSize())
 		hyper.UI.$('#input-setting-number-of-directory-levels').val(SETTINGS.getNumberOfDirecoryLevelsToTraverse())
@@ -1331,7 +1332,8 @@ function createNewsEntry(item) {
 		SETTINGS.setDistinguishedName(hyper.UI.$('#input-setting-keystore-distinguished-name').val())
 		SETTINGS.setJarSignCommand(hyper.UI.$('#input-setting-keystore-jarsigner-sign-command').val())
 		SETTINGS.setJarVerifyCommand(hyper.UI.$('#input-setting-keystore-jarsigner-verify-command').val())
-
+		SETTINGS.setVBoxManagePath(hyper.UI.$('#input-setting-vboxmanage-path').val())
+		
 		// TODO: Make this take effect instantly.
 		SETTINGS.setWorkbenchFontSize(hyper.UI.$('#input-setting-javascript-workbench-font-size').val())
 
@@ -1939,7 +1941,7 @@ function createNewsEntry(item) {
 		var vbox
 		if (process.platform == "win32") {
  			// On Windows we use an explicit setting, or we try the obvious place
-      		vbox = SETTINGS.getVBoxManagePath() || PATH.join(process.env['programfiles'], 'Oracle', 'VirtualBox', 'VBoxManage.exe')
+			vbox = SETTINGS.getVBoxManagePath() || PATH.join(process.env['programfiles'], 'Oracle', 'VirtualBox', 'VBoxManage.exe')
 		} else {
 			vbox = 'VBoxManage'
 		}

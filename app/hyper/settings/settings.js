@@ -114,7 +114,7 @@ systemSetting('DistinguishedName', 'CN=Evothings, OU=Dev, O=Evothings, L=Stockho
 systemSetting('JarSignCommand', 'jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -tsa http://timestamp.digicert.com -keystore #{RootDir}/#{Keystore} -storepass \\"#{StorePassword}\\" -keypass \\"#{KeyPassword}\\" #{TargetFileName}-unaligned.apk evokey256')
 systemSetting('JarVerifyCommand', 'jarsigner -verify -verbose -certs #{TargetFileName}-unaligned.apk')
 systemSetting('CordovaPrefix', 'com.evothings.samples')
-systemSetting('VBoxManagePath', '')
+systemSetting('VBoxManagePath', '') // This is so that you can enter a custom path if it fails to find VBoxManage.exe
 
 /**
  * Tools settings.
