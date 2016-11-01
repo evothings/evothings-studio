@@ -1527,20 +1527,13 @@ function createNewsEntry(item) {
     		} else {		    
     		  // Extract into targetDir
     		  FSEXTRA.mkdirsSync(targetDir)
-	    	  UTIL.unzip(zipFile, targetDir, function(err) {
-	  		    if (err) {
-	  		      // TODO: This doesn't seem to work
-	  		      FSEXTRA.removeSync(targetDir)
-        		  window.alert('Something went wrong when unzipping app.')
-        		  LOGGER.log('[main-window-func.js] Error in copyAppFromURL: ' + err)
-        		} else {       
-		          //Callback
+	    	  UTIL.unzip(zipFile, targetDir)
 		          cb()
 		        }
 		      })
-		    }
-	  	})
 	  } catch (error) {
+			// TODO: This doesn't seem to work
+	  	FSEXTRA.removeSync(targetDir)
 		  window.alert('Something went wrong, could not download and unzip app.')
 		  LOGGER.log('[main-window-func.js] Error in copyAppFromURL: ' + error)
 	  }
@@ -2201,17 +2194,10 @@ function ensureResDirectory(targetDir, cb) {
   		    UTIL.alertDownloadError('Something went wrong, could not download default res graphics.', sourceURL, err)
     		  LOGGER.log('[main-window-func.js] Error in ensureResDirectory: ' + err)
     		} else {		    
-	    	  UTIL.unzip(zipFile, targetDir, function(err) {
-	  		    if (err) {
-        		  window.alert('Something went wrong when downloading/unzipping library.')
-        		  LOGGER.log('[main-window-func.js] Error in ensureResDirectory: ' + err)
-        		} else {       
-		          //Callback
+	    	  UTIL.unzip(zipFile, targetDir)
 		          cb()
 		        }
 		      })
-		    }
-	  	})
 	  } catch (error) {
 		  window.alert('Something went wrong, could not download and unzip default res graphics.')
 		  LOGGER.log('[main-window-func.js] Error in ensureResDirectory: ' + error)
@@ -2579,20 +2565,13 @@ JarVerify = "${verifyCommand}"
     		} else {		    
     		  // Extract into targetDir
     		  FSEXTRA.mkdirsSync(targetDir)
-	    	  UTIL.unzip(zipFile, targetDir, function(err) {
-	  		    if (err) {
-	  		      // TODO: This doesn't seem to work
-	  		      FSEXTRA.removeSync(targetDir)
-        		  window.alert('Something went wrong when downloading/unzipping library.')
-        		  LOGGER.log('[main-window-func.js] Error in copyLibraryFromURL: ' + err)
-        		} else {       
-		          //Callback
+	    	  UTIL.unzip(zipFile, targetDir)
 		          cb()
-		        }
-		      })
 		    }
 	  	})
 	  } catch (error) {
+			// TODO: This doesn't seem to work
+			FSEXTRA.removeSync(targetDir)
 		  window.alert('Something went wrong, could not download and unzip library.')
 		  LOGGER.log('[main-window-func.js] Error in copyLibraryFromURL: ' + error)
 	  }

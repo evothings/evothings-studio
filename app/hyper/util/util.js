@@ -25,7 +25,7 @@ var FS = require('fs')
 var TEMP = require('temp').track()
 var HTTPS = require('https')
 var PATH = require('path')
-var UNZIP = require('unzip2')
+var UNZIP = require('adm-zip')
 const CHILD_PROCESS = require('child_process')
 
 exports.alertDownloadError = function(msg, url, status) {
@@ -116,10 +116,12 @@ exports.isVagrantUp = function(dir) {
 }
 
 exports.unzip = function(zipfile, path, cb) {
-  var extractor = UNZIP.Extract({ path: path })
-  extractor.on("close", cb);
-  extractor.on("error", cb);
-  FS.createReadStream(zipfile).pipe(extractor)
+  var zip = new UNZIP(zipfile)
+  zip.extractAllTo(path)
+  //var extractor = UNZIP.Extract({ path: path })
+  //extractor.on("close", cb);
+  //extractor.on("error", cb);
+  //FS.createReadStream(zipfile).pipe(extractor)
 }
 
 function download(url, dest, cb) {
