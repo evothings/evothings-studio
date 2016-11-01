@@ -52,13 +52,14 @@ var getJSON = function(url, type) {
     });
 };
 
+/*
 exports.updateTranslations = function(url) {
     getJSON(url).then(json => {
         translations = json
     }, error => {
         console.log('Unable to download translations')
     })
-}
+}*/
 
 exports.getJSON = getJSON
 
@@ -149,7 +150,7 @@ exports.download = function(url, cb) {
     })
   })
 }
-
+/*
 var translations =
 {
     // Strings internal to the workbench
@@ -169,10 +170,10 @@ var translations =
 exports.translate = function(content)
 {
     // This seems odd... we can't do ALL replacemenets
-    /*for( k in translations)
+    for( k in translations)
     {
         var v = translations[k]
         content = content.replace(k,v)
-    }*/
+    }
     return content
-}
+}*/

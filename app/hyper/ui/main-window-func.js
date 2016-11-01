@@ -95,7 +95,7 @@ exports.defineUIFunctions = function(hyper)
       hyper.UI.updateLibraryList(silent)
 			hyper.UI.updateBuildConfigList(silent)
 			hyper.UI.updatePluginList(silent)
-	  	UTIL.updateTranslations(SETTINGS.getTranslationsURL())
+	  	//UTIL.updateTranslations(SETTINGS.getTranslationsURL())
     } else {
       console.log("Already updating lists, ignoring")
     }

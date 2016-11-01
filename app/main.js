@@ -525,7 +525,7 @@ main.openDialog = function(title, content, type) {
     title: title,
     /*message:content,*/
     buttons: ["Close"],
-    detail: UTIL.translate(content)
+    detail: content
   })
 }
 
@@ -538,7 +538,7 @@ main.openWorkbenchDialog = function(title, message, details, type, butts) {
       title: title,
       message: message,
       buttons: buttons,
-      detail: UTIL.translate(details)
+      detail: details
     })
   return buttons[index]
 }
