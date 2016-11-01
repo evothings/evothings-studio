@@ -1958,11 +1958,11 @@ function createNewsEntry(item) {
 		if (needVirtualboxOrVagrant) {
 			var title = 'Install VirtualBox and Vagrant?'
 			if (haveVirtualbox) {
-				have = '\n\nYou already have Virtualbox, but not Vagrant.'
+				have = '\n\nYou already have Virtualbox, but not Vagrant (or it\'s too old).'
 				title = 'Install Vagrant?'
 			}
 			if (haveVagrant) {
-				have = '\n\nYou already have Vagrant, but not Virtualbox.'
+				have = '\n\nYou already have Vagrant, but not Virtualbox (or it\'s too old).'
 				title = 'Install Virtualbox?'
 			}
 			var res = MAIN.openWorkbenchDialog('Build Tools',
@@ -2046,9 +2046,9 @@ function createNewsEntry(item) {
 			if (res == doit) {
 				// Run vagrant init to produce Vagrantfile
 				try {
-					CHILD_PROCESS.execFileSync('vagrant', ['init', 'evobox', config.boxUrl],  {cwd: evoboxDir})
+					CHILD_PROCESS.execFileSync('vagrant', ['init', config.name, config.boxUrl],  {cwd: evoboxDir})
 				} catch (er) {
-					window.alert('Something went wrong setting up Evobox Vagrant machine:' + er.stdout) 
+					window.alert(`Something went wrong setting up Evobox Vagrant machine ${config.name}:` + er.stdout) 
 					return
 				}
 			} else {
