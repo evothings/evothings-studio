@@ -1528,9 +1528,9 @@ function createNewsEntry(item) {
     		  // Extract into targetDir
     		  FSEXTRA.mkdirsSync(targetDir)
 	    	  UTIL.unzip(zipFile, targetDir)
-		          cb()
-		        }
-		      })
+					cb()
+		    }
+	  	})
 	  } catch (error) {
 			// TODO: This doesn't seem to work
 	  	FSEXTRA.removeSync(targetDir)
@@ -2195,9 +2195,9 @@ function ensureResDirectory(targetDir, cb) {
     		  LOGGER.log('[main-window-func.js] Error in ensureResDirectory: ' + err)
     		} else {		    
 	    	  UTIL.unzip(zipFile, targetDir)
-		          cb()
-		        }
-		      })
+		      cb()
+		    }
+	  	})
 	  } catch (error) {
 		  window.alert('Something went wrong, could not download and unzip default res graphics.')
 		  LOGGER.log('[main-window-func.js] Error in ensureResDirectory: ' + error)
@@ -2285,9 +2285,9 @@ function ensureResDirectory(targetDir, cb) {
 				title: APP_SETTINGS.getTitle(path),
 				shortDescription: APP_SETTINGS.getDescription(path),
 				longDescription: APP_SETTINGS.getLongDescription(path),
-				authorName: APP_SETTINGS.getAuthorName(path),
-				authorEmail: APP_SETTINGS.getAuthorEmail(path),
-				authorURL: APP_SETTINGS.getAuthorURL(path),
+				authorName: APP_SETTINGS.getAuthorName(path) || SETTINGS.getAuthorName(),
+				authorEmail: APP_SETTINGS.getAuthorEmail(path) || SETTINGS.getAuthorEmail(),
+				authorURL: APP_SETTINGS.getAuthorURL(path) || SETTINGS.getAuthorURL(),
 				path: path,
 				source: '/www/',
 				plugins: JSON.parse(JSON.stringify(APP_SETTINGS.getPlugins(path))),
@@ -2566,7 +2566,7 @@ JarVerify = "${verifyCommand}"
     		  // Extract into targetDir
     		  FSEXTRA.mkdirsSync(targetDir)
 	    	  UTIL.unzip(zipFile, targetDir)
-		          cb()
+	        cb()
 		    }
 	  	})
 	  } catch (error) {
