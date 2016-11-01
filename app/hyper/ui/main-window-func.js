@@ -819,7 +819,7 @@ exports.defineUIFunctions = function(hyper)
 			error = err
 			console.log(`Spawn of editor exited with error: ${err}`);
 		})
-		edit.on('close', (code) => {
+		edit.on('exit', (code, signal) => {
 			console.log(`Spawn of editor exited with code ${code}`);
 			// If we fail then... let's check
 			if (code != 0) {
@@ -2002,7 +2002,7 @@ function createNewsEntry(item) {
 					var s = data.toString()
 					console.log(s)
 				});
-				build.on('close', (code) => {
+				build.on('exit', (code, signal) => {
 					if (code != 0) {
 						console.log(`child process exited with code ${code}`);
 						window.alert('Something went wrong stopping Evobox Vagrant machine')
@@ -2099,7 +2099,7 @@ function createNewsEntry(item) {
 				var s = data.toString()
 				hyper.UI.buildLog('stderr: ' + s + '\n')
 			});
-			build.on('close', (code) => {
+			build.on('exit', (code, signal) => {
 				if (code != 0) {
 					console.log(`child process exited with code ${code}`);
 					window.alert('Something went wrong starting Evobox Vagrant machine')
@@ -2345,9 +2345,10 @@ function ensureResDirectory(targetDir, cb) {
 					console.log(`Build process exited with error: ${err}`);
 					error = err
 				})
-				proc.on('close', (code) => {
+				proc.on('exit', (code, signal) => {
 					build.exitCode = code
-					console.log(`Build process exited with code ${code}`);
+					build.signal = signal
+					console.log(`Build process exited with code: ${code} and signal: ${signal}`);
 					console.dir(build)
 					build.stop = Date.now()
 					if (error) {
