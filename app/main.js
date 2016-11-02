@@ -9,7 +9,7 @@ main.MAJOR = 2
 main.MINOR = 2
 main.PATCH = 0
 // Disabled for a real release:
-main.BUILD = "beta6"
+main.BUILD = "beta7"
 
 // This one is burned in by scripts
 main.TIMESTAMP = '<timestamp>'
