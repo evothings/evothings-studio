@@ -63,6 +63,11 @@ done
 #shift $(($OPTIND - 1))
 
 if [ ! -z "$DOBUILD" ] ; then
+  echo "Checking missing npm packages ..."
+  npm-install-missing
+  cd app
+  npm-install-missing
+  cd ..
   echo "Building version $VER ..."
   # Burn in build timestamp
   NOW=$(date)
