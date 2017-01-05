@@ -1,6 +1,6 @@
 {
-  "name": "evothings-studio",
-  "productName": "Evothings Studio",
+  "name": "evothings-workbench",
+  "productName": "Evothings Workbench",
   "description": "HTML/JS IoT mobile app development tool",
   "version": "2.2.0-beta7",
   "author": "Evothings <info@evothings.com>",
@@ -35,9 +35,6 @@
     "socket.io-client": "^1.7.2",
     "temp": "^0.8.3",
     "adm-zip": "^0.4.7"
-  },
-  "other-dependencies": {
-    "comment": "See functions downloadJavaScriptLibraries in init.rb"
   },
   "private": true
 }

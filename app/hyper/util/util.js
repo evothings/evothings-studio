@@ -74,7 +74,7 @@ exports.checkInternet = function() {
       return true
     }, error => {
       // Ok, couldn't reach pong.json, internet is probably down
-      window.alert('You do not seem to have internet access?\n\nEvothings Studio requires access to the Internet.');
+      window.alert('You do not seem to have internet access?\n\nEvothings Workbench requires access to the Internet.');
       return false
     })
 }

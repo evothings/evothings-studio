@@ -339,13 +339,13 @@ main.addMenu = function() {
           type: 'separator'
         },
         {
-          label: 'About Evothings Studio',
+          label: 'About Evothings Workbench',
           click: function() { dialog.showMessageBox({
             type: "info",
-            title: "Evothings Studio " + main.FULLVERSION,
+            title: "Evothings Workbench " + main.FULLVERSION,
             buttons: ["Close"],
-            message: "Evothings Studio " + main.FULLVERSION,
-            detail: "Evothings Studio is a development environment tailored for making hybrid mobile apps in the IoT domain.\n" +
+            message: "Evothings Workbench " + main.FULLVERSION,
+            detail: "Evothings Workbench is a development environment tailored for making hybrid mobile apps in the IoT domain.\n" +
               "\nBuilt: " + main.TIMESTAMP +
               "\nElectron: " + process.versions['electron'] +
               "\nChrome: " + process.versions['chrome'] +
@@ -360,7 +360,7 @@ main.addMenu = function() {
 
   if (process.platform == 'darwin') {
     template.unshift({
-      label: 'Evothings Studio',
+      label: 'Evothings Workbench',
       submenu: [
         /*{
           label: 'About ' + name,
@@ -378,7 +378,7 @@ main.addMenu = function() {
           type: 'separator'
         },
         {
-          label: 'Hide Evothings Studio',
+          label: 'Hide Evothings Workbench',
           accelerator: 'Command+H',
           role: 'hide'
         },
@@ -448,7 +448,7 @@ main.getRootDir = function() {
 
 main.createWorkbenchWindow = function() {
   main.workbenchWindow = new BrowserWindow({
-    title: 'Evothings Studio ' + main.FULLVERSION + ' - Workbench',
+    title: 'Evothings Workbench ' + main.FULLVERSION,
     icon: 'hyper/ui/images/app-icon.png',
     width: 850, height: 720, webSecurity: false, show: false
   });

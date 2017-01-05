@@ -143,7 +143,7 @@ exports.defineUIEvents = function(hyper)
 
 	// ************** Connect Screen Button **************
 
-	hyper.UI.$('#button-connect, .button-open-connect-screen').click(function()
+	hyper.UI.$('#button-connect, .button-open-login-screen').click(function()
 	{
 		hyper.UI.showTab('connect')
 	})
@@ -376,7 +376,7 @@ exports.defineUIEvents = function(hyper)
 
 	// ************** Login Close Button **************
 
-	hyper.UI.$('#connect-screen-login-close-button').click(function()
+	hyper.UI.$('#login-screen-login-close-button').click(function()
 	{
 		hideLoginScreen()
 	})
@@ -470,7 +470,7 @@ exports.defineUIEvents = function(hyper)
 		{
 			// Open logout url in hidden logout iframe.
 			var logoutURL = USER_HANDLER.getLogoutURL()
-			hyper.UI.$('#connect-screen-logout-iframe').attr('src', logoutURL)
+			hyper.UI.$('#login-screen-logout-iframe').attr('src', logoutURL)
 
 			// TODO: Find better solution for managing double logouts, when server can't find us and reply back
 			setTimeout(function()
@@ -508,20 +508,20 @@ exports.defineUIEvents = function(hyper)
 	{
 		hyper.UI.$('#button-login').html('Personalize')
 		hyper.UI.$('#login-info').html('')
-		hyper.UI.$('#connect-screen-login').hide()
+		hyper.UI.$('#login-screen-login').hide()
 	}
 
 	function showLoginScreen(loginURL)
 	{
-		hyper.UI.$('#connect-screen-login').show()
-		//hyper.UI.$('#connect-screen-login-loading-message').show()
-		//hyper.UI.$('#connect-screen-login-iframe').attr('src', loginURL)
+		hyper.UI.$('#login-screen-login').show()
+		//hyper.UI.$('#login-screen-login-loading-message').show()
+		//hyper.UI.$('#login-screen-login-iframe').attr('src', loginURL)
 		hyper.UI.openInBrowser(loginURL)
 	}
 
 	function hideLoginScreen()
 	{
-		hyper.UI.$('#connect-screen-login').hide()
+		hyper.UI.$('#login-screen-login').hide()
 	}
 
 	function showUserInfo(user)
@@ -568,7 +568,7 @@ exports.defineUIEvents = function(hyper)
 		// Hide all screens.
 		hyper.UI.$('#screen-getting-started').hide()
 		hyper.UI.$('#screen-news').hide()
-		hyper.UI.$('#screen-connect').hide()
+		hyper.UI.$('#screen-login').hide()
 		hyper.UI.$('#screen-examples').hide()
 		hyper.UI.$('#screen-libraries').hide()
 		hyper.UI.$('#screen-projects').hide()

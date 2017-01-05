@@ -163,8 +163,10 @@ systemSetting('MyAppsPath', FILEUTIL.getEvothingsMyAppsPath())
 
 exports.getOrCreateMyAppsPath = function() {
   var homeDir = FILEUTIL.getEvothingsHomePath()
+  var oldHomeDir = FILEUTIL.getOldEvothingsHomePath()
+  possiblyRenameOldEvothingsHomePath(homeDir, oldHomeDir)
   var myAppsDir = exports.getMyAppsPath()
-  // Make directory if missing
+  // Make directory if still missing
   if (!FS.existsSync(myAppsDir)) {
     try {
       FSEXTRA.mkdirsSync(homeDir)
@@ -176,6 +178,21 @@ exports.getOrCreateMyAppsPath = function() {
     }
   }
   return myAppsDir
+}
+
+function possiblyRenameOldEvothingsHomePath(homeDir, oldHomeDir) {
+  if (FS.existsSync(oldHomeDir)) {
+    if (FS.existsSync(homeDir)) {
+      MAIN.openWorkbenchDialog('Old directory still exists', `Old directory still exists`, `Evothings was earlier called Evothings Studio and used a directory called "EvothingsStudio".\n\nThe directory is now called simply "Evothings" but you seem to still also have the old directory. You should remove it, or move its contents to "Evothings".`, 'warning', ["Ok"])
+    } else {
+      MAIN.openWorkbenchDialog('Rename old directory', `Rename old directory `, `Evothings was earlier called Evothings Studio and used a directory called "EvothingsStudio".\n\nWe renamed the tool to Evothings Workbench and the directory should now simply be called "Evothings".\n\nNow we will rename it for you!`, 'info', ["Ok, rename it"])
+      FS.renameSync(oldHomeDir, homeDir)
+      var myAppsPath = exports.getMyAppsPath()
+      if (myAppsPath.startsWith(FILEUTIL.getOldEvothingsHomePath())) {
+        exports.setMyAppsPath(myAppsPath.replace(FILEUTIL.getOldEvothingsHomePath(), FILEUTIL.getEvothingsHomePath()))
+      }
+    }
+  }
 }
 
 /**

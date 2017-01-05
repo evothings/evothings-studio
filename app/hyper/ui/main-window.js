@@ -68,10 +68,6 @@ hyper.UI.DOM.localStorage = window.localStorage
 // used to highlight list item).
 hyper.UI.activeAppPath = ''
 
-
-
-/*** Main setup function ***/
-
 // This function is called at the end of this file.
 hyper.UI.main = function()
 {
@@ -123,7 +119,7 @@ hyper.UI.main = function()
     hyper.UI.setStartScreenHelpVisibility()
     hyper.UI.showInitialScreen()
 
-    //Connect to server.
+    // Connect to server.
     hyper.UI.setupServer()
     hyper.UI.connect()
 }

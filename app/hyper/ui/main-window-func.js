@@ -712,7 +712,7 @@ exports.defineUIFunctions = function(hyper)
 	hyper.UI.duplicateUUID = function(path) {
 		var newUUID = APP_SETTINGS.getAppID(path)
 		for (let p of mProjectList) {
-			// p can actually be == path, since the Studio may have an old entry
+			// p can actually be == path, since the Workbench may have an old entry
 			// pointing to this new path (if you copy stuff around too much!)
 			if (p != path && APP_SETTINGS.getAppID(p) == newUUID) {
 				return true
@@ -2563,12 +2563,9 @@ JarVerify = "${verifyCommand}"
 	hyper.UI.setStartScreenHelpVisibility = function()
 	{
 		var show = SETTINGS.getShowStartScreenHelp()
-		if (show)
-		{
+		if (show) {
 			hyper.UI.showStartScreenHelp()
-		}
-		else
-		{
+		} else {
 			hyper.UI.hideStartScreenHelp()
 		}
 	}
@@ -2576,12 +2573,9 @@ JarVerify = "${verifyCommand}"
 	hyper.UI.toogleStartScreenHelp = function()
 	{
 		var visible = SETTINGS.getShowStartScreenHelp()
-		if (visible)
-		{
+		if (visible)	{
 			hyper.UI.hideStartScreenHelp()
-		}
-		else
-		{
+		} else {
 			hyper.UI.showStartScreenHelp()
 		}
 	}

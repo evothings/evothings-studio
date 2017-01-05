@@ -145,10 +145,23 @@ exports.getEvothingsHomePath = function() {
 	try	{
 		var home = exports.getHomeDir()
 		if (home) {
-			evothingsHome =	PATH.join(home, 'EvothingsStudio')
+			evothingsHome =	PATH.join(home, 'Evothings')
 		}
 	} catch (error) {
 		HYPER.log('[fileutil.js] Failed to get Evothings home path')
+	}
+	return evothingsHome
+}
+
+exports.getOldEvothingsHomePath = function() {
+	var evothingsHome
+	try	{
+		var home = exports.getHomeDir()
+		if (home) {
+			evothingsHome =	PATH.join(home, 'EvothingsStudio')
+		}
+	} catch (error) {
+		HYPER.log('[fileutil.js] Failed to get old Evothings home path')
 	}
 	return evothingsHome
 }
