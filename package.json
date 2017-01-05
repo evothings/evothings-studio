@@ -10,17 +10,21 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
-    "electron-builder": "^7.14.1",
-    "electron-packager": "^8.1.0",
-    "electron-prebuilt": "^1.2.6",
+    "electron": "^1.4.13",
+    "electron-builder": "^10.17.3",
+    "electron-packager": "^8.4.0",
     "node-promise": "^0.5.12",
-    "spectron": "^3.4.0"
+    "spectron": "^3.4.1"
   },
   "build": {
     "appId": "com.evothings.studio",
     "linux": {
       "category": "Development",
-      "target": ["deb", "rpm", "AppImage"],
+      "target": [
+        "deb",
+        "rpm",
+        "AppImage"
+      ],
       "synopsis": "IoT hybrid mobile app development tool",
       "vendor": "Evothings <info@evothings.com>"
     },
@@ -28,12 +32,12 @@
       "category": "public.app-category.developer-tools"
     },
     "dmg": {
-       "contents": [
-         {
+      "contents": [
+        {
           "x": 140,
           "y": 220
-         },
-         {
+        },
+        {
           "x": 450,
           "y": 220,
           "type": "link",
@@ -42,7 +46,10 @@
       ]
     },
     "win": {
-      "target": ["nsis", "squirrel"]
+      "target": [
+        "nsis",
+        "squirrel"
+      ]
     },
     "squirrelWindows": {
       "iconUrl": "http://evothings.com/evothings-logo.ico"
