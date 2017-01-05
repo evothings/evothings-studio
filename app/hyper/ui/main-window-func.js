@@ -112,6 +112,9 @@ exports.defineUIFunctions = function(hyper)
 	    }
     })
 
+		// Make sure we have proper name for home dir
+		SETTINGS.getOrCreateMyAppsPath()
+
 		// Register a timer so that we update the lists every 30 min, but silently.
 	  setInterval(function() {
       updateLists(true)
