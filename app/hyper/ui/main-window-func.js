@@ -76,7 +76,6 @@ exports.defineUIFunctions = function(hyper)
 
 	hyper.UI.setupUI = function()
 	{
-		ensureCloudApiTokenExists()
 		styleUI()
 		setUIActions()
 		setWindowActions()
@@ -122,62 +121,6 @@ exports.defineUIFunctions = function(hyper)
 	  EVENTS.subscribe(EVENTS.LOGIN, function() {updateLists(true)})
 	  
 		hyper.UI.setServerMessageFun()
-	}
-
-	function ensureCloudApiTokenExists()
-	{
-		var token = SETTINGS.getEvoCloudToken()
-		var dialog = hyper.UI.$('#dialog-cloud-token-alert')[0]
-		if(!token)
-		{
-			console.dir(dialog)
-			//dialog.showModal()
-		}
-		else
-		{
-			console.log('existing cloud api token found: '+token)
-			hyper.UI.showToken(token)
-		}
-		console.log('------------------ setting up open token dialog listener...')
-		EVENTS.subscribe(EVENTS.OPENTOKENDIALOG, function(message)
-		{
-			console.log('------------------ token dialog event. message = '+message)
-			if(message)
-			{
-				console.log('open cloud token dialog')
-				MAIN.openDialog('Cloud Token Message', message, 'info')
-			}
-
-			/*
-			if(message)
-			{
-				hyper.UI.$('#tokentext')[0].innerHTML = message
-			}
-			hyper.UI.$('#connect-spinner').removeClass('icon-spin-animate')
-			dialog.showModal()
-			*/
-			hyper.UI.hideToken()
-		})
-	}
-
-	hyper.UI.showToken = function(token)
-	{
-		var panelHaveToken = hyper.UI.$('#panel-have-token')[0]
-		var panelHaveNoToken = hyper.UI.$('#panel-have-no-token')[0]
-		var tokenInputField = hyper.UI.$('.token-input-field')[0]
-		panelHaveToken.style.display = 'block'
-		panelHaveNoToken.style.display = 'none'
-		tokenInputField.value = ''
-		hyper.UI.$('.token-key').html(token)
-	}
-
-	hyper.UI.hideToken = function()
-	{
-		var panelHaveToken = hyper.UI.$('#panel-have-token')[0]
-		var panelHaveNoToken = hyper.UI.$('#panel-have-no-token')[0]
-		panelHaveToken.style.display = 'none'
-		panelHaveNoToken.style.display = 'block'
-		hyper.UI.$('.token-key').html('')
 	}
 
 	// Helper function that returns the application name
@@ -1979,32 +1922,34 @@ function createNewsEntry(item) {
 
 	hyper.UI.stopEvobox = function(cb) {
 		var config = hyper.UI.mBuildConfigList[0]
-		var myAppsDir = SETTINGS.getMyAppsPath()
-		var buildDir = PATH.join(myAppsDir, 'build')
-		var evoboxDir = PATH.join(buildDir, config.name)
-		if (!FS.existsSync(evoboxDir)) {
-			cb()
-		} else {
-			if (UTIL.isVagrantUp(evoboxDir)) {
-				const build = CHILD_PROCESS.spawn('vagrant', ['halt', '--machine-readable'], {cwd: evoboxDir})
-				build.stdout.on('data', (data) => {
-					var s = data.toString()
-					console.log(s)
-				})
-				build.stderr.on('data', (data) => {
-					var s = data.toString()
-					console.log(s)
-				});
-				build.on('exit', (code, signal) => {
-					if (code != 0) {
-						console.log(`child process exited with code ${code}`);
-						window.alert('Something went wrong stopping Evobox Vagrant machine')
-						LOGGER.log('[main-window-func.js] Error in stopEvobox')
-					}
-					cb()
-				})
-			} else {
+		if (config) {
+			var myAppsDir = SETTINGS.getMyAppsPath()
+			var buildDir = PATH.join(myAppsDir, 'build')
+			var evoboxDir = PATH.join(buildDir, config.name)
+			if (!FS.existsSync(evoboxDir)) {
 				cb()
+			} else {
+				if (UTIL.isVagrantUp(evoboxDir)) {
+					const build = CHILD_PROCESS.spawn('vagrant', ['halt', '--machine-readable'], {cwd: evoboxDir})
+					build.stdout.on('data', (data) => {
+						var s = data.toString()
+						console.log(s)
+					})
+					build.stderr.on('data', (data) => {
+						var s = data.toString()
+						console.log(s)
+					});
+					build.on('exit', (code, signal) => {
+						if (code != 0) {
+							console.log(`child process exited with code ${code}`);
+							window.alert('Something went wrong stopping Evobox Vagrant machine')
+							LOGGER.log('[main-window-func.js] Error in stopEvobox')
+						}
+						cb()
+					})
+				} else {
+					cb()
+				}
 			}
 		}
 	}

@@ -217,30 +217,6 @@ exports.setEvoGUID = function(value)
 	window.localStorage.setItem('evo-guid', value)
 }
 
-exports.getEvoCloudToken = function()
-{
-	return window.localStorage.getItem('evo-cloudtoken')
-}
-
-exports.setEvoCloudToken = function(value)
-{
-	console.log('* setting evo-cloudtoken to '+value)
-	window.localStorage.setItem('evo-cloudtoken', value)
-}
-
-
-// hasXXXX are capabilities associated with the user account
-exports.hasEnterprise = function()
-{
-  return USER_HANDLER.isEnterprise()
-}
-
-// Means that the user ONLY has free features
-exports.hasFree = function()
-{
-  return USER_HANDLER.isFree()
-}
-
 /**
  * List of URLs as array
  */
@@ -297,9 +273,6 @@ exports.getNewsLists = function()
 {
   var lists = []
   lists.push(MAIN.NEWS + '/news-list.json')
-  if (exports.hasEnterprise()) {
-    lists.push(MAIN.NEWS + '/news-list-enterprise.json')
-  }
   var urls = exports.getRepositoryURLsArray()
   for (url of urls) {
     lists.push(url + '/news/news-list.json')
@@ -311,9 +284,6 @@ exports.getExampleLists = function()
 {
   var lists = []
   lists.push(MAIN.EXAMPLES + '/examples-list.json')
-  if (exports.hasEnterprise()) {
-    lists.push(MAIN.EXAMPLES + '/examples-list-enterprise.json')
-  }
   var urls = exports.getRepositoryURLsArray()
   for (url of urls) {
     lists.push(url + '/examples/examples-list.json')
@@ -325,9 +295,6 @@ exports.getBuildConfigLists = function()
 {
   var lists = []
   lists.push(MAIN.BUILDS + '/build-list.json')
-  if (exports.hasEnterprise()) {
-    lists.push(MAIN.BUILDS + '/build-list-enterprise.json')
-  }
   var urls = exports.getRepositoryURLsArray()
   for (url of urls) {
     lists.push(url + '/build/build-list.json')
@@ -339,9 +306,6 @@ exports.getPluginLists = function()
 {
   var lists = []
   lists.push(MAIN.PLUGINS + '/plugin-list.json')
-  if (exports.hasEnterprise()) {
-    lists.push(MAIN.PLUGINS + '/plugin-list-enterprise.json')
-  }
   var urls = exports.getRepositoryURLsArray()
   for (url of urls) {
     lists.push(url + '/plugins/plugin-list.json')
@@ -353,9 +317,6 @@ exports.getLibraryLists = function()
 {
   var lists = []
   lists.push(MAIN.LIBRARIES + '/library-list.json')
-  if (exports.hasEnterprise()) {
-   lists.push(MAIN.LIBRARIES + '/library-list-enterprise.json')
-  }
   var urls = exports.getRepositoryURLsArray()
   for (url of urls) {
     lists.push(url + '/libraries/library-list.json')

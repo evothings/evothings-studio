@@ -16,8 +16,7 @@ var Events =
     HYPER_RESULT:           'hyper.result',
     EXECUTEFILEDATA:        'execute_file_data',
     INJECTFILEDATA:         'inject_file_data',
-    OPENTOKENDIALOG:        'open_token_dialog',
-    REQUESTINITIALVIEWERS:        'request_initial_viewers',
+    REQUESTINITIALVIEWERS:  'request_initial_viewers',
 
     listeners:  [],
 

@@ -79,14 +79,11 @@ var mBasePath = ''
 exports.connectToRemoteServer = function()
 {
 	LOGGER.log('[file-server.js] Connecting to remote server')
-	var cloudToken = SETTINGS.getEvoCloudToken()
-	console.log('cloud token = '+cloudToken)
 	// Message handler table.
 	var messageHandlers =
 	{
 		// Messages from the server to the Workbench.
 		'workbench.set-session-id': onMessageWorkbenchSetSessionID,
-		'workbench.token-rejected': onMessageWorkbenchTokenRejected,
 		'workbench.set-connect-key': onMessageWorkbenchSetConnectKey,
 		'workbench.client-info': onMessageWorkbenchClientInfo,
 		'client.instrumentation': onMessageWorkbenchClientInstrumentation,
@@ -188,16 +185,8 @@ function sendResetMessage()
 
 function heartbeat()
 {
-	var cloudToken = SETTINGS.getEvoCloudToken()
-	if(cloudToken)
-	{
-		var uuid = SETTINGS.getEvoGUID()
-		sendMessageToServer(mSocket, 'workbench.heartbeat', {sessionID: mSessionID, uuid: uuid, info: mDeviceInfo})
-	}
-	else
-	{
-		console.log('skipping heartbeat due to missing cloud token')
-	}
+	var uuid = SETTINGS.getEvoGUID()
+	sendMessageToServer(mSocket, 'workbench.heartbeat', {sessionID: mSessionID, uuid: uuid, info: mDeviceInfo})
 }
 
 function onMessageWorkbenchUserLogin(socket, message)
@@ -208,12 +197,6 @@ function onMessageWorkbenchUserLogin(socket, message)
 	}
 }
 
-function onMessageWorkbenchTokenRejected(socket, message)
-{
-	console.log('++++++++++++++++++ Cloud Token Rejected by Proxy !!!!!  ++++++++++++++++++++')
-	EVENTS.publish(EVENTS.OPENTOKENDIALOG, message.reason || "Token rejected.")
-}
-
 function onMessageWorkbenchUserLogout(socket, message)
 {
 	EVENTS.publish(EVENTS.LOGOUT, {event: 'logout'})
@@ -221,36 +204,16 @@ function onMessageWorkbenchUserLogout(socket, message)
 
 function sendMessageToServer(_socket, name, data)
 {
-	//console.log('sendMessage to server called. token is '+mCloudToken)
 	var socket = _socket || mSocket
 	var uuid = SETTINGS.getEvoGUID()
-	var cloudToken = SETTINGS.getEvoCloudToken()
-	if(!cloudToken)
-	{
-		cloudToken = SETTINGS.getEvoCloudToken()
-		if(!cloudToken)
-		{
-			console.log('trying to open token dialog....')
-			EVENTS.publish(EVENTS.OPENTOKENDIALOG, 'Cloud Token Missing')
-		}
-	}
-	else
-	{
-		/*
-		 console.log('[file-server.js] --------------')
-		 console.log('[file-server.js] sendMessageToServer: ' + JSON.stringify(data))
-		 console.log('[file-server.js] --------------')
-		 console.log('[file-server.js] sendMessageToServer -- uuid = '+uuid)
-		*/
-		socket.emit('hyper-workbench-message', {
-			protocolVersion: mProtocolVersion,
-			workbenchVersionCode: mWorkbenchVersionCode,
-			cloudApiToken: cloudToken,
-			name: name,
-			sessionID: mSessionID,
-			UUID: uuid,
-			data: data })
-	}
+
+	socket.emit('hyper-workbench-message', {
+		protocolVersion: mProtocolVersion,
+		workbenchVersionCode: mWorkbenchVersionCode,
+		name: name,
+		sessionID: mSessionID,
+		UUID: uuid,
+		data: data })	
 }
 
 function onMessageWorkbenchSetSessionID(socket, message)

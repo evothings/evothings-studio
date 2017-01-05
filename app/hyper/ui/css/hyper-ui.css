@@ -304,52 +304,6 @@ html, body
 	-webkit-border-radius: 4px;
 }
 
-#panel-have-no-token
-{
-	margin-bottom: 5px;
-}
-
-#panel-have-token
-{
-	margin-bottom: 5px;
-	padding-bottom: 0px;
-	display: none;
-}
-
-.token-input-field
-{
-	font-weight: bold;
-	font-size: 18px;
-	letter-spacing: 1px;
-	font-kerning: none;
-	color: black;
-	background: rgb(245,245,245);
-	padding: 7px 10px;
-	margin-left: 10px;
-	margin-top: 0px;
-	margin-bottom: 0px;
-	margin-right:10px;
-	min-width: 385px;
-	border: 1px solid #888888;
-	-webkit-border-radius: 4px;
-}
-
-.token-key
-{
-
-	font-weight: bold;
-	letter-spacing: 1px;
-	font-kerning: none;
-	color: black;
-/*
-	padding: 0px 15px;
-	margin-left: 10px;
-	margin-top: 0px;
-	margin-bottom: 0px;
-	min-width: 230px;
-	-webkit-border-radius: 4px;
-*/
-}
 
 #connect-spinner
 {

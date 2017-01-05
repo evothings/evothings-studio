@@ -381,54 +381,6 @@ exports.defineUIEvents = function(hyper)
 		hideLoginScreen()
 	})
 
-	// ************** Remember me checkbox **************
-
-	/*
-	hyper.UI.$('#remember-checkbox').change(function(e)
-	{
-		var remember = e.target.checked;
-		LOGGER.log('[main-window-events.js] remmember me changed value to '+remember);
-		SETTINGS.setRememberMe(remember)
-	})
-	*/
-
-	hyper.UI.$('#button-save-token').click(function()
-	{
-		console.log('--------------- token button clicked-------------')
-
-		var token = hyper.UI.$('.token-input-field')[0].value
-		//console.dir(hyper.UI.$('.token-input-field')[0])
-		//console.dir(token)
-		console.log('token is '+token)
-		SETTINGS.setEvoCloudToken(token)
-		//hyper.UI.$('#tokentext')[0].innerHTML = ""
-		hyper.UI.showToken(token)
-		SERVER.disconnectFromRemoteServer()
-		SERVER.connectToRemoteServer()
-	});
-	hyper.UI.$('#button-close-dialog-cloud-token-alert').click(function()
-	{
-		//hyper.UI.$('#tokentext')[0].innerHTML = ""
-		hyper.UI.$('#dialog-cloud-token-alert')[0].close()
-	});
-	hyper.UI.$('#button-open-cloud-token-reset-dialog').click(function()
-	{
-		hyper.UI.$('#dialog-cloud-token-reset')[0].showModal()
-	})
-	hyper.UI.$('#button-cloud-token-reset-cancel').click(function()
-	{
-		hyper.UI.$('#dialog-cloud-token-reset')[0].close()
-	})
-	hyper.UI.$('#button-cloud-token-reset').click(function()
-	{
-		console.log('cloud token factory reset clicked')
-		hyper.UI.$('#dialog-cloud-token-reset')[0].close()
-		SERVER.sendResetMessage()
-		SETTINGS.setEvoCloudToken('')
-		SETTINGS.setSessionID('')
-		hyper.UI.hideToken()
-		hideLoginButton()
-	})
 
 	// ************** Login Events **************
 
@@ -633,7 +585,7 @@ exports.defineUIEvents = function(hyper)
 		  hyper.UI.updateExampleList(true)
 		}
 		if (tabname == 'news' && hyper.UI.mNewsList.length == 0) {
-		  hyper.UI.updateNews(true)
+		  hyper.UI.updateNewsList(true)
 		}
 		if (tabname == 'libraries' && hyper.UI.mLibraryList.length == 0) {
 		  hyper.UI.updateLibraryList(true)
