@@ -2,7 +2,7 @@
   "name": "evothings-workbench",
   "productName": "Evothings Workbench",
   "description": "HTML/JS IoT mobile app development tool",
-  "version": "2.2.0-beta7",
+  "version": "2.3.0-alpha1",
   "author": "Evothings <info@evothings.com>",
   "homepage": "https://evothings.com",
   "license": "Apache-2.0",
