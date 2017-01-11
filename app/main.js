@@ -29,7 +29,6 @@ main.BUILDS = main.BASE + "/builds"
 main.PLUGINS = main.BASE + "/plugins"
 main.TRANSLATIONS = main.BASE + '/translations'
 
-main.limits = 'Not yet available'
 
 // Fix for accessing vagrant, virtualbox and vscode that usually installs in /usr/local/bin
 // When OSX runs a UI app it often seems to only include core bin PATHs and not user .profile paths.
@@ -350,7 +349,6 @@ main.addMenu = function() {
               "\nElectron: " + process.versions['electron'] +
               "\nChrome: " + process.versions['chrome'] +
               "\nNode: " + process.versions['node'] +
-              "\n\nLimits: " + main.limits +
               "\nLicense: Apache License version 2.0" +
               "\n\nCopyright (c) 2016 Evothings AB"}) }
         }

@@ -56,17 +56,6 @@ exports.setUser = function(uobj)
 	mUser = uobj
 }
 
-exports.isEnterprise = function()
-{
-	return mUser && mUser.limits && mUser.limits.license === "enterprise"
-}
-
-exports.isFree = function()
-{
-	return mUser && mUser.limits && mUser.limits.license === "free"
-}
-
-
 exports.clearUser = function()
 {
 	LOGGER.log('[user-handler.js] LOGIN:clearing user')

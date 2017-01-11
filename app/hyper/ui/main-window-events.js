@@ -410,8 +410,6 @@ exports.defineUIEvents = function(hyper)
 		{
 			showLoginButton()
 		}
-		// Save globally so we can show it in the About dialog
-		saveLimits(user)
 	})
 
 	EVENTS.subscribe(EVENTS.LOGOUT, function()
@@ -442,17 +440,6 @@ exports.defineUIEvents = function(hyper)
 			//logoutUser()
 		}, DISCONNECT_DELAY)
 	})
-
-	function saveLimits(user)
-	{
-		var list = ''
-		for (var k in user.limits) {
-			var v = user.limits[k]
-			list += '\n  '+k+': '+v
-		}
-		list += '\n'
-		MAIN.limits = list
-	}
 
 	function loginUser()
 	{
