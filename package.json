@@ -10,9 +10,9 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
-    "electron": "^1.4.13",
-    "electron-builder": "^10.17.3",
-    "electron-packager": "^8.4.0",
+    "electron": "^1.4.14",
+    "electron-builder": "^11.2.4",
+    "electron-packager": "^8.5.0",
     "node-promise": "^0.5.12",
     "spectron": "^3.4.1"
   },
