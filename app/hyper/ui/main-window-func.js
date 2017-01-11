@@ -775,6 +775,12 @@ exports.defineUIFunctions = function(hyper)
 				return true
 			}
 		}
+		for (let p of hyper.UI.mExampleList) {
+			// We also crosscheck against the Examples
+			if (p.uuid == newUUID) {
+				return true
+			}
+		}
 		return false
 	}
 
@@ -2285,6 +2291,7 @@ function ensureResDirectory(targetDir, cb) {
 				title: APP_SETTINGS.getTitle(path),
 				shortDescription: APP_SETTINGS.getDescription(path),
 				longDescription: APP_SETTINGS.getLongDescription(path),
+				version: APP_SETTINGS.getVersion(path),
 				authorName: APP_SETTINGS.getAuthorName(path) || SETTINGS.getAuthorName(),
 				authorEmail: APP_SETTINGS.getAuthorEmail(path) || SETTINGS.getAuthorEmail(),
 				authorURL: APP_SETTINGS.getAuthorURL(path) || SETTINGS.getAuthorURL(),
@@ -2395,6 +2402,7 @@ function ensureResDirectory(targetDir, cb) {
 		config = `Title = "${build.title}"
 ShortDesc = "${build.shortDescription}"
 LongDesc = "${build.longDescription}"
+Version = "${build.version}"
 AuthorEmail = "${build.authorEmail}"
 AuthorHref = "${build.authorURL}"
 AuthorName = "${build.authorName}"
