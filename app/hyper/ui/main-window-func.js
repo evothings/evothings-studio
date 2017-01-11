@@ -775,6 +775,12 @@ exports.defineUIFunctions = function(hyper)
 				return true
 			}
 		}
+		for (let p of hyper.UI.mExampleList) {
+			// We also crosscheck against the Examples
+			if (p.uuid == newUUID) {
+				return true
+			}
+		}
 		return false
 	}
 
