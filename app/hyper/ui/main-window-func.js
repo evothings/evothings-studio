@@ -1894,6 +1894,7 @@ function createNewsEntry(item) {
 				hyper.UI.showTab('build')
 				// Verify we have virtualbox, vagrant and evobox ready to run.
 				hyper.UI.verifyBuildEnvironment(path, function() {
+					hyper.UI.showTab('build')
 					// Evobox is up and running, now we can ask user for build details
 					// First we find any previous build to copy values from
 					var shortName = APP_SETTINGS.getName(path)
