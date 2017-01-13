@@ -323,7 +323,7 @@ exports.defineUIFunctions = function(hyper)
 			if (pathIsValidAppPath(path)) {
 				hyper.UI.addProject(path)
 			} else {
-				MAIN.alert('Not a valid evothings.json file or HTML file (extension .html or .htm)')
+				MAIN.alert('Not a valid evothings.json file or HTML file (extension .html or .htm). You may need to add an index file entry to evothings.json.')
 				break;
 			}
 		}
@@ -754,6 +754,9 @@ exports.defineUIFunctions = function(hyper)
 
 	hyper.UI.duplicateUUID = function(path) {
 		var newUUID = APP_SETTINGS.getAppID(path)
+		if (!newUUID) {
+			return false
+		}
 		for (let p of mProjectList) {
 			// p can actually be == path, since the Studio may have an old entry
 			// pointing to this new path (if you copy stuff around too much!)
