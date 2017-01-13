@@ -664,7 +664,7 @@ exports.defineUIEvents = function(hyper)
 		 </div>
 		 */
 		//hyper.UI.$('#ModalDialog-NoClientConnected').modal('show')
-		MAIN.openDialog(
+		MAIN.openWorkbenchDialog(
 			'No Evothings Viewer app connected',
 			'Please connect from the Evothings Viewer app on your mobile device(s). Learn more on the Getting Started screen.'
 		)
