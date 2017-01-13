@@ -145,7 +145,7 @@ exports.defineUIFunctions = function(hyper)
 			if(message)
 			{
 				console.log('open cloud token dialog')
-				MAIN.openDialog('Cloud Token Message', message, 'info')
+				MAIN.openWorkbenchDialog('Cloud Token Message', message)
 			}
 
 			/*
@@ -316,27 +316,14 @@ exports.defineUIFunctions = function(hyper)
 		})
 	}
 
-	function handleFileDrop(files)
-	{
-/*
-		// Debug print.
-		console.log('@@@ handleFileDrop');
-		for (var i = 0; i < files.length; ++i)
-		{
-			console.log(files[i].path);
-		}
-*/
-
-		for (var i = 0; i < files.length; ++i)
-		{
+	function handleFileDrop(files) {
+		for (var i = 0; i < files.length; ++i) {
 			var path = files[i].path
-			if (pathIsValidAppPath(path))
-			{
+			// console.log(path)
+			if (pathIsValidAppPath(path)) {
 				hyper.UI.addProject(path)
-			}
-			else
-			{
-				window.alert('Not a valid evothings.json file or HTML file (extension .html or .htm)')
+			} else {
+				MAIN.alert('Not a valid evothings.json file or HTML file (extension .html or .htm). You may need to add an index file entry to evothings.json.')
 				break;
 			}
 		}
@@ -344,43 +331,42 @@ exports.defineUIFunctions = function(hyper)
 		hyper.UI.displayProjectList()
 	}
 
-    function pathIsValidAppPath(path)
-    {
-      // Is it an existing HTML file?
-		  if (FILEUTIL.fileIsHTML(path) && FILEUTIL.pathExists(path))
-		  {
-			  return true
-		  }
+	function pathIsValidAppPath(path) {
+		// Is it an existing HTML file?
+		if (FILEUTIL.fileIsHTML(path) && FILEUTIL.pathExists(path))
+		{
+			return true
+		}
 
-		  // Directory containing evothings.json file.
-		  var dirPath = null
+		// Directory containing evothings.json file.
+		var dirPath = null
 
-		  // If path points to evothings.json file, get the directory
-		  if (FILEUTIL.fileIsEvothingsSettings(path))
-		  {
-			  dirPath = PATH.dirname(path)
-		  }
-		  else if (FILEUTIL.fileIsDirectory(path))
-		  {
-			  // Dropped file is a directory.
-			  dirPath = path
-		  }
+		// If path points to evothings.json file, get the directory
+		if (FILEUTIL.fileIsEvothingsSettings(path))
+		{
+			dirPath = PATH.dirname(path)
+		}
+		else if (FILEUTIL.fileIsDirectory(path))
+		{
+			// Dropped file is a directory.
+			dirPath = path
+		}
 
-		  // Must have directory to continue.
-		  if (!dirPath)
-		  {
-			  return false
-		  }
+		// Must have directory to continue.
+		if (!dirPath)
+		{
+			return false
+		}
 
-      // Does the directory have an evothings.json file pointing to existing index file?
-      var indexPath = APP_SETTINGS.getIndexFileFullPath(dirPath)
-		  if (FILEUTIL.pathExists(indexPath))
-		  {
-			  return true
-		  }
+		// Does the directory have an evothings.json file pointing to existing index file?
+		var indexPath = APP_SETTINGS.getIndexFileFullPath(dirPath)
+		if (FILEUTIL.pathExists(indexPath))
+		{
+			return true
+		}
 
-		  return false
-    }
+		return false
+	}
 
 	/**
 	 * Possible options include:
@@ -768,6 +754,9 @@ exports.defineUIFunctions = function(hyper)
 
 	hyper.UI.duplicateUUID = function(path) {
 		var newUUID = APP_SETTINGS.getAppID(path)
+		if (!newUUID) {
+			return false
+		}
 		for (let p of mProjectList) {
 			// p can actually be == path, since the Studio may have an old entry
 			// pointing to this new path (if you copy stuff around too much!)
@@ -1285,6 +1274,7 @@ function createNewsEntry(item) {
 		hyper.UI.$('#input-setting-keystore-jarsigner-sign-command').val(SETTINGS.getJarSignCommand())
 		hyper.UI.$('#input-setting-keystore-jarsigner-verify-command').val(SETTINGS.getJarVerifyCommand())
 		hyper.UI.$('#input-setting-vboxmanage-path').val(SETTINGS.getVBoxManagePath())
+		hyper.UI.$('#input-setting-relax-versions').prop('checked', SETTINGS.getRelaxVagrantVirtualboxVersions())
 
 		hyper.UI.$('#input-setting-javascript-workbench-font-size').val(SETTINGS.getWorkbenchFontSize())
 		hyper.UI.$('#input-setting-number-of-directory-levels').val(SETTINGS.getNumberOfDirecoryLevelsToTraverse())
@@ -1307,20 +1297,20 @@ function createNewsEntry(item) {
 		var storePassword = hyper.UI.$('#input-setting-storepassword').val()
 		if (keyPassword.length > 0) {
 			if (keyPassword.length < 6) {
-				window.alert('The key password needs to be at least 6 characters long.')
+				MAIN.alert('The key password needs to be at least 6 characters long.')
 				return
 			}
 		}
 		if (storePassword.length > 0) {
 			if (storePassword.length < 6) {
- 	    	window.alert('The key store password needs to be at least 6 characters long.')
+ 	    	MAIN.alert('The key store password needs to be at least 6 characters long.')
 				return
 			}
 		}
 		var cordovaPrefix = hyper.UI.$('#input-setting-cordova-prefix').val()
 
 		if (!reverseDomainRE.test(cordovaPrefix)) {
- 	    window.alert('The Cordova prefix should be in reverse domain style like "com.acme.dev" with no ending period. Letters and dots are allowed.')
+ 	    MAIN.alert('The Cordova prefix should be in reverse domain style like "com.acme.dev" with no ending period. Letters and dots are allowed.')
 			return
 		}
 		// Hide settings dialog.
@@ -1339,7 +1329,7 @@ function createNewsEntry(item) {
 		SETTINGS.setJarSignCommand(hyper.UI.$('#input-setting-keystore-jarsigner-sign-command').val())
 		SETTINGS.setJarVerifyCommand(hyper.UI.$('#input-setting-keystore-jarsigner-verify-command').val())
 		SETTINGS.setVBoxManagePath(hyper.UI.$('#input-setting-vboxmanage-path').val())
-		
+		SETTINGS.setRelaxVagrantVirtualboxVersions(hyper.UI.$('#input-setting-relax-versions').prop('checked'))
 		// TODO: Make this take effect instantly.
 		SETTINGS.setWorkbenchFontSize(hyper.UI.$('#input-setting-javascript-workbench-font-size').val())
 
@@ -1435,33 +1425,33 @@ function createNewsEntry(item) {
 
     // Name is empty
     if (!targetShortName) {
-      window.alert('You need to enter a short name for the app.')
+      MAIN.alert('You need to enter a short name for the app.')
 			return // Abort (dialog is still visible)
     }
 
     // App folder is empty
     if (!targetAppFolder) {
-      window.alert('You need to enter a name for the destination folder.')
+      MAIN.alert('You need to enter a name for the destination folder.')
 			return // Abort (dialog is still visible)
     }
     
     // Parent folder is empty
     if (!targetParentDir) {
-      window.alert('You need to enter or select a parent folder.')
+      MAIN.alert('You need to enter or select a parent folder.')
 			return // Abort (dialog is still visible)
     }
 
 		// If target parent folder does not exist, display an alert dialog and abort.
 		if (!FILEUTIL.pathExists(targetParentDir))
 		{
-			window.alert('The parent folder does not exist, please change folder.')
+			MAIN.alert('The parent folder does not exist, please change folder.')
 			return // Abort (dialog is still visible)
 		}
 
 		// If target folder exists, display an alert dialog and abort.
 		if (FILEUTIL.pathExists(targetDir))
 		{
-			window.alert('An app with this folder name already exists, please type a new folder name.')
+			MAIN.alert('An app with this folder name already exists, please type a new folder name.')
 			return // Abort (dialog is still visible)
 		}
 
@@ -1506,7 +1496,7 @@ function createNewsEntry(item) {
 			  // Callback
 			  cb()
 		  } catch (error) {
-			  window.alert('Something went wrong, could not save app.')
+			  MAIN.alert('Something went wrong, could not save app.')
 			  LOGGER.log('[main-window-func.js] Error in copyApp: ' + error)
 		  }
 		}
@@ -1540,7 +1530,7 @@ function createNewsEntry(item) {
 	  } catch (error) {
 			// TODO: This doesn't seem to work
 	  	FSEXTRA.removeSync(targetDir)
-		  window.alert('Something went wrong, could not download and unzip app.')
+		  MAIN.alert('Something went wrong, could not download and unzip app.')
 		  LOGGER.log('[main-window-func.js] Error in copyAppFromURL: ' + error)
 	  }
 	}
@@ -1591,33 +1581,33 @@ function createNewsEntry(item) {
 
     // App name is empty
     if (!shortName) {
-      window.alert('You need to enter a short name for the app.')
+      MAIN.alert('You need to enter a short name for the app.')
 			return // Abort (dialog is still visible)
     }
 
     // App folder is empty
     if (!appFolder) {
-      window.alert('You need to enter a name for the app folder.')
+      MAIN.alert('You need to enter a name for the app folder.')
 			return // Abort (dialog is still visible)
     }
     
     // Parent folder is empty
     if (!parentFolder) {
-      window.alert('You need to enter or select a parent folder.')
+      MAIN.alert('You need to enter or select a parent folder.')
 			return // Abort (dialog is still visible)
     }
 
 		// If target parent folder does not exist, display an alert dialog and abort.
 		if (!FILEUTIL.pathExists(parentFolder))
 		{
-			window.alert('The parent folder does not exist, please change folder.')
+			MAIN.alert('The parent folder does not exist, please change folder.')
 			return // Abort (dialog is still visible)
 		}
 
 		// If target folder exists, display an alert dialog and abort.
 		if (FILEUTIL.pathExists(targetDir))
 		{
-			window.alert('An app with this folder name already exists, please type a new folder name.')
+			MAIN.alert('An app with this folder name already exists, please type a new folder name.')
 			return // Abort (dialog is still visible)
 		}
 
@@ -1754,27 +1744,27 @@ function createNewsEntry(item) {
 		var cordovaID = hyper.UI.$('#input-config-app-cordova-id').val()
 
 		if (!reverseDomainRE.test(cordovaID)) {
- 	    window.alert('The Cordova ID should be in reverse domain style like "com.acme.dev" with no ending period. Letters and dots are allowed.')
+ 	    MAIN.alert('The Cordova ID should be in reverse domain style like "com.acme.dev" with no ending period. Letters and dots are allowed.')
 			return
 		}
 
 		if (title.length < 3 || title.length > 30) {
-			window.alert(`The app title is ${title.length} characters but should be 3-30 characters long.`)
+			MAIN.alert(`The app title is ${title.length} characters but should be 3-30 characters long.`)
 			return
 		}
 
 		if (description.length < 10 || description.length > 80) {
-			window.alert(`The one line description is ${description.length} characters but should be 10-80 characters long.`)
+			MAIN.alert(`The one line description is ${description.length} characters but should be 10-80 characters long.`)
 			return
 		}
 
 		if (longDescription.length < 10 || longDescription.length > 4000) {
-			window.alert(`The long description is ${longDescription.length} characters should be 10-4000 characters long.`)
+			MAIN.alert(`The long description is ${longDescription.length} characters should be 10-4000 characters long.`)
 			return
 		}
 
     if (/[^a-z0-9\_\-]/.test(name)) {
-      window.alert('The app short name should only consist of lower case letters, digits, underscores and dashes.')
+      MAIN.alert('The app short name should only consist of lower case letters, digits, underscores and dashes.')
       // This is just to try to make it match the regexp test
       var newName = name.replace(/\s/g, '-')
       newName = newName.toLowerCase()
@@ -1783,7 +1773,7 @@ function createNewsEntry(item) {
     }
 
     if (version.length > 0 && !SEMVER_REGEX().test(version)) {
-      window.alert('The version should follow semantic versioning style in the form of MAJOR.MINOR.PATCH, see semver.org for details.')
+      MAIN.alert('The version should follow semantic versioning style in the form of MAJOR.MINOR.PATCH, see semver.org for details.')
       // This is just to try to make it match the regexp test
       var newVersion = version.replace(/\s/g, '-')
       hyper.UI.$('#input-config-app-version').val(newVersion)
@@ -1813,7 +1803,7 @@ function createNewsEntry(item) {
 		var names = new Set()
 		for (let p of plugins) {
 			if (names.has(p.name)) {
-				window.alert(`You can only have one version of ${p.name}.`)
+				MAIN.alert(`You can only have one version of ${p.name}.`)
 				return
 			}
 			names.add(p.name)
@@ -1834,7 +1824,7 @@ function createNewsEntry(item) {
 		var names = new Set()
 		for (let l of libs) {
 			if (names.has(l.name)) {
-				window.alert(`You can only have one version of ${l.name}.`)
+				MAIN.alert(`You can only have one version of ${l.name}.`)
 				return
 			}
 			names.add(l.name)
@@ -1891,9 +1881,9 @@ function createNewsEntry(item) {
 		// Before we open the dialog, we need to make sure the app itself is built (ES6)
 		hyper.UI.buildAppIfNeeded(dirOrFile, null, false, function(error) {
 			if (!error) {
-				hyper.UI.showTab('build')
 				// Verify we have virtualbox, vagrant and evobox ready to run.
 				hyper.UI.verifyBuildEnvironment(path, function() {
+					hyper.UI.showTab('build')
 					// Evobox is up and running, now we can ask user for build details
 					// First we find any previous build to copy values from
 					var shortName = APP_SETTINGS.getName(path)
@@ -1944,24 +1934,25 @@ function createNewsEntry(item) {
 		} else {
 			vbox = 'VBoxManage'
 		}
-		return UTIL.haveVirtualbox(vbox)
+		return UTIL.haveVirtualbox(vbox, SETTINGS.getRelaxVagrantVirtualboxVersions())
 	}
 
 	hyper.UI.verifyBuildEnvironment = function(path, cb) {
 		var haveVirtualbox = hyper.UI.haveVirtualbox()
-		var haveVagrant = UTIL.haveVagrant()
+		var haveVagrant = UTIL.haveVagrant(SETTINGS.getRelaxVagrantVirtualboxVersions())
 		var have = ""
 		var doit = "Ok, open download page(s)"
 		// Verify we have virtualbox and Vagrant
 		needVirtualboxOrVagrant = !haveVirtualbox || !haveVagrant
 		if (needVirtualboxOrVagrant) {
 			var title = 'Install VirtualBox and Vagrant?'
+			have = '\n\nNOTE: If you have Virtualbox or Vagrant installed, they seem to not be of verified versions (5.1.x and 1.8.x/1.9.x). You can try using them by setting unverified versions to true in Settings.'
 			if (haveVirtualbox) {
-				have = '\n\nYou already have Virtualbox, but not Vagrant (or it\'s too old).'
+				have = '\n\nNOTE: You already have Virtualbox, but not Vagrant (or it\'s not version 1.8.x/1.9.x). You can try using them by setting unverified versions to true in Settings.'
 				title = 'Install Vagrant?'
 			}
 			if (haveVagrant) {
-				have = '\n\nYou already have Vagrant, but not Virtualbox (or it\'s too old).'
+				have = '\n\nNOTE: You already have Vagrant, but not Virtualbox (or it\'s not version 5.1.x). You can try using them by setting unverified versions to true in Settings.'
 				title = 'Install Virtualbox?'
 			}
 			var res = MAIN.openWorkbenchDialog('Build Tools',
@@ -2004,7 +1995,7 @@ function createNewsEntry(item) {
 				build.on('exit', (code, signal) => {
 					if (code != 0) {
 						console.log(`child process exited with code ${code}`);
-						window.alert('Something went wrong stopping Evobox Vagrant machine')
+						MAIN.alert('Something went wrong stopping Evobox Vagrant machine')
 						LOGGER.log('[main-window-func.js] Error in stopEvobox')
 					}
 					cb()
@@ -2030,7 +2021,7 @@ function createNewsEntry(item) {
 				FSEXTRA.mkdirsSync(evoboxDir)
 				FSEXTRA.mkdirsSync(resultDir)
 			} catch (error) {
-				window.alert('Something went wrong creating directories for Evobox.')
+				MAIN.alert('Something went wrong creating directories for Evobox.')
 				LOGGER.log('[main-window-func.js] Error in startEvobox: ' + error)
 				return
 			}
@@ -2047,7 +2038,7 @@ function createNewsEntry(item) {
 				try {
 					CHILD_PROCESS.execFileSync('vagrant', ['init', config.name, config.boxUrl],  {cwd: evoboxDir})
 				} catch (er) {
-					window.alert(`Something went wrong setting up Evobox Vagrant machine ${config.name}:` + er.stdout) 
+					MAIN.alert(`Something went wrong setting up Evobox Vagrant machine ${config.name}:` + er.stdout) 
 					return
 				}
 			} else {
@@ -2064,7 +2055,7 @@ function createNewsEntry(item) {
 					FS.writeFileSync(buildScript, contentAndUrl[0])
 				})
 			} catch (er) {
-				window.alert('Something went wrong downloading build script:' + er.stdout) 
+				MAIN.alert('Something went wrong downloading build script:' + er.stdout) 
 				return
 			}
 		//}
@@ -2101,7 +2092,7 @@ function createNewsEntry(item) {
 			build.on('exit', (code, signal) => {
 				if (code != 0) {
 					console.log(`child process exited with code ${code}`);
-					window.alert('Something went wrong starting Evobox Vagrant machine')
+					MAIN.alert('Something went wrong starting Evobox Vagrant machine')
 					LOGGER.log('[main-window-func.js] Error in startEvobox')
 					return
 				} else {
@@ -2131,24 +2122,24 @@ function createNewsEntry(item) {
 		var keyPassword = hyper.UI.$('#input-build-app-keypassword').val()
 
 		if (filename.length = 0) {
-			window.alert('The target filename can not be empty.')
+			MAIN.alert('The target filename can not be empty.')
 			return
 		}
 
 		// Check if we are already building
 		var currentBuild = hyper.UI.currentBuild()
 		if (currentBuild) {
-			window.alert(`Evothings is currently limited to building one application at a time and we are already building "${currentBuild.title}". Try again later.`)
+			MAIN.alert(`Evothings is currently limited to building one application at a time and we are already building "${currentBuild.title}". Try again later.`)
 			return
 		}
 
 		if (!debug) {
 			if (keyPassword.length < 6) {
-				window.alert('The key password is needed for a release build and it needs to be at least 6 characters long.')
+				MAIN.alert('The key password is needed for a release build and it needs to be at least 6 characters long.')
 				return
 			}
 			if (storePassword.length < 6) {
-				window.alert('The key store password is needed for a release build and it needs to be at least 6 characters long.')
+				MAIN.alert('The key store password is needed for a release build and it needs to be at least 6 characters long.')
 				return
 			}
 		}
@@ -2205,7 +2196,7 @@ function ensureResDirectory(targetDir, cb) {
 		    }
 	  	})
 	  } catch (error) {
-		  window.alert('Something went wrong, could not download and unzip default res graphics.')
+		  MAIN.alert('Something went wrong, could not download and unzip default res graphics.')
 		  LOGGER.log('[main-window-func.js] Error in ensureResDirectory: ' + error)
 	  }
 	}
@@ -2449,7 +2440,7 @@ JarVerify = "${verifyCommand}"
 	   	// We do not do anything yet depending on adding/removing a plugin
 			/*var libsPath = APP_SETTINGS.getLibDirFullPath(path)
 	    if (!FS.existsSync(libsPath)) {
-	      window.alert(`The library directory "${libsPath}" does not exist, perhaps you need to add "app-dir": "app", or similar to evothings.json?`)
+	      MAIN.alert(`The library directory "${libsPath}" does not exist, perhaps you need to add "app-dir": "app", or similar to evothings.json?`)
 	      LOGGER.log("Directory does not exist: " + libsPath)
 	      return false
 	    }
@@ -2478,7 +2469,7 @@ JarVerify = "${verifyCommand}"
 	 	if (toRemove.length > 0 || toAdd.length > 0) {
 	   	var libsPath = APP_SETTINGS.getLibDirFullPath(path)
 	    if (!FS.existsSync(libsPath)) {
-	      window.alert(`The library directory "${libsPath}" does not exist, perhaps you need to add "app-dir": "app", or similar to evothings.json?`)
+	      MAIN.alert(`The library directory "${libsPath}" does not exist, perhaps you need to add "app-dir": "app", or similar to evothings.json?`)
 	      LOGGER.log("Directory does not exist: " + libsPath)
 	      return false
 	    }
@@ -2580,7 +2571,7 @@ JarVerify = "${verifyCommand}"
 	  } catch (error) {
 			// TODO: This doesn't seem to work
 			FSEXTRA.removeSync(targetDir)
-		  window.alert('Something went wrong, could not download and unzip library.')
+		  MAIN.alert('Something went wrong, could not download and unzip library.')
 		  LOGGER.log('[main-window-func.js] Error in copyLibraryFromURL: ' + error)
 	  }
 	}
@@ -2720,7 +2711,7 @@ JarVerify = "${verifyCommand}"
 
 	hyper.UI.displaySystemMessage = function(message)
 	{
-		MAIN.openDialog('System Message', message, 'info')
+		MAIN.openWorkbenchDialog('System Message', message)
 	}
 
 	hyper.UI.openBuildMessageDialog = function(message)

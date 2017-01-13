@@ -79,19 +79,19 @@ exports.checkInternet = function() {
     })
 }
 
-exports.haveVirtualbox = function(vboxPath) {
+exports.haveVirtualbox = function(vboxPath, relax) {
   try {
     var output = CHILD_PROCESS.execFileSync(vboxPath, ['--version']).toString()
-    return output.startsWith("5.1.")
+    return relax || output.startsWith("5.1.")
   } catch (er) {
     return false
   }
 }
 
-exports.haveVagrant = function() {
+exports.haveVagrant = function(relax) {
   try {
     var output = CHILD_PROCESS.execFileSync('vagrant', ['-v']).toString()
-    return output.startsWith("Vagrant 1.8.")
+    return relax || output.startsWith("Vagrant 1.8.") || output.startsWith("Vagrant 1.9.")
   } catch (er) {
     return false
   }

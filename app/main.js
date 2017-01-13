@@ -517,18 +517,6 @@ main.selectOrCreateFolder = function(title, defaultDir) {
         defaultPath: defaultDir, properties: [ 'openDirectory', 'createDirectory']})
 }
 
-main.openDialog = function(title, content, type) {
-  console.log('openDialog called title = '+title+', content = '+content)
-  DIALOG.showMessageBox(
-  {
-    type: type || "info",
-    title: title,
-    /*message:content,*/
-    buttons: ["Close"],
-    detail: content
-  })
-}
-
 main.openWorkbenchDialog = function(title, message, details, type, butts) {
   var buttons = butts || ["Close"]
   var index = DIALOG.showMessageBox(
@@ -541,6 +529,10 @@ main.openWorkbenchDialog = function(title, message, details, type, butts) {
       detail: details
     })
   return buttons[index]
+}
+
+main.alert = function(message) {
+  main.openWorkbenchDialog('Info', message, '', 'info', ["OK"])
 }
 
 // Work as relay between our BrowserWindows since they can not talk to
