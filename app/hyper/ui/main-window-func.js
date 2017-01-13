@@ -1285,6 +1285,7 @@ function createNewsEntry(item) {
 		hyper.UI.$('#input-setting-keystore-jarsigner-sign-command').val(SETTINGS.getJarSignCommand())
 		hyper.UI.$('#input-setting-keystore-jarsigner-verify-command').val(SETTINGS.getJarVerifyCommand())
 		hyper.UI.$('#input-setting-vboxmanage-path').val(SETTINGS.getVBoxManagePath())
+		hyper.UI.$('#input-setting-relax-versions').prop('checked', SETTINGS.getRelaxVagrantVirtualboxVersions())
 
 		hyper.UI.$('#input-setting-javascript-workbench-font-size').val(SETTINGS.getWorkbenchFontSize())
 		hyper.UI.$('#input-setting-number-of-directory-levels').val(SETTINGS.getNumberOfDirecoryLevelsToTraverse())
@@ -1339,7 +1340,7 @@ function createNewsEntry(item) {
 		SETTINGS.setJarSignCommand(hyper.UI.$('#input-setting-keystore-jarsigner-sign-command').val())
 		SETTINGS.setJarVerifyCommand(hyper.UI.$('#input-setting-keystore-jarsigner-verify-command').val())
 		SETTINGS.setVBoxManagePath(hyper.UI.$('#input-setting-vboxmanage-path').val())
-		
+		SETTINGS.setRelaxVagrantVirtualboxVersions(hyper.UI.$('#input-setting-relax-versions').prop('checked'))
 		// TODO: Make this take effect instantly.
 		SETTINGS.setWorkbenchFontSize(hyper.UI.$('#input-setting-javascript-workbench-font-size').val())
 
@@ -1891,7 +1892,6 @@ function createNewsEntry(item) {
 		// Before we open the dialog, we need to make sure the app itself is built (ES6)
 		hyper.UI.buildAppIfNeeded(dirOrFile, null, false, function(error) {
 			if (!error) {
-				hyper.UI.showTab('build')
 				// Verify we have virtualbox, vagrant and evobox ready to run.
 				hyper.UI.verifyBuildEnvironment(path, function() {
 					hyper.UI.showTab('build')
@@ -1945,24 +1945,25 @@ function createNewsEntry(item) {
 		} else {
 			vbox = 'VBoxManage'
 		}
-		return UTIL.haveVirtualbox(vbox)
+		return UTIL.haveVirtualbox(vbox, SETTINGS.getRelaxVagrantVirtualboxVersions())
 	}
 
 	hyper.UI.verifyBuildEnvironment = function(path, cb) {
 		var haveVirtualbox = hyper.UI.haveVirtualbox()
-		var haveVagrant = UTIL.haveVagrant()
+		var haveVagrant = UTIL.haveVagrant(SETTINGS.getRelaxVagrantVirtualboxVersions())
 		var have = ""
 		var doit = "Ok, open download page(s)"
 		// Verify we have virtualbox and Vagrant
 		needVirtualboxOrVagrant = !haveVirtualbox || !haveVagrant
 		if (needVirtualboxOrVagrant) {
 			var title = 'Install VirtualBox and Vagrant?'
+			have = '\n\nNOTE: If you have Virtualbox or Vagrant installed, they seem to not be of verified versions (5.1.x and 1.8.x/1.9.x). You can try using them by setting unverified versions to true in Settings.'
 			if (haveVirtualbox) {
-				have = '\n\nYou already have Virtualbox, but not Vagrant (or it\'s too old).'
+				have = '\n\nNOTE: You already have Virtualbox, but not Vagrant (or it\'s not version 1.8.x/1.9.x). You can try using them by setting unverified versions to true in Settings.'
 				title = 'Install Vagrant?'
 			}
 			if (haveVagrant) {
-				have = '\n\nYou already have Vagrant, but not Virtualbox (or it\'s too old).'
+				have = '\n\nNOTE: You already have Vagrant, but not Virtualbox (or it\'s not version 5.1.x). You can try using them by setting unverified versions to true in Settings.'
 				title = 'Install Virtualbox?'
 			}
 			var res = MAIN.openWorkbenchDialog('Build Tools',

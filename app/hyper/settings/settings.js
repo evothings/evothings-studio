@@ -115,6 +115,7 @@ systemSetting('JarSignCommand', 'jarsigner -verbose -sigalg SHA1withRSA -digesta
 systemSetting('JarVerifyCommand', 'jarsigner -verify -verbose -certs #{TargetFileName}-unaligned.apk')
 systemSetting('CordovaPrefix', 'com.evothings.samples')
 systemSetting('VBoxManagePath', '') // This is so that you can enter a custom path if it fails to find VBoxManage.exe
+systemSetting('RelaxVagrantVirtualboxVersions', false) // This is to make it possible to relax version checks if future versions do work
 
 /**
  * Tools settings.
