@@ -14,7 +14,8 @@
     "electron-builder": "^11.2.4",
     "electron-packager": "^8.5.0",
     "node-promise": "^0.5.12",
-    "spectron": "^3.4.1"
+    "spectron": "^3.4.1",
+    "electron-builder-squirrel-windows": "^11.2.5"
   },
   "build": {
     "appId": "com.evothings.studio",
